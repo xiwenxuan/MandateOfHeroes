@@ -60,7 +60,7 @@ internal static class CoreTestRunner
         {
             return Assembly.LoadFrom(
                 "C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/" +
-                "NetStandard/ref/2.1.0/netstandard.dll");
+                "MonoBleedingEdge/lib/mono/4.7.1-api/Facades/netstandard.dll");
         }
 
         var path = Path.Combine(binaryDirectory, name + ".dll");
