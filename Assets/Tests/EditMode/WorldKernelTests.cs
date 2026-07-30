@@ -1289,6 +1289,98 @@ namespace Mandate.Tests
             Assert.Throws<System.InvalidOperationException>(world.Validate);
         }
 
+        [Test]
+        public void MapPerspective_RecommendsViewForEachStartingIdentity()
+        {
+            var identities = new[]
+            {
+                StartingIdentity.Soldier,
+                StartingIdentity.CountyClerk,
+                StartingIdentity.Merchant,
+                StartingIdentity.Physician
+            };
+            var expected = new[]
+            {
+                MapPerspective.Military,
+                MapPerspective.Administration,
+                MapPerspective.Commerce,
+                MapPerspective.Medicine
+            };
+            var setup = new NewGameSetupService();
+
+            for (var i = 0; i < identities.Length; i++)
+            {
+                var world = setup.CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = "视角测试",
+                        Age = 20,
+                        Gender = PersonGender.Male,
+                        Identity = identities[i]
+                    },
+                    184);
+                Assert.That(
+                    MapPerspectiveSystem.RecommendForPlayer(
+                        world,
+                        world.PlayerPersonId),
+                    Is.EqualTo(expected[i]));
+            }
+        }
+
+        [Test]
+        public void MapPerspective_CommerceAndMedicineExposeDifferentInformation()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var location = world.Locations.Find(
+                item => item.Id == "location.guangzong");
+            var patient = world.People.Find(
+                item => item.Id == "person.generated.physician_001");
+            var army = world.Armies.Find(
+                item => item.Id == "army.yellow_turban_guangzong");
+            patient.HealthBasisPoints = 8_000;
+            army.WoundedTroops = 240;
+            army.Troops -= 240;
+
+            var commerce = MapPerspectiveSystem.Inspect(
+                world,
+                location,
+                MapPerspective.Commerce);
+            var medicine = MapPerspectiveSystem.Inspect(
+                world,
+                location,
+                MapPerspective.Medicine);
+
+            Assert.That(commerce.PrimaryMetric, Does.StartWith("粮"));
+            Assert.That(
+                commerce.VisibleFeatures & LocationFeature.Market,
+                Is.Not.EqualTo(LocationFeature.None));
+            Assert.That(medicine.PrimaryMetric, Is.EqualTo("伤病241"));
+            Assert.That(medicine.SecondaryMetric, Does.Contain("药"));
+            Assert.That(
+                medicine.VisibleFeatures & LocationFeature.Clinic,
+                Is.Not.EqualTo(LocationFeature.None));
+        }
+
+        [Test]
+        public void MapPerspective_MilitaryDoesNotCountArmyAlreadyMarching()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            new ArmySystem().StartMarch(
+                world,
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+            var origin = world.Locations.Find(
+                item => item.Id == "location.xiaquyang");
+
+            var information = MapPerspectiveSystem.Inspect(
+                world,
+                origin,
+                MapPerspective.Military);
+
+            Assert.That(information.PrimaryMetric, Is.EqualTo("兵0"));
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
