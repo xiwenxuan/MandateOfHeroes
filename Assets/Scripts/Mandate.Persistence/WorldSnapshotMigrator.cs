@@ -26,6 +26,9 @@ namespace Mandate.Persistence
                     case 1:
                         MigrateVersionOneToTwo(world);
                         break;
+                    case 2:
+                        MigrateVersionTwoToThree(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -39,6 +42,12 @@ namespace Mandate.Persistence
         {
             PopulationLedgerBootstrap.Initialize(world);
             world.SchemaVersion = 2;
+        }
+
+        private static void MigrateVersionTwoToThree(WorldState world)
+        {
+            CharacterAbilityBootstrap.InitializeWorld(world);
+            world.SchemaVersion = 3;
         }
     }
 }

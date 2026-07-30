@@ -72,6 +72,11 @@ namespace Mandate.Domain
         public long LastChildbirthDay = -1;
         public bool CountsTowardPopulation = true;
         public string PopulationOriginLocationId;
+        public bool AbilityProfileInitialized;
+        public CharacterAptitudeState Aptitudes = new CharacterAptitudeState();
+        public ProfessionalSkillState ProfessionalSkills =
+            new ProfessionalSkillState();
+        public LifeGoalKind LifeGoal = LifeGoalKind.Unknown;
         public PersonalityState Personality = new PersonalityState();
         public NeedState Needs = new NeedState();
     }
@@ -107,7 +112,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 3;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -252,6 +257,71 @@ namespace Mandate.Domain
                 ValidateBasisPoints(person.Needs.WarPressure, person.Id, "war pressure");
                 ValidateBasisPoints(
                     person.MedicalSkillBasisPoints, person.Id, "medical skill");
+                if (person.Aptitudes == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing aptitudes for {person.Id}.");
+                }
+
+                if (person.ProfessionalSkills == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing professional skills for {person.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    person.Aptitudes.Constitution, person.Id, "constitution");
+                ValidateBasisPoints(
+                    person.Aptitudes.Strength, person.Id, "strength");
+                ValidateBasisPoints(
+                    person.Aptitudes.Dexterity, person.Id, "dexterity");
+                ValidateBasisPoints(
+                    person.Aptitudes.Perception, person.Id, "perception");
+                ValidateBasisPoints(
+                    person.Aptitudes.Memory, person.Id, "memory");
+                ValidateBasisPoints(
+                    person.Aptitudes.Reasoning, person.Id, "reasoning");
+                ValidateBasisPoints(
+                    person.Aptitudes.Willpower, person.Id, "willpower");
+                ValidateBasisPoints(
+                    person.Aptitudes.Affinity, person.Id, "affinity");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Military, person.Id, "military");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.MartialArts,
+                    person.Id,
+                    "martial arts");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Administration,
+                    person.Id,
+                    "administration");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Commerce, person.Id, "commerce");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Agriculture,
+                    person.Id,
+                    "agriculture");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Craft, person.Id, "craft");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Medicine, person.Id, "medicine");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Scholarship,
+                    person.Id,
+                    "scholarship");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Negotiation,
+                    person.Id,
+                    "negotiation");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Intelligence,
+                    person.Id,
+                    "intelligence");
+                if (!Enum.IsDefined(typeof(LifeGoalKind), person.LifeGoal))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid life goal for {person.Id}.");
+                }
             }
 
             if (!string.IsNullOrEmpty(PlayerPersonId) &&

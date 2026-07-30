@@ -582,6 +582,7 @@ namespace Mandate.Simulation
                     Value = -1_000
                 });
 
+            CharacterAbilityBootstrap.InitializeWorld(world);
             new PopulationLedgerSystem().InitializeFromLocationSummaries(world);
             world.Validate();
             return world;

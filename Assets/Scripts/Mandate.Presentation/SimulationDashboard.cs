@@ -1718,6 +1718,7 @@ namespace Mandate.Presentation
         private void DrawPlayerCharacter()
         {
             var player = FindPlayer();
+            var strategic = StrategicAttributeCalculator.Calculate(player);
             GUILayout.Label("人物", _sectionStyle);
             GUILayout.Label(
                 $"姓名：{player.DisplayName}　性别：{GenderName(player.Gender)}　" +
@@ -1728,8 +1729,53 @@ namespace Mandate.Presentation
                 $"口粮：{player.Provisions}　载货：{CargoSummary(player.Id)}",
                 _normalStyle);
             GUILayout.Label(
-                $"医术：{player.MedicalSkillBasisPoints / 100f:F1}%　" +
+                $"人生志向：{LifeGoalName(player.LifeGoal)}　" +
                 $"身份：{FindIdentityName(_world, player.Id)}",
+                _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("五维综合评价", _sectionStyle);
+            GUILayout.Label(
+                $"统率 {AbilityValue(strategic.Leadership)}　" +
+                $"武勇 {AbilityValue(strategic.Martial)}　" +
+                $"智略 {AbilityValue(strategic.Strategy)}　" +
+                $"政务 {AbilityValue(strategic.Administration)}　" +
+                $"魅力 {AbilityValue(strategic.Charisma)}",
+                _normalStyle);
+            GUILayout.Label(
+                "五维由禀赋、专业能力、性格和当前健康实时派生，不单独存档。",
+                _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("基础禀赋", _sectionStyle);
+            GUILayout.Label(
+                $"体质 {AbilityValue(player.Aptitudes.Constitution)}　" +
+                $"力量 {AbilityValue(player.Aptitudes.Strength)}　" +
+                $"灵巧 {AbilityValue(player.Aptitudes.Dexterity)}　" +
+                $"感知 {AbilityValue(player.Aptitudes.Perception)}",
+                _normalStyle);
+            GUILayout.Label(
+                $"记忆 {AbilityValue(player.Aptitudes.Memory)}　" +
+                $"思辨 {AbilityValue(player.Aptitudes.Reasoning)}　" +
+                $"意志 {AbilityValue(player.Aptitudes.Willpower)}　" +
+                $"亲和 {AbilityValue(player.Aptitudes.Affinity)}",
+                _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("专业能力", _sectionStyle);
+            GUILayout.Label(
+                $"军事 {AbilityValue(player.ProfessionalSkills.Military)}　" +
+                $"武艺 {AbilityValue(player.ProfessionalSkills.MartialArts)}　" +
+                $"政务 {AbilityValue(player.ProfessionalSkills.Administration)}　" +
+                $"商业 {AbilityValue(player.ProfessionalSkills.Commerce)}　" +
+                $"农业 {AbilityValue(player.ProfessionalSkills.Agriculture)}",
+                _normalStyle);
+            GUILayout.Label(
+                $"工艺 {AbilityValue(player.ProfessionalSkills.Craft)}　" +
+                $"医药 {AbilityValue(player.ProfessionalSkills.Medicine)}　" +
+                $"学问 {AbilityValue(player.ProfessionalSkills.Scholarship)}　" +
+                $"交涉 {AbilityValue(player.ProfessionalSkills.Negotiation)}　" +
+                $"情报 {AbilityValue(player.ProfessionalSkills.Intelligence)}",
                 _normalStyle);
 
             GUILayout.Space(12);
@@ -1777,6 +1823,38 @@ namespace Mandate.Presentation
             if (!hasMembership)
             {
                 GUILayout.Label("当前为在野人物。", _normalStyle);
+            }
+        }
+
+        private static string AbilityValue(int basisPoints)
+        {
+            return (basisPoints / 100f).ToString("F1");
+        }
+
+        private static string LifeGoalName(LifeGoalKind goal)
+        {
+            switch (goal)
+            {
+                case LifeGoalKind.PreserveFamily:
+                    return "保全家族";
+                case LifeGoalKind.WinMerit:
+                    return "建功立业";
+                case LifeGoalKind.BuildFortune:
+                    return "富甲一方";
+                case LifeGoalKind.HealThePeople:
+                    return "济世救人";
+                case LifeGoalKind.PassOnCraft:
+                    return "技艺传世";
+                case LifeGoalKind.RestoreOrder:
+                    return "匡扶秩序";
+                case LifeGoalKind.SeekKnowledge:
+                    return "求取学问";
+                case LifeGoalKind.LiveInSeclusion:
+                    return "隐居避世";
+                case LifeGoalKind.UnifyRealm:
+                    return "统一天下";
+                default:
+                    return "尚未形成";
             }
         }
 
@@ -2356,7 +2434,8 @@ namespace Mandate.Presentation
             var herbQuantity = _tradingSystem.GetQuantity(
                 _world, physician.Id, "commodity.herbs");
             GUILayout.Label(
-                $"{physician.DisplayName}　医术：{physician.MedicalSkillBasisPoints / 100f:F1}%　" +
+                $"{physician.DisplayName}　医药：" +
+                $"{AbilityValue(physician.ProfessionalSkills.Medicine)}　" +
                 $"所在：{FindLocationName(physician.LocationId)}　药材：{herbQuantity}单位　" +
                 $"官军伤兵：{han.WoundedTroops}　黄巾伤兵：{yellow.WoundedTroops}",
                 _normalStyle);

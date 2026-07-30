@@ -54,6 +54,10 @@ namespace Mandate.Simulation
 
             var world = PrototypeWorldFactory.Create184World(masterSeed);
             var person = BuildPlayerPerson(displayName, request);
+            CharacterAbilityBootstrap.InitializePerson(
+                world.MasterSeed,
+                person,
+                StartingCharacterBackground(request.Identity));
             new PopulationLedgerSystem().MaterializePerson(
                 world,
                 person,
@@ -183,6 +187,24 @@ namespace Mandate.Simulation
                     return PopulationOccupation.Merchant;
                 case StartingIdentity.Physician:
                     return PopulationOccupation.Medical;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(identity));
+            }
+        }
+
+        private static CharacterBackgroundKind StartingCharacterBackground(
+            StartingIdentity identity)
+        {
+            switch (identity)
+            {
+                case StartingIdentity.Soldier:
+                    return CharacterBackgroundKind.Soldier;
+                case StartingIdentity.CountyClerk:
+                    return CharacterBackgroundKind.Official;
+                case StartingIdentity.Merchant:
+                    return CharacterBackgroundKind.Merchant;
+                case StartingIdentity.Physician:
+                    return CharacterBackgroundKind.Physician;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(identity));
             }

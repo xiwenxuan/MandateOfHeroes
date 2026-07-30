@@ -1699,6 +1699,7 @@ namespace Mandate.Tests
                 "\"Id\":\"person.liu_bei\"," +
                 "\"DisplayName\":\"刘备\"," +
                 "\"LocationId\":\"location.zhuo\"," +
+                "\"PopulationOriginLocationId\":\"location.zhuo\"," +
                 "\"BirthDay\":-5000," +
                 "\"IsAlive\":true," +
                 "\"HealthBasisPoints\":10000" +
@@ -1765,6 +1766,244 @@ namespace Mandate.Tests
                 Is.EqualTo(world.PopulationOpeningTotal));
         }
 
+        [Test]
+        public void CharacterAbility_PrototypeInitializesEveryPerson()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+
+            Assert.That(
+                world.People.TrueForAll(
+                    person =>
+                        person.AbilityProfileInitialized &&
+                        person.Aptitudes != null &&
+                        person.ProfessionalSkills != null),
+                Is.True);
+            Assert.That(
+                world.People.Find(item => item.Id == "person.guan_yu")
+                    .ProfessionalSkills.MartialArts,
+                Is.GreaterThan(
+                    world.People.Find(item => item.Id == "person.liu_bei")
+                        .ProfessionalSkills.MartialArts));
+        }
+
+        [Test]
+        public void CharacterAbility_SameSeedAndIdAreDeterministic()
+        {
+            var first = PrototypeWorldFactory.Create184World(184)
+                .People.Find(item => item.Id == "person.liu_bei");
+            var second = PrototypeWorldFactory.Create184World(184)
+                .People.Find(item => item.Id == "person.liu_bei");
+
+            Assert.That(
+                second.Aptitudes.Constitution,
+                Is.EqualTo(first.Aptitudes.Constitution));
+            Assert.That(
+                second.Aptitudes.Reasoning,
+                Is.EqualTo(first.Aptitudes.Reasoning));
+            Assert.That(
+                second.ProfessionalSkills.Military,
+                Is.EqualTo(first.ProfessionalSkills.Military));
+            Assert.That(second.LifeGoal, Is.EqualTo(first.LifeGoal));
+        }
+
+        [Test]
+        public void CharacterAbility_DifferentSeedChangesNaturalAptitude()
+        {
+            var first = PrototypeWorldFactory.Create184World(184)
+                .People.Find(item => item.Id == "person.liu_bei");
+            var second = PrototypeWorldFactory.Create184World(185)
+                .People.Find(item => item.Id == "person.liu_bei");
+
+            var allEqual =
+                first.Aptitudes.Constitution == second.Aptitudes.Constitution &&
+                first.Aptitudes.Strength == second.Aptitudes.Strength &&
+                first.Aptitudes.Dexterity == second.Aptitudes.Dexterity &&
+                first.Aptitudes.Perception == second.Aptitudes.Perception &&
+                first.Aptitudes.Memory == second.Aptitudes.Memory &&
+                first.Aptitudes.Reasoning == second.Aptitudes.Reasoning &&
+                first.Aptitudes.Willpower == second.Aptitudes.Willpower &&
+                first.Aptitudes.Affinity == second.Aptitudes.Affinity;
+
+            Assert.That(allEqual, Is.False);
+        }
+
+        [Test]
+        public void CharacterAbility_ReinitializationDoesNotRerollPerson()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var person = world.People.Find(item => item.Id == "person.liu_bei");
+            var constitution = person.Aptitudes.Constitution;
+            var military = person.ProfessionalSkills.Military;
+
+            var changed = CharacterAbilityBootstrap.InitializePerson(
+                world.MasterSeed,
+                person,
+                CharacterBackgroundKind.Farmer);
+
+            Assert.That(changed, Is.False);
+            Assert.That(person.Aptitudes.Constitution, Is.EqualTo(constitution));
+            Assert.That(person.ProfessionalSkills.Military, Is.EqualTo(military));
+        }
+
+        [Test]
+        public void CharacterAbility_CustomIdentityAppliesProfessionalBackground()
+        {
+            var setup = new NewGameSetupService();
+            var soldier = setup.CreateCustom184World(
+                NewGameRequest(StartingIdentity.Soldier), 184)
+                .People.Find(item => item.Id == NewGameSetupService.CustomPlayerPersonId);
+            var clerk = setup.CreateCustom184World(
+                NewGameRequest(StartingIdentity.CountyClerk), 184)
+                .People.Find(item => item.Id == NewGameSetupService.CustomPlayerPersonId);
+            var merchant = setup.CreateCustom184World(
+                NewGameRequest(StartingIdentity.Merchant), 184)
+                .People.Find(item => item.Id == NewGameSetupService.CustomPlayerPersonId);
+            var physician = setup.CreateCustom184World(
+                NewGameRequest(StartingIdentity.Physician), 184)
+                .People.Find(item => item.Id == NewGameSetupService.CustomPlayerPersonId);
+
+            Assert.That(
+                soldier.ProfessionalSkills.Military,
+                Is.GreaterThan(clerk.ProfessionalSkills.Military));
+            Assert.That(
+                clerk.ProfessionalSkills.Administration,
+                Is.GreaterThan(soldier.ProfessionalSkills.Administration));
+            Assert.That(
+                merchant.ProfessionalSkills.Commerce,
+                Is.GreaterThan(clerk.ProfessionalSkills.Commerce));
+            Assert.That(
+                physician.ProfessionalSkills.Medicine,
+                Is.GreaterThan(merchant.ProfessionalSkills.Medicine));
+        }
+
+        [Test]
+        public void CharacterAbility_FiveDimensionsRecalculateFromCurrentHealth()
+        {
+            var person = PrototypeWorldFactory.Create184World(184)
+                .People.Find(item => item.Id == "person.guan_yu");
+            var healthy = StrategicAttributeCalculator.Calculate(person);
+
+            person.HealthBasisPoints = 4_000;
+            var wounded = StrategicAttributeCalculator.Calculate(person);
+
+            Assert.That(wounded.Martial, Is.LessThan(healthy.Martial));
+            Assert.That(wounded.Leadership, Is.EqualTo(healthy.Leadership));
+            Assert.That(wounded.Strategy, Is.EqualTo(healthy.Strategy));
+            Assert.That(
+                wounded.Administration,
+                Is.EqualTo(healthy.Administration));
+            Assert.That(wounded.Charisma, Is.EqualTo(healthy.Charisma));
+        }
+
+        [Test]
+        public void CharacterAbility_ChildInheritsAptitudeButNotProfession()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var father = world.People.Find(
+                item => item.Id == "person.generated.farmer_001");
+            var mother = world.People.Find(
+                item => item.Id == "person.generated.farmer_002");
+            var child = new PersonState
+            {
+                Id = "person.generated.child.ability_test",
+                DisplayName = "能力测试新生儿",
+                LocationId = father.LocationId,
+                BirthDay = world.AbsoluteDay,
+                FatherPersonId = father.Id,
+                MotherPersonId = mother.Id
+            };
+
+            CharacterAbilityBootstrap.InitializeChild(
+                world, child, father, mother);
+
+            var constitutionMean =
+                (father.Aptitudes.Constitution + mother.Aptitudes.Constitution) / 2;
+            Assert.That(
+                child.Aptitudes.Constitution,
+                Is.InRange(
+                    Math.Max(1_500, constitutionMean - 1_200),
+                    Math.Min(9_000, constitutionMean + 1_200)));
+            Assert.That(child.ProfessionalSkills.Agriculture, Is.AtMost(300));
+            Assert.That(child.ProfessionalSkills.Medicine, Is.AtMost(300));
+            Assert.That(child.LifeGoal, Is.EqualTo(LifeGoalKind.Unknown));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionTwoCharacterAbilities()
+        {
+            const string legacyJson =
+                "{" +
+                "\"SchemaVersion\":2," +
+                "\"MasterSeed\":184," +
+                "\"AbsoluteDay\":0," +
+                "\"Segment\":0," +
+                "\"Revision\":0," +
+                "\"PopulationLedgerInitialized\":true," +
+                "\"PopulationOpeningTotal\":1," +
+                "\"Locations\":[{" +
+                "\"Id\":\"location.zhuo\"," +
+                "\"DisplayName\":\"涿县\"," +
+                "\"Population\":1," +
+                "\"PublicOrderBasisPoints\":5000," +
+                "\"GrainPrice\":100" +
+                "}]," +
+                "\"People\":[{" +
+                "\"Id\":\"person.liu_bei\"," +
+                "\"DisplayName\":\"刘备\"," +
+                "\"LocationId\":\"location.zhuo\"," +
+                "\"PopulationOriginLocationId\":\"location.zhuo\"," +
+                "\"BirthDay\":-5000," +
+                "\"IsAlive\":true," +
+                "\"HealthBasisPoints\":10000" +
+                "}]" +
+                "}";
+
+            var loaded = WorldSnapshotSerializer.Deserialize(legacyJson);
+            var person = loaded.People[0];
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(person.AbilityProfileInitialized, Is.True);
+            Assert.That(person.Aptitudes.Willpower, Is.GreaterThan(0));
+            Assert.That(person.ProfessionalSkills.Military, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void Snapshot_RoundTripPreservesCharacterAbilityAndSummary()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var original = world.People.Find(item => item.Id == "person.lu_zhi");
+            var originalSummary = StrategicAttributeCalculator.Calculate(original);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var restored = loaded.People.Find(item => item.Id == "person.lu_zhi");
+            var restoredSummary = StrategicAttributeCalculator.Calculate(restored);
+
+            Assert.That(
+                restored.Aptitudes.Reasoning,
+                Is.EqualTo(original.Aptitudes.Reasoning));
+            Assert.That(
+                restored.ProfessionalSkills.Scholarship,
+                Is.EqualTo(original.ProfessionalSkills.Scholarship));
+            Assert.That(
+                restoredSummary.Leadership,
+                Is.EqualTo(originalSummary.Leadership));
+            Assert.That(
+                restoredSummary.Administration,
+                Is.EqualTo(originalSummary.Administration));
+        }
+
+        [Test]
+        public void CharacterAbility_ValidationRejectsOutOfRangeValue()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            world.People[0].Aptitudes.Memory = 10_001;
+
+            Assert.Throws<InvalidOperationException>(world.Validate);
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -1776,6 +2015,18 @@ namespace Mandate.Tests
                 new StableId("location.guangzong"));
             new WorldSimulator(world.MasterSeed).AdvanceDays(world, 8);
             return world;
+        }
+
+        private static NewGameCharacterRequest NewGameRequest(
+            StartingIdentity identity)
+        {
+            return new NewGameCharacterRequest
+            {
+                DisplayName = "能力测试",
+                Age = 20,
+                Gender = PersonGender.Male,
+                Identity = identity
+            };
         }
 
         private static WorldState BuildMinimalWorld()

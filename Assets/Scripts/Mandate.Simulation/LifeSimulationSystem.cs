@@ -187,6 +187,11 @@ namespace Mandate.Simulation
                     MotherPersonId = mother.Id,
                     Provisions = 0
                 };
+                CharacterAbilityBootstrap.InitializeChild(
+                    world,
+                    child,
+                    father,
+                    mother);
                 world.People.Add(child);
                 _populationLedgerSystem.RecordBirth(world, child);
                 family.MemberIds.Add(child.Id);

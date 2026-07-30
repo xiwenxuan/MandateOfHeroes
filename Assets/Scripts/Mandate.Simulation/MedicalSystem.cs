@@ -55,7 +55,8 @@ namespace Mandate.Simulation
             world.Validate();
             var physician = FindPerson(world, physicianId.Value);
             var army = FindArmy(world, armyId.Value);
-            if (!physician.IsAlive || physician.MedicalSkillBasisPoints <= 0)
+            var medicalSkill = EffectiveMedicalSkill(physician);
+            if (!physician.IsAlive || medicalSkill < 2_500)
             {
                 return Failure("该人物没有可用于军中救治的医术。");
             }
@@ -99,7 +100,7 @@ namespace Mandate.Simulation
                 -500,
                 501);
             var recoveryRate = Clamp(
-                3_500 + physician.MedicalSkillBasisPoints / 2 + variation,
+                3_500 + medicalSkill / 2 + variation,
                 2_500,
                 9_500);
             var recovered = Math.Max(1, patients * recoveryRate / 10_000);
@@ -223,6 +224,14 @@ namespace Mandate.Simulation
             }
 
             return value > maximum ? maximum : value;
+        }
+
+        private static int EffectiveMedicalSkill(PersonState person)
+        {
+            var professionalSkill = person.ProfessionalSkills == null
+                ? 0
+                : person.ProfessionalSkills.Medicine;
+            return Math.Max(person.MedicalSkillBasisPoints, professionalSkill);
         }
 
         private static MedicalTreatmentResult Failure(string message)
