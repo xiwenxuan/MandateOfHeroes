@@ -35,6 +35,13 @@ namespace Mandate.Presentation
             War
         }
 
+        private enum MapDetailLevel : byte
+        {
+            Strategic,
+            Regional,
+            Local
+        }
+
         private static readonly string[] StartingIdentityLabels =
         {
             "军人",
@@ -86,11 +93,21 @@ namespace Mandate.Presentation
         private GUIStyle _titleStyle;
         private GUIStyle _sectionStyle;
         private GUIStyle _normalStyle;
+        private GUIStyle _mapLabelStyle;
+        private GUIStyle _mapSealStyle;
+        private ProceduralSilkMapArt _mapArt;
 
         private void Awake()
         {
+            _mapArt = new ProceduralSilkMapArt();
             _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
             _message = "请选择开始新游戏，创建人物或扮演世界中的现有人物。";
+        }
+
+        private void OnDestroy()
+        {
+            _mapArt?.Dispose();
+            _mapArt = null;
         }
 
         private void OnGUI()
@@ -563,6 +580,7 @@ namespace Mandate.Presentation
             DrawMapTerrain(canvas);
             DrawMapRiver(canvas);
             DrawMapRoutes(canvas);
+            DrawLocalMapDetails(canvas);
             DrawArmyMarkers(canvas);
             DrawLocationNodes(canvas, player);
             DrawPlayerMarker(canvas, player, journey);
@@ -570,9 +588,10 @@ namespace Mandate.Presentation
 
             if (!string.IsNullOrEmpty(GUI.tooltip))
             {
-                GUI.Box(
-                    new Rect(canvas.width - 310f, 12f, 296f, 48f),
-                    GUI.tooltip);
+                var tooltipRect =
+                    new Rect(canvas.width - 310f, 12f, 296f, 48f);
+                DrawMapPanel(tooltipRect, 0.92f);
+                GUI.Label(tooltipRect, GUI.tooltip, _mapLabelStyle);
             }
 
             GUI.EndGroup();
@@ -588,34 +607,133 @@ namespace Mandate.Presentation
 
         private void DrawMapTerrain(Rect canvas)
         {
-            DrawSolidRect(canvas, new Color(0.12f, 0.16f, 0.12f, 1f));
-            DrawSolidRect(
-                new Rect(0f, 0f, canvas.width * 0.36f, canvas.height),
-                new Color(0.18f, 0.28f, 0.16f, 1f));
-            DrawSolidRect(
-                new Rect(
-                    canvas.width * 0.30f,
-                    canvas.height * 0.18f,
-                    canvas.width * 0.70f,
-                    canvas.height * 0.55f),
-                new Color(0.27f, 0.30f, 0.16f, 1f));
-            DrawSolidRect(
-                new Rect(
-                    canvas.width * 0.42f,
-                    canvas.height * 0.65f,
-                    canvas.width * 0.58f,
-                    canvas.height * 0.35f),
-                new Color(0.25f, 0.22f, 0.13f, 1f));
-
-            for (var i = 0; i < 6; i++)
+            if (_mapArt == null)
             {
-                var ridge = new Rect(
-                    18f + i * 31f,
-                    42f + i * 58f,
-                    105f,
-                    8f);
-                DrawSolidRect(ridge, new Color(0.35f, 0.45f, 0.24f, 0.65f));
+                _mapArt = new ProceduralSilkMapArt();
             }
+
+            var previous = GUI.color;
+            GUI.color = Color.white;
+            GUI.DrawTextureWithTexCoords(
+                canvas,
+                _mapArt.SilkTexture,
+                new Rect(
+                    0f,
+                    0f,
+                    Mathf.Max(1f, canvas.width / 128f),
+                    Mathf.Max(1f, canvas.height / 128f)));
+
+            DrawTerrainBrush(
+                canvas,
+                1_600,
+                3_500,
+                430f,
+                470f,
+                new Color(0.25f, 0.39f, 0.22f, 0.58f));
+            DrawTerrainBrush(
+                canvas,
+                3_400,
+                7_300,
+                520f,
+                260f,
+                new Color(0.43f, 0.31f, 0.15f, 0.35f));
+            DrawTerrainBrush(
+                canvas,
+                6_200,
+                3_700,
+                680f,
+                310f,
+                new Color(0.53f, 0.43f, 0.22f, 0.28f));
+            DrawTerrainBrush(
+                canvas,
+                8_000,
+                7_200,
+                460f,
+                330f,
+                new Color(0.34f, 0.42f, 0.21f, 0.34f));
+
+            DrawMountainStamp(canvas, 900, 1_400, 138f);
+            DrawMountainStamp(canvas, 1_500, 2_800, 122f);
+            DrawMountainStamp(canvas, 1_200, 6_700, 150f);
+            DrawMountainStamp(canvas, 3_000, 8_400, 116f);
+            if (CurrentMapDetailLevel() != MapDetailLevel.Strategic)
+            {
+                DrawMountainStamp(canvas, 7_900, 1_300, 96f);
+                DrawMountainStamp(canvas, 8_800, 8_400, 110f);
+            }
+
+            DrawMapFrame(canvas);
+            GUI.color = previous;
+        }
+
+        private void DrawTerrainBrush(
+            Rect canvas,
+            int xBasisPoints,
+            int yBasisPoints,
+            float width,
+            float height,
+            Color color)
+        {
+            var point = MapPoint(canvas, xBasisPoints, yBasisPoints);
+            var rect = new Rect(
+                point.x - width * _mapZoom * 0.5f,
+                point.y - height * _mapZoom * 0.5f,
+                width * _mapZoom,
+                height * _mapZoom);
+            var previous = GUI.color;
+            GUI.color = color;
+            GUI.DrawTexture(
+                rect,
+                _mapArt.BrushStampTexture,
+                ScaleMode.StretchToFill,
+                true);
+            GUI.color = previous;
+        }
+
+        private void DrawMountainStamp(
+            Rect canvas,
+            int xBasisPoints,
+            int yBasisPoints,
+            float width)
+        {
+            var point = MapPoint(canvas, xBasisPoints, yBasisPoints);
+            var height = width * 0.56f;
+            var rect = new Rect(
+                point.x - width * _mapZoom * 0.5f,
+                point.y - height * _mapZoom * 0.5f,
+                width * _mapZoom,
+                height * _mapZoom);
+            var previous = GUI.color;
+            GUI.color = new Color(
+                ProceduralSilkMapArt.Ochre.r,
+                ProceduralSilkMapArt.Ochre.g,
+                ProceduralSilkMapArt.Ochre.b,
+                0.68f);
+            GUI.DrawTexture(
+                rect,
+                _mapArt.MountainStampTexture,
+                ScaleMode.StretchToFill,
+                true);
+            GUI.color = previous;
+        }
+
+        private static void DrawMapFrame(Rect canvas)
+        {
+            var border = ProceduralSilkMapArt.Ink;
+            border.a = 0.72f;
+            DrawSolidRect(new Rect(0f, 0f, canvas.width, 3f), border);
+            DrawSolidRect(
+                new Rect(0f, canvas.height - 3f, canvas.width, 3f),
+                border);
+            DrawSolidRect(new Rect(0f, 0f, 3f, canvas.height), border);
+            DrawSolidRect(
+                new Rect(canvas.width - 3f, 0f, 3f, canvas.height),
+                border);
+            border.a = 0.25f;
+            DrawSolidRect(new Rect(8f, 8f, canvas.width - 16f, 1f), border);
+            DrawSolidRect(
+                new Rect(8f, canvas.height - 9f, canvas.width - 16f, 1f),
+                border);
         }
 
         private void DrawMapRiver(Rect canvas)
@@ -634,13 +752,18 @@ namespace Mandate.Presentation
                 DrawMapLine(
                     river[i],
                     river[i + 1],
-                    7f,
-                    new Color(0.16f, 0.48f, 0.68f, 0.9f));
+                    9f,
+                    new Color(0.12f, 0.18f, 0.16f, 0.34f));
                 DrawMapLine(
                     river[i],
                     river[i + 1],
-                    2f,
-                    new Color(0.52f, 0.78f, 0.92f, 0.9f));
+                    6f,
+                    new Color(0.20f, 0.43f, 0.55f, 0.88f));
+                DrawMapLine(
+                    river[i],
+                    river[i + 1],
+                    1.5f,
+                    new Color(0.58f, 0.73f, 0.72f, 0.78f));
             }
         }
 
@@ -652,18 +775,86 @@ namespace Mandate.Presentation
                 var from = MapPoint(canvas, FindLocation(route.FromLocationId));
                 var to = MapPoint(canvas, FindLocation(route.ToLocationId));
                 var color = RouteColor(route);
-                DrawMapLine(from, to, 6f, new Color(0.05f, 0.04f, 0.02f, 0.65f));
-                DrawMapLine(from, to, 3f, color);
+                DrawMapLine(from, to, 5f, new Color(0.18f, 0.11f, 0.06f, 0.46f));
+                DrawMapLine(from, to, 2.4f, color);
 
-                if (_mapZoom >= 0.9f)
+                if (CurrentMapDetailLevel() != MapDetailLevel.Strategic)
                 {
                     var midpoint = (from + to) * 0.5f;
+                    var distanceRect =
+                        new Rect(midpoint.x - 34f, midpoint.y - 14f, 68f, 19f);
+                    DrawMapPanel(distanceRect, 0.78f);
                     GUI.Label(
-                        new Rect(midpoint.x - 42f, midpoint.y - 18f, 84f, 22f),
-                        $"{route.DistanceKilometers}里程",
-                        GUI.skin.box);
+                        distanceRect,
+                        $"{route.DistanceKilometers}公里",
+                        _mapLabelStyle);
                 }
             }
+        }
+
+        private void DrawLocalMapDetails(Rect canvas)
+        {
+            if (CurrentMapDetailLevel() != MapDetailLevel.Local)
+            {
+                return;
+            }
+
+            for (var i = 0; i < _world.Locations.Count; i++)
+            {
+                var point = MapPoint(canvas, _world.Locations[i]);
+                DrawFarmRows(point + new Vector2(-62f, 34f));
+                if (i % 2 == 0)
+                {
+                    DrawGrove(point + new Vector2(58f, -38f));
+                }
+                else
+                {
+                    DrawWatchPost(point + new Vector2(62f, 37f));
+                }
+            }
+        }
+
+        private static void DrawFarmRows(Vector2 center)
+        {
+            var color = new Color(0.43f, 0.31f, 0.13f, 0.52f);
+            for (var row = 0; row < 4; row++)
+            {
+                var start = center + new Vector2(-17f, row * 5f);
+                DrawMapLine(start, start + new Vector2(34f, 0f), 1.2f, color);
+            }
+        }
+
+        private void DrawGrove(Vector2 center)
+        {
+            var previous = GUI.color;
+            GUI.color = new Color(0.20f, 0.37f, 0.20f, 0.74f);
+            for (var i = 0; i < 3; i++)
+            {
+                var rect = new Rect(
+                    center.x - 15f + i * 11f,
+                    center.y - 10f + (i % 2) * 6f,
+                    20f,
+                    20f);
+                GUI.DrawTexture(
+                    rect,
+                    _mapArt.BrushStampTexture,
+                    ScaleMode.StretchToFill,
+                    true);
+            }
+
+            GUI.color = previous;
+        }
+
+        private static void DrawWatchPost(Vector2 center)
+        {
+            var ink = ProceduralSilkMapArt.Ink;
+            ink.a = 0.65f;
+            DrawSolidRect(
+                new Rect(center.x - 1f, center.y - 11f, 2f, 21f),
+                ink);
+            DrawSolidRect(
+                new Rect(center.x - 7f, center.y - 12f, 14f, 4f),
+                ProceduralSilkMapArt.Cinnabar);
         }
 
         private void DrawLocationNodes(Rect canvas, PersonState player)
@@ -672,13 +863,13 @@ namespace Mandate.Presentation
             {
                 var location = _world.Locations[i];
                 var point = MapPoint(canvas, location);
-                var width = Mathf.Clamp(104f * _mapZoom, 82f, 132f);
-                var height = Mathf.Clamp(50f * _mapZoom, 42f, 62f);
-                var nodeRect = new Rect(
-                    point.x - width * 0.5f,
-                    point.y - height * 0.5f,
-                    width,
-                    height);
+                var detailLevel = CurrentMapDetailLevel();
+                var width = detailLevel == MapDetailLevel.Strategic
+                    ? 82f
+                    : Mathf.Clamp(116f * _mapZoom, 96f, 146f);
+                var height = detailLevel == MapDetailLevel.Strategic
+                    ? 38f
+                    : Mathf.Clamp(48f * _mapZoom, 44f, 62f);
                 var isCurrent = location.Id == player.LocationId;
                 var isSelected = location.Id == _selectedLocationId;
                 var isAdjacent = FindRouteBetween(player.LocationId, location.Id) != null;
@@ -689,22 +880,57 @@ namespace Mandate.Presentation
                         : isAdjacent
                             ? new Color(0.82f, 0.88f, 0.62f, 0.9f)
                             : new Color(0.20f, 0.20f, 0.18f, 0.8f);
-                DrawSolidRect(
-                    new Rect(
-                        nodeRect.x - 4f,
-                        nodeRect.y - 4f,
-                        nodeRect.width + 8f,
-                        nodeRect.height + 8f),
-                    border);
 
                 var previous = GUI.color;
-                GUI.color = LocationColor(location);
-                var label = location.DisplayName + "\n" + LocationOverlayLabel(location);
+                var sealSize = Mathf.Clamp(38f * _mapZoom, 32f, 47f);
+                var sealRect = new Rect(
+                    point.x - sealSize * 0.5f,
+                    point.y - sealSize * 0.5f,
+                    sealSize,
+                    sealSize);
+                var locationColor = LocationColor(location);
+                GUI.color = border;
+                GUI.DrawTexture(
+                    new Rect(
+                        sealRect.x - 3f,
+                        sealRect.y - 3f,
+                        sealRect.width + 6f,
+                        sealRect.height + 6f),
+                    _mapArt.SealTexture,
+                    ScaleMode.StretchToFill,
+                    true);
+                GUI.color = locationColor;
+                GUI.DrawTexture(
+                    sealRect,
+                    _mapArt.SealTexture,
+                    ScaleMode.StretchToFill,
+                    true);
+                GUI.color = previous;
+                GUI.Label(sealRect, "城", _mapSealStyle);
+
+                var labelRect = new Rect(
+                    point.x + sealSize * 0.34f,
+                    point.y - height * 0.48f,
+                    width * 0.78f,
+                    height);
+                DrawMapPanel(labelRect, 0.87f);
+                var label = detailLevel == MapDetailLevel.Strategic
+                    ? location.DisplayName
+                    : location.DisplayName + "\n" + LocationOverlayLabel(location);
+                GUI.Label(labelRect, label, _mapLabelStyle);
                 var tooltip =
                     $"{location.DisplayName}　人口{location.Population}　" +
                     $"治安{location.PublicOrderBasisPoints / 100f:F1}%　" +
                     $"粮价{location.GrainPrice}";
-                if (GUI.Button(nodeRect, new GUIContent(label, tooltip)))
+                var hitRect = Rect.MinMaxRect(
+                    Mathf.Min(sealRect.xMin, labelRect.xMin),
+                    Mathf.Min(sealRect.yMin, labelRect.yMin),
+                    Mathf.Max(sealRect.xMax, labelRect.xMax),
+                    Mathf.Max(sealRect.yMax, labelRect.yMax));
+                if (GUI.Button(
+                        hitRect,
+                        new GUIContent(string.Empty, tooltip),
+                        GUIStyle.none))
                 {
                     _selectedLocationId = location.Id;
                     _message = $"已选择{location.DisplayName}。";
@@ -722,14 +948,23 @@ namespace Mandate.Presentation
                 var point = ArmyMapPoint(canvas, army);
                 var hostile =
                     army.OrganizationId == "organization.taiping_yellow_turban";
-                var previous = GUI.color;
-                GUI.color = hostile
-                    ? new Color(0.92f, 0.42f, 0.18f, 1f)
-                    : new Color(0.30f, 0.62f, 0.92f, 1f);
-                GUI.Box(
-                    new Rect(point.x - 33f, point.y + 28f + i * 3f, 66f, 24f),
-                    $"{(hostile ? "黄" : "汉")}{army.Troops}");
-                GUI.color = previous;
+                var markerPoint = point + new Vector2(0f, 28f + i * 3f);
+                var factionColor = hostile
+                    ? new Color(0.72f, 0.31f, 0.12f, 1f)
+                    : new Color(0.18f, 0.38f, 0.50f, 1f);
+                DrawSolidRect(
+                    new Rect(markerPoint.x - 29f, markerPoint.y - 13f, 2f, 30f),
+                    ProceduralSilkMapArt.Ink);
+                DrawSolidRect(
+                    new Rect(markerPoint.x - 27f, markerPoint.y - 13f, 56f, 24f),
+                    factionColor);
+                DrawSolidRect(
+                    new Rect(markerPoint.x - 23f, markerPoint.y - 9f, 48f, 16f),
+                    new Color(0.82f, 0.72f, 0.50f, 0.92f));
+                GUI.Label(
+                    new Rect(markerPoint.x - 23f, markerPoint.y - 10f, 48f, 18f),
+                    $"{(hostile ? "黄" : "汉")}{army.Troops}",
+                    _mapLabelStyle);
             }
         }
 
@@ -756,20 +991,75 @@ namespace Mandate.Presentation
                     progress);
             }
 
+            var marker = new Rect(point.x - 15f, point.y - 47f, 30f, 30f);
             DrawSolidRect(
-                new Rect(point.x - 17f, point.y - 48f, 34f, 34f),
-                new Color(1f, 0.78f, 0.15f, 1f));
-            GUI.Box(
-                new Rect(point.x - 14f, point.y - 45f, 28f, 28f),
-                "我");
+                new Rect(
+                    marker.x - 3f,
+                    marker.y - 3f,
+                    marker.width + 6f,
+                    marker.height + 6f),
+                ProceduralSilkMapArt.Ink);
+            DrawSolidRect(marker, new Color(0.78f, 0.55f, 0.13f, 1f));
+            GUI.Label(marker, "我", _mapSealStyle);
         }
 
         private void DrawMapLegend(Rect canvas)
         {
-            GUI.Box(
-                new Rect(12f, canvas.height - 70f, 370f, 56f),
+            var legendRect = new Rect(12f, canvas.height - 70f, 430f, 56f);
+            DrawMapPanel(legendRect, 0.91f);
+            GUI.Label(
+                legendRect,
+                $"{MapDetailLevelName(CurrentMapDetailLevel())}　" +
                 $"图层：{MapOverlayName(_mapOverlay)}　缩放：{_mapZoom:F1}倍\n" +
-                "金色=玩家　蓝色=汉军　橙红=黄巾　线色表示道路治安");
+                "金色=玩家　石青=汉军　朱砂=黄巾　线色=道路治安",
+                _mapLabelStyle);
+        }
+
+        private static void DrawMapPanel(Rect rect, float opacity)
+        {
+            DrawSolidRect(
+                new Rect(
+                    rect.x - 2f,
+                    rect.y - 2f,
+                    rect.width + 4f,
+                    rect.height + 4f),
+                new Color(
+                    ProceduralSilkMapArt.Ink.r,
+                    ProceduralSilkMapArt.Ink.g,
+                    ProceduralSilkMapArt.Ink.b,
+                    Mathf.Clamp01(opacity * 0.62f)));
+            DrawSolidRect(
+                rect,
+                new Color(
+                    ProceduralSilkMapArt.SilkLight.r,
+                    ProceduralSilkMapArt.SilkLight.g,
+                    ProceduralSilkMapArt.SilkLight.b,
+                    Mathf.Clamp01(opacity)));
+        }
+
+        private MapDetailLevel CurrentMapDetailLevel()
+        {
+            if (_mapZoom < 0.86f)
+            {
+                return MapDetailLevel.Strategic;
+            }
+
+            return _mapZoom < 1.55f
+                ? MapDetailLevel.Regional
+                : MapDetailLevel.Local;
+        }
+
+        private static string MapDetailLevelName(MapDetailLevel level)
+        {
+            switch (level)
+            {
+                case MapDetailLevel.Strategic:
+                    return "天下概览";
+                case MapDetailLevel.Local:
+                    return "县乡近览";
+                default:
+                    return "州郡舆图";
+            }
         }
 
         private void DrawSelectedLocationDetails(PersonState player)
@@ -2184,6 +2474,22 @@ namespace Mandate.Presentation
                 fontSize = 15,
                 wordWrap = true,
                 normal = { textColor = Color.white }
+            };
+            _mapLabelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                wordWrap = true,
+                padding = new RectOffset(4, 4, 2, 2),
+                normal = { textColor = ProceduralSilkMapArt.Ink }
+            };
+            _mapSealStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(0.95f, 0.85f, 0.59f, 1f) }
             };
         }
 
