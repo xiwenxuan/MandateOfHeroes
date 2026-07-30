@@ -1,0 +1,16 @@
+{
+  "name": "Mandate.Simulation",
+  "rootNamespace": "Mandate.Simulation",
+  "references": [
+    "Mandate.Domain"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}
