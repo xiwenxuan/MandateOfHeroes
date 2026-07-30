@@ -56,6 +56,7 @@ namespace Mandate.Domain
         public long AbsoluteDay;
         public byte Segment;
         public long Revision;
+        public string PlayerPersonId;
         public List<PersonState> People = new List<PersonState>();
         public List<LocationState> Locations = new List<LocationState>();
         public List<FamilyState> Families = new List<FamilyState>();
@@ -179,6 +180,13 @@ namespace Mandate.Domain
                 ValidateBasisPoints(person.Needs.WarPressure, person.Id, "war pressure");
                 ValidateBasisPoints(
                     person.MedicalSkillBasisPoints, person.Id, "medical skill");
+            }
+
+            if (!string.IsNullOrEmpty(PlayerPersonId) &&
+                !personIds.Contains(PlayerPersonId))
+            {
+                throw new InvalidOperationException(
+                    $"Player references missing person {PlayerPersonId}.");
             }
 
             for (var i = 0; i < People.Count; i++)

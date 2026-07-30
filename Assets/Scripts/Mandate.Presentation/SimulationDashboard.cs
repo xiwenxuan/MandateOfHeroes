@@ -11,7 +11,34 @@ namespace Mandate.Presentation
     {
         private const ulong DefaultSeed = 184_001UL;
 
+        private enum ScreenMode : byte
+        {
+            MainMenu,
+            NewGame,
+            Playing
+        }
+
+        private enum PlayerPanel : byte
+        {
+            Map,
+            Character,
+            Tasks,
+            World,
+            Developer
+        }
+
+        private static readonly string[] StartingIdentityLabels =
+        {
+            "军人",
+            "县吏",
+            "商人",
+            "医者"
+        };
+
+        private readonly NewGameSetupService _newGameSetupService =
+            new NewGameSetupService();
         private WorldState _world;
+        private WorldState _selectionPreview;
         private WorldSimulator _simulator;
         private NpcDecisionSystem _decisionSystem;
         private NpcActionResolver _actionResolver;
@@ -31,31 +58,601 @@ namespace Mandate.Presentation
         private string _snapshot;
         private string _message = "世界尚未初始化。";
         private readonly List<string> _actionLog = new List<string>();
+        private ScreenMode _screen = ScreenMode.MainMenu;
+        private PlayerPanel _playerPanel = PlayerPanel.Map;
+        private int _newGameMode;
+        private string _customName = "无名";
+        private string _customAge = "18";
+        private int _customGender;
+        private int _customIdentity;
+        private int _existingPersonIndex;
+        private Vector2 _selectionScroll;
         private GUIStyle _titleStyle;
         private GUIStyle _sectionStyle;
         private GUIStyle _normalStyle;
 
         private void Awake()
         {
-            InitializeWorld();
+            _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
+            _message = "请选择开始新游戏，创建人物或扮演世界中的现有人物。";
         }
 
         private void OnGUI()
         {
             EnsureStyles();
 
-            GUILayout.BeginArea(new Rect(16, 16, Screen.width - 32, Screen.height - 32));
-            GUILayout.Label("群雄志：仕途——世界模拟观察台", _titleStyle);
-            GUILayout.Label(
-                "这是开发调试界面：用于观察时间、人物、市场、沙盒AI和旅行，并非最终UI。",
-                _normalStyle);
+            if (_screen == ScreenMode.MainMenu)
+            {
+                DrawMainMenu();
+                return;
+            }
 
-            DrawToolbar();
+            if (_screen == ScreenMode.NewGame)
+            {
+                DrawNewGame();
+                return;
+            }
+
+            DrawPlayerGame();
+        }
+
+        private void DrawMainMenu()
+        {
+            var width = Mathf.Min(620f, Screen.width - 40f);
+            var height = Mathf.Min(520f, Screen.height - 40f);
+            GUILayout.BeginArea(
+                new Rect(
+                    (Screen.width - width) * 0.5f,
+                    (Screen.height - height) * 0.5f,
+                    width,
+                    height),
+                GUI.skin.box);
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("群雄志：仕途", _titleStyle);
+            GUILayout.Label(
+                "从一名普通人或历史人物开始，在东汉末年的同一个世界中生活、从业、旅行并参与历史。",
+                _normalStyle);
+            GUILayout.Space(24);
+
+            if (GUILayout.Button("开始新游戏", GUILayout.Height(48)))
+            {
+                _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
+                _screen = ScreenMode.NewGame;
+                _message = "请选择自建人物或现有人物。";
+            }
+
+            GUI.enabled = _world != null;
+            if (GUILayout.Button("继续当前游戏", GUILayout.Height(40)))
+            {
+                _screen = ScreenMode.Playing;
+            }
+
+            GUI.enabled = !string.IsNullOrEmpty(_snapshot);
+            if (GUILayout.Button("读取内存存档", GUILayout.Height(40)))
+            {
+                try
+                {
+                    EnterWorld(WorldSnapshotSerializer.Deserialize(_snapshot));
+                    _message = "已读取内存存档。";
+                }
+                catch (Exception exception)
+                {
+                    _message = exception.Message;
+                }
+            }
+
+            GUI.enabled = true;
+            if (GUILayout.Button("开发者快速进入（刘备）", GUILayout.Height(36)))
+            {
+                EnterWorld(
+                    _newGameSetupService.CreateExisting184World(
+                        "person.liu_bei",
+                        DefaultSeed));
+                _playerPanel = PlayerPanel.Developer;
+                _message = "已使用刘备进入开发观察台。";
+            }
+
+            GUILayout.Space(18);
+            GUILayout.Label(_message, _normalStyle);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndArea();
+        }
+
+        private void DrawNewGame()
+        {
+            GUILayout.BeginArea(new Rect(24, 20, Screen.width - 48, Screen.height - 40));
+            GUILayout.Label("开始184年新游戏", _titleStyle);
+            GUILayout.Label(
+                "第一版场景覆盖涿县—中山—广宗。自建身份决定初始地点、资源和组织职位。",
+                _normalStyle);
+            GUILayout.Space(10);
+
+            _newGameMode = GUILayout.Toolbar(
+                _newGameMode,
+                new[] { "自建人物", "选择现有人物" },
+                GUILayout.Height(36));
+            GUILayout.Space(12);
+
+            _selectionScroll = GUILayout.BeginScrollView(_selectionScroll);
+            if (_newGameMode == 0)
+            {
+                DrawCustomCharacterSetup();
+            }
+            else
+            {
+                DrawExistingCharacterSetup();
+            }
+
+            GUILayout.EndScrollView();
+            GUILayout.Space(8);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("返回主菜单", GUILayout.Height(38)))
+            {
+                _screen = ScreenMode.MainMenu;
+            }
+
+            if (GUILayout.Button("进入世界", GUILayout.Height(38)))
+            {
+                TryStartSelectedGame();
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.Label(_message, _normalStyle);
+            GUILayout.EndArea();
+        }
+
+        private void DrawCustomCharacterSetup()
+        {
+            GUILayout.Label("人物姓名", _sectionStyle);
+            _customName = GUILayout.TextField(_customName, 16, GUILayout.Height(34));
+
+            GUILayout.Space(12);
+            GUILayout.Label("开局年龄（16—70）", _sectionStyle);
+            _customAge = GUILayout.TextField(_customAge, 2, GUILayout.Height(34));
+
+            GUILayout.Space(12);
+            GUILayout.Label("性别", _sectionStyle);
+            _customGender = GUILayout.Toolbar(
+                _customGender,
+                new[] { "男", "女" },
+                GUILayout.Height(34));
+
+            GUILayout.Space(12);
+            GUILayout.Label("初始身份", _sectionStyle);
+            _customIdentity = GUILayout.SelectionGrid(
+                _customIdentity,
+                StartingIdentityLabels,
+                2,
+                GUILayout.Height(84));
+            GUILayout.Space(8);
+            GUILayout.Label(StartingIdentityDescription(_customIdentity), _normalStyle);
+        }
+
+        private void DrawExistingCharacterSetup()
+        {
+            GUILayout.Label("选择要扮演的人物", _sectionStyle);
+            var labels = new string[_selectionPreview.People.Count];
+            for (var i = 0; i < _selectionPreview.People.Count; i++)
+            {
+                var person = _selectionPreview.People[i];
+                labels[i] =
+                    $"{person.DisplayName}　{FindLocationName(_selectionPreview, person.LocationId)}　" +
+                    $"{FindIdentityName(_selectionPreview, person.Id)}";
+            }
+
+            _existingPersonIndex = GUILayout.SelectionGrid(
+                _existingPersonIndex,
+                labels,
+                2,
+                GUILayout.Height(Mathf.Max(160f, labels.Length * 27f)));
+            GUILayout.Space(8);
+            GUILayout.Label(
+                "现有人物使用同一套人物、身份和世界规则；选择后不会获得额外的玩家专属加成。",
+                _normalStyle);
+        }
+
+        private void TryStartSelectedGame()
+        {
+            try
+            {
+                if (_newGameMode == 0)
+                {
+                    if (!int.TryParse(_customAge, out var age))
+                    {
+                        throw new ArgumentException("年龄必须是整数。");
+                    }
+
+                    var request = new NewGameCharacterRequest
+                    {
+                        DisplayName = _customName,
+                        Age = age,
+                        Gender = _customGender == 0
+                            ? PersonGender.Male
+                            : PersonGender.Female,
+                        Identity = (StartingIdentity)_customIdentity
+                    };
+                    EnterWorld(
+                        _newGameSetupService.CreateCustom184World(
+                            request,
+                            DefaultSeed));
+                }
+                else
+                {
+                    if (_existingPersonIndex < 0 ||
+                        _existingPersonIndex >= _selectionPreview.People.Count)
+                    {
+                        throw new InvalidOperationException("请选择一名现有人物。");
+                    }
+
+                    EnterWorld(
+                        _newGameSetupService.CreateExisting184World(
+                            _selectionPreview.People[_existingPersonIndex].Id,
+                            DefaultSeed));
+                }
+
+                _message = $"已进入184年世界，当前扮演{FindPlayer().DisplayName}。";
+            }
+            catch (Exception exception)
+            {
+                _message = exception.Message;
+            }
+        }
+
+        private void EnterWorld(WorldState world)
+        {
+            _world = world ?? throw new ArgumentNullException(nameof(world));
+            if (string.IsNullOrEmpty(_world.PlayerPersonId))
+            {
+                throw new InvalidOperationException("存档没有指定玩家控制人物。");
+            }
+
+            RebindServices();
+            RefreshMonthlyDecisions();
+            _actionLog.Clear();
+            _screen = ScreenMode.Playing;
+            _playerPanel = PlayerPanel.Map;
+            _scroll = Vector2.zero;
+        }
+
+        private void DrawPlayerGame()
+        {
+            GUILayout.BeginArea(new Rect(16, 16, Screen.width - 32, Screen.height - 32));
+            DrawPlayerHeader();
             GUILayout.Space(8);
             GUILayout.Label(_message, _normalStyle);
             GUILayout.Space(8);
 
             _scroll = GUILayout.BeginScrollView(_scroll);
+            switch (_playerPanel)
+            {
+                case PlayerPanel.Map:
+                    DrawPlayerMap();
+                    break;
+                case PlayerPanel.Character:
+                    DrawPlayerCharacter();
+                    break;
+                case PlayerPanel.Tasks:
+                    DrawPlayerTasks();
+                    break;
+                case PlayerPanel.World:
+                    DrawWorldSummary();
+                    DrawHistoricalTimeline();
+                    DrawLocations();
+                    DrawActionLog();
+                    break;
+                case PlayerPanel.Developer:
+                    DrawDeveloperDashboard();
+                    break;
+            }
+
+            GUILayout.EndScrollView();
+            GUILayout.EndArea();
+        }
+
+        private void DrawPlayerHeader()
+        {
+            var player = FindPlayer();
+            var journey = FindJourney(player.Id);
+            var travelText = journey == null
+                ? string.Empty
+                : $"　旅途中：前往{FindLocationName(journey.DestinationLocationId)}，" +
+                  $"剩余{journey.RemainingKilometers}公里";
+            GUILayout.Label("群雄志：仕途——184年涿县至广宗", _titleStyle);
+            GUILayout.Label(
+                $"扮演：{player.DisplayName}　身份：{FindIdentityName(_world, player.Id)}　" +
+                $"所在地：{FindLocationName(player.LocationId)}　" +
+                $"第{_world.AbsoluteDay + 1}日{travelText}",
+                _normalStyle);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("地图", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Map);
+            }
+
+            if (GUILayout.Button("人物", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Character);
+            }
+
+            if (GUILayout.Button("任务", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Tasks);
+            }
+
+            if (GUILayout.Button("天下", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.World);
+            }
+
+            if (GUILayout.Button("开发观察台", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Developer);
+            }
+
+            if (GUILayout.Button("推进一天", GUILayout.Height(32)))
+            {
+                AdvancePlayerDays(1);
+            }
+
+            if (GUILayout.Button("结算NPC", GUILayout.Height(32)))
+            {
+                ResolveMonthlyNpcActions();
+            }
+
+            if (GUILayout.Button("内存保存", GUILayout.Height(32)))
+            {
+                _snapshot = WorldSnapshotSerializer.Serialize(_world);
+                _message = $"已保存当前世界，共{_snapshot.Length}个字符。";
+            }
+
+            GUI.enabled = !string.IsNullOrEmpty(_snapshot);
+            if (GUILayout.Button("读取", GUILayout.Height(32)))
+            {
+                EnterWorld(WorldSnapshotSerializer.Deserialize(_snapshot));
+                _message = "已恢复内存存档，玩家身份保持不变。";
+            }
+
+            GUI.enabled = true;
+            if (GUILayout.Button("主菜单", GUILayout.Height(32)))
+            {
+                _screen = ScreenMode.MainMenu;
+                _message = "当前世界仍保留在内存中，可选择继续当前游戏。";
+            }
+
+            GUILayout.EndHorizontal();
+        }
+
+        private void SetPlayerPanel(PlayerPanel panel)
+        {
+            _playerPanel = panel;
+            _scroll = Vector2.zero;
+        }
+
+        private void DrawPlayerMap()
+        {
+            var player = FindPlayer();
+            var journey = FindJourney(player.Id);
+            GUILayout.Label("地区地图", _sectionStyle);
+            GUILayout.Label(
+                "所有移动都沿世界中的真实道路进行；旅行会消耗时间和口粮。",
+                _normalStyle);
+
+            if (journey != null)
+            {
+                GUILayout.Space(10);
+                GUILayout.Label(
+                    $"正在从{FindLocationName(journey.OriginLocationId)}前往" +
+                    $"{FindLocationName(journey.DestinationLocationId)}，" +
+                    $"剩余{journey.RemainingKilometers}公里。",
+                    _normalStyle);
+                if (GUILayout.Button("推进一天旅程", GUILayout.Height(38)))
+                {
+                    AdvancePlayerDays(1);
+                }
+            }
+            else
+            {
+                GUILayout.Space(10);
+                GUILayout.Label(
+                    $"当前位置：{FindLocationName(player.LocationId)}　可前往：",
+                    _normalStyle);
+                for (var i = 0; i < _world.Routes.Count; i++)
+                {
+                    var route = _world.Routes[i];
+                    string destinationId = null;
+                    if (route.FromLocationId == player.LocationId)
+                    {
+                        destinationId = route.ToLocationId;
+                    }
+                    else if (route.Bidirectional &&
+                             route.ToLocationId == player.LocationId)
+                    {
+                        destinationId = route.FromLocationId;
+                    }
+
+                    if (destinationId == null)
+                    {
+                        continue;
+                    }
+
+                    var capturedRoute = route;
+                    var capturedDestinationId = destinationId;
+                    if (GUILayout.Button(
+                            $"沿路前往{FindLocationName(destinationId)}　" +
+                            $"{route.DistanceKilometers}公里　" +
+                            $"治安{route.SecurityBasisPoints / 100f:F1}%",
+                            GUILayout.Height(38)))
+                    {
+                        TryStartPlayerJourney(capturedRoute, capturedDestinationId);
+                    }
+                }
+            }
+
+            GUILayout.Space(16);
+            GUILayout.Label("地区状态", _sectionStyle);
+            for (var i = 0; i < _world.Locations.Count; i++)
+            {
+                var location = _world.Locations[i];
+                var marker = location.Id == player.LocationId ? "【当前】" : string.Empty;
+                GUILayout.Label(
+                    $"{marker}{location.DisplayName}　人口{location.Population}　" +
+                    $"粮价{location.GrainPrice}　治安" +
+                    $"{location.PublicOrderBasisPoints / 100f:F1}%",
+                    _normalStyle);
+            }
+        }
+
+        private void TryStartPlayerJourney(
+            RouteState route,
+            string destinationId)
+        {
+            try
+            {
+                var player = FindPlayer();
+                var mode = FindIdentityName(_world, player.Id) == "行商"
+                    ? TravelMode.Caravan
+                    : TravelMode.Foot;
+                _travelSystem.StartJourney(
+                    _world,
+                    new StableId(player.Id),
+                    new StableId(route.Id),
+                    new StableId(destinationId),
+                    mode);
+                _message =
+                    $"{player.DisplayName}已出发前往{FindLocationName(destinationId)}。";
+            }
+            catch (Exception exception)
+            {
+                _message = exception.Message;
+            }
+        }
+
+        private void DrawPlayerCharacter()
+        {
+            var player = FindPlayer();
+            GUILayout.Label("人物", _sectionStyle);
+            GUILayout.Label(
+                $"姓名：{player.DisplayName}　性别：{GenderName(player.Gender)}　" +
+                $"年龄：{Math.Max(0, (_world.AbsoluteDay - player.BirthDay) / 360)}岁",
+                _normalStyle);
+            GUILayout.Label(
+                $"健康：{player.HealthBasisPoints / 100f:F1}%　财富：{player.Wealth}钱　" +
+                $"口粮：{player.Provisions}　载货：{CargoSummary(player.Id)}",
+                _normalStyle);
+            GUILayout.Label(
+                $"医术：{player.MedicalSkillBasisPoints / 100f:F1}%　" +
+                $"身份：{FindIdentityName(_world, player.Id)}",
+                _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("家庭", _sectionStyle);
+            var hasFamily = false;
+            for (var i = 0; i < _world.Families.Count; i++)
+            {
+                var family = _world.Families[i];
+                if (!family.MemberIds.Contains(player.Id))
+                {
+                    continue;
+                }
+
+                hasFamily = true;
+                GUILayout.Label(
+                    $"{family.DisplayName}　家产{family.Wealth}　债务{family.Debt}　" +
+                    $"成员{family.MemberIds.Count}人",
+                    _normalStyle);
+            }
+
+            if (!hasFamily)
+            {
+                GUILayout.Label("尚未建立独立家户。", _normalStyle);
+            }
+
+            GUILayout.Space(12);
+            GUILayout.Label("组织与职位", _sectionStyle);
+            var hasMembership = false;
+            for (var i = 0; i < _world.Memberships.Count; i++)
+            {
+                var membership = _world.Memberships[i];
+                if (membership.PersonId != player.Id)
+                {
+                    continue;
+                }
+
+                hasMembership = true;
+                GUILayout.Label(
+                    $"{FindOrganization(membership.OrganizationId).DisplayName}　" +
+                    $"{FindPositionName(membership.PositionId)}　忠诚" +
+                    $"{membership.LoyaltyBasisPoints / 100f:F1}%",
+                    _normalStyle);
+            }
+
+            if (!hasMembership)
+            {
+                GUILayout.Label("当前为在野人物。", _normalStyle);
+            }
+        }
+
+        private void DrawPlayerTasks()
+        {
+            var player = FindPlayer();
+            GUILayout.Label("当前人物任务", _sectionStyle);
+            var activeTask = false;
+            for (var i = 0; i < _world.Tasks.Count; i++)
+            {
+                var task = _world.Tasks[i];
+                if (task.AssigneePersonId != player.Id)
+                {
+                    continue;
+                }
+
+                activeTask = task.Status == TaskStatus.Active || activeTask;
+                var definition = FindTaskDefinition(task.DefinitionId);
+                GUILayout.Label(
+                    $"{definition.DisplayName}　状态：{task.Status}　" +
+                    $"进度：{task.Progress}/{definition.RequiredProgress}　" +
+                    $"截止：第{task.DeadlineDay + 1}日",
+                    _normalStyle);
+            }
+
+            if (!activeTask)
+            {
+                GUILayout.Label("当前没有进行中的任务。", _normalStyle);
+            }
+
+            GUILayout.Space(12);
+            GUILayout.Label("可以申请的任务", _sectionStyle);
+            for (var i = 0; i < _world.TaskDefinitions.Count; i++)
+            {
+                var definition = _world.TaskDefinitions[i];
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(
+                    $"{definition.DisplayName}　起点：" +
+                    $"{FindLocationName(definition.OriginLocationId)}　" +
+                    $"期限{definition.DurationDays}天　奖励{definition.RewardMoney}钱",
+                    _normalStyle);
+                GUI.enabled = definition.IsAvailable && !activeTask;
+                if (GUILayout.Button("申请", GUILayout.Width(90)))
+                {
+                    var result = _taskSystem.TryAccept(
+                        _world,
+                        new StableId(player.Id),
+                        new StableId(definition.Id));
+                    _message = result.Message;
+                }
+
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+            }
+        }
+
+        private void DrawDeveloperDashboard()
+        {
+            GUILayout.Label("世界模拟观察台", _sectionStyle);
+            GUILayout.Label(
+                "开发调试界面：完整展示时间、人物、市场、AI、旅行、战争和医疗状态。",
+                _normalStyle);
+            DrawToolbar();
             DrawWorldSummary();
             DrawHistoricalTimeline();
             DrawLocations();
@@ -72,8 +669,13 @@ namespace Mandate.Presentation
             DrawTasks();
             DrawJourneys();
             DrawActionLog();
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
+        }
+
+        private void AdvancePlayerDays(int days)
+        {
+            _simulator.AdvanceDays(_world, days);
+            RefreshMonthlyDecisions();
+            _message = $"世界推进了{days}天。";
         }
 
         private void DrawToolbar()
@@ -708,7 +1310,9 @@ namespace Mandate.Presentation
 
         private void InitializeWorld()
         {
-            _world = PrototypeWorldFactory.Create184World(DefaultSeed);
+            _world = _newGameSetupService.CreateExisting184World(
+                "person.liu_bei",
+                DefaultSeed);
             _snapshot = null;
             _actionLog.Clear();
             RebindServices();
@@ -790,6 +1394,16 @@ namespace Mandate.Presentation
             _message = "刘备已从涿县出发，徒步前往中山；预计5天抵达。";
         }
 
+        private PersonState FindPlayer()
+        {
+            if (_world == null || string.IsNullOrEmpty(_world.PlayerPersonId))
+            {
+                throw new InvalidOperationException("当前世界没有玩家控制人物。");
+            }
+
+            return FindPerson(_world.PlayerPersonId);
+        }
+
         private PersonState FindPerson(string personId)
         {
             for (var i = 0; i < _world.People.Count; i++)
@@ -858,15 +1472,74 @@ namespace Mandate.Presentation
 
         private string FindLocationName(string locationId)
         {
-            for (var i = 0; i < _world.Locations.Count; i++)
+            return FindLocationName(_world, locationId);
+        }
+
+        private static string FindLocationName(WorldState world, string locationId)
+        {
+            for (var i = 0; i < world.Locations.Count; i++)
             {
-                if (_world.Locations[i].Id == locationId)
+                if (world.Locations[i].Id == locationId)
                 {
-                    return _world.Locations[i].DisplayName;
+                    return world.Locations[i].DisplayName;
                 }
             }
 
             return locationId;
+        }
+
+        private static string FindIdentityName(WorldState world, string personId)
+        {
+            for (var i = 0; i < world.Memberships.Count; i++)
+            {
+                var membership = world.Memberships[i];
+                if (membership.PersonId != personId)
+                {
+                    continue;
+                }
+
+                for (var positionIndex = 0;
+                     positionIndex < world.Positions.Count;
+                     positionIndex++)
+                {
+                    if (world.Positions[positionIndex].Id == membership.PositionId)
+                    {
+                        return world.Positions[positionIndex].DisplayName;
+                    }
+                }
+            }
+
+            return "在野";
+        }
+
+        private static string StartingIdentityDescription(int identityIndex)
+        {
+            switch ((StartingIdentity)identityIndex)
+            {
+                case StartingIdentity.Soldier:
+                    return "从涿县加入幽州官军，拥有士卒职位，可承接军粮和征募任务。";
+                case StartingIdentity.CountyClerk:
+                    return "从涿县官署担任书佐，可承接户籍、治安和地方政务任务。";
+                case StartingIdentity.Merchant:
+                    return "从中山商行开始，拥有更多本钱和载货能力，可经营中山—涿县商路。";
+                case StartingIdentity.Physician:
+                    return "从广宗救济营开始，拥有较高医术，可购买药材并救治战场伤员。";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string GenderName(PersonGender gender)
+        {
+            switch (gender)
+            {
+                case PersonGender.Male:
+                    return "男";
+                case PersonGender.Female:
+                    return "女";
+                default:
+                    return "未记载";
+            }
         }
 
         private string FindPersonName(string personId)

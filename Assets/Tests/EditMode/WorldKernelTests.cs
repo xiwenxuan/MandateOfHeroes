@@ -1040,6 +1040,151 @@ namespace Mandate.Tests
                 Is.GreaterThan(0));
         }
 
+        [Test]
+        public void NewGame_CustomCharacterCreatesPlayableHouseholdAndPosition()
+        {
+            var request = new NewGameCharacterRequest
+            {
+                DisplayName = "玄德",
+                Age = 22,
+                Gender = PersonGender.Male,
+                Identity = StartingIdentity.Soldier
+            };
+
+            var world = new NewGameSetupService().CreateCustom184World(request, 184);
+            var player = world.People.Find(
+                item => item.Id == NewGameSetupService.CustomPlayerPersonId);
+            var household = world.Families.Find(
+                item => item.HeadPersonId == NewGameSetupService.CustomPlayerPersonId);
+            var membership = world.Memberships.Find(
+                item => item.PersonId == NewGameSetupService.CustomPlayerPersonId);
+
+            Assert.That(world.PlayerPersonId, Is.EqualTo(player.Id));
+            Assert.That(player.DisplayName, Is.EqualTo("玄德"));
+            Assert.That(player.BirthDay, Is.EqualTo(-22 * 360L));
+            Assert.That(player.LocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.MemberIds, Does.Contain(player.Id));
+            Assert.That(membership.PositionId, Is.EqualTo("position.youzhou_soldier"));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void NewGame_EachStartingIdentityReceivesItsWorldRole()
+        {
+            var identities = new[]
+            {
+                StartingIdentity.Soldier,
+                StartingIdentity.CountyClerk,
+                StartingIdentity.Merchant,
+                StartingIdentity.Physician
+            };
+            var expectedLocations = new[]
+            {
+                "location.zhuo",
+                "location.zhuo",
+                "location.zhongshan",
+                "location.guangzong"
+            };
+            var expectedPositions = new[]
+            {
+                "position.youzhou_soldier",
+                "position.zhuo_county_clerk",
+                "position.zhongshan_trader",
+                "position.guangzong_physician"
+            };
+
+            for (var i = 0; i < identities.Length; i++)
+            {
+                var world = new NewGameSetupService().CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = "测试人物" + i,
+                        Age = 18 + i,
+                        Gender = i % 2 == 0 ? PersonGender.Male : PersonGender.Female,
+                        Identity = identities[i]
+                    },
+                    184);
+                var player = world.People.Find(
+                    item => item.Id == world.PlayerPersonId);
+                var membership = world.Memberships.Find(
+                    item => item.PersonId == world.PlayerPersonId);
+
+                Assert.That(player.LocationId, Is.EqualTo(expectedLocations[i]));
+                Assert.That(membership.PositionId, Is.EqualTo(expectedPositions[i]));
+                Assert.DoesNotThrow(world.Validate);
+            }
+        }
+
+        [Test]
+        public void NewGame_CanControlAnyExistingWorldPerson()
+        {
+            var service = new NewGameSetupService();
+            var world = service.CreateExisting184World("person.zhang_shiping", 184);
+
+            Assert.That(world.PlayerPersonId, Is.EqualTo("person.zhang_shiping"));
+            Assert.That(
+                world.People.Find(item => item.Id == world.PlayerPersonId).DisplayName,
+                Is.EqualTo("张世平"));
+            Assert.That(
+                world.People.Exists(
+                    item => item.Id == NewGameSetupService.CustomPlayerPersonId),
+                Is.False);
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void NewGame_RejectsInvalidCustomCharacter()
+        {
+            var service = new NewGameSetupService();
+
+            Assert.Throws<ArgumentException>(
+                () => service.CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = " ",
+                        Age = 18,
+                        Gender = PersonGender.Male
+                    },
+                    184));
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => service.CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = "幼童",
+                        Age = 10,
+                        Gender = PersonGender.Male
+                    },
+                    184));
+            Assert.Throws<InvalidOperationException>(
+                () => service.CreateExisting184World("person.missing", 184));
+        }
+
+        [Test]
+        public void Snapshot_RoundTripPreservesControlledPlayer()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "行医者",
+                    Age = 30,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Physician
+                },
+                184);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(
+                loaded.PlayerPersonId,
+                Is.EqualTo(NewGameSetupService.CustomPlayerPersonId));
+            Assert.That(
+                loaded.People.Find(item => item.Id == loaded.PlayerPersonId).DisplayName,
+                Is.EqualTo("行医者"));
+            Assert.DoesNotThrow(loaded.Validate);
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
