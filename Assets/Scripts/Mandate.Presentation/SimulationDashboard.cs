@@ -68,6 +68,8 @@ namespace Mandate.Presentation
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
             new ConstructionSystem();
+        private readonly PopulationLedgerSystem _populationLedgerSystem =
+            new PopulationLedgerSystem();
         private readonly Dictionary<string, NpcDecision> _decisions =
             new Dictionary<string, NpcDecision>(StringComparer.Ordinal);
 
@@ -1839,6 +1841,7 @@ namespace Mandate.Presentation
                 _normalStyle);
             DrawToolbar();
             DrawWorldSummary();
+            DrawPopulationLedger();
             DrawHistoricalTimeline();
             DrawLocations();
             DrawMarkets();
@@ -1912,6 +1915,133 @@ namespace Mandate.Presentation
 
             GUI.enabled = true;
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawPopulationLedger()
+        {
+            GUILayout.Space(10);
+            GUILayout.Label("人口总账与守恒审计", _sectionStyle);
+            if (!_world.PopulationLedgerInitialized)
+            {
+                GUILayout.Label("当前世界尚未初始化人口总账。", _normalStyle);
+                return;
+            }
+
+            var audit = _populationLedgerSystem.Audit(_world);
+            GUILayout.Label(
+                $"期初人口：{audit.OpeningPopulation}　" +
+                $"应有人口：{audit.ExpectedPopulation}　" +
+                $"实际人口：{audit.ActualPopulation}　" +
+                $"审计：{(audit.IsBalanced ? "平衡" : "不平衡")}",
+                _normalStyle);
+            GUILayout.Label(
+                $"统计人口：{audit.AbstractPopulation}　" +
+                $"独立人物：{audit.IndependentPopulation}　" +
+                $"出生：{audit.Births}　死亡：{audit.Deaths}　" +
+                $"事务：{_world.PopulationTransactions.Count}",
+                _normalStyle);
+
+            for (var locationIndex = 0;
+                 locationIndex < _world.Locations.Count;
+                 locationIndex++)
+            {
+                var location = _world.Locations[locationIndex];
+                var summary = string.Empty;
+                for (var occupation = PopulationOccupation.Agriculture;
+                     occupation <= PopulationOccupation.Dependent;
+                     occupation++)
+                {
+                    var population = 0;
+                    for (var cohortIndex = 0;
+                         cohortIndex < _world.PopulationCohorts.Count;
+                         cohortIndex++)
+                    {
+                        var cohort = _world.PopulationCohorts[cohortIndex];
+                        if (cohort.LocationId == location.Id &&
+                            cohort.Occupation == occupation)
+                        {
+                            population += cohort.Population;
+                        }
+                    }
+
+                    if (summary.Length > 0)
+                    {
+                        summary += "　";
+                    }
+
+                    summary +=
+                        $"{PopulationLedgerSystem.OccupationName(occupation)}" +
+                        $"{population}";
+                }
+
+                GUILayout.Label(
+                    $"{location.DisplayName}　总人口{location.Population}　{summary}",
+                    _normalStyle);
+            }
+
+            var migrationCohort = FindPopulationCohort(
+                "location.zhuo",
+                PopulationOccupation.Agriculture);
+            GUI.enabled =
+                migrationCohort != null &&
+                migrationCohort.Population >= 100;
+            if (GUILayout.Button(
+                    "调试：100名涿县农业人口迁往广宗",
+                    GUILayout.Height(32)))
+            {
+                try
+                {
+                    _populationLedgerSystem.TransferCohort(
+                        _world,
+                        new StableId(migrationCohort.Id),
+                        new StableId("location.guangzong"),
+                        100);
+                    _message = "100名农业人口已经迁往广宗，世界总人口保持不变。";
+                }
+                catch (Exception exception)
+                {
+                    _message = exception.Message;
+                }
+            }
+
+            GUI.enabled = true;
+            var first = Math.Max(
+                0,
+                _world.PopulationTransactions.Count - 8);
+            for (var i = _world.PopulationTransactions.Count - 1;
+                 i >= first;
+                 i--)
+            {
+                var transaction = _world.PopulationTransactions[i];
+                GUILayout.Label(
+                    $"第{transaction.Day}日　{transaction.Type}　" +
+                    $"{transaction.Summary}",
+                    _normalStyle);
+            }
+
+            for (var i = 0; i < audit.LocationMismatches.Count; i++)
+            {
+                GUILayout.Label(
+                    "异常：" + audit.LocationMismatches[i],
+                    _normalStyle);
+            }
+        }
+
+        private PopulationCohortState FindPopulationCohort(
+            string locationId,
+            PopulationOccupation occupation)
+        {
+            for (var i = 0; i < _world.PopulationCohorts.Count; i++)
+            {
+                var cohort = _world.PopulationCohorts[i];
+                if (cohort.LocationId == locationId &&
+                    cohort.Occupation == occupation)
+                {
+                    return cohort;
+                }
+            }
+
+            return null;
         }
 
         private void DrawWorldSummary()

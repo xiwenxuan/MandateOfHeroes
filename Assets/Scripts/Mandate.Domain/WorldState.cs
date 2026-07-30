@@ -70,6 +70,8 @@ namespace Mandate.Domain
         public string MotherPersonId;
         public string SpousePersonId;
         public long LastChildbirthDay = -1;
+        public bool CountsTowardPopulation = true;
+        public string PopulationOriginLocationId;
         public PersonalityState Personality = new PersonalityState();
         public NeedState Needs = new NeedState();
     }
@@ -105,7 +107,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -142,6 +144,12 @@ namespace Mandate.Domain
             new List<MedicalTreatmentRecordState>();
         public List<ConstructionProjectState> ConstructionProjects =
             new List<ConstructionProjectState>();
+        public bool PopulationLedgerInitialized;
+        public long PopulationOpeningTotal;
+        public List<PopulationCohortState> PopulationCohorts =
+            new List<PopulationCohortState>();
+        public List<PopulationTransactionState> PopulationTransactions =
+            new List<PopulationTransactionState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -209,6 +217,10 @@ namespace Mandate.Domain
                 MedicalTreatments, item => item.Id, "medical treatment");
             ValidateUniqueIds(
                 ConstructionProjects, item => item.Id, "construction project");
+            ValidateUniqueIds(
+                PopulationCohorts, item => item.Id, "population cohort");
+            ValidateUniqueIds(
+                PopulationTransactions, item => item.Id, "population transaction");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -346,7 +358,18 @@ namespace Mandate.Domain
                     throw new InvalidOperationException(
                         $"Person {person.Id} references missing location {person.LocationId}.");
                 }
+
+                if (PopulationLedgerInitialized &&
+                    person.CountsTowardPopulation &&
+                    (string.IsNullOrEmpty(person.PopulationOriginLocationId) ||
+                     !locationIds.Contains(person.PopulationOriginLocationId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has an invalid population origin.");
+                }
             }
+
+            ValidatePopulationLedger(personIds, locationIds);
 
             for (var i = 0; i < Families.Count; i++)
             {
@@ -953,6 +976,189 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Position {Positions[i].Id} exceeds its capacity.");
+                }
+            }
+        }
+
+        private void ValidatePopulationLedger(
+            HashSet<string> personIds,
+            HashSet<string> locationIds)
+        {
+            if (!PopulationLedgerInitialized)
+            {
+                if (PopulationOpeningTotal != 0 ||
+                    PopulationCohorts.Count != 0 ||
+                    PopulationTransactions.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Uninitialized population ledger contains data.");
+                }
+
+                return;
+            }
+
+            if (PopulationOpeningTotal < 0)
+            {
+                throw new InvalidOperationException(
+                    "Population opening total cannot be negative.");
+            }
+
+            var cohortIds = new HashSet<string>(StringComparer.Ordinal);
+            var populationByLocation =
+                new Dictionary<string, long>(StringComparer.Ordinal);
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                populationByLocation.Add(Locations[i].Id, 0);
+            }
+
+            long actualPopulation = 0;
+            for (var i = 0; i < PopulationCohorts.Count; i++)
+            {
+                var cohort = PopulationCohorts[i];
+                cohortIds.Add(cohort.Id);
+                if (!locationIds.Contains(cohort.LocationId) ||
+                    !locationIds.Contains(cohort.OriginLocationId) ||
+                    !Enum.IsDefined(
+                        typeof(PopulationOccupation),
+                        cohort.Occupation) ||
+                    cohort.Population < 0 ||
+                    cohort.Households < 0 ||
+                    cohort.WorkingAgePopulation < 0 ||
+                    cohort.WorkingAgePopulation > cohort.Population ||
+                    cohort.CollectiveWealth < 0 ||
+                    cohort.StableSeed == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid population cohort {cohort.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    cohort.AverageHealthBasisPoints,
+                    cohort.Id,
+                    "average health");
+                ValidateBasisPoints(
+                    cohort.SatisfactionBasisPoints,
+                    cohort.Id,
+                    "satisfaction");
+                ValidateBasisPoints(
+                    cohort.MigrationPressureBasisPoints,
+                    cohort.Id,
+                    "migration pressure");
+                actualPopulation += cohort.Population;
+                populationByLocation[cohort.LocationId] += cohort.Population;
+            }
+
+            for (var i = 0; i < People.Count; i++)
+            {
+                var person = People[i];
+                if (!person.CountsTowardPopulation || !person.IsAlive)
+                {
+                    continue;
+                }
+
+                actualPopulation++;
+                populationByLocation[person.LocationId]++;
+            }
+
+            long expectedPopulation = PopulationOpeningTotal;
+            for (var i = 0; i < PopulationTransactions.Count; i++)
+            {
+                var transaction = PopulationTransactions[i];
+                if (!Enum.IsDefined(
+                        typeof(PopulationTransactionType),
+                        transaction.Type) ||
+                    transaction.Day < 0 ||
+                    transaction.Day > AbsoluteDay ||
+                    transaction.Quantity <= 0 ||
+                    !string.IsNullOrEmpty(transaction.FromLocationId) &&
+                    !locationIds.Contains(transaction.FromLocationId) ||
+                    !string.IsNullOrEmpty(transaction.ToLocationId) &&
+                    !locationIds.Contains(transaction.ToLocationId) ||
+                    !string.IsNullOrEmpty(transaction.FromCohortId) &&
+                    !cohortIds.Contains(transaction.FromCohortId) ||
+                    !string.IsNullOrEmpty(transaction.ToCohortId) &&
+                    !cohortIds.Contains(transaction.ToCohortId) ||
+                    !string.IsNullOrEmpty(transaction.PersonId) &&
+                    !personIds.Contains(transaction.PersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid population transaction {transaction.Id}.");
+                }
+
+                switch (transaction.Type)
+                {
+                    case PopulationTransactionType.Birth:
+                        if (string.IsNullOrEmpty(transaction.ToLocationId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Birth transaction {transaction.Id} is incomplete.");
+                        }
+
+                        expectedPopulation += transaction.Quantity;
+                        break;
+                    case PopulationTransactionType.Death:
+                        if (string.IsNullOrEmpty(transaction.FromLocationId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Death transaction {transaction.Id} is incomplete.");
+                        }
+
+                        expectedPopulation -= transaction.Quantity;
+                        break;
+                    case PopulationTransactionType.Migration:
+                        if (string.IsNullOrEmpty(transaction.FromLocationId) ||
+                            string.IsNullOrEmpty(transaction.ToLocationId) ||
+                            transaction.FromLocationId ==
+                            transaction.ToLocationId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Migration transaction {transaction.Id} is incomplete.");
+                        }
+
+                        break;
+                    case PopulationTransactionType.Instantiation:
+                        if (transaction.Quantity != 1 ||
+                            string.IsNullOrEmpty(transaction.FromCohortId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Instantiation transaction {transaction.Id} " +
+                                "is incomplete.");
+                        }
+
+                        break;
+                    case PopulationTransactionType.Reaggregation:
+                        if (transaction.Quantity != 1 ||
+                            string.IsNullOrEmpty(transaction.ToCohortId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Reaggregation transaction {transaction.Id} " +
+                                "is incomplete.");
+                        }
+
+                        break;
+                }
+            }
+
+            if (actualPopulation != expectedPopulation)
+            {
+                throw new InvalidOperationException(
+                    $"Population conservation failed: actual {actualPopulation}, " +
+                    $"expected {expectedPopulation}.");
+            }
+
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                var location = Locations[i];
+                if (populationByLocation[location.Id] != location.Population)
+                {
+                    throw new InvalidOperationException(
+                        $"Population summary mismatch at {location.Id}: " +
+                        $"summary {location.Population}, ledger " +
+                        $"{populationByLocation[location.Id]}.");
                 }
             }
         }

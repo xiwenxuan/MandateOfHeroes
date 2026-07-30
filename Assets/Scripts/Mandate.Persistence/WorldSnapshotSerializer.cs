@@ -33,6 +33,7 @@ namespace Mandate.Persistence
 
             var world = JsonConvert.DeserializeObject<WorldState>(json, Settings)
                 ?? throw new InvalidOperationException("Snapshot did not contain a world.");
+            world = WorldSnapshotMigrator.MigrateToCurrent(world);
             world.Validate();
             return world;
         }

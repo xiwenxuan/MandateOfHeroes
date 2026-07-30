@@ -8,6 +8,8 @@ namespace Mandate.Simulation
     {
         private const int DaysPerYear = 360;
         private readonly NamedRandom _random;
+        private readonly PopulationLedgerSystem _populationLedgerSystem =
+            new PopulationLedgerSystem();
 
         public LifeSimulationSystem(ulong masterSeed)
         {
@@ -186,6 +188,7 @@ namespace Mandate.Simulation
                     Provisions = 0
                 };
                 world.People.Add(child);
+                _populationLedgerSystem.RecordBirth(world, child);
                 family.MemberIds.Add(child.Id);
                 mother.LastChildbirthDay = world.AbsoluteDay;
                 AddEvent(
@@ -199,14 +202,14 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveDeathsAndSuccession(WorldState world)
+        private void ResolveDeathsAndSuccession(WorldState world)
         {
             for (var i = 0; i < world.People.Count; i++)
             {
                 var person = world.People[i];
                 if (person.IsAlive && person.HealthBasisPoints <= 0)
                 {
-                    person.IsAlive = false;
+                    _populationLedgerSystem.RecordDeath(world, person);
                     AddEvent(
                         world,
                         LifeEventType.Death,

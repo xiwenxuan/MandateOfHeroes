@@ -35,6 +35,7 @@
 - `Docs/TASK_M4_LOCATION_GEOGRAPHY.md`
 - `Docs/TASK_M5_IDENTITY_MAP_PERSPECTIVES.md`
 - `Docs/TASK_M6_IDENTITY_CONSTRUCTION.md`
+- `Docs/TASK_M7_POPULATION_LEDGER.md`
 - `Docs/WORLD_SIMULATION_FOUNDATION.md`
 - `Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`
 - `Docs/MAP_ART_RESOURCE_PLAN.md`
@@ -87,6 +88,8 @@
 地图支持通用、军务、政务、商旅和医药五种身份视角。自建人物进入世界时会根据初始身份自动选择推荐视角，也可以随时手动切换；身份视角负责地点标签和设施情报，地形、治安、粮价、战争图层仍独立负责着色。
 
 玩家在地点详情中可以按当前身份视角发起地方建设，投入个人资金和一天劳作。项目进度、累计投资和完工日期进入存档；完工后地点获得真实设施，并立即改变县乡近览和身份视角情报。
+
+世界人口已经拆分为统计人口批次和独立人物，并通过出生、死亡、迁徙和人物实例化事务保持守恒。开发观察台可以查看各地点职业人口、期初与实际人口、最近事务以及守恒审计结果。
 
 ## 开源策略
 

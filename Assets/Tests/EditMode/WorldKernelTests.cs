@@ -1537,6 +1537,234 @@ namespace Mandate.Tests
             }
         }
 
+        [Test]
+        public void PopulationLedger_PrototypeOpeningPopulationIsBalanced()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var audit = new PopulationLedgerSystem().Audit(world);
+            long locationPopulation = 0;
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                locationPopulation += world.Locations[i].Population;
+            }
+
+            Assert.That(world.PopulationLedgerInitialized, Is.True);
+            Assert.That(world.PopulationCohorts.Count, Is.GreaterThan(0));
+            Assert.That(audit.IsBalanced, Is.True);
+            Assert.That(audit.ActualPopulation, Is.EqualTo(locationPopulation));
+            Assert.That(
+                audit.AbstractPopulation + audit.IndependentPopulation,
+                Is.EqualTo(audit.ActualPopulation));
+        }
+
+        [Test]
+        public void PopulationLedger_CustomPlayerMaterializesWithoutCreatingPerson()
+        {
+            var baseline = PrototypeWorldFactory.Create184World(184);
+            var baselinePopulation =
+                new PopulationLedgerSystem().Audit(baseline).ActualPopulation;
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "人口账测试",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Merchant
+                },
+                184);
+            var audit = new PopulationLedgerSystem().Audit(world);
+
+            Assert.That(audit.ActualPopulation, Is.EqualTo(baselinePopulation));
+            Assert.That(
+                world.PopulationTransactions.Exists(
+                    item =>
+                        item.Type ==
+                        PopulationTransactionType.Instantiation &&
+                        item.PersonId == world.PlayerPersonId),
+                Is.True);
+        }
+
+        [Test]
+        public void PopulationLedger_TravelMovesOnePersonWithoutChangingWorldTotal()
+        {
+            var world = new NewGameSetupService().CreateExisting184World(
+                "person.liu_bei",
+                184);
+            var populationSystem = new PopulationLedgerSystem();
+            var totalBefore = populationSystem.Audit(world).ActualPopulation;
+            var zhuoBefore = world.Locations.Find(
+                item => item.Id == "location.zhuo").Population;
+            var zhongshanBefore = world.Locations.Find(
+                item => item.Id == "location.zhongshan").Population;
+            new TravelSystem().StartJourney(
+                world,
+                new StableId("person.liu_bei"),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhongshan"),
+                TravelMode.Foot);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 5);
+
+            var audit = populationSystem.Audit(world);
+            Assert.That(audit.ActualPopulation, Is.EqualTo(totalBefore));
+            Assert.That(
+                world.Locations.Find(item => item.Id == "location.zhuo")
+                    .Population,
+                Is.EqualTo(zhuoBefore - 1));
+            Assert.That(
+                world.Locations.Find(item => item.Id == "location.zhongshan")
+                    .Population,
+                Is.EqualTo(zhongshanBefore + 1));
+            Assert.That(
+                world.PopulationTransactions.Exists(
+                    item =>
+                        item.Type == PopulationTransactionType.Migration &&
+                        item.PersonId == "person.liu_bei"),
+                Is.True);
+        }
+
+        [Test]
+        public void PopulationLedger_CohortMigrationPreservesGlobalPopulation()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var system = new PopulationLedgerSystem();
+            var source = world.PopulationCohorts.Find(
+                item =>
+                    item.LocationId == "location.zhuo" &&
+                    item.Occupation == PopulationOccupation.Agriculture);
+            var totalBefore = system.Audit(world).ActualPopulation;
+
+            system.TransferCohort(
+                world,
+                new StableId(source.Id),
+                new StableId("location.guangzong"),
+                100);
+
+            var audit = system.Audit(world);
+            Assert.That(audit.IsBalanced, Is.True);
+            Assert.That(audit.ActualPopulation, Is.EqualTo(totalBefore));
+            Assert.That(
+                world.PopulationTransactions[0].Quantity,
+                Is.EqualTo(100));
+        }
+
+        [Test]
+        public void PopulationLedger_BirthAndDeathHaveTraceableNetEffect()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var system = new PopulationLedgerSystem();
+            var totalBefore = system.Audit(world).ActualPopulation;
+            var child = new PersonState
+            {
+                Id = "person.generated.population_test_child",
+                DisplayName = "人口测试新生儿",
+                LocationId = "location.zhuo",
+                BirthDay = world.AbsoluteDay,
+                Gender = PersonGender.Female,
+                Provisions = 0
+            };
+            world.People.Add(child);
+            system.RecordBirth(world, child);
+
+            Assert.That(
+                system.Audit(world).ActualPopulation,
+                Is.EqualTo(totalBefore + 1));
+            system.RecordDeath(world, child);
+            var audit = system.Audit(world);
+            Assert.That(audit.ActualPopulation, Is.EqualTo(totalBefore));
+            Assert.That(audit.Births, Is.EqualTo(1));
+            Assert.That(audit.Deaths, Is.EqualTo(1));
+            Assert.That(audit.IsBalanced, Is.True);
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionOneWorldToPopulationLedger()
+        {
+            const string legacyJson =
+                "{" +
+                "\"SchemaVersion\":1," +
+                "\"MasterSeed\":184," +
+                "\"AbsoluteDay\":0," +
+                "\"Segment\":0," +
+                "\"Revision\":0," +
+                "\"Locations\":[{" +
+                "\"Id\":\"location.zhuo\"," +
+                "\"DisplayName\":\"涿县\"," +
+                "\"Population\":20000," +
+                "\"PublicOrderBasisPoints\":5000," +
+                "\"GrainPrice\":100," +
+                "\"MapXBasisPoints\":1600," +
+                "\"MapYBasisPoints\":1300" +
+                "}]," +
+                "\"People\":[{" +
+                "\"Id\":\"person.liu_bei\"," +
+                "\"DisplayName\":\"刘备\"," +
+                "\"LocationId\":\"location.zhuo\"," +
+                "\"BirthDay\":-5000," +
+                "\"IsAlive\":true," +
+                "\"HealthBasisPoints\":10000" +
+                "}]" +
+                "}";
+
+            var loaded = WorldSnapshotSerializer.Deserialize(legacyJson);
+            var audit = new PopulationLedgerSystem().Audit(loaded);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.PopulationLedgerInitialized, Is.True);
+            Assert.That(audit.IsBalanced, Is.True);
+            Assert.That(
+                audit.ActualPopulation,
+                Is.EqualTo(20_000));
+        }
+
+        [Test]
+        public void PopulationLedger_ValidationRejectsTamperedLocationSummary()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            world.Locations[0].Population++;
+
+            Assert.Throws<System.InvalidOperationException>(world.Validate);
+        }
+
+        [Test]
+        public void Snapshot_RoundTripPreservesPopulationLedgerAndTransactions()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "人口存档",
+                    Age = 20,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Physician
+                },
+                184);
+            var source = world.PopulationCohorts.Find(
+                item =>
+                    item.LocationId == "location.zhuo" &&
+                    item.Occupation == PopulationOccupation.Agriculture);
+            new PopulationLedgerSystem().TransferCohort(
+                world,
+                new StableId(source.Id),
+                new StableId("location.guangzong"),
+                50);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var audit = new PopulationLedgerSystem().Audit(loaded);
+
+            Assert.That(
+                loaded.PopulationCohorts.Count,
+                Is.EqualTo(world.PopulationCohorts.Count));
+            Assert.That(
+                loaded.PopulationTransactions.Count,
+                Is.EqualTo(world.PopulationTransactions.Count));
+            Assert.That(audit.IsBalanced, Is.True);
+            Assert.That(
+                audit.ActualPopulation,
+                Is.EqualTo(world.PopulationOpeningTotal));
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);

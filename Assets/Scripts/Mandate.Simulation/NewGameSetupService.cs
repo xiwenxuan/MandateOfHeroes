@@ -54,7 +54,10 @@ namespace Mandate.Simulation
 
             var world = PrototypeWorldFactory.Create184World(masterSeed);
             var person = BuildPlayerPerson(displayName, request);
-            world.People.Add(person);
+            new PopulationLedgerSystem().MaterializePerson(
+                world,
+                person,
+                StartingPopulationOccupation(request.Identity));
             world.Families.Add(new FamilyState
             {
                 Id = "family.player_household",
@@ -163,6 +166,23 @@ namespace Mandate.Simulation
                     return 3_000;
                 case StartingIdentity.Physician:
                     return 1_200;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(identity));
+            }
+        }
+
+        private static PopulationOccupation StartingPopulationOccupation(
+            StartingIdentity identity)
+        {
+            switch (identity)
+            {
+                case StartingIdentity.Soldier:
+                case StartingIdentity.CountyClerk:
+                    return PopulationOccupation.Administration;
+                case StartingIdentity.Merchant:
+                    return PopulationOccupation.Merchant;
+                case StartingIdentity.Physician:
+                    return PopulationOccupation.Medical;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(identity));
             }
