@@ -584,6 +584,7 @@ namespace Mandate.Simulation
 
             CharacterAbilityBootstrap.InitializeWorld(world);
             new PopulationLedgerSystem().InitializeFromLocationSummaries(world);
+            new MilitaryServiceSystem().InitializePrototype(world);
             world.Validate();
             return world;
         }

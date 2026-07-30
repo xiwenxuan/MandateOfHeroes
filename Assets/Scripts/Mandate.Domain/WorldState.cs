@@ -112,7 +112,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 4;
+        public const int CurrentSchemaVersion = 5;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -159,6 +159,13 @@ namespace Mandate.Domain
             new List<EducationPlanState>();
         public List<LearningRecordState> LearningRecords =
             new List<LearningRecordState>();
+        public bool MilitaryServiceInitialized;
+        public List<MilitaryFormationState> MilitaryFormations =
+            new List<MilitaryFormationState>();
+        public List<MilitaryServiceState> MilitaryServices =
+            new List<MilitaryServiceState>();
+        public List<MilitaryOrderState> MilitaryOrders =
+            new List<MilitaryOrderState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -234,6 +241,12 @@ namespace Mandate.Domain
                 EducationPlans, item => item.Id, "education plan");
             ValidateUniqueIds(
                 LearningRecords, item => item.Id, "learning record");
+            ValidateUniqueIds(
+                MilitaryFormations, item => item.Id, "military formation");
+            ValidateUniqueIds(
+                MilitaryServices, item => item.Id, "military service");
+            ValidateUniqueIds(
+                MilitaryOrders, item => item.Id, "military order");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -1058,6 +1071,249 @@ namespace Mandate.Domain
             }
 
             ValidateEducation(personIds, positionIds);
+            ValidateMilitaryService(personIds, locationIds, armyIds);
+        }
+
+        private void ValidateMilitaryService(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> armyIds)
+        {
+            if (!MilitaryServiceInitialized)
+            {
+                if (MilitaryFormations.Count != 0 ||
+                    MilitaryServices.Count != 0 ||
+                    MilitaryOrders.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Uninitialized military service must not contain records.");
+                }
+
+                return;
+            }
+
+            var formationIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                formationIds.Add(formation.Id);
+                if (!armyIds.Contains(formation.ArmyId) ||
+                    !personIds.Contains(formation.CommanderPersonId) ||
+                    formation.AuthorizedStrength <= 0 ||
+                    formation.DisplayOrder < 0 ||
+                    !Enum.IsDefined(typeof(MilitaryFormationKind), formation.Kind))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military formation {formation.Id}.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                if (string.IsNullOrEmpty(formation.ParentFormationId))
+                {
+                    if (formation.Kind != MilitaryFormationKind.Army)
+                    {
+                        throw new InvalidOperationException(
+                            $"Formation {formation.Id} is not an army root.");
+                    }
+                }
+                else
+                {
+                    var parent = FindMilitaryFormation(
+                        MilitaryFormations, formation.ParentFormationId);
+                    if (parent.ArmyId != formation.ArmyId ||
+                        formation.ParentFormationId == formation.Id)
+                    {
+                        throw new InvalidOperationException(
+                            $"Formation {formation.Id} has an invalid parent.");
+                    }
+                }
+            }
+
+            var servingPeople = new HashSet<string>(StringComparer.Ordinal);
+            var activeByArmy = new Dictionary<string, int>(StringComparer.Ordinal);
+            var woundedByArmy = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryServices.Count; i++)
+            {
+                var service = MilitaryServices[i];
+                if (!servingPeople.Add(service.PersonId) ||
+                    !personIds.Contains(service.PersonId) ||
+                    !armyIds.Contains(service.ArmyId) ||
+                    !formationIds.Contains(service.FormationId) ||
+                    !Enum.IsDefined(typeof(MilitaryServiceRole), service.Role) ||
+                    !Enum.IsDefined(typeof(MilitaryServiceStatus), service.Status) ||
+                    service.Rank < 0 ||
+                    service.EnlistedDay < 0 ||
+                    service.LastStatusChangeDay < service.EnlistedDay ||
+                    service.LastStatusChangeDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military service {service.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    service.DisciplineBasisPoints, service.Id, "discipline");
+                ValidateBasisPoints(
+                    service.LoyaltyBasisPoints, service.Id, "loyalty");
+                ValidateBasisPoints(
+                    service.ServiceExperienceBasisPoints,
+                    service.Id,
+                    "service experience");
+                var formation = FindMilitaryFormation(
+                    MilitaryFormations, service.FormationId);
+                if (formation.ArmyId != service.ArmyId)
+                {
+                    throw new InvalidOperationException(
+                        $"Military service {service.Id} is in another army's formation.");
+                }
+
+                var person = FindPerson(People, service.PersonId);
+                var army = FindArmy(Armies, service.ArmyId);
+                var available =
+                    service.Status == MilitaryServiceStatus.Mustering ||
+                    service.Status == MilitaryServiceStatus.Active ||
+                    service.Status == MilitaryServiceStatus.Wounded;
+                if (available && (!person.IsAlive || person.LocationId != army.LocationId) ||
+                    service.Status == MilitaryServiceStatus.Dead && person.IsAlive)
+                {
+                    throw new InvalidOperationException(
+                        $"Military service {service.Id} disagrees with its person.");
+                }
+
+                if (service.Status == MilitaryServiceStatus.Mustering ||
+                    service.Status == MilitaryServiceStatus.Active)
+                {
+                    AddCount(activeByArmy, service.ArmyId);
+                }
+                else if (service.Status == MilitaryServiceStatus.Wounded)
+                {
+                    AddCount(woundedByArmy, service.ArmyId);
+                }
+            }
+
+            for (var i = 0; i < Armies.Count; i++)
+            {
+                var army = Armies[i];
+                var rootCount = 0;
+                for (var formationIndex = 0;
+                     formationIndex < MilitaryFormations.Count;
+                     formationIndex++)
+                {
+                    var formation = MilitaryFormations[formationIndex];
+                    if (formation.ArmyId == army.Id &&
+                        string.IsNullOrEmpty(formation.ParentFormationId))
+                    {
+                        rootCount++;
+                        if (formation.CommanderPersonId != army.CommanderPersonId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Army {army.Id} root commander does not match.");
+                        }
+                    }
+                }
+
+                activeByArmy.TryGetValue(army.Id, out var active);
+                woundedByArmy.TryGetValue(army.Id, out var wounded);
+                if (rootCount != 1 ||
+                    active != army.Troops ||
+                    wounded != army.WoundedTroops)
+                {
+                    throw new InvalidOperationException(
+                        $"Army {army.Id} military service cache is inconsistent.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                MilitaryServiceState commanderService = null;
+                for (var serviceIndex = 0;
+                     serviceIndex < MilitaryServices.Count;
+                     serviceIndex++)
+                {
+                    var service = MilitaryServices[serviceIndex];
+                    if (service.PersonId == formation.CommanderPersonId &&
+                        service.ArmyId == formation.ArmyId &&
+                        service.FormationId == formation.Id)
+                    {
+                        commanderService = service;
+                        break;
+                    }
+                }
+
+                if (commanderService == null ||
+                    formation.Kind == MilitaryFormationKind.Army &&
+                    commanderService.Role != MilitaryServiceRole.Commander ||
+                    formation.Kind != MilitaryFormationKind.Army &&
+                    commanderService.Role != MilitaryServiceRole.Officer)
+                {
+                    throw new InvalidOperationException(
+                        $"Formation {formation.Id} has no available commander.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryOrders.Count; i++)
+            {
+                var order = MilitaryOrders[i];
+                MilitaryFormationState targetFormation = null;
+                if (!string.IsNullOrEmpty(order.FormationId))
+                {
+                    targetFormation = FindMilitaryFormation(
+                        MilitaryFormations, order.FormationId);
+                }
+
+                var shouldAuthorize =
+                    order.ActualAuthority >= order.RequiredAuthority;
+                if (!personIds.Contains(order.IssuerPersonId) ||
+                    !armyIds.Contains(order.ArmyId) ||
+                    targetFormation != null &&
+                    targetFormation.ArmyId != order.ArmyId ||
+                    !string.IsNullOrEmpty(order.TargetLocationId) &&
+                    !locationIds.Contains(order.TargetLocationId) ||
+                    !string.IsNullOrEmpty(order.TargetArmyId) &&
+                    !armyIds.Contains(order.TargetArmyId) ||
+                    order.Day < 0 ||
+                    order.Day > AbsoluteDay ||
+                    !Enum.IsDefined(typeof(MilitaryOrderType), order.Type) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel), order.RequiredAuthority) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel), order.ActualAuthority) ||
+                    !Enum.IsDefined(typeof(MilitaryOrderResult), order.Result) ||
+                    shouldAuthorize !=
+                    (order.Result == MilitaryOrderResult.Authorized) ||
+                    string.IsNullOrWhiteSpace(order.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military order {order.Id}.");
+                }
+            }
+        }
+
+        private static void AddCount(
+            Dictionary<string, int> counts,
+            string key)
+        {
+            counts.TryGetValue(key, out var count);
+            counts[key] = count + 1;
+        }
+
+        private static MilitaryFormationState FindMilitaryFormation(
+            List<MilitaryFormationState> formations,
+            string formationId)
+        {
+            for (var i = 0; i < formations.Count; i++)
+            {
+                if (formations[i].Id == formationId)
+                {
+                    return formations[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing military formation {formationId}.");
         }
 
         private void ValidateEducation(

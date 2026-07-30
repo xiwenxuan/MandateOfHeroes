@@ -44,6 +44,27 @@ namespace Mandate.Simulation
                 throw new ArgumentNullException(nameof(person));
             }
 
+            MaterializePeople(
+                world,
+                new[] { person },
+                occupation);
+        }
+
+        public void MaterializePeople(
+            WorldState world,
+            IList<PersonState> people,
+            PopulationOccupation occupation)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+
+            if (people == null)
+            {
+                throw new ArgumentNullException(nameof(people));
+            }
+
             world.Validate();
             if (!world.PopulationLedgerInitialized)
             {
@@ -51,34 +72,47 @@ namespace Mandate.Simulation
                     "Population ledger has not been initialized.");
             }
 
+            var existingIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < world.People.Count; i++)
             {
-                if (world.People[i].Id == person.Id)
+                existingIds.Add(world.People[i].Id);
+            }
+
+            for (var personIndex = 0;
+                 personIndex < people.Count;
+                 personIndex++)
+            {
+                var person = people[personIndex] ??
+                    throw new InvalidOperationException(
+                        "A materialized person cannot be null.");
+                _ = new StableId(person.Id);
+                if (!existingIds.Add(person.Id))
                 {
                     throw new InvalidOperationException(
                         $"Person {person.Id} already exists.");
                 }
+
+                var cohort = FindAvailableCohort(
+                    world,
+                    person.LocationId,
+                    occupation);
+                cohort.Population--;
+                RefreshCohortDemographics(cohort);
+                person.CountsTowardPopulation = true;
+                person.PopulationOriginLocationId = cohort.OriginLocationId;
+                world.People.Add(person);
+                AddTransaction(
+                    world,
+                    PopulationTransactionType.Instantiation,
+                    1,
+                    person.LocationId,
+                    person.LocationId,
+                    cohort.Id,
+                    string.Empty,
+                    person.Id,
+                    $"{person.DisplayName}从{OccupationName(occupation)}人口中实例化。");
             }
 
-            var cohort = FindAvailableCohort(
-                world,
-                person.LocationId,
-                occupation);
-            cohort.Population--;
-            RefreshCohortDemographics(cohort);
-            person.CountsTowardPopulation = true;
-            person.PopulationOriginLocationId = cohort.OriginLocationId;
-            world.People.Add(person);
-            AddTransaction(
-                world,
-                PopulationTransactionType.Instantiation,
-                1,
-                person.LocationId,
-                person.LocationId,
-                cohort.Id,
-                string.Empty,
-                person.Id,
-                $"{person.DisplayName}从{OccupationName(occupation)}人口中实例化。");
             world.Validate();
         }
 
@@ -128,29 +162,79 @@ namespace Mandate.Simulation
                 throw new ArgumentNullException(nameof(person));
             }
 
-            world.Validate();
-            if (!person.IsAlive)
+            RecordDeaths(world, new[] { person }, true);
+        }
+
+        public void RecordDeaths(
+            WorldState world,
+            IList<PersonState> people,
+            bool validateInitialState)
+        {
+            if (world == null)
             {
-                throw new InvalidOperationException(
-                    $"Person {person.Id} is already deceased.");
+                throw new ArgumentNullException(nameof(world));
             }
 
-            person.IsAlive = false;
-            if (world.PopulationLedgerInitialized &&
-                person.CountsTowardPopulation)
+            if (people == null)
             {
-                var location = FindLocation(world, person.LocationId);
-                location.Population = checked(location.Population - 1);
-                AddTransaction(
-                    world,
-                    PopulationTransactionType.Death,
-                    1,
-                    person.LocationId,
-                    string.Empty,
-                    string.Empty,
-                    string.Empty,
-                    person.Id,
-                    $"{person.DisplayName}死亡。");
+                throw new ArgumentNullException(nameof(people));
+            }
+
+            if (validateInitialState)
+            {
+                world.Validate();
+            }
+
+            var affectedArmies = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < people.Count; i++)
+            {
+                var person = people[i] ??
+                    throw new InvalidOperationException(
+                        "A deceased person cannot be null.");
+                if (!person.IsAlive)
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} is already deceased.");
+                }
+
+                for (var serviceIndex = 0;
+                     serviceIndex < world.MilitaryServices.Count;
+                     serviceIndex++)
+                {
+                    var service = world.MilitaryServices[serviceIndex];
+                    if (service.PersonId != person.Id)
+                    {
+                        continue;
+                    }
+
+                    service.Status = MilitaryServiceStatus.Dead;
+                    service.LastStatusChangeDay = world.AbsoluteDay;
+                    affectedArmies.Add(service.ArmyId);
+                }
+
+                person.IsAlive = false;
+                if (world.PopulationLedgerInitialized &&
+                    person.CountsTowardPopulation)
+                {
+                    var location = FindLocation(world, person.LocationId);
+                    location.Population = checked(location.Population - 1);
+                    AddTransaction(
+                        world,
+                        PopulationTransactionType.Death,
+                        1,
+                        person.LocationId,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        person.Id,
+                        $"{person.DisplayName}死亡。");
+                }
+            }
+
+            var militaryService = new MilitaryServiceSystem();
+            foreach (var armyId in affectedArmies)
+            {
+                militaryService.SynchronizeArmyCaches(world, armyId);
             }
 
             world.Validate();
@@ -204,6 +288,71 @@ namespace Mandate.Simulation
                     person.Id,
                     $"{person.DisplayName}从{origin.DisplayName}迁往" +
                     $"{destination.DisplayName}。");
+            }
+
+            world.Validate();
+        }
+
+        public void MovePeople(
+            WorldState world,
+            IList<PersonState> people,
+            string destinationLocationId,
+            bool validateInitialState)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+
+            if (people == null)
+            {
+                throw new ArgumentNullException(nameof(people));
+            }
+
+            if (validateInitialState)
+            {
+                world.Validate();
+            }
+
+            var destination = FindLocation(world, destinationLocationId);
+            for (var i = 0; i < people.Count; i++)
+            {
+                var person = people[i] ??
+                    throw new InvalidOperationException(
+                        "A moving person cannot be null.");
+                var originLocationId = person.LocationId;
+                if (originLocationId == destinationLocationId)
+                {
+                    continue;
+                }
+
+                var origin = FindLocation(world, originLocationId);
+                if (world.PopulationLedgerInitialized &&
+                    person.CountsTowardPopulation &&
+                    person.IsAlive)
+                {
+                    origin.Population = checked(origin.Population - 1);
+                    destination.Population =
+                        checked(destination.Population + 1);
+                }
+
+                person.LocationId = destinationLocationId;
+                if (world.PopulationLedgerInitialized &&
+                    person.CountsTowardPopulation &&
+                    person.IsAlive)
+                {
+                    AddTransaction(
+                        world,
+                        PopulationTransactionType.Migration,
+                        1,
+                        originLocationId,
+                        destinationLocationId,
+                        string.Empty,
+                        string.Empty,
+                        person.Id,
+                        $"{person.DisplayName}随军由{origin.DisplayName}" +
+                        $"迁往{destination.DisplayName}。");
+                }
             }
 
             world.Validate();

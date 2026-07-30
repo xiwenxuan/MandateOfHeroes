@@ -111,8 +111,11 @@ namespace Mandate.Simulation
                 world.Inventories.Remove(herbs);
             }
 
-            army.WoundedTroops -= recovered;
-            army.Troops = checked(army.Troops + recovered);
+            recovered = new MilitaryServiceSystem().RecoverWounded(
+                world,
+                armyId,
+                recovered,
+                sequence);
             if (army.Troops > army.MaximumTroops)
             {
                 throw new InvalidOperationException(

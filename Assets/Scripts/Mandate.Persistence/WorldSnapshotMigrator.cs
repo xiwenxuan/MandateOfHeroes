@@ -32,6 +32,9 @@ namespace Mandate.Persistence
                     case 3:
                         MigrateVersionThreeToFour(world);
                         break;
+                    case 4:
+                        MigrateVersionFourToFive(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -60,6 +63,18 @@ namespace Mandate.Persistence
             world.LearningRecords ??= new System.Collections.Generic.List<
                 LearningRecordState>();
             world.SchemaVersion = 4;
+        }
+
+        private static void MigrateVersionFourToFive(WorldState world)
+        {
+            world.MilitaryFormations ??= new System.Collections.Generic.List<
+                MilitaryFormationState>();
+            world.MilitaryServices ??= new System.Collections.Generic.List<
+                MilitaryServiceState>();
+            world.MilitaryOrders ??= new System.Collections.Generic.List<
+                MilitaryOrderState>();
+            world.MilitaryServiceInitialized = false;
+            world.SchemaVersion = 5;
         }
     }
 }

@@ -745,6 +745,7 @@ namespace Mandate.Tests
             var startingProvisions = army.Provisions;
             new ArmySystem().StartMarch(
                 world,
+                new StableId(army.CommanderPersonId),
                 new StableId(army.Id),
                 new StableId("route.xiaquyang_guangzong"),
                 new StableId("location.guangzong"));
@@ -771,10 +772,12 @@ namespace Mandate.Tests
 
             var firstOutcome = new BattleResolver(first.MasterSeed).Resolve(
                 first,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
             var secondOutcome = new BattleResolver(second.MasterSeed).Resolve(
                 second,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
 
@@ -800,6 +803,7 @@ namespace Mandate.Tests
             var world = BuildGuangzongBattleWorld();
             new BattleResolver(world.MasterSeed).Resolve(
                 world,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
 
@@ -922,10 +926,12 @@ namespace Mandate.Tests
             var second = BuildGuangzongBattleWorld();
             new BattleResolver(first.MasterSeed).Resolve(
                 first,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
             new BattleResolver(second.MasterSeed).Resolve(
                 second,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
             var firstPhysician = first.People.Find(
@@ -977,7 +983,14 @@ namespace Mandate.Tests
                 firstArmy.Troops,
                 Is.EqualTo(troopsBefore + firstResult.RecoveredTroops));
             Assert.That(first.MedicalTreatments.Count, Is.EqualTo(1));
-            Assert.That(first.Inventories.Count, Is.EqualTo(0));
+            var remainingHerbs = first.Inventories.Find(
+                item =>
+                    item.OwnerPersonId == firstPhysician.Id &&
+                    item.CommodityId == "commodity.herbs");
+            Assert.That(remainingHerbs, Is.Not.Null);
+            Assert.That(
+                remainingHerbs.Quantity,
+                Is.EqualTo(5 - firstResult.HerbsConsumed));
         }
 
         [Test]
@@ -986,6 +999,7 @@ namespace Mandate.Tests
             var world = BuildGuangzongBattleWorld();
             new BattleResolver(world.MasterSeed).Resolve(
                 world,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
             var physician = world.People.Find(
@@ -1011,6 +1025,7 @@ namespace Mandate.Tests
             var world = BuildGuangzongBattleWorld();
             new BattleResolver(world.MasterSeed).Resolve(
                 world,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("army.yellow_turban_guangzong"));
             var physician = world.People.Find(
@@ -1338,8 +1353,12 @@ namespace Mandate.Tests
             var army = world.Armies.Find(
                 item => item.Id == "army.yellow_turban_guangzong");
             patient.HealthBasisPoints = 8_000;
-            army.WoundedTroops = 240;
-            army.Troops -= 240;
+            new MilitaryServiceSystem().ApplyCasualties(
+                world,
+                new StableId(army.Id),
+                20,
+                20,
+                1);
 
             var commerce = MapPerspectiveSystem.Inspect(
                 world,
@@ -1354,7 +1373,14 @@ namespace Mandate.Tests
             Assert.That(
                 commerce.VisibleFeatures & LocationFeature.Market,
                 Is.Not.EqualTo(LocationFeature.None));
-            Assert.That(medicine.PrimaryMetric, Is.EqualTo("伤病241"));
+            var unhealthyPeople = world.People.FindAll(
+                item =>
+                    item.LocationId == location.Id &&
+                    item.IsAlive &&
+                    item.HealthBasisPoints < 9_000).Count;
+            Assert.That(
+                medicine.PrimaryMetric,
+                Does.EndWith((unhealthyPeople + army.WoundedTroops).ToString()));
             Assert.That(medicine.SecondaryMetric, Does.Contain("药"));
             Assert.That(
                 medicine.VisibleFeatures & LocationFeature.Clinic,
@@ -1367,6 +1393,7 @@ namespace Mandate.Tests
             var world = PrototypeWorldFactory.Create184World(184);
             new ArmySystem().StartMarch(
                 world,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("route.xiaquyang_guangzong"),
                 new StableId("location.guangzong"));
@@ -1643,8 +1670,11 @@ namespace Mandate.Tests
             Assert.That(audit.IsBalanced, Is.True);
             Assert.That(audit.ActualPopulation, Is.EqualTo(totalBefore));
             Assert.That(
-                world.PopulationTransactions[0].Quantity,
-                Is.EqualTo(100));
+                world.PopulationTransactions.Exists(
+                    item =>
+                        item.Type == PopulationTransactionType.Migration &&
+                        item.Quantity == 100),
+                Is.True);
         }
 
         [Test]
@@ -2479,12 +2509,314 @@ namespace Mandate.Tests
             Assert.That(loaded.EducationPlans.Count, Is.EqualTo(0));
         }
 
+        [Test]
+        public void MilitaryService_PrototypeCreatesRealPersonnelAndFormations()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var populationAudit = new PopulationLedgerSystem().Audit(world);
+            var military = new MilitaryServiceSystem();
+
+            Assert.That(world.MilitaryServiceInitialized, Is.True);
+            Assert.That(world.MilitaryServices.Count, Is.EqualTo(240));
+            Assert.That(world.MilitaryFormations.Count, Is.EqualTo(9));
+            Assert.That(
+                world.People.FindAll(
+                    item => item.Id.StartsWith("person.military.")).Count,
+                Is.EqualTo(237));
+            Assert.That(populationAudit.IsBalanced, Is.True);
+            Assert.That(
+                populationAudit.ActualPopulation,
+                Is.EqualTo(populationAudit.OpeningPopulation));
+            for (var i = 0; i < world.Armies.Count; i++)
+            {
+                var audit = military.AuditArmy(
+                    world, new StableId(world.Armies[i].Id));
+                Assert.That(audit.Total, Is.EqualTo(80));
+                Assert.That(audit.Available, Is.EqualTo(80));
+                Assert.That(world.Armies[i].Troops, Is.EqualTo(80));
+            }
+        }
+
+        [Test]
+        public void MilitaryAuthority_RecordsAuthorizedAndRejectedOrders()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var officer = world.MilitaryServices.Find(
+                item =>
+                    item.ArmyId == army.Id &&
+                    item.Role == MilitaryServiceRole.Officer);
+            var soldier = world.MilitaryServices.Find(
+                item =>
+                    item.ArmyId == army.Id &&
+                    item.Role == MilitaryServiceRole.Soldier);
+            var authority = new MilitaryAuthoritySystem();
+
+            var commanderOrder = authority.IssueOrder(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(army.Id),
+                MilitaryOrderType.March,
+                MilitaryAuthorityLevel.Army,
+                targetLocationId: "location.guangzong");
+            var officerOrder = authority.IssueOrder(
+                world,
+                new StableId(officer.PersonId),
+                new StableId(army.Id),
+                MilitaryOrderType.March,
+                MilitaryAuthorityLevel.Army,
+                targetLocationId: "location.guangzong");
+            var soldierOrder = authority.IssueOrder(
+                world,
+                new StableId(soldier.PersonId),
+                new StableId(army.Id),
+                MilitaryOrderType.Engage,
+                MilitaryAuthorityLevel.Army,
+                targetArmyId: "army.yellow_turban_guangzong");
+            var outsiderOrder = authority.IssueOrder(
+                world,
+                new StableId("person.liu_bei"),
+                new StableId(army.Id),
+                MilitaryOrderType.Retreat,
+                MilitaryAuthorityLevel.Army);
+
+            Assert.That(
+                commanderOrder.Result,
+                Is.EqualTo(MilitaryOrderResult.Authorized));
+            Assert.That(
+                officerOrder.ActualAuthority,
+                Is.EqualTo(MilitaryAuthorityLevel.Formation));
+            Assert.That(
+                officerOrder.Result,
+                Is.EqualTo(MilitaryOrderResult.Rejected));
+            Assert.That(
+                soldierOrder.ActualAuthority,
+                Is.EqualTo(MilitaryAuthorityLevel.Self));
+            Assert.That(
+                outsiderOrder.ActualAuthority,
+                Is.EqualTo(MilitaryAuthorityLevel.None));
+            Assert.That(world.MilitaryOrders.Count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void MilitaryAuthority_UnavailableCommanderCannotCommand()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var commander = world.MilitaryServices.Find(
+                item => item.PersonId == army.CommanderPersonId);
+            commander.Status = MilitaryServiceStatus.Wounded;
+            commander.LastStatusChangeDay = world.AbsoluteDay;
+            new MilitaryServiceSystem().SynchronizeArmyCaches(world, army.Id);
+            world.Validate();
+
+            var order = new MilitaryAuthoritySystem().IssueOrder(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(army.Id),
+                MilitaryOrderType.March,
+                MilitaryAuthorityLevel.Army,
+                targetLocationId: "location.guangzong");
+
+            Assert.That(order.Result, Is.EqualTo(MilitaryOrderResult.Rejected));
+            Assert.That(
+                order.ActualAuthority,
+                Is.EqualTo(MilitaryAuthorityLevel.None));
+        }
+
+        [Test]
+        public void Battle_CasualtiesMapToPeopleAndPopulationLedger()
+        {
+            var world = BuildGuangzongBattleWorld();
+            var military = new MilitaryServiceSystem();
+            var population = new PopulationLedgerSystem();
+            var deathsBefore = population.Audit(world).Deaths;
+
+            var outcome = new BattleResolver(world.MasterSeed).Resolve(
+                world,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            var totalDead =
+                outcome.Record.AttackerCasualties -
+                outcome.Record.AttackerWounded +
+                outcome.Record.DefenderCasualties -
+                outcome.Record.DefenderWounded;
+            var hanAudit = military.AuditArmy(
+                world, new StableId(outcome.Record.AttackerArmyId));
+            var yellowAudit = military.AuditArmy(
+                world, new StableId(outcome.Record.DefenderArmyId));
+            var populationAudit = population.Audit(world);
+
+            Assert.That(
+                hanAudit.Wounded + yellowAudit.Wounded,
+                Is.EqualTo(
+                    outcome.Record.AttackerWounded +
+                    outcome.Record.DefenderWounded));
+            Assert.That(
+                hanAudit.Dead + yellowAudit.Dead,
+                Is.EqualTo(totalDead));
+            Assert.That(
+                populationAudit.Deaths - deathsBefore,
+                Is.EqualTo(totalDead));
+            Assert.That(populationAudit.IsBalanced, Is.True);
+        }
+
+        [Test]
+        public void Starvation_DesertionChangesSpecificServiceMembers()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            new ArmySystem().StartMarch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(army.Id),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+            army.Provisions = 0;
+            var troopsBefore = army.Troops;
+
+            new ArmySystem().ConsumeDailyMarchSupplies(world);
+            var audit = new MilitaryServiceSystem().AuditArmy(
+                world, new StableId(army.Id));
+
+            Assert.That(audit.Deserters, Is.EqualTo(1));
+            Assert.That(army.Troops, Is.EqualTo(troopsBefore - 1));
+            Assert.That(
+                world.MilitaryServices.Exists(
+                    item =>
+                        item.ArmyId == army.Id &&
+                        item.Status == MilitaryServiceStatus.Deserter),
+                Is.True);
+        }
+
+        [Test]
+        public void MilitarySnapshot_RoundTripPreservesFactsAndOrders()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            new MilitaryAuthoritySystem().IssueOrder(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(army.Id),
+                MilitaryOrderType.Resupply,
+                MilitaryAuthorityLevel.Army);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(5));
+            Assert.That(loaded.MilitaryServiceInitialized, Is.True);
+            Assert.That(
+                loaded.MilitaryServices.Count,
+                Is.EqualTo(world.MilitaryServices.Count));
+            Assert.That(
+                loaded.MilitaryFormations.Count,
+                Is.EqualTo(world.MilitaryFormations.Count));
+            Assert.That(loaded.MilitaryOrders.Count, Is.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFourAbstractArmyWithoutFabrication()
+        {
+            const string legacyJson =
+                "{" +
+                "\"SchemaVersion\":4," +
+                "\"MasterSeed\":184," +
+                "\"AbsoluteDay\":0," +
+                "\"Segment\":0," +
+                "\"Revision\":0," +
+                "\"Locations\":[{" +
+                "\"Id\":\"location.legacy\"," +
+                "\"DisplayName\":\"旧城\"," +
+                "\"Kind\":2," +
+                "\"Terrain\":1," +
+                "\"StrategicImportance\":1," +
+                "\"Population\":1000," +
+                "\"PublicOrderBasisPoints\":5000," +
+                "\"GrainPrice\":100" +
+                "}]," +
+                "\"People\":[{" +
+                "\"Id\":\"person.legacy_commander\"," +
+                "\"DisplayName\":\"旧将\"," +
+                "\"LocationId\":\"location.legacy\"," +
+                "\"BirthDay\":-5000," +
+                "\"IsAlive\":true," +
+                "\"HealthBasisPoints\":10000" +
+                "}]," +
+                "\"Organizations\":[{" +
+                "\"Id\":\"organization.legacy\"," +
+                "\"DisplayName\":\"旧军\"," +
+                "\"Type\":1," +
+                "\"HeadquartersLocationId\":\"location.legacy\"," +
+                "\"LeaderPersonId\":\"person.legacy_commander\"," +
+                "\"ReputationBasisPoints\":5000" +
+                "}]," +
+                "\"Armies\":[{" +
+                "\"Id\":\"army.legacy\"," +
+                "\"DisplayName\":\"旧军\"," +
+                "\"OrganizationId\":\"organization.legacy\"," +
+                "\"CommanderPersonId\":\"person.legacy_commander\"," +
+                "\"LocationId\":\"location.legacy\"," +
+                "\"Troops\":5000," +
+                "\"WoundedTroops\":100," +
+                "\"MaximumTroops\":6000," +
+                "\"MoraleBasisPoints\":5000," +
+                "\"TrainingBasisPoints\":5000," +
+                "\"Provisions\":1000," +
+                "\"IsMobilized\":true" +
+                "}]" +
+                "}";
+
+            var loaded = WorldSnapshotSerializer.Deserialize(legacyJson);
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(5));
+            Assert.That(loaded.MilitaryServiceInitialized, Is.False);
+            Assert.That(loaded.MilitaryServices.Count, Is.EqualTo(0));
+            Assert.That(loaded.Armies.Count, Is.EqualTo(1));
+            Assert.That(loaded.Armies[0].Troops, Is.EqualTo(5000));
+        }
+
+        [Test]
+        public void MilitaryValidation_RejectsDuplicateServiceAndCacheTamper()
+        {
+            var duplicateWorld = PrototypeWorldFactory.Create184World(184);
+            var source = duplicateWorld.MilitaryServices[0];
+            duplicateWorld.MilitaryServices.Add(new MilitaryServiceState
+            {
+                Id = source.Id + ".duplicate",
+                PersonId = source.PersonId,
+                ArmyId = source.ArmyId,
+                FormationId = source.FormationId,
+                Role = source.Role,
+                Rank = source.Rank,
+                Status = source.Status,
+                DisciplineBasisPoints = source.DisciplineBasisPoints,
+                LoyaltyBasisPoints = source.LoyaltyBasisPoints,
+                ServiceExperienceBasisPoints =
+                    source.ServiceExperienceBasisPoints,
+                EnlistedDay = source.EnlistedDay,
+                LastStatusChangeDay = source.LastStatusChangeDay
+            });
+            Assert.Throws<InvalidOperationException>(duplicateWorld.Validate);
+
+            var cacheWorld = PrototypeWorldFactory.Create184World(184);
+            cacheWorld.Armies[0].Troops--;
+            Assert.Throws<InvalidOperationException>(cacheWorld.Validate);
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
             new WorldSimulator(world.MasterSeed).AdvanceDays(world, 30);
             new ArmySystem().StartMarch(
                 world,
+                new StableId("person.guo_dian"),
                 new StableId("army.han_jizhou_vanguard"),
                 new StableId("route.xiaquyang_guangzong"),
                 new StableId("location.guangzong"));

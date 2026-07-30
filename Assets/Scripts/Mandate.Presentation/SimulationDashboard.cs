@@ -64,6 +64,10 @@ namespace Mandate.Presentation
         private readonly ArmySystem _armySystem = new ArmySystem();
         private readonly MilitarySupplySystem _militarySupplySystem =
             new MilitarySupplySystem();
+        private readonly MilitaryServiceSystem _militaryServiceSystem =
+            new MilitaryServiceSystem();
+        private readonly MilitaryAuthoritySystem _militaryAuthoritySystem =
+            new MilitaryAuthoritySystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2520,6 +2524,21 @@ namespace Mandate.Presentation
         {
             GUILayout.Space(10);
             GUILayout.Label("战争层：军队、行军与野战", _sectionStyle);
+            if (_world.MilitaryServiceInitialized)
+            {
+                GUILayout.Label(
+                    $"真实服役：{_world.MilitaryServices.Count}人　" +
+                    $"编制：{_world.MilitaryFormations.Count}个　" +
+                    $"军令记录：{_world.MilitaryOrders.Count}条",
+                    _normalStyle);
+            }
+            else
+            {
+                GUILayout.Label(
+                    "当前为旧存档抽象兵力模式，尚未建立真实服役账。",
+                    _normalStyle);
+            }
+
             for (var i = 0; i < _world.Armies.Count; i++)
             {
                 var army = _world.Armies[i];
@@ -2538,6 +2557,41 @@ namespace Mandate.Presentation
                     $"训练：{army.TrainingBasisPoints / 100f:F1}%　" +
                     $"军粮：{army.Provisions}　{state}",
                     _normalStyle);
+                if (_world.MilitaryServiceInitialized)
+                {
+                    var audit = _militaryServiceSystem.AuditArmy(
+                        _world, new StableId(army.Id));
+                    var playerAuthority = string.IsNullOrEmpty(
+                        _world.PlayerPersonId)
+                        ? MilitaryAuthorityLevel.None
+                        : _militaryAuthoritySystem.GetAuthority(
+                            _world,
+                            new StableId(_world.PlayerPersonId),
+                            new StableId(army.Id));
+                    GUILayout.Label(
+                        $"　服役审计：可战{audit.Available}、伤{audit.Wounded}、" +
+                        $"掉队{audit.Stragglers}、逃亡{audit.Deserters}、" +
+                        $"被俘{audit.Captured}、退役{audit.Retired}、死亡{audit.Dead}；" +
+                        $"玩家权限：{playerAuthority}",
+                        _normalStyle);
+                    for (var formationIndex = 0;
+                         formationIndex < _world.MilitaryFormations.Count;
+                         formationIndex++)
+                    {
+                        var formation = _world.MilitaryFormations[formationIndex];
+                        if (formation.ArmyId != army.Id)
+                        {
+                            continue;
+                        }
+
+                        GUILayout.Label(
+                            $"{(string.IsNullOrEmpty(formation.ParentFormationId) ? "　" : "　　↳ ")}" +
+                            $"{formation.DisplayName} [{formation.Kind}]　" +
+                            $"指挥：{FindPersonName(formation.CommanderPersonId)}　" +
+                            $"额定：{formation.AuthorizedStrength}",
+                            _normalStyle);
+                    }
+                }
             }
 
             var han = FindArmy("army.han_jizhou_vanguard");
@@ -2552,6 +2606,7 @@ namespace Mandate.Presentation
             {
                 _armySystem.StartMarch(
                     _world,
+                    new StableId(han.CommanderPersonId),
                     new StableId(han.Id),
                     new StableId("route.xiaquyang_guangzong"),
                     new StableId("location.guangzong"));
@@ -2576,6 +2631,7 @@ namespace Mandate.Presentation
             {
                 var outcome = _battleResolver.Resolve(
                     _world,
+                    new StableId(han.CommanderPersonId),
                     new StableId(han.Id),
                     new StableId(yellow.Id));
                 _message = outcome.Summary;
@@ -2590,6 +2646,25 @@ namespace Mandate.Presentation
                 GUILayout.Label(
                     $"第{_world.Battles[i].Day}日　{_world.Battles[i].Summary}",
                     _normalStyle);
+            }
+
+            if (_world.MilitaryServiceInitialized &&
+                _world.MilitaryOrders.Count > 0)
+            {
+                GUILayout.Label("近期军令", _sectionStyle);
+                var firstOrder = Math.Max(
+                    0, _world.MilitaryOrders.Count - 5);
+                for (var i = _world.MilitaryOrders.Count - 1;
+                     i >= firstOrder;
+                     i--)
+                {
+                    var order = _world.MilitaryOrders[i];
+                    GUILayout.Label(
+                        $"第{order.Day}日　{FindPersonName(order.IssuerPersonId)}　" +
+                        $"{order.Type}　{order.Result}　" +
+                        $"权限{order.ActualAuthority}/{order.RequiredAuthority}",
+                        _normalStyle);
+                }
             }
         }
 
