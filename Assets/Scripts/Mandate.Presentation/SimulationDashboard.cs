@@ -83,6 +83,7 @@ namespace Mandate.Presentation
         private int _existingPersonIndex;
         private Vector2 _selectionScroll;
         private MapOverlay _mapOverlay;
+        private MapPerspective _mapPerspective;
         private float _mapZoom = 1f;
         private Vector2 _mapPan;
         private bool _mapDragging;
@@ -348,6 +349,9 @@ namespace Mandate.Presentation
             _mapZoom = 1f;
             _mapPan = Vector2.zero;
             _selectedLocationId = FindPlayer().LocationId;
+            _mapPerspective = MapPerspectiveSystem.RecommendForPlayer(
+                _world,
+                _world.PlayerPersonId);
         }
 
         private void DrawPlayerGame()
@@ -475,6 +479,17 @@ namespace Mandate.Presentation
                 _normalStyle);
 
             GUILayout.BeginHorizontal();
+            GUILayout.Label("身份视角", GUILayout.Width(70f), GUILayout.Height(30f));
+            _mapPerspective = (MapPerspective)GUILayout.Toolbar(
+                (int)_mapPerspective,
+                new[] { "通用", "军务", "政务", "商旅", "医药" },
+                GUILayout.Height(30f));
+            GUILayout.EndHorizontal();
+            GUILayout.Label(
+                MapPerspectiveDescription(_mapPerspective),
+                _normalStyle);
+
+            GUILayout.BeginHorizontal();
             _mapOverlay = (MapOverlay)GUILayout.Toolbar(
                 (int)_mapOverlay,
                 new[] { "地形", "治安", "粮价", "战争" },
@@ -487,7 +502,7 @@ namespace Mandate.Presentation
 
             GUILayout.EndHorizontal();
 
-            var mapHeight = Mathf.Clamp(Screen.height - 310f, 430f, 650f);
+            var mapHeight = Mathf.Clamp(Screen.height - 365f, 430f, 650f);
             var mapRect = GUILayoutUtility.GetRect(
                 100f,
                 mapHeight,
@@ -803,7 +818,11 @@ namespace Mandate.Presentation
             {
                 var location = _world.Locations[i];
                 var point = MapPoint(canvas, location);
-                if ((location.Features & LocationFeature.Farmland) != 0)
+                var visibleFeatures = MapPerspectiveSystem.Inspect(
+                    _world,
+                    location,
+                    _mapPerspective).VisibleFeatures;
+                if ((visibleFeatures & LocationFeature.Farmland) != 0)
                 {
                     DrawFarmRows(point + new Vector2(-62f, 34f));
                 }
@@ -815,7 +834,7 @@ namespace Mandate.Presentation
                     DrawGrove(point + new Vector2(58f, -38f));
                 }
 
-                if ((location.Features &
+                if ((visibleFeatures &
                      (LocationFeature.Garrison |
                       LocationFeature.Fortification)) != 0)
                 {
@@ -824,28 +843,28 @@ namespace Mandate.Presentation
 
                 var featureIndex = 0;
                 DrawLocalFeatureToken(
-                    location,
+                    visibleFeatures,
                     LocationFeature.Market,
                     "市",
                     new Color(0.60f, 0.36f, 0.13f, 1f),
                     point,
                     ref featureIndex);
                 DrawLocalFeatureToken(
-                    location,
+                    visibleFeatures,
                     LocationFeature.Workshop,
                     "坊",
                     new Color(0.46f, 0.29f, 0.16f, 1f),
                     point,
                     ref featureIndex);
                 DrawLocalFeatureToken(
-                    location,
+                    visibleFeatures,
                     LocationFeature.Clinic,
                     "医",
                     new Color(0.24f, 0.48f, 0.32f, 1f),
                     point,
                     ref featureIndex);
                 DrawLocalFeatureToken(
-                    location,
+                    visibleFeatures,
                     LocationFeature.RelayStation,
                     "驿",
                     new Color(0.24f, 0.42f, 0.55f, 1f),
@@ -855,14 +874,14 @@ namespace Mandate.Presentation
         }
 
         private void DrawLocalFeatureToken(
-            LocationState location,
+            LocationFeature visibleFeatures,
             LocationFeature feature,
             string label,
             Color color,
             Vector2 point,
             ref int featureIndex)
         {
-            if ((location.Features & feature) == 0)
+            if ((visibleFeatures & feature) == 0)
             {
                 return;
             }
@@ -992,7 +1011,11 @@ namespace Mandate.Presentation
                     $"{location.DisplayName}　{LocationKindName(location.Kind)}　" +
                     $"{TerrainKindName(location.Terrain)}　人口{location.Population}　" +
                     $"治安{location.PublicOrderBasisPoints / 100f:F1}%　" +
-                    $"粮价{location.GrainPrice}";
+                    $"粮价{location.GrainPrice}　" +
+                    MapPerspectiveSystem.Inspect(
+                        _world,
+                        location,
+                        _mapPerspective).SecondaryMetric;
                 var hitRect = Rect.MinMaxRect(
                     Mathf.Min(sealRect.xMin, labelRect.xMin),
                     Mathf.Min(sealRect.yMin, labelRect.yMin),
@@ -1034,7 +1057,7 @@ namespace Mandate.Presentation
                     new Color(0.82f, 0.72f, 0.50f, 0.92f));
                 GUI.Label(
                     new Rect(markerPoint.x - 23f, markerPoint.y - 10f, 48f, 18f),
-                    $"{(hostile ? "黄" : "汉")}{army.Troops}",
+                    ArmyPerspectiveLabel(army, hostile),
                     _mapLabelStyle);
             }
         }
@@ -1076,11 +1099,16 @@ namespace Mandate.Presentation
 
         private void DrawMapLegend(Rect canvas)
         {
-            var legendRect = new Rect(12f, canvas.height - 70f, 430f, 56f);
+            var legendRect = new Rect(
+                12f,
+                canvas.height - 70f,
+                Mathf.Min(540f, canvas.width - 24f),
+                56f);
             DrawMapPanel(legendRect, 0.91f);
             GUI.Label(
                 legendRect,
                 $"{MapDetailLevelName(CurrentMapDetailLevel())}　" +
+                $"视角：{MapPerspectiveName(_mapPerspective)}　" +
                 $"图层：{MapOverlayName(_mapOverlay)}　缩放：{_mapZoom:F1}倍\n" +
                 "金色=玩家　石青=汉军　朱砂=黄巾　线色=道路治安",
                 _mapLabelStyle);
@@ -1133,6 +1161,57 @@ namespace Mandate.Presentation
             }
         }
 
+        private static string MapPerspectiveName(MapPerspective perspective)
+        {
+            switch (perspective)
+            {
+                case MapPerspective.Military:
+                    return "军务";
+                case MapPerspective.Administration:
+                    return "政务";
+                case MapPerspective.Commerce:
+                    return "商旅";
+                case MapPerspective.Medicine:
+                    return "医药";
+                default:
+                    return "通用";
+            }
+        }
+
+        private static string MapPerspectiveDescription(
+            MapPerspective perspective)
+        {
+            switch (perspective)
+            {
+                case MapPerspective.Military:
+                    return "军务视角突出驻军、伤兵、城防、交通节点和战略价值。";
+                case MapPerspective.Administration:
+                    return "政务视角突出人口、治安、官署、农田和地方交通。";
+                case MapPerspective.Commerce:
+                    return "商旅视角突出粮价、库存、市场、工坊、驿站和港池。";
+                case MapPerspective.Medicine:
+                    return "医药视角突出低健康人物、军队伤兵、药价、医馆和补给点。";
+                default:
+                    return "通用视角显示地貌、地点层级、战略重要度与基础设施。";
+            }
+        }
+
+        private string ArmyPerspectiveLabel(ArmyState army, bool hostile)
+        {
+            if (_mapPerspective == MapPerspective.Medicine)
+            {
+                return $"伤{army.WoundedTroops}";
+            }
+
+            if (_mapPerspective == MapPerspective.Military ||
+                _mapPerspective == MapPerspective.General)
+            {
+                return $"{(hostile ? "黄" : "汉")}{army.Troops}";
+            }
+
+            return hostile ? "黄巾军" : "汉军";
+        }
+
         private void DrawSelectedLocationDetails(PersonState player)
         {
             var selected = FindLocation(
@@ -1151,6 +1230,14 @@ namespace Mandate.Presentation
                 _normalStyle);
             GUILayout.Label(
                 $"设施：{LocationFeaturesName(selected.Features)}",
+                _normalStyle);
+            var perspectiveInfo = MapPerspectiveSystem.Inspect(
+                _world,
+                selected,
+                _mapPerspective);
+            GUILayout.Label(
+                $"{MapPerspectiveName(_mapPerspective)}情报：" +
+                $"{perspectiveInfo.PrimaryMetric}　{perspectiveInfo.SecondaryMetric}",
                 _normalStyle);
 
             var armyCount = 0;
@@ -1334,7 +1421,10 @@ namespace Mandate.Presentation
 
                     return armies == 0 ? "无驻军" : $"{armies}支军队";
                 default:
-                    return TerrainKindName(location.Terrain);
+                    return MapPerspectiveSystem.Inspect(
+                        _world,
+                        location,
+                        _mapPerspective).PrimaryMetric;
             }
         }
 
