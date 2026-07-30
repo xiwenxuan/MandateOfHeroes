@@ -8,16 +8,100 @@ namespace Mandate.Simulation
         {
             var world = WorldState.Create(masterSeed);
 
-            AddLocation(world, "location.zhuo", "涿县", 20_000, 100, 1_600, 1_300);
             AddLocation(
-                world, "location.zhongshan", "中山国节点", 35_000, 96, 3_400, 2_800);
+                world,
+                "location.zhuo",
+                "涿县",
+                20_000,
+                100,
+                1_600,
+                1_300,
+                LocationKind.CountySeat,
+                TerrainKind.Plains,
+                3,
+                LocationFeature.Government |
+                LocationFeature.Market |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland |
+                LocationFeature.RelayStation);
             AddLocation(
-                world, "location.anping", "安平国节点", 30_000, 102, 5_200, 4_000);
+                world,
+                "location.zhongshan",
+                "中山国节点",
+                35_000,
+                96,
+                3_400,
+                2_800,
+                LocationKind.RegionalSeat,
+                TerrainKind.Plains,
+                4,
+                LocationFeature.Government |
+                LocationFeature.Market |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland |
+                LocationFeature.Workshop);
             AddLocation(
-                world, "location.xiaquyang", "下曲阳", 18_000, 112, 6_600, 3_800);
+                world,
+                "location.anping",
+                "安平国节点",
+                30_000,
+                102,
+                5_200,
+                4_000,
+                LocationKind.RegionalSeat,
+                TerrainKind.Riverland,
+                4,
+                LocationFeature.Government |
+                LocationFeature.Market |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland);
             AddLocation(
-                world, "location.guangzong", "广宗", 25_000, 118, 7_300, 6_200);
-            AddLocation(world, "location.ye", "邺县", 50_000, 94, 8_700, 8_100);
+                world,
+                "location.xiaquyang",
+                "下曲阳",
+                18_000,
+                112,
+                6_600,
+                3_800,
+                LocationKind.CountySeat,
+                TerrainKind.Riverland,
+                3,
+                LocationFeature.Government |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland);
+            AddLocation(
+                world,
+                "location.guangzong",
+                "广宗",
+                25_000,
+                118,
+                7_300,
+                6_200,
+                LocationKind.CountySeat,
+                TerrainKind.Plains,
+                4,
+                LocationFeature.Market |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland |
+                LocationFeature.Clinic);
+            AddLocation(
+                world,
+                "location.ye",
+                "邺县",
+                50_000,
+                94,
+                8_700,
+                8_100,
+                LocationKind.RegionalSeat,
+                TerrainKind.Riverland,
+                5,
+                LocationFeature.Government |
+                LocationFeature.Market |
+                LocationFeature.Garrison |
+                LocationFeature.Farmland |
+                LocationFeature.Workshop |
+                LocationFeature.RelayStation |
+                LocationFeature.Fortification);
 
             AddCommodity(world, "commodity.grain", "粮食", 100, 1);
             AddCommodity(world, "commodity.cloth", "布帛", 180, 2);
@@ -509,12 +593,20 @@ namespace Mandate.Simulation
             int population,
             int grainPrice,
             int mapXBasisPoints,
-            int mapYBasisPoints)
+            int mapYBasisPoints,
+            LocationKind kind,
+            TerrainKind terrain,
+            int strategicImportance,
+            LocationFeature features)
         {
             world.Locations.Add(new LocationState
             {
                 Id = id,
                 DisplayName = displayName,
+                Kind = kind,
+                Terrain = terrain,
+                StrategicImportance = strategicImportance,
+                Features = features,
                 Population = population,
                 GrainPrice = grainPrice,
                 PublicOrderBasisPoints = 5_000,

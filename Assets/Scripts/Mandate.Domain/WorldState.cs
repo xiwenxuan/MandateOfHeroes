@@ -3,6 +3,55 @@ using System.Collections.Generic;
 
 namespace Mandate.Domain
 {
+    public enum LocationKind : byte
+    {
+        Unknown,
+        RegionalSeat,
+        CountySeat,
+        Pass,
+        Port,
+        MarketTown,
+        Village,
+        Camp
+    }
+
+    public enum TerrainKind : byte
+    {
+        Unknown,
+        Plains,
+        Hills,
+        Mountains,
+        Riverland,
+        Forest,
+        Marsh
+    }
+
+    [Flags]
+    public enum LocationFeature : ushort
+    {
+        None = 0,
+        Government = 1 << 0,
+        Market = 1 << 1,
+        Garrison = 1 << 2,
+        Farmland = 1 << 3,
+        Workshop = 1 << 4,
+        Clinic = 1 << 5,
+        Temple = 1 << 6,
+        RelayStation = 1 << 7,
+        Harbor = 1 << 8,
+        Fortification = 1 << 9,
+        All = Government |
+              Market |
+              Garrison |
+              Farmland |
+              Workshop |
+              Clinic |
+              Temple |
+              RelayStation |
+              Harbor |
+              Fortification
+    }
+
     [Serializable]
     public sealed class PersonState
     {
@@ -30,6 +79,11 @@ namespace Mandate.Domain
     {
         public string Id;
         public string DisplayName;
+        public LocationKind Kind = LocationKind.CountySeat;
+        public TerrainKind Terrain = TerrainKind.Plains;
+        public LocationFeature Features = LocationFeature.None;
+        public int StrategicImportance = 1;
+        public string ParentLocationId;
         public int Population;
         public int PublicOrderBasisPoints = 5_000;
         public int GrainPrice = 100;
@@ -233,6 +287,50 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid map position at {location.Id}.");
+                }
+
+                if (!Enum.IsDefined(typeof(LocationKind), location.Kind) ||
+                    location.Kind == LocationKind.Unknown)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid location kind at {location.Id}.");
+                }
+
+                if (!Enum.IsDefined(typeof(TerrainKind), location.Terrain) ||
+                    location.Terrain == TerrainKind.Unknown)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid terrain at {location.Id}.");
+                }
+
+                if ((location.Features & ~LocationFeature.All) != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid location features at {location.Id}.");
+                }
+
+                if (location.StrategicImportance < 1 ||
+                    location.StrategicImportance > 5)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid strategic importance at {location.Id}.");
+                }
+            }
+
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                var location = Locations[i];
+                if (string.IsNullOrEmpty(location.ParentLocationId))
+                {
+                    continue;
+                }
+
+                if (location.ParentLocationId == location.Id ||
+                    !locationIds.Contains(location.ParentLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Location {location.Id} references invalid parent " +
+                        $"{location.ParentLocationId}.");
                 }
             }
 

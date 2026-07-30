@@ -32,6 +32,7 @@
 - `Docs/TASK_M1_PLAYABLE_ENTRY.md`
 - `Docs/TASK_M2_VISUAL_REGION_MAP.md`
 - `Docs/TASK_M3_SILK_MAP_ART_SLICE.md`
+- `Docs/TASK_M4_LOCATION_GEOGRAPHY.md`
 - `Docs/MAP_ART_RESOURCE_PLAN.md`
 
 ## 运行可玩原型
@@ -76,6 +77,8 @@
 - 地形、治安、粮价和战争图层仍可随时切换。
 
 本阶段没有引入任何商业游戏或第三方美术文件，全部地图纹理和图章由程序在运行时原创生成。
+
+地点现在同时记录层级、地貌、战略重要度和设施。县乡近览中的农田、市场、工坊、医馆和驿站等标记由世界数据决定；地点详情可以查看这些信息，为后续身份专属地图和建设系统提供统一基础。
 
 ## 开源策略
 
