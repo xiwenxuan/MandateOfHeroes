@@ -12,6 +12,56 @@ namespace Mandate.Simulation
 
     public sealed class ConstructionSystem
     {
+        public static LocationFeature RecommendFeature(
+            LocationState location,
+            MapPerspective perspective)
+        {
+            if (location == null)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
+
+            switch (perspective)
+            {
+                case MapPerspective.Military:
+                    return FirstMissingFeature(
+                        location,
+                        LocationFeature.Fortification,
+                        LocationFeature.Garrison);
+                case MapPerspective.Administration:
+                    return FirstMissingFeature(
+                        location,
+                        LocationFeature.Government,
+                        LocationFeature.RelayStation,
+                        LocationFeature.Farmland,
+                        LocationFeature.Workshop,
+                        LocationFeature.Clinic);
+                case MapPerspective.Commerce:
+                    return FirstMissingFeature(
+                        location,
+                        LocationFeature.Market,
+                        LocationFeature.Workshop,
+                        LocationFeature.RelayStation,
+                        location.Kind == LocationKind.Port ||
+                        location.Terrain == TerrainKind.Riverland
+                            ? LocationFeature.Harbor
+                            : LocationFeature.None);
+                case MapPerspective.Medicine:
+                    return FirstMissingFeature(
+                        location,
+                        LocationFeature.Clinic,
+                        LocationFeature.RelayStation,
+                        LocationFeature.Temple);
+                default:
+                    return FirstMissingFeature(
+                        location,
+                        LocationFeature.Market,
+                        LocationFeature.RelayStation,
+                        LocationFeature.Workshop,
+                        LocationFeature.Clinic);
+            }
+        }
+
         public ConstructionProjectState StartProject(
             WorldState world,
             StableId sponsorPersonId,
@@ -204,6 +254,22 @@ namespace Mandate.Simulation
                     throw new InvalidOperationException("旅途中不能参与地方建设。");
                 }
             }
+        }
+
+        private static LocationFeature FirstMissingFeature(
+            LocationState location,
+            params LocationFeature[] features)
+        {
+            for (var i = 0; i < features.Length; i++)
+            {
+                if (features[i] != LocationFeature.None &&
+                    (location.Features & features[i]) == 0)
+                {
+                    return features[i];
+                }
+            }
+
+            return LocationFeature.None;
         }
 
         private static void ValidateConstructibleFeature(LocationFeature feature)

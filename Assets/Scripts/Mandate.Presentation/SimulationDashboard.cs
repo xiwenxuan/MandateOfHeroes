@@ -1357,7 +1357,9 @@ namespace Mandate.Presentation
                 GUILayout.Label("当前没有建设项目。", _normalStyle);
             }
 
-            var suggestion = SuggestedConstructionFeature(location);
+            var suggestion = ConstructionSystem.RecommendFeature(
+                location,
+                _mapPerspective);
             if (suggestion == LocationFeature.None)
             {
                 GUILayout.Label(
@@ -1396,61 +1398,6 @@ namespace Mandate.Presentation
             }
 
             GUI.enabled = true;
-        }
-
-        private LocationFeature SuggestedConstructionFeature(
-            LocationState location)
-        {
-            switch (_mapPerspective)
-            {
-                case MapPerspective.Military:
-                    return FirstMissingFeature(
-                        location,
-                        LocationFeature.Fortification,
-                        LocationFeature.Garrison);
-                case MapPerspective.Administration:
-                    return FirstMissingFeature(
-                        location,
-                        LocationFeature.Government,
-                        LocationFeature.RelayStation,
-                        LocationFeature.Farmland);
-                case MapPerspective.Commerce:
-                    return FirstMissingFeature(
-                        location,
-                        LocationFeature.Market,
-                        LocationFeature.Workshop,
-                        LocationFeature.RelayStation,
-                        location.Kind == LocationKind.Port ||
-                        location.Terrain == TerrainKind.Riverland
-                            ? LocationFeature.Harbor
-                            : LocationFeature.None);
-                case MapPerspective.Medicine:
-                    return FirstMissingFeature(
-                        location,
-                        LocationFeature.Clinic);
-                default:
-                    return FirstMissingFeature(
-                        location,
-                        LocationFeature.Market,
-                        LocationFeature.RelayStation,
-                        LocationFeature.Workshop);
-            }
-        }
-
-        private static LocationFeature FirstMissingFeature(
-            LocationState location,
-            params LocationFeature[] features)
-        {
-            for (var i = 0; i < features.Length; i++)
-            {
-                if (features[i] != LocationFeature.None &&
-                    (location.Features & features[i]) == 0)
-                {
-                    return features[i];
-                }
-            }
-
-            return LocationFeature.None;
         }
 
         private ConstructionProjectState FindConstructionProject(

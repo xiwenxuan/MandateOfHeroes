@@ -1496,6 +1496,47 @@ namespace Mandate.Tests
                     LocationFeature.Clinic));
         }
 
+        [Test]
+        public void Construction_EachStartingIdentityHasSuggestedLocalProject()
+        {
+            var identities = new[]
+            {
+                StartingIdentity.Soldier,
+                StartingIdentity.CountyClerk,
+                StartingIdentity.Merchant,
+                StartingIdentity.Physician
+            };
+            var setup = new NewGameSetupService();
+
+            for (var i = 0; i < identities.Length; i++)
+            {
+                var world = setup.CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = "营造建议",
+                        Age = 25,
+                        Gender = PersonGender.Male,
+                        Identity = identities[i]
+                    },
+                    184);
+                var player = world.People.Find(
+                    item => item.Id == world.PlayerPersonId);
+                var location = world.Locations.Find(
+                    item => item.Id == player.LocationId);
+                var perspective = MapPerspectiveSystem.RecommendForPlayer(
+                    world,
+                    player.Id);
+                var feature = ConstructionSystem.RecommendFeature(
+                    location,
+                    perspective);
+
+                Assert.That(feature, Is.Not.EqualTo(LocationFeature.None));
+                Assert.That(
+                    location.Features & feature,
+                    Is.EqualTo(LocationFeature.None));
+            }
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
