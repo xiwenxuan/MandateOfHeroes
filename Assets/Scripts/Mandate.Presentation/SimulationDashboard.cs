@@ -801,17 +801,87 @@ namespace Mandate.Presentation
 
             for (var i = 0; i < _world.Locations.Count; i++)
             {
-                var point = MapPoint(canvas, _world.Locations[i]);
-                DrawFarmRows(point + new Vector2(-62f, 34f));
-                if (i % 2 == 0)
+                var location = _world.Locations[i];
+                var point = MapPoint(canvas, location);
+                if ((location.Features & LocationFeature.Farmland) != 0)
+                {
+                    DrawFarmRows(point + new Vector2(-62f, 34f));
+                }
+
+                if (location.Terrain == TerrainKind.Forest ||
+                    location.Terrain == TerrainKind.Hills ||
+                    location.Terrain == TerrainKind.Mountains)
                 {
                     DrawGrove(point + new Vector2(58f, -38f));
                 }
-                else
+
+                if ((location.Features &
+                     (LocationFeature.Garrison |
+                      LocationFeature.Fortification)) != 0)
                 {
                     DrawWatchPost(point + new Vector2(62f, 37f));
                 }
+
+                var featureIndex = 0;
+                DrawLocalFeatureToken(
+                    location,
+                    LocationFeature.Market,
+                    "市",
+                    new Color(0.60f, 0.36f, 0.13f, 1f),
+                    point,
+                    ref featureIndex);
+                DrawLocalFeatureToken(
+                    location,
+                    LocationFeature.Workshop,
+                    "坊",
+                    new Color(0.46f, 0.29f, 0.16f, 1f),
+                    point,
+                    ref featureIndex);
+                DrawLocalFeatureToken(
+                    location,
+                    LocationFeature.Clinic,
+                    "医",
+                    new Color(0.24f, 0.48f, 0.32f, 1f),
+                    point,
+                    ref featureIndex);
+                DrawLocalFeatureToken(
+                    location,
+                    LocationFeature.RelayStation,
+                    "驿",
+                    new Color(0.24f, 0.42f, 0.55f, 1f),
+                    point,
+                    ref featureIndex);
             }
+        }
+
+        private void DrawLocalFeatureToken(
+            LocationState location,
+            LocationFeature feature,
+            string label,
+            Color color,
+            Vector2 point,
+            ref int featureIndex)
+        {
+            if ((location.Features & feature) == 0)
+            {
+                return;
+            }
+
+            var tokenRect = new Rect(
+                point.x - 39f + featureIndex * 25f,
+                point.y + 56f,
+                21f,
+                21f);
+            DrawSolidRect(
+                new Rect(
+                    tokenRect.x - 2f,
+                    tokenRect.y - 2f,
+                    tokenRect.width + 4f,
+                    tokenRect.height + 4f),
+                ProceduralSilkMapArt.Ink);
+            DrawSolidRect(tokenRect, color);
+            GUI.Label(tokenRect, label, _mapSealStyle);
+            featureIndex++;
         }
 
         private static void DrawFarmRows(Vector2 center)
@@ -906,7 +976,7 @@ namespace Mandate.Presentation
                     ScaleMode.StretchToFill,
                     true);
                 GUI.color = previous;
-                GUI.Label(sealRect, "城", _mapSealStyle);
+                GUI.Label(sealRect, LocationKindGlyph(location.Kind), _mapSealStyle);
 
                 var labelRect = new Rect(
                     point.x + sealSize * 0.34f,
@@ -919,7 +989,8 @@ namespace Mandate.Presentation
                     : location.DisplayName + "\n" + LocationOverlayLabel(location);
                 GUI.Label(labelRect, label, _mapLabelStyle);
                 var tooltip =
-                    $"{location.DisplayName}　人口{location.Population}　" +
+                    $"{location.DisplayName}　{LocationKindName(location.Kind)}　" +
+                    $"{TerrainKindName(location.Terrain)}　人口{location.Population}　" +
                     $"治安{location.PublicOrderBasisPoints / 100f:F1}%　" +
                     $"粮价{location.GrainPrice}";
                 var hitRect = Rect.MinMaxRect(
@@ -1072,6 +1143,14 @@ namespace Mandate.Presentation
             GUILayout.Label(
                 $"人口：{selected.Population}　粮价：{selected.GrainPrice}　" +
                 $"治安：{selected.PublicOrderBasisPoints / 100f:F1}%",
+                _normalStyle);
+            GUILayout.Label(
+                $"层级：{LocationKindName(selected.Kind)}　" +
+                $"地貌：{TerrainKindName(selected.Terrain)}　" +
+                $"战略重要度：{selected.StrategicImportance}星",
+                _normalStyle);
+            GUILayout.Label(
+                $"设施：{LocationFeaturesName(selected.Features)}",
                 _normalStyle);
 
             var armyCount = 0;
@@ -1255,8 +1334,119 @@ namespace Mandate.Presentation
 
                     return armies == 0 ? "无驻军" : $"{armies}支军队";
                 default:
-                    return $"人口{location.Population / 1_000}千";
+                    return TerrainKindName(location.Terrain);
             }
+        }
+
+        private static string LocationKindGlyph(LocationKind kind)
+        {
+            switch (kind)
+            {
+                case LocationKind.RegionalSeat:
+                    return "府";
+                case LocationKind.Pass:
+                    return "关";
+                case LocationKind.Port:
+                    return "港";
+                case LocationKind.MarketTown:
+                    return "镇";
+                case LocationKind.Village:
+                    return "村";
+                case LocationKind.Camp:
+                    return "营";
+                default:
+                    return "县";
+            }
+        }
+
+        private static string LocationKindName(LocationKind kind)
+        {
+            switch (kind)
+            {
+                case LocationKind.RegionalSeat:
+                    return "州郡治所";
+                case LocationKind.Pass:
+                    return "关隘";
+                case LocationKind.Port:
+                    return "港口";
+                case LocationKind.MarketTown:
+                    return "市镇";
+                case LocationKind.Village:
+                    return "村庄";
+                case LocationKind.Camp:
+                    return "营地";
+                default:
+                    return "县城";
+            }
+        }
+
+        private static string TerrainKindName(TerrainKind terrain)
+        {
+            switch (terrain)
+            {
+                case TerrainKind.Hills:
+                    return "丘陵";
+                case TerrainKind.Mountains:
+                    return "山地";
+                case TerrainKind.Riverland:
+                    return "河网";
+                case TerrainKind.Forest:
+                    return "森林";
+                case TerrainKind.Marsh:
+                    return "湿地";
+                default:
+                    return "平原";
+            }
+        }
+
+        private static string LocationFeaturesName(LocationFeature features)
+        {
+            if (features == LocationFeature.None)
+            {
+                return "无";
+            }
+
+            var result = string.Empty;
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Government, "官署");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Market, "市场");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Garrison, "驻军");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Farmland, "农田");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Workshop, "工坊");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Clinic, "医馆");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Temple, "寺观");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.RelayStation, "驿站");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Harbor, "港池");
+            AppendLocationFeature(
+                ref result, features, LocationFeature.Fortification, "城防");
+            return result;
+        }
+
+        private static void AppendLocationFeature(
+            ref string result,
+            LocationFeature features,
+            LocationFeature expected,
+            string label)
+        {
+            if ((features & expected) == 0)
+            {
+                return;
+            }
+
+            if (result.Length > 0)
+            {
+                result += "、";
+            }
+
+            result += label;
         }
 
         private static string MapOverlayName(MapOverlay overlay)

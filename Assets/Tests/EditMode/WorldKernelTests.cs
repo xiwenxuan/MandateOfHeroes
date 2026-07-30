@@ -1227,6 +1227,68 @@ namespace Mandate.Tests
             }
         }
 
+        [Test]
+        public void PrototypeWorld_LocationsDeclareGeographyAndFacilities()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var kinds = new System.Collections.Generic.HashSet<LocationKind>();
+            var terrains = new System.Collections.Generic.HashSet<TerrainKind>();
+            var hasMarket = false;
+            var hasFarmland = false;
+
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                var location = world.Locations[i];
+                Assert.That(location.Kind, Is.Not.EqualTo(LocationKind.Unknown));
+                Assert.That(location.Terrain, Is.Not.EqualTo(TerrainKind.Unknown));
+                Assert.That(location.StrategicImportance, Is.InRange(1, 5));
+                kinds.Add(location.Kind);
+                terrains.Add(location.Terrain);
+                hasMarket |=
+                    (location.Features & LocationFeature.Market) != 0;
+                hasFarmland |=
+                    (location.Features & LocationFeature.Farmland) != 0;
+            }
+
+            Assert.That(kinds.Count, Is.GreaterThanOrEqualTo(2));
+            Assert.That(terrains.Count, Is.GreaterThanOrEqualTo(2));
+            Assert.That(hasMarket, Is.True);
+            Assert.That(hasFarmland, Is.True);
+        }
+
+        [Test]
+        public void Snapshot_RoundTripPreservesLocationGeographyMetadata()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                Assert.That(
+                    loaded.Locations[i].Kind,
+                    Is.EqualTo(world.Locations[i].Kind));
+                Assert.That(
+                    loaded.Locations[i].Terrain,
+                    Is.EqualTo(world.Locations[i].Terrain));
+                Assert.That(
+                    loaded.Locations[i].Features,
+                    Is.EqualTo(world.Locations[i].Features));
+                Assert.That(
+                    loaded.Locations[i].StrategicImportance,
+                    Is.EqualTo(world.Locations[i].StrategicImportance));
+            }
+        }
+
+        [Test]
+        public void Validation_RejectsInvalidLocationGeographyMetadata()
+        {
+            var world = BuildMinimalWorld();
+            world.Locations[0].StrategicImportance = 0;
+
+            Assert.Throws<System.InvalidOperationException>(world.Validate);
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
