@@ -140,6 +140,8 @@ namespace Mandate.Domain
             new List<MilitarySupplyRecordState>();
         public List<MedicalTreatmentRecordState> MedicalTreatments =
             new List<MedicalTreatmentRecordState>();
+        public List<ConstructionProjectState> ConstructionProjects =
+            new List<ConstructionProjectState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -205,6 +207,8 @@ namespace Mandate.Domain
             ValidateUniqueIds(MilitarySupplies, item => item.Id, "military supply");
             ValidateUniqueIds(
                 MedicalTreatments, item => item.Id, "medical treatment");
+            ValidateUniqueIds(
+                ConstructionProjects, item => item.Id, "construction project");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -694,6 +698,53 @@ namespace Mandate.Domain
                 }
             }
 
+            var constructionTargets =
+                new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < ConstructionProjects.Count; i++)
+            {
+                var project = ConstructionProjects[i] ??
+                    throw new InvalidOperationException(
+                        "A construction project cannot be null.");
+                _ = new StableId(project.Id);
+                var featureValue = (ushort)project.TargetFeature;
+                var singleFeature =
+                    featureValue != 0 &&
+                    (featureValue & (featureValue - 1)) == 0 &&
+                    (project.TargetFeature & ~LocationFeature.All) == 0;
+                var targetKey =
+                    project.LocationId + "|" + (ushort)project.TargetFeature;
+                if (!locationIds.Contains(project.LocationId) ||
+                    !personIds.Contains(project.SponsorPersonId) ||
+                    !singleFeature ||
+                    !constructionTargets.Add(targetKey) ||
+                    project.StartedDay < 0 ||
+                    project.StartedDay > AbsoluteDay ||
+                    project.RequiredProgress <= 0 ||
+                    project.Progress < 0 ||
+                    project.Progress > project.RequiredProgress ||
+                    project.MoneyInvested < 0 ||
+                    project.IsCompleted !=
+                    (project.Progress == project.RequiredProgress) ||
+                    project.IsCompleted &&
+                    (project.CompletedDay < project.StartedDay ||
+                     project.CompletedDay > AbsoluteDay) ||
+                    !project.IsCompleted && project.CompletedDay != -1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid construction project {project.Id}.");
+                }
+
+                var location = FindLocation(Locations, project.LocationId);
+                var featureExists =
+                    (location.Features & project.TargetFeature) != 0;
+                if (project.IsCompleted != featureExists)
+                {
+                    throw new InvalidOperationException(
+                        $"Construction project {project.Id} is inconsistent " +
+                        "with its location feature.");
+                }
+            }
+
             var historicalDefinitionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < HistoricalEventDefinitions.Count; i++)
             {
@@ -927,6 +978,21 @@ namespace Mandate.Domain
                     throw new InvalidOperationException($"Duplicate {entityType} ID: {id}.");
                 }
             }
+        }
+
+        private static LocationState FindLocation(
+            List<LocationState> locations,
+            string locationId)
+        {
+            for (var i = 0; i < locations.Count; i++)
+            {
+                if (locations[i].Id == locationId)
+                {
+                    return locations[i];
+                }
+            }
+
+            return null;
         }
 
         private static void ValidateBasisPoints(int value, string personId, string field)

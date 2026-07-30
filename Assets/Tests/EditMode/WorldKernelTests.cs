@@ -1381,6 +1381,162 @@ namespace Mandate.Tests
             Assert.That(information.PrimaryMetric, Is.EqualTo("兵0"));
         }
 
+        [Test]
+        public void Construction_ContributionCompletesProjectAndAddsFacility()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "营造者",
+                    Age = 25,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Merchant
+                },
+                184);
+            var player = world.People.Find(
+                item => item.Id == world.PlayerPersonId);
+            var wealthBefore = player.Wealth;
+            var system = new ConstructionSystem();
+            var project = system.StartProject(
+                world,
+                new StableId(player.Id),
+                new StableId(player.LocationId),
+                LocationFeature.Clinic);
+
+            var result = system.Contribute(
+                world,
+                new StableId(project.Id),
+                new StableId(player.Id),
+                100,
+                80);
+            var location = world.Locations.Find(
+                item => item.Id == player.LocationId);
+
+            Assert.That(result.Completed, Is.True);
+            Assert.That(project.IsCompleted, Is.True);
+            Assert.That(player.Wealth, Is.EqualTo(wealthBefore - 100));
+            Assert.That(
+                location.Features & LocationFeature.Clinic,
+                Is.EqualTo(LocationFeature.Clinic));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void Construction_SnapshotPreservesActiveProjectProgress()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "筑城者",
+                    Age = 25,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier
+                },
+                184);
+            var player = world.People.Find(
+                item => item.Id == world.PlayerPersonId);
+            var system = new ConstructionSystem();
+            var project = system.StartProject(
+                world,
+                new StableId(player.Id),
+                new StableId(player.LocationId),
+                LocationFeature.Fortification);
+            system.Contribute(
+                world,
+                new StableId(project.Id),
+                new StableId(player.Id),
+                20,
+                20);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedProject = loaded.ConstructionProjects[0];
+
+            Assert.That(loadedProject.Progress, Is.EqualTo(24));
+            Assert.That(loadedProject.MoneyInvested, Is.EqualTo(20));
+            Assert.That(loadedProject.IsCompleted, Is.False);
+            Assert.That(
+                loaded.Locations.Find(item => item.Id == player.LocationId)
+                    .Features & LocationFeature.Fortification,
+                Is.EqualTo(LocationFeature.None));
+        }
+
+        [Test]
+        public void Construction_RejectsExistingFacilityAndDuplicateProject()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "营造者",
+                    Age = 25,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Merchant
+                },
+                184);
+            var player = world.People.Find(
+                item => item.Id == world.PlayerPersonId);
+            var system = new ConstructionSystem();
+
+            Assert.Throws<System.InvalidOperationException>(
+                () => system.StartProject(
+                    world,
+                    new StableId(player.Id),
+                    new StableId(player.LocationId),
+                    LocationFeature.Market));
+            system.StartProject(
+                world,
+                new StableId(player.Id),
+                new StableId(player.LocationId),
+                LocationFeature.Clinic);
+            Assert.Throws<System.InvalidOperationException>(
+                () => system.StartProject(
+                    world,
+                    new StableId(player.Id),
+                    new StableId(player.LocationId),
+                    LocationFeature.Clinic));
+        }
+
+        [Test]
+        public void Construction_EachStartingIdentityHasSuggestedLocalProject()
+        {
+            var identities = new[]
+            {
+                StartingIdentity.Soldier,
+                StartingIdentity.CountyClerk,
+                StartingIdentity.Merchant,
+                StartingIdentity.Physician
+            };
+            var setup = new NewGameSetupService();
+
+            for (var i = 0; i < identities.Length; i++)
+            {
+                var world = setup.CreateCustom184World(
+                    new NewGameCharacterRequest
+                    {
+                        DisplayName = "营造建议",
+                        Age = 25,
+                        Gender = PersonGender.Male,
+                        Identity = identities[i]
+                    },
+                    184);
+                var player = world.People.Find(
+                    item => item.Id == world.PlayerPersonId);
+                var location = world.Locations.Find(
+                    item => item.Id == player.LocationId);
+                var perspective = MapPerspectiveSystem.RecommendForPlayer(
+                    world,
+                    player.Id);
+                var feature = ConstructionSystem.RecommendFeature(
+                    location,
+                    perspective);
+
+                Assert.That(feature, Is.Not.EqualTo(LocationFeature.None));
+                Assert.That(
+                    location.Features & feature,
+                    Is.EqualTo(LocationFeature.None));
+            }
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);

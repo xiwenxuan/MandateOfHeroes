@@ -66,6 +66,8 @@ namespace Mandate.Presentation
             new MilitarySupplySystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
+        private readonly ConstructionSystem _constructionSystem =
+            new ConstructionSystem();
         private readonly Dictionary<string, NpcDecision> _decisions =
             new Dictionary<string, NpcDecision>(StringComparer.Ordinal);
 
@@ -1239,6 +1241,7 @@ namespace Mandate.Presentation
                 $"{MapPerspectiveName(_mapPerspective)}情报：" +
                 $"{perspectiveInfo.PrimaryMetric}　{perspectiveInfo.SecondaryMetric}",
                 _normalStyle);
+            DrawLocationConstruction(selected, player);
 
             var armyCount = 0;
             for (var i = 0; i < _world.Armies.Count; i++)
@@ -1281,6 +1284,137 @@ namespace Mandate.Presentation
             {
                 TryStartPlayerJourney(route, selected.Id);
             }
+        }
+
+        private void DrawLocationConstruction(
+            LocationState location,
+            PersonState player)
+        {
+            GUILayout.Space(8);
+            GUILayout.Label("地方建设", _sectionStyle);
+            var projectCount = 0;
+            for (var i = 0; i < _world.ConstructionProjects.Count; i++)
+            {
+                var project = _world.ConstructionProjects[i];
+                if (project.LocationId != location.Id)
+                {
+                    continue;
+                }
+
+                projectCount++;
+                GUILayout.Label(
+                    $"{project.DisplayName}　进度{project.Progress}/" +
+                    $"{project.RequiredProgress}　累计投入{project.MoneyInvested}钱" +
+                    (project.IsCompleted ? "　已完工" : string.Empty),
+                    _normalStyle);
+                if (project.IsCompleted)
+                {
+                    continue;
+                }
+
+                var canContribute =
+                    player.LocationId == location.Id &&
+                    FindJourney(player.Id) == null &&
+                    player.Wealth >= 20;
+                GUI.enabled = canContribute;
+                if (GUILayout.Button(
+                        "投入20钱并劳作一日",
+                        GUILayout.Height(32)))
+                {
+                    try
+                    {
+                        var result = _constructionSystem.Contribute(
+                            _world,
+                            new StableId(project.Id),
+                            new StableId(player.Id),
+                            20,
+                            20);
+                        _simulator.AdvanceDays(_world, 1);
+                        RefreshMonthlyDecisions();
+                        _message = result.Summary + "世界推进了一日。";
+                    }
+                    catch (Exception exception)
+                    {
+                        _message = exception.Message;
+                    }
+                }
+
+                GUI.enabled = true;
+                if (!canContribute)
+                {
+                    GUILayout.Label(
+                        player.LocationId != location.Id
+                            ? "必须到达当地才能投入建设。"
+                            : player.Wealth < 20
+                                ? "财富不足20钱。"
+                                : "旅途中不能参与建设。",
+                        _normalStyle);
+                }
+            }
+
+            if (projectCount == 0)
+            {
+                GUILayout.Label("当前没有建设项目。", _normalStyle);
+            }
+
+            var suggestion = ConstructionSystem.RecommendFeature(
+                location,
+                _mapPerspective);
+            if (suggestion == LocationFeature.None)
+            {
+                GUILayout.Label(
+                    "当前视角下没有可建议的新设施。",
+                    _normalStyle);
+                return;
+            }
+
+            if (FindConstructionProject(location.Id, suggestion) != null)
+            {
+                return;
+            }
+
+            var canStart =
+                player.LocationId == location.Id &&
+                FindJourney(player.Id) == null;
+            GUI.enabled = canStart;
+            if (GUILayout.Button(
+                    $"发起{ConstructionSystem.FeatureName(suggestion)}建设　" +
+                    $"需要{ConstructionSystem.RequiredProgress(suggestion)}进度",
+                    GUILayout.Height(34)))
+            {
+                try
+                {
+                    var project = _constructionSystem.StartProject(
+                        _world,
+                        new StableId(player.Id),
+                        new StableId(location.Id),
+                        suggestion);
+                    _message = $"已发起{project.DisplayName}。";
+                }
+                catch (Exception exception)
+                {
+                    _message = exception.Message;
+                }
+            }
+
+            GUI.enabled = true;
+        }
+
+        private ConstructionProjectState FindConstructionProject(
+            string locationId,
+            LocationFeature feature)
+        {
+            for (var i = 0; i < _world.ConstructionProjects.Count; i++)
+            {
+                var project = _world.ConstructionProjects[i];
+                if (project.LocationId == locationId &&
+                    project.TargetFeature == feature)
+                {
+                    return project;
+                }
+            }
+
+            return null;
         }
 
         private Vector2 ArmyMapPoint(Rect canvas, ArmyState army)
