@@ -1,0 +1,37 @@
+{
+  "schema_version": "han140.sources.v1",
+  "dataset_year": 140,
+  "national_anchor": {
+    "registered_households": 9698630,
+    "registered_population": 49150220,
+    "source_ids": [
+      "source.hou_han_shu.jun_guo_zhi"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "source.hou_han_shu.jun_guo_zhi",
+      "source_type": "primary_text",
+      "title": "《后汉书》志第二十至二十三·郡国（源出司马彪《续汉书》）",
+      "author_or_editor": "司马彪撰志，刘昭注，后并入《后汉书》",
+      "edition_or_host": "古籍卷次定位；逐条校录时补充所用公开影印本或版本页码",
+      "publication_or_access_date": "古代文献；项目登记于2026-07-31",
+      "url_or_bibliographic_locator": "《后汉书》郡国志篇末户口合计及各郡国条目",
+      "license_or_public_domain_note": "古籍原文属于公共领域；不复制现代点校、数据库或研究者受保护的完整表格与注释",
+      "evidence_scope": "140年全国户口锚点与后续郡国原文校录",
+      "notes": "全国锚点与现存分项可能存在缺项、讹误和口径差异，必须分别审计"
+    },
+    {
+      "source_id": "source.project.historical_population.v0_1",
+      "source_type": "project_model",
+      "title": "135—260年东汉至三国人口分布基线V0.1",
+      "author_or_editor": "MandateOfHeroes contributors",
+      "edition_or_host": "MandateOfHeroes repository",
+      "publication_or_access_date": "2026-07-31",
+      "url_or_bibliographic_locator": "Docs/HISTORICAL_POPULATION_135_260.md",
+      "license_or_public_domain_note": "项目原创整理，随仓库MIT许可证发布；引用外部事实时仍须追溯原始来源",
+      "evidence_scope": "证据等级、全国锚点采用规则与稳定地理分配方法",
+      "notes": "项目模型不能替代郡国原始史料来源"
+    }
+  ]
+}

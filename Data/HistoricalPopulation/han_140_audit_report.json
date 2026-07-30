@@ -1,0 +1,43 @@
+{
+    "schema_version":  "han140.audit.v1",
+    "dataset_year":  140,
+    "validation_status":  "passed",
+    "national_anchor":  {
+                            "registered_households":  9698630,
+                            "registered_population":  49150220
+                        },
+    "row_counts":  {
+                       "sources":  2,
+                       "administrative_units":  0,
+                       "population_records":  0,
+                       "stable_regions":  0,
+                       "region_mappings":  0,
+                       "game_location_crosswalks":  0
+                   },
+    "population_totals":  {
+                              "raw_households":  0,
+                              "raw_population":  0,
+                              "explicit_corrected_households":  0,
+                              "explicit_corrected_population":  0,
+                              "effective_households":  0,
+                              "effective_population":  0,
+                              "household_difference_from_anchor":  -9698630,
+                              "population_difference_from_anchor":  -49150220
+                          },
+    "data_quality":  {
+                         "records_missing_raw_households":  0,
+                         "records_missing_raw_population":  0,
+                         "records_with_corrections":  0,
+                         "provisional_stable_regions":  0,
+                         "provisional_region_mappings":  0,
+                         "unresolved_game_locations":  0
+                     },
+    "mapping_audit":  {
+                          "mapped_admin_source_count":  0,
+                          "weight_error_count":  0
+                      },
+    "registered_source_ids":  [
+                                  "source.hou_han_shu.jun_guo_zhi",
+                                  "source.project.historical_population.v0_1"
+                              ]
+}
