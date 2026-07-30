@@ -14,6 +14,7 @@ namespace Mandate.Simulation
         private readonly LifeSimulationSystem _lifeSimulationSystem;
         private readonly MarketSimulationSystem _marketSimulationSystem;
         private readonly ArmySystem _armySystem = new ArmySystem();
+        private readonly EducationSystem _educationSystem = new EducationSystem();
 
         public WorldSimulator(ulong masterSeed)
         {
@@ -74,6 +75,7 @@ namespace Mandate.Simulation
             _historicalEventSystem.ResolveEligibleEvents(world);
             _taskSystem.ResolveDailyProgress(world);
             _lifeSimulationSystem.ResolveMonthly(world);
+            _educationSystem.ResolveDuePlans(world);
             _marketSimulationSystem.ResolveDailyPrices(world);
             var locations = new List<LocationState>(world.Locations);
             locations.Sort((left, right) => string.CompareOrdinal(left.Id, right.Id));

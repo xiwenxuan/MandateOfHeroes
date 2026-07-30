@@ -112,7 +112,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 3;
+        public const int CurrentSchemaVersion = 4;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -155,6 +155,10 @@ namespace Mandate.Domain
             new List<PopulationCohortState>();
         public List<PopulationTransactionState> PopulationTransactions =
             new List<PopulationTransactionState>();
+        public List<EducationPlanState> EducationPlans =
+            new List<EducationPlanState>();
+        public List<LearningRecordState> LearningRecords =
+            new List<LearningRecordState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -226,6 +230,10 @@ namespace Mandate.Domain
                 PopulationCohorts, item => item.Id, "population cohort");
             ValidateUniqueIds(
                 PopulationTransactions, item => item.Id, "population transaction");
+            ValidateUniqueIds(
+                EducationPlans, item => item.Id, "education plan");
+            ValidateUniqueIds(
+                LearningRecords, item => item.Id, "learning record");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -1048,6 +1056,182 @@ namespace Mandate.Domain
                         $"Position {Positions[i].Id} exceeds its capacity.");
                 }
             }
+
+            ValidateEducation(personIds, positionIds);
+        }
+
+        private void ValidateEducation(
+            HashSet<string> personIds,
+            HashSet<string> positionIds)
+        {
+            var activeStudents = new HashSet<string>(StringComparer.Ordinal);
+            var activeTeacherCounts =
+                new Dictionary<string, int>(StringComparer.Ordinal);
+            var planIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < EducationPlans.Count; i++)
+            {
+                var plan = EducationPlans[i];
+                planIds.Add(plan.Id);
+                if (!personIds.Contains(plan.StudentPersonId) ||
+                    !string.IsNullOrEmpty(plan.TeacherPersonId) &&
+                    !personIds.Contains(plan.TeacherPersonId) ||
+                    plan.StudentPersonId == plan.TeacherPersonId)
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has an invalid person reference.");
+                }
+
+                if (!Enum.IsDefined(
+                        typeof(ProfessionalDiscipline), plan.Discipline) ||
+                    !Enum.IsDefined(
+                        typeof(EducationFundingSource), plan.FundingSource) ||
+                    !Enum.IsDefined(
+                        typeof(EducationPlanStatus), plan.Status) ||
+                    plan.MonthlyStudyDays < 1 ||
+                    plan.MonthlyStudyDays > 20 ||
+                    plan.MonthlyFee < 0 ||
+                    plan.CreatedDay < 0 ||
+                    plan.CreatedDay > AbsoluteDay ||
+                    plan.LastResolvedDay < -1 ||
+                    plan.LastResolvedDay > AbsoluteDay ||
+                    plan.LastResolvedDay >= 0 &&
+                    plan.LastResolvedDay < plan.CreatedDay ||
+                    plan.TotalStudyDays < 0 ||
+                    plan.TotalFeesPaid < 0 ||
+                    plan.TotalSkillGain < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has invalid values.");
+                }
+
+                if (plan.FundingSource == EducationFundingSource.Family)
+                {
+                    if (string.IsNullOrEmpty(plan.FundingFamilyId) ||
+                        !FamilyContainsPerson(
+                            Families,
+                            plan.FundingFamilyId,
+                            plan.StudentPersonId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Education plan {plan.Id} has invalid family funding.");
+                    }
+                }
+                else if (!string.IsNullOrEmpty(plan.FundingFamilyId))
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has unexpected family funding.");
+                }
+
+                if (!string.IsNullOrEmpty(plan.PracticePositionId) &&
+                    (!positionIds.Contains(plan.PracticePositionId) ||
+                     !HasMembershipPosition(
+                         Memberships,
+                         plan.StudentPersonId,
+                         plan.PracticePositionId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has invalid practice position.");
+                }
+
+                if (plan.Status != EducationPlanStatus.Active &&
+                    plan.Status != EducationPlanStatus.Suspended)
+                {
+                    continue;
+                }
+
+                if (!activeStudents.Add(plan.StudentPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Person {plan.StudentPersonId} has multiple education plans.");
+                }
+
+                if (string.IsNullOrEmpty(plan.TeacherPersonId))
+                {
+                    continue;
+                }
+
+                activeTeacherCounts.TryGetValue(
+                    plan.TeacherPersonId, out var teacherCount);
+                teacherCount++;
+                if (teacherCount > 3)
+                {
+                    throw new InvalidOperationException(
+                        $"Teacher {plan.TeacherPersonId} exceeds student capacity.");
+                }
+
+                activeTeacherCounts[plan.TeacherPersonId] = teacherCount;
+            }
+
+            for (var i = 0; i < LearningRecords.Count; i++)
+            {
+                var record = LearningRecords[i];
+                if (!planIds.Contains(record.EducationPlanId) ||
+                    !personIds.Contains(record.StudentPersonId) ||
+                    !string.IsNullOrEmpty(record.TeacherPersonId) &&
+                    !personIds.Contains(record.TeacherPersonId) ||
+                    !Enum.IsDefined(
+                        typeof(ProfessionalDiscipline), record.Discipline) ||
+                    !Enum.IsDefined(
+                        typeof(LearningOutcomeKind), record.Outcome) ||
+                    record.Day < 0 ||
+                    record.Day > AbsoluteDay ||
+                    record.MonthIndex < 0 ||
+                    record.StudyDays < 0 ||
+                    record.StudyDays > 20 ||
+                    record.FeePaid < 0 ||
+                    record.SkillGain < 0 ||
+                    record.SkillAfter - record.SkillBefore != record.SkillGain ||
+                    string.IsNullOrWhiteSpace(record.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Learning record {record.Id} has invalid values.");
+                }
+
+                ValidateBasisPoints(
+                    record.SkillBefore, record.Id, "learning skill before");
+                ValidateBasisPoints(
+                    record.SkillAfter, record.Id, "learning skill after");
+                ValidateBasisPoints(
+                    record.CompositeAptitudeBasisPoints,
+                    record.Id,
+                    "learning aptitude");
+                ValidateBasisPoints(
+                    record.SoftPotentialBasisPoints,
+                    record.Id,
+                    "learning soft potential");
+                ValidateOptionalLearningFactor(
+                    record.TeacherFactorBasisPoints,
+                    record.Id,
+                    "teacher factor");
+                ValidateOptionalLearningFactor(
+                    record.FacilityFactorBasisPoints,
+                    record.Id,
+                    "facility factor");
+                ValidateOptionalLearningFactor(
+                    record.HealthFactorBasisPoints,
+                    record.Id,
+                    "health factor");
+                ValidateOptionalLearningFactor(
+                    record.MotivationFactorBasisPoints,
+                    record.Id,
+                    "motivation factor");
+                ValidateOptionalLearningFactor(
+                    record.PracticeFactorBasisPoints,
+                    record.Id,
+                    "practice factor");
+                ValidateOptionalLearningFactor(
+                    record.DiminishingFactorBasisPoints,
+                    record.Id,
+                    "diminishing factor");
+
+                var plan = FindEducationPlan(EducationPlans, record.EducationPlanId);
+                if (plan.StudentPersonId != record.StudentPersonId ||
+                    plan.Discipline != record.Discipline)
+                {
+                    throw new InvalidOperationException(
+                        $"Learning record {record.Id} does not match its plan.");
+                }
+            }
         }
 
         private void ValidatePopulationLedger(
@@ -1372,6 +1556,67 @@ namespace Mandate.Domain
             }
 
             return false;
+        }
+
+        private static bool FamilyContainsPerson(
+            IList<FamilyState> families,
+            string familyId,
+            string personId)
+        {
+            for (var i = 0; i < families.Count; i++)
+            {
+                if (families[i].Id == familyId)
+                {
+                    return families[i].MemberIds.Contains(personId);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasMembershipPosition(
+            IList<MembershipState> memberships,
+            string personId,
+            string positionId)
+        {
+            for (var i = 0; i < memberships.Count; i++)
+            {
+                if (memberships[i].PersonId == personId &&
+                    memberships[i].PositionId == positionId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static EducationPlanState FindEducationPlan(
+            IList<EducationPlanState> plans,
+            string planId)
+        {
+            for (var i = 0; i < plans.Count; i++)
+            {
+                if (plans[i].Id == planId)
+                {
+                    return plans[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing education plan {planId}.");
+        }
+
+        private static void ValidateOptionalLearningFactor(
+            int value,
+            string recordId,
+            string field)
+        {
+            if (value < 0 || value > 12_000)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid {field} for {recordId}: {value}.");
+            }
         }
 
         private static CommodityState FindCommodity(

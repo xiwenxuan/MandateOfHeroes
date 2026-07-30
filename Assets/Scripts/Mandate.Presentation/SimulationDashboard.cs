@@ -70,6 +70,8 @@ namespace Mandate.Presentation
             new ConstructionSystem();
         private readonly PopulationLedgerSystem _populationLedgerSystem =
             new PopulationLedgerSystem();
+        private readonly EducationSystem _educationSystem =
+            new EducationSystem();
         private readonly Dictionary<string, NpcDecision> _decisions =
             new Dictionary<string, NpcDecision>(StringComparer.Ordinal);
 
@@ -85,6 +87,10 @@ namespace Mandate.Presentation
         private int _customGender;
         private int _customIdentity;
         private int _existingPersonIndex;
+        private int _educationDiscipline;
+        private int _educationStudyDays = 10;
+        private bool _educationUseTeacher = true;
+        private bool _educationUseFamilyFunds;
         private Vector2 _selectionScroll;
         private MapOverlay _mapOverlay;
         private MapPerspective _mapPerspective;
@@ -1779,6 +1785,9 @@ namespace Mandate.Presentation
                 _normalStyle);
 
             GUILayout.Space(12);
+            DrawPlayerEducation(player);
+
+            GUILayout.Space(12);
             GUILayout.Label("家庭", _sectionStyle);
             var hasFamily = false;
             for (var i = 0; i < _world.Families.Count; i++)
@@ -1823,6 +1832,166 @@ namespace Mandate.Presentation
             if (!hasMembership)
             {
                 GUILayout.Label("当前为在野人物。", _normalStyle);
+            }
+        }
+
+        private void DrawPlayerEducation(PersonState player)
+        {
+            GUILayout.Label("培养", _sectionStyle);
+            EducationPlanState currentPlan = null;
+            for (var i = 0; i < _world.EducationPlans.Count; i++)
+            {
+                var candidate = _world.EducationPlans[i];
+                if (candidate.StudentPersonId == player.Id &&
+                    (candidate.Status == EducationPlanStatus.Active ||
+                     candidate.Status == EducationPlanStatus.Suspended))
+                {
+                    currentPlan = candidate;
+                    break;
+                }
+            }
+
+            if (currentPlan != null)
+            {
+                var teacherName = string.IsNullOrEmpty(currentPlan.TeacherPersonId)
+                    ? "自修"
+                    : FindPerson(currentPlan.TeacherPersonId).DisplayName;
+                var nextDay = currentPlan.LastResolvedDay < 0
+                    ? currentPlan.CreatedDay + EducationSystem.DaysPerStudyMonth
+                    : currentPlan.LastResolvedDay +
+                      EducationSystem.DaysPerStudyMonth;
+                GUILayout.Label(
+                    $"{ProfessionalSkillAccess.DisplayName(currentPlan.Discipline)}　" +
+                    $"教师：{teacherName}　每月{currentPlan.MonthlyStudyDays}日　" +
+                    $"费用{currentPlan.MonthlyFee}钱　状态：{currentPlan.Status}",
+                    _normalStyle);
+                GUILayout.Label(
+                    $"下次结算：第{nextDay + 1}日　累计学习" +
+                    $"{currentPlan.TotalStudyDays}日　累计成长" +
+                    $"{AbilityValue(currentPlan.TotalSkillGain)}",
+                    _normalStyle);
+                if (GUILayout.Button("取消当前学习计划", GUILayout.Height(32)))
+                {
+                    try
+                    {
+                        _educationSystem.CancelPlan(
+                            _world, new StableId(currentPlan.Id));
+                        _message = "已取消当前学习计划。";
+                    }
+                    catch (Exception exception)
+                    {
+                        _message = exception.Message;
+                    }
+                }
+            }
+            else
+            {
+                _educationDiscipline = GUILayout.SelectionGrid(
+                    _educationDiscipline,
+                    new[]
+                    {
+                        "军事", "武艺", "政务", "商业", "农业",
+                        "工艺", "医药", "学问", "交涉", "情报"
+                    },
+                    5,
+                    GUILayout.Height(64));
+                var discipline = (ProfessionalDiscipline)_educationDiscipline;
+                var currentSkill = ProfessionalSkillAccess.Get(
+                    player.ProfessionalSkills, discipline);
+                var aptitude = ProfessionalSkillAccess.CompositeAptitude(
+                    player.Aptitudes, discipline);
+                var potential = ProfessionalSkillAccess.SoftPotential(
+                    player.Aptitudes, discipline);
+                _educationStudyDays = Mathf.RoundToInt(
+                    GUILayout.HorizontalSlider(
+                        _educationStudyDays,
+                        1,
+                        EducationSystem.MaximumStudyDaysPerMonth));
+                GUILayout.Label(
+                    $"每月学习：{_educationStudyDays}日　当前：" +
+                    $"{AbilityValue(currentSkill)}　综合资质：" +
+                    $"{AbilityValue(aptitude)}　软潜力：" +
+                    $"{AbilityValue(potential)}",
+                    _normalStyle);
+
+                _educationUseTeacher = GUILayout.Toggle(
+                    _educationUseTeacher, "自动寻找同地最佳教师");
+                var teacher = _educationUseTeacher
+                    ? _educationSystem.FindBestTeacher(
+                        _world, player.Id, discipline)
+                    : null;
+                var practicePosition =
+                    _educationSystem.FindCompatiblePracticePosition(
+                        _world, player.Id, discipline);
+                var family = FindFamilyForPerson(player.Id);
+                GUI.enabled = family != null;
+                _educationUseFamilyFunds = GUILayout.Toggle(
+                    _educationUseFamilyFunds,
+                    family == null
+                        ? "当前没有可支付学费的家庭"
+                        : $"由{family.DisplayName}支付");
+                GUI.enabled = true;
+
+                var teacherText = "自修或暂无合格教师";
+                if (teacher != null)
+                {
+                    var teacherSkill = ProfessionalSkillAccess.Get(
+                        teacher.ProfessionalSkills, discipline);
+                    var monthlyFee = EducationSystem.RecommendedMonthlyFee(
+                        teacherSkill, _educationStudyDays);
+                    teacherText =
+                        $"{teacher.DisplayName}，能力{AbilityValue(teacherSkill)}，" +
+                        $"月费{monthlyFee}";
+                }
+
+                GUILayout.Label(
+                    $"教师：{teacherText}　实践职位：" +
+                    $"{(string.IsNullOrEmpty(practicePosition) ? "无" : FindPositionName(practicePosition))}",
+                    _normalStyle);
+
+                if (GUILayout.Button("建立学习计划", GUILayout.Height(34)))
+                {
+                    try
+                    {
+                        var plan = _educationSystem.StartPlan(
+                            _world,
+                            new StableId(player.Id),
+                            discipline,
+                            _educationStudyDays,
+                            teacher == null ? string.Empty : teacher.Id,
+                            _educationUseFamilyFunds && family != null
+                                ? EducationFundingSource.Family
+                                : EducationFundingSource.Personal,
+                            _educationUseFamilyFunds && family != null
+                                ? family.Id
+                                : string.Empty,
+                            practicePosition);
+                        _message =
+                            $"已建立{ProfessionalSkillAccess.DisplayName(discipline)}" +
+                            $"学习计划，首次结算在第{plan.CreatedDay + 31}日。";
+                    }
+                    catch (Exception exception)
+                    {
+                        _message = exception.Message;
+                    }
+                }
+            }
+
+            var shownRecords = 0;
+            for (var i = _world.LearningRecords.Count - 1;
+                 i >= 0 && shownRecords < 3;
+                 i--)
+            {
+                var record = _world.LearningRecords[i];
+                if (record.StudentPersonId != player.Id)
+                {
+                    continue;
+                }
+
+                GUILayout.Label(
+                    $"第{record.Day + 1}日　{record.Summary}",
+                    _normalStyle);
+                shownRecords++;
             }
         }
 
@@ -2809,6 +2978,19 @@ namespace Mandate.Presentation
             }
 
             throw new InvalidOperationException($"Missing person {personId}.");
+        }
+
+        private FamilyState FindFamilyForPerson(string personId)
+        {
+            for (var i = 0; i < _world.Families.Count; i++)
+            {
+                if (_world.Families[i].MemberIds.Contains(personId))
+                {
+                    return _world.Families[i];
+                }
+            }
+
+            return null;
         }
 
         private JourneyState FindJourney(string personId)

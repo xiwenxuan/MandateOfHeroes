@@ -2004,6 +2004,481 @@ namespace Mandate.Tests
             Assert.Throws<InvalidOperationException>(world.Validate);
         }
 
+        [Test]
+        public void Education_GrowsOnlyAfterThirtyRealDaysAndOnlyOnce()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var before = student.ProfessionalSkills.Military;
+            var system = new EducationSystem();
+            system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                "person.liu_bei");
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 29);
+            Assert.That(
+                student.ProfessionalSkills.Military,
+                Is.EqualTo(before));
+            Assert.That(world.LearningRecords.Count, Is.EqualTo(0));
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            var after = student.ProfessionalSkills.Military;
+            Assert.That(after, Is.GreaterThan(before));
+            Assert.That(world.LearningRecords.Count, Is.EqualTo(1));
+            Assert.That(world.EducationPlans[0].TotalStudyDays, Is.EqualTo(10));
+
+            system.ResolveDuePlans(world);
+            Assert.That(student.ProfessionalSkills.Military, Is.EqualTo(after));
+            Assert.That(world.LearningRecords.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Education_PersonalFeeTransfersToTeacher()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            var system = new EducationSystem();
+            var plan = system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                12,
+                teacher.Id);
+            var studentBefore = student.Wealth;
+            var teacherBefore = teacher.Wealth;
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                student.Wealth,
+                Is.EqualTo(studentBefore - plan.MonthlyFee));
+            Assert.That(
+                teacher.Wealth,
+                Is.EqualTo(teacherBefore + plan.MonthlyFee));
+            Assert.That(plan.TotalFeesPaid, Is.EqualTo(plan.MonthlyFee));
+            Assert.That(
+                world.LearningRecords[0].FeePaid,
+                Is.EqualTo(plan.MonthlyFee));
+        }
+
+        [Test]
+        public void Education_FamilyFundingConsumesRealFamilyWealth()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var family = world.Families.Find(
+                item => item.Id == "family.zhuo_farm_household");
+            family.Wealth = 5_000;
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            var system = new EducationSystem();
+            var plan = system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id,
+                EducationFundingSource.Family,
+                family.Id);
+            var familyBefore = family.Wealth;
+            var studentBefore = student.Wealth;
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                family.Wealth,
+                Is.EqualTo(familyBefore - plan.MonthlyFee));
+            Assert.That(student.Wealth, Is.EqualTo(studentBefore));
+        }
+
+        [Test]
+        public void Education_InsufficientFundsProducesNoGrowthOrPayment()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            student.Wealth = 0;
+            var system = new EducationSystem();
+            system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            var skillBefore = student.ProfessionalSkills.Military;
+            var teacherWealth = teacher.Wealth;
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                student.ProfessionalSkills.Military,
+                Is.EqualTo(skillBefore));
+            Assert.That(teacher.Wealth, Is.EqualTo(teacherWealth));
+            Assert.That(
+                world.LearningRecords[0].Outcome,
+                Is.EqualTo(LearningOutcomeKind.InsufficientFunds));
+            Assert.That(world.EducationPlans[0].TotalStudyDays, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Education_HigherAptitudeProducesMoreGrowth()
+        {
+            var lowWorld = PrepareEducationWorld(1_000, 8_000);
+            var highWorld = PrepareEducationWorld(1_000, 8_000);
+            SetMilitaryAptitude(FindTestStudent(lowWorld), 2_000);
+            SetMilitaryAptitude(FindTestStudent(highWorld), 8_000);
+            var lowSystem = new EducationSystem();
+            var highSystem = new EducationSystem();
+            StartMilitaryStudy(lowWorld, lowSystem, string.Empty);
+            StartMilitaryStudy(highWorld, highSystem, string.Empty);
+
+            ResolveEducationAtDay(lowWorld, 30, lowSystem);
+            ResolveEducationAtDay(highWorld, 30, highSystem);
+
+            Assert.That(
+                highWorld.LearningRecords[0].SkillGain,
+                Is.GreaterThan(lowWorld.LearningRecords[0].SkillGain));
+        }
+
+        [Test]
+        public void Education_DiminishingReturnsReduceHighSkillGrowth()
+        {
+            var lowWorld = PrepareEducationWorld(1_000, 9_500);
+            var highWorld = PrepareEducationWorld(5_000, 9_500);
+            var lowSystem = new EducationSystem();
+            var highSystem = new EducationSystem();
+            StartMilitaryStudy(lowWorld, lowSystem, "person.liu_bei");
+            StartMilitaryStudy(highWorld, highSystem, "person.liu_bei");
+
+            ResolveEducationAtDay(lowWorld, 30, lowSystem);
+            ResolveEducationAtDay(highWorld, 30, highSystem);
+
+            Assert.That(
+                lowWorld.LearningRecords[0].SkillGain,
+                Is.GreaterThan(highWorld.LearningRecords[0].SkillGain));
+            Assert.That(
+                lowWorld.LearningRecords[0].DiminishingFactorBasisPoints,
+                Is.GreaterThan(
+                    highWorld.LearningRecords[0]
+                        .DiminishingFactorBasisPoints));
+        }
+
+        [Test]
+        public void Education_MatchingPracticePositionImprovesGrowth()
+        {
+            var theoryWorld = PrepareEducationWorld(4_000, 9_500);
+            var practiceWorld = PrepareEducationWorld(4_000, 9_500);
+            AddMilitaryPracticeMembership(practiceWorld);
+            var theorySystem = new EducationSystem();
+            var practiceSystem = new EducationSystem();
+            StartMilitaryStudy(
+                theoryWorld, theorySystem, "person.liu_bei");
+            StartMilitaryStudy(
+                practiceWorld,
+                practiceSystem,
+                "person.liu_bei",
+                "position.youzhou_soldier");
+
+            ResolveEducationAtDay(theoryWorld, 30, theorySystem);
+            ResolveEducationAtDay(practiceWorld, 30, practiceSystem);
+
+            Assert.That(
+                practiceWorld.LearningRecords[0].SkillGain,
+                Is.GreaterThan(theoryWorld.LearningRecords[0].SkillGain));
+            Assert.That(
+                practiceWorld.LearningRecords[0].PracticeFactorBasisPoints,
+                Is.EqualTo(12_000));
+        }
+
+        [Test]
+        public void Education_ExpertStageRequiresRealPracticePosition()
+        {
+            var world = PrepareEducationWorld(6_100, 9_500);
+            var student = FindTestStudent(world);
+            var system = new EducationSystem();
+
+            Assert.Throws<InvalidOperationException>(
+                () => system.StartPlan(
+                    world,
+                    new StableId(student.Id),
+                    ProfessionalDiscipline.Military,
+                    10,
+                    "person.liu_bei"));
+
+            AddMilitaryPracticeMembership(world);
+            var plan = system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                "person.liu_bei",
+                EducationFundingSource.Personal,
+                string.Empty,
+                "position.youzhou_soldier");
+            Assert.That(plan.PracticePositionId, Is.Not.Empty);
+        }
+
+        [Test]
+        public void Education_SelfStudyStopsAtThirty()
+        {
+            var world = PrepareEducationWorld(2_950, 8_000);
+            var student = FindTestStudent(world);
+            var system = new EducationSystem();
+            var plan = system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                20);
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                student.ProfessionalSkills.Military,
+                Is.EqualTo(EducationSystem.SelfStudyLimitBasisPoints));
+            Assert.That(plan.Status, Is.EqualTo(EducationPlanStatus.Completed));
+        }
+
+        [Test]
+        public void Education_DeadTeacherSuspendsPlanWithoutGrowth()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            var system = new EducationSystem();
+            var plan = system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            new PopulationLedgerSystem().RecordDeath(world, teacher);
+            var skillBefore = student.ProfessionalSkills.Military;
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                student.ProfessionalSkills.Military,
+                Is.EqualTo(skillBefore));
+            Assert.That(plan.Status, Is.EqualTo(EducationPlanStatus.Suspended));
+            Assert.That(
+                world.LearningRecords[0].Outcome,
+                Is.EqualTo(LearningOutcomeKind.TeacherUnavailable));
+        }
+
+        [Test]
+        public void Education_TravelingStudentSkipsStudyMonth()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var system = new EducationSystem();
+            system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                "person.liu_bei");
+            new TravelSystem().StartJourney(
+                world,
+                new StableId(student.Id),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhongshan"),
+                TravelMode.Foot);
+            var skillBefore = student.ProfessionalSkills.Military;
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                student.ProfessionalSkills.Military,
+                Is.EqualTo(skillBefore));
+            Assert.That(
+                world.LearningRecords[0].Outcome,
+                Is.EqualTo(LearningOutcomeKind.StudentUnavailable));
+            Assert.That(world.LearningRecords[0].FeePaid, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Education_IdenticalStateProducesIdenticalGrowth()
+        {
+            var first = PrepareEducationWorld(1_000, 8_000);
+            var second = PrepareEducationWorld(1_000, 8_000);
+            var firstSystem = new EducationSystem();
+            var secondSystem = new EducationSystem();
+            StartMilitaryStudy(first, firstSystem, "person.liu_bei");
+            StartMilitaryStudy(second, secondSystem, "person.liu_bei");
+
+            ResolveEducationAtDay(first, 30, firstSystem);
+            ResolveEducationAtDay(second, 30, secondSystem);
+
+            Assert.That(
+                second.LearningRecords[0].SkillGain,
+                Is.EqualTo(first.LearningRecords[0].SkillGain));
+            Assert.That(
+                second.LearningRecords[0].DiminishingFactorBasisPoints,
+                Is.EqualTo(
+                    first.LearningRecords[0].DiminishingFactorBasisPoints));
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(second),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(first)));
+        }
+
+        [Test]
+        public void Education_RejectsInvalidFamilyAndPracticeReferences()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            var system = new EducationSystem();
+
+            Assert.Throws<InvalidOperationException>(
+                () => system.StartPlan(
+                    world,
+                    new StableId(student.Id),
+                    ProfessionalDiscipline.Military,
+                    10,
+                    "person.liu_bei",
+                    EducationFundingSource.Family,
+                    "family.missing"));
+            Assert.Throws<InvalidOperationException>(
+                () => system.StartPlan(
+                    world,
+                    new StableId(student.Id),
+                    ProfessionalDiscipline.Military,
+                    10,
+                    "person.liu_bei",
+                    EducationFundingSource.Personal,
+                    string.Empty,
+                    "position.missing"));
+        }
+
+        [Test]
+        public void Education_RejectsDuplicatePlanAndFourthStudent()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            ProfessionalSkillAccess.Set(
+                teacher.ProfessionalSkills,
+                ProfessionalDiscipline.Military,
+                9_500);
+            var studentIds = new[]
+            {
+                "person.guan_yu",
+                "person.zhang_fei",
+                "person.jian_yong",
+                "person.generated.farmer_001"
+            };
+            var system = new EducationSystem();
+            for (var i = 0; i < studentIds.Length; i++)
+            {
+                var student = world.People.Find(
+                    item => item.Id == studentIds[i]);
+                student.Wealth = 5_000;
+                ProfessionalSkillAccess.Set(
+                    student.ProfessionalSkills,
+                    ProfessionalDiscipline.Military,
+                    1_000);
+            }
+
+            system.StartPlan(
+                world,
+                new StableId(studentIds[0]),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            Assert.Throws<InvalidOperationException>(
+                () => system.StartPlan(
+                    world,
+                    new StableId(studentIds[0]),
+                    ProfessionalDiscipline.Scholarship,
+                    10));
+            system.StartPlan(
+                world,
+                new StableId(studentIds[1]),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            system.StartPlan(
+                world,
+                new StableId(studentIds[2]),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            Assert.Throws<InvalidOperationException>(
+                () => system.StartPlan(
+                    world,
+                    new StableId(studentIds[3]),
+                    ProfessionalDiscipline.Military,
+                    10,
+                    teacher.Id));
+        }
+
+        [Test]
+        public void Education_SnapshotRoundTripPreservesPlanAndRecords()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var system = new EducationSystem();
+            StartMilitaryStudy(world, system, "person.liu_bei");
+            ResolveEducationAtDay(world, 30, system);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(loaded.EducationPlans.Count, Is.EqualTo(1));
+            Assert.That(loaded.LearningRecords.Count, Is.EqualTo(1));
+            Assert.That(
+                loaded.EducationPlans[0].TotalStudyDays,
+                Is.EqualTo(world.EducationPlans[0].TotalStudyDays));
+            Assert.That(
+                loaded.LearningRecords[0].SkillGain,
+                Is.EqualTo(world.LearningRecords[0].SkillGain));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThreeEducationCollections()
+        {
+            const string legacyJson =
+                "{" +
+                "\"SchemaVersion\":3," +
+                "\"MasterSeed\":184," +
+                "\"AbsoluteDay\":0," +
+                "\"Segment\":0," +
+                "\"Revision\":0," +
+                "\"PopulationLedgerInitialized\":true," +
+                "\"PopulationOpeningTotal\":1," +
+                "\"Locations\":[{" +
+                "\"Id\":\"location.zhuo\"," +
+                "\"DisplayName\":\"涿县\"," +
+                "\"Population\":1," +
+                "\"PublicOrderBasisPoints\":5000," +
+                "\"GrainPrice\":100" +
+                "}]," +
+                "\"People\":[{" +
+                "\"Id\":\"person.liu_bei\"," +
+                "\"DisplayName\":\"刘备\"," +
+                "\"LocationId\":\"location.zhuo\"," +
+                "\"PopulationOriginLocationId\":\"location.zhuo\"," +
+                "\"BirthDay\":-5000," +
+                "\"IsAlive\":true," +
+                "\"HealthBasisPoints\":10000" +
+                "}]" +
+                "}";
+
+            var loaded = WorldSnapshotSerializer.Deserialize(legacyJson);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.EducationPlans, Is.Not.Null);
+            Assert.That(loaded.LearningRecords, Is.Not.Null);
+            Assert.That(loaded.EducationPlans.Count, Is.EqualTo(0));
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -2027,6 +2502,85 @@ namespace Mandate.Tests
                 Gender = PersonGender.Male,
                 Identity = identity
             };
+        }
+
+        private static WorldState PrepareEducationWorld(
+            int studentSkill,
+            int teacherSkill)
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var student = FindTestStudent(world);
+            var teacher = world.People.Find(
+                item => item.Id == "person.liu_bei");
+            student.Wealth = 10_000;
+            student.LifeGoal = LifeGoalKind.WinMerit;
+            ProfessionalSkillAccess.Set(
+                student.ProfessionalSkills,
+                ProfessionalDiscipline.Military,
+                studentSkill);
+            ProfessionalSkillAccess.Set(
+                teacher.ProfessionalSkills,
+                ProfessionalDiscipline.Military,
+                teacherSkill);
+            world.Validate();
+            return world;
+        }
+
+        private static PersonState FindTestStudent(WorldState world)
+        {
+            return world.People.Find(
+                item => item.Id == "person.generated.farmer_001");
+        }
+
+        private static void SetMilitaryAptitude(
+            PersonState person,
+            int value)
+        {
+            person.Aptitudes.Reasoning = value;
+            person.Aptitudes.Willpower = value;
+            person.Aptitudes.Perception = value;
+        }
+
+        private static EducationPlanState StartMilitaryStudy(
+            WorldState world,
+            EducationSystem system,
+            string teacherId,
+            string practicePositionId = "")
+        {
+            return system.StartPlan(
+                world,
+                new StableId(FindTestStudent(world).Id),
+                ProfessionalDiscipline.Military,
+                10,
+                teacherId,
+                EducationFundingSource.Personal,
+                string.Empty,
+                practicePositionId);
+        }
+
+        private static void ResolveEducationAtDay(
+            WorldState world,
+            long day,
+            EducationSystem system)
+        {
+            world.AbsoluteDay = day;
+            system.ResolveDuePlans(world);
+            world.Validate();
+        }
+
+        private static void AddMilitaryPracticeMembership(WorldState world)
+        {
+            var student = FindTestStudent(world);
+            world.Memberships.Add(new MembershipState
+            {
+                Id = "membership.education_test.youzhou",
+                PersonId = student.Id,
+                OrganizationId = "organization.youzhou_field_force",
+                PositionId = "position.youzhou_soldier",
+                JoinedDay = world.AbsoluteDay,
+                LoyaltyBasisPoints = 5_000
+            });
+            world.Validate();
         }
 
         private static WorldState BuildMinimalWorld()

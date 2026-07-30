@@ -29,6 +29,9 @@ namespace Mandate.Persistence
                     case 2:
                         MigrateVersionTwoToThree(world);
                         break;
+                    case 3:
+                        MigrateVersionThreeToFour(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -48,6 +51,15 @@ namespace Mandate.Persistence
         {
             CharacterAbilityBootstrap.InitializeWorld(world);
             world.SchemaVersion = 3;
+        }
+
+        private static void MigrateVersionThreeToFour(WorldState world)
+        {
+            world.EducationPlans ??= new System.Collections.Generic.List<
+                EducationPlanState>();
+            world.LearningRecords ??= new System.Collections.Generic.List<
+                LearningRecordState>();
+            world.SchemaVersion = 4;
         }
     }
 }
