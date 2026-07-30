@@ -1185,6 +1185,48 @@ namespace Mandate.Tests
             Assert.DoesNotThrow(loaded.Validate);
         }
 
+        [Test]
+        public void PrototypeWorld_MapPositionsAreUniqueAndInBounds()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var positions = new System.Collections.Generic.HashSet<string>();
+
+            Assert.That(world.Locations.Count, Is.EqualTo(6));
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                var location = world.Locations[i];
+                Assert.That(location.MapXBasisPoints, Is.InRange(0, 10_000));
+                Assert.That(location.MapYBasisPoints, Is.InRange(0, 10_000));
+                Assert.That(
+                    positions.Add(
+                        location.MapXBasisPoints + "|" + location.MapYBasisPoints),
+                    Is.True,
+                    $"地图地点坐标重叠：{location.DisplayName}");
+            }
+        }
+
+        [Test]
+        public void Snapshot_RoundTripPreservesRegionMapPositions()
+        {
+            var world = new NewGameSetupService().CreateExisting184World(
+                "person.liu_bei",
+                184);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(loaded.Locations.Count, Is.EqualTo(world.Locations.Count));
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                Assert.That(
+                    loaded.Locations[i].MapXBasisPoints,
+                    Is.EqualTo(world.Locations[i].MapXBasisPoints));
+                Assert.That(
+                    loaded.Locations[i].MapYBasisPoints,
+                    Is.EqualTo(world.Locations[i].MapYBasisPoints));
+            }
+        }
+
         private static WorldState BuildGuangzongBattleWorld()
         {
             var world = PrototypeWorldFactory.Create184World(184);

@@ -33,6 +33,8 @@ namespace Mandate.Domain
         public int Population;
         public int PublicOrderBasisPoints = 5_000;
         public int GrainPrice = 100;
+        public int MapXBasisPoints;
+        public int MapYBasisPoints;
     }
 
     [Serializable]
@@ -222,6 +224,15 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid grain price at {location.Id}.");
+                }
+
+                if (location.MapXBasisPoints < 0 ||
+                    location.MapXBasisPoints > 10_000 ||
+                    location.MapYBasisPoints < 0 ||
+                    location.MapYBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid map position at {location.Id}.");
                 }
             }
 

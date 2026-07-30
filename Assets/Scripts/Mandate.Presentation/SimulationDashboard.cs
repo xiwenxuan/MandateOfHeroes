@@ -27,6 +27,14 @@ namespace Mandate.Presentation
             Developer
         }
 
+        private enum MapOverlay : byte
+        {
+            Terrain,
+            PublicOrder,
+            GrainPrice,
+            War
+        }
+
         private static readonly string[] StartingIdentityLabels =
         {
             "军人",
@@ -67,6 +75,14 @@ namespace Mandate.Presentation
         private int _customIdentity;
         private int _existingPersonIndex;
         private Vector2 _selectionScroll;
+        private MapOverlay _mapOverlay;
+        private float _mapZoom = 1f;
+        private Vector2 _mapPan;
+        private bool _mapDragging;
+        private int _mapDragButton = -1;
+        private Vector2 _mapDragStart;
+        private Vector2 _mapPanStart;
+        private string _selectedLocationId;
         private GUIStyle _titleStyle;
         private GUIStyle _sectionStyle;
         private GUIStyle _normalStyle;
@@ -312,6 +328,9 @@ namespace Mandate.Presentation
             _screen = ScreenMode.Playing;
             _playerPanel = PlayerPanel.Map;
             _scroll = Vector2.zero;
+            _mapZoom = 1f;
+            _mapPan = Vector2.zero;
+            _selectedLocationId = FindPlayer().LocationId;
         }
 
         private void DrawPlayerGame()
@@ -435,12 +454,33 @@ namespace Mandate.Presentation
             var journey = FindJourney(player.Id);
             GUILayout.Label("地区地图", _sectionStyle);
             GUILayout.Label(
-                "所有移动都沿世界中的真实道路进行；旅行会消耗时间和口粮。",
+                "点击地点查看详情；鼠标滚轮缩放，按住鼠标右键或中键拖动地图。",
                 _normalStyle);
 
+            GUILayout.BeginHorizontal();
+            _mapOverlay = (MapOverlay)GUILayout.Toolbar(
+                (int)_mapOverlay,
+                new[] { "地形", "治安", "粮价", "战争" },
+                GUILayout.Height(32));
+            if (GUILayout.Button("重置视角", GUILayout.Width(110), GUILayout.Height(32)))
+            {
+                _mapZoom = 1f;
+                _mapPan = Vector2.zero;
+            }
+
+            GUILayout.EndHorizontal();
+
+            var mapHeight = Mathf.Clamp(Screen.height - 310f, 430f, 650f);
+            var mapRect = GUILayoutUtility.GetRect(
+                100f,
+                mapHeight,
+                GUILayout.ExpandWidth(true));
+            HandleMapInput(mapRect);
+            DrawRegionMap(mapRect, player, journey);
+
+            GUILayout.Space(10);
             if (journey != null)
             {
-                GUILayout.Space(10);
                 GUILayout.Label(
                     $"正在从{FindLocationName(journey.OriginLocationId)}前往" +
                     $"{FindLocationName(journey.DestinationLocationId)}，" +
@@ -453,53 +493,494 @@ namespace Mandate.Presentation
             }
             else
             {
-                GUILayout.Space(10);
-                GUILayout.Label(
-                    $"当前位置：{FindLocationName(player.LocationId)}　可前往：",
-                    _normalStyle);
-                for (var i = 0; i < _world.Routes.Count; i++)
+                DrawSelectedLocationDetails(player);
+            }
+        }
+
+        private void HandleMapInput(Rect mapRect)
+        {
+            var current = Event.current;
+            if (!mapRect.Contains(current.mousePosition))
+            {
+                if (current.type == EventType.MouseUp)
                 {
-                    var route = _world.Routes[i];
-                    string destinationId = null;
-                    if (route.FromLocationId == player.LocationId)
-                    {
-                        destinationId = route.ToLocationId;
-                    }
-                    else if (route.Bidirectional &&
-                             route.ToLocationId == player.LocationId)
-                    {
-                        destinationId = route.FromLocationId;
-                    }
-
-                    if (destinationId == null)
-                    {
-                        continue;
-                    }
-
-                    var capturedRoute = route;
-                    var capturedDestinationId = destinationId;
-                    if (GUILayout.Button(
-                            $"沿路前往{FindLocationName(destinationId)}　" +
-                            $"{route.DistanceKilometers}公里　" +
-                            $"治安{route.SecurityBasisPoints / 100f:F1}%",
-                            GUILayout.Height(38)))
-                    {
-                        TryStartPlayerJourney(capturedRoute, capturedDestinationId);
-                    }
+                    _mapDragging = false;
+                    _mapDragButton = -1;
                 }
+
+                return;
             }
 
-            GUILayout.Space(16);
-            GUILayout.Label("地区状态", _sectionStyle);
+            if (current.type == EventType.ScrollWheel)
+            {
+                var oldZoom = _mapZoom;
+                var zoomFactor = current.delta.y > 0f ? 0.9f : 1.1f;
+                _mapZoom = Mathf.Clamp(oldZoom * zoomFactor, 0.65f, 2.4f);
+                var relative =
+                    current.mousePosition - mapRect.center - _mapPan;
+                _mapPan += relative * (1f - _mapZoom / oldZoom);
+                current.Use();
+                return;
+            }
+
+            if (current.type == EventType.MouseDown &&
+                (current.button == 1 || current.button == 2))
+            {
+                _mapDragging = true;
+                _mapDragButton = current.button;
+                _mapDragStart = current.mousePosition;
+                _mapPanStart = _mapPan;
+                current.Use();
+                return;
+            }
+
+            if (current.type == EventType.MouseDrag &&
+                _mapDragging &&
+                current.button == _mapDragButton)
+            {
+                _mapPan = _mapPanStart + current.mousePosition - _mapDragStart;
+                current.Use();
+                return;
+            }
+
+            if (current.type == EventType.MouseUp &&
+                _mapDragging &&
+                current.button == _mapDragButton)
+            {
+                _mapDragging = false;
+                _mapDragButton = -1;
+                current.Use();
+            }
+        }
+
+        private void DrawRegionMap(
+            Rect mapRect,
+            PersonState player,
+            JourneyState journey)
+        {
+            GUI.BeginGroup(mapRect);
+            var canvas = new Rect(0f, 0f, mapRect.width, mapRect.height);
+            DrawMapTerrain(canvas);
+            DrawMapRiver(canvas);
+            DrawMapRoutes(canvas);
+            DrawArmyMarkers(canvas);
+            DrawLocationNodes(canvas, player);
+            DrawPlayerMarker(canvas, player, journey);
+            DrawMapLegend(canvas);
+
+            if (!string.IsNullOrEmpty(GUI.tooltip))
+            {
+                GUI.Box(
+                    new Rect(canvas.width - 310f, 12f, 296f, 48f),
+                    GUI.tooltip);
+            }
+
+            GUI.EndGroup();
+        }
+
+        private static void DrawSolidRect(Rect rect, Color color)
+        {
+            var previous = GUI.color;
+            GUI.color = color;
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = previous;
+        }
+
+        private void DrawMapTerrain(Rect canvas)
+        {
+            DrawSolidRect(canvas, new Color(0.12f, 0.16f, 0.12f, 1f));
+            DrawSolidRect(
+                new Rect(0f, 0f, canvas.width * 0.36f, canvas.height),
+                new Color(0.18f, 0.28f, 0.16f, 1f));
+            DrawSolidRect(
+                new Rect(
+                    canvas.width * 0.30f,
+                    canvas.height * 0.18f,
+                    canvas.width * 0.70f,
+                    canvas.height * 0.55f),
+                new Color(0.27f, 0.30f, 0.16f, 1f));
+            DrawSolidRect(
+                new Rect(
+                    canvas.width * 0.42f,
+                    canvas.height * 0.65f,
+                    canvas.width * 0.58f,
+                    canvas.height * 0.35f),
+                new Color(0.25f, 0.22f, 0.13f, 1f));
+
+            for (var i = 0; i < 6; i++)
+            {
+                var ridge = new Rect(
+                    18f + i * 31f,
+                    42f + i * 58f,
+                    105f,
+                    8f);
+                DrawSolidRect(ridge, new Color(0.35f, 0.45f, 0.24f, 0.65f));
+            }
+        }
+
+        private void DrawMapRiver(Rect canvas)
+        {
+            var river = new[]
+            {
+                MapPoint(canvas, 600, 5_000),
+                MapPoint(canvas, 2_200, 5_350),
+                MapPoint(canvas, 4_000, 5_150),
+                MapPoint(canvas, 5_900, 5_700),
+                MapPoint(canvas, 7_500, 5_450),
+                MapPoint(canvas, 9_500, 6_050)
+            };
+            for (var i = 0; i < river.Length - 1; i++)
+            {
+                DrawMapLine(
+                    river[i],
+                    river[i + 1],
+                    7f,
+                    new Color(0.16f, 0.48f, 0.68f, 0.9f));
+                DrawMapLine(
+                    river[i],
+                    river[i + 1],
+                    2f,
+                    new Color(0.52f, 0.78f, 0.92f, 0.9f));
+            }
+        }
+
+        private void DrawMapRoutes(Rect canvas)
+        {
+            for (var i = 0; i < _world.Routes.Count; i++)
+            {
+                var route = _world.Routes[i];
+                var from = MapPoint(canvas, FindLocation(route.FromLocationId));
+                var to = MapPoint(canvas, FindLocation(route.ToLocationId));
+                var color = RouteColor(route);
+                DrawMapLine(from, to, 6f, new Color(0.05f, 0.04f, 0.02f, 0.65f));
+                DrawMapLine(from, to, 3f, color);
+
+                if (_mapZoom >= 0.9f)
+                {
+                    var midpoint = (from + to) * 0.5f;
+                    GUI.Label(
+                        new Rect(midpoint.x - 42f, midpoint.y - 18f, 84f, 22f),
+                        $"{route.DistanceKilometers}里程",
+                        GUI.skin.box);
+                }
+            }
+        }
+
+        private void DrawLocationNodes(Rect canvas, PersonState player)
+        {
             for (var i = 0; i < _world.Locations.Count; i++)
             {
                 var location = _world.Locations[i];
-                var marker = location.Id == player.LocationId ? "【当前】" : string.Empty;
+                var point = MapPoint(canvas, location);
+                var width = Mathf.Clamp(104f * _mapZoom, 82f, 132f);
+                var height = Mathf.Clamp(50f * _mapZoom, 42f, 62f);
+                var nodeRect = new Rect(
+                    point.x - width * 0.5f,
+                    point.y - height * 0.5f,
+                    width,
+                    height);
+                var isCurrent = location.Id == player.LocationId;
+                var isSelected = location.Id == _selectedLocationId;
+                var isAdjacent = FindRouteBetween(player.LocationId, location.Id) != null;
+                var border = isCurrent
+                    ? new Color(1f, 0.78f, 0.18f, 1f)
+                    : isSelected
+                        ? new Color(0.38f, 0.78f, 1f, 1f)
+                        : isAdjacent
+                            ? new Color(0.82f, 0.88f, 0.62f, 0.9f)
+                            : new Color(0.20f, 0.20f, 0.18f, 0.8f);
+                DrawSolidRect(
+                    new Rect(
+                        nodeRect.x - 4f,
+                        nodeRect.y - 4f,
+                        nodeRect.width + 8f,
+                        nodeRect.height + 8f),
+                    border);
+
+                var previous = GUI.color;
+                GUI.color = LocationColor(location);
+                var label = location.DisplayName + "\n" + LocationOverlayLabel(location);
+                var tooltip =
+                    $"{location.DisplayName}　人口{location.Population}　" +
+                    $"治安{location.PublicOrderBasisPoints / 100f:F1}%　" +
+                    $"粮价{location.GrainPrice}";
+                if (GUI.Button(nodeRect, new GUIContent(label, tooltip)))
+                {
+                    _selectedLocationId = location.Id;
+                    _message = $"已选择{location.DisplayName}。";
+                }
+
+                GUI.color = previous;
+            }
+        }
+
+        private void DrawArmyMarkers(Rect canvas)
+        {
+            for (var i = 0; i < _world.Armies.Count; i++)
+            {
+                var army = _world.Armies[i];
+                var point = ArmyMapPoint(canvas, army);
+                var hostile =
+                    army.OrganizationId == "organization.taiping_yellow_turban";
+                var previous = GUI.color;
+                GUI.color = hostile
+                    ? new Color(0.92f, 0.42f, 0.18f, 1f)
+                    : new Color(0.30f, 0.62f, 0.92f, 1f);
+                GUI.Box(
+                    new Rect(point.x - 33f, point.y + 28f + i * 3f, 66f, 24f),
+                    $"{(hostile ? "黄" : "汉")}{army.Troops}");
+                GUI.color = previous;
+            }
+        }
+
+        private void DrawPlayerMarker(
+            Rect canvas,
+            PersonState player,
+            JourneyState journey)
+        {
+            Vector2 point;
+            if (journey == null)
+            {
+                point = MapPoint(canvas, FindLocation(player.LocationId));
+            }
+            else
+            {
+                var route = FindRoute(journey.RouteId);
+                var progress = 1f -
+                    Mathf.Clamp01(
+                        journey.RemainingKilometers /
+                        (float)route.DistanceKilometers);
+                point = Vector2.Lerp(
+                    MapPoint(canvas, FindLocation(journey.OriginLocationId)),
+                    MapPoint(canvas, FindLocation(journey.DestinationLocationId)),
+                    progress);
+            }
+
+            DrawSolidRect(
+                new Rect(point.x - 17f, point.y - 48f, 34f, 34f),
+                new Color(1f, 0.78f, 0.15f, 1f));
+            GUI.Box(
+                new Rect(point.x - 14f, point.y - 45f, 28f, 28f),
+                "我");
+        }
+
+        private void DrawMapLegend(Rect canvas)
+        {
+            GUI.Box(
+                new Rect(12f, canvas.height - 70f, 370f, 56f),
+                $"图层：{MapOverlayName(_mapOverlay)}　缩放：{_mapZoom:F1}倍\n" +
+                "金色=玩家　蓝色=汉军　橙红=黄巾　线色表示道路治安");
+        }
+
+        private void DrawSelectedLocationDetails(PersonState player)
+        {
+            var selected = FindLocation(
+                string.IsNullOrEmpty(_selectedLocationId)
+                    ? player.LocationId
+                    : _selectedLocationId);
+            GUILayout.Label($"{selected.DisplayName}详情", _sectionStyle);
+            GUILayout.Label(
+                $"人口：{selected.Population}　粮价：{selected.GrainPrice}　" +
+                $"治安：{selected.PublicOrderBasisPoints / 100f:F1}%",
+                _normalStyle);
+
+            var armyCount = 0;
+            for (var i = 0; i < _world.Armies.Count; i++)
+            {
+                var army = _world.Armies[i];
+                if (army.LocationId != selected.Id || FindArmyMarch(army.Id) != null)
+                {
+                    continue;
+                }
+
+                armyCount++;
                 GUILayout.Label(
-                    $"{marker}{location.DisplayName}　人口{location.Population}　" +
-                    $"粮价{location.GrainPrice}　治安" +
-                    $"{location.PublicOrderBasisPoints / 100f:F1}%",
+                    $"驻军：{army.DisplayName}　兵力{army.Troops}　" +
+                    $"士气{army.MoraleBasisPoints / 100f:F1}%",
                     _normalStyle);
+            }
+
+            if (armyCount == 0)
+            {
+                GUILayout.Label("当前没有驻军。", _normalStyle);
+            }
+
+            if (selected.Id == player.LocationId)
+            {
+                GUILayout.Label("这是你当前所在的地点。", _normalStyle);
+                return;
+            }
+
+            var route = FindRouteBetween(player.LocationId, selected.Id);
+            if (route == null)
+            {
+                GUILayout.Label("该地点不与当前位置直接相连，需要分段旅行。", _normalStyle);
+                return;
+            }
+
+            if (GUILayout.Button(
+                    $"沿{route.DistanceKilometers}公里道路前往{selected.DisplayName}　" +
+                    $"治安{route.SecurityBasisPoints / 100f:F1}%",
+                    GUILayout.Height(40)))
+            {
+                TryStartPlayerJourney(route, selected.Id);
+            }
+        }
+
+        private Vector2 ArmyMapPoint(Rect canvas, ArmyState army)
+        {
+            var march = FindArmyMarch(army.Id);
+            if (march == null)
+            {
+                return MapPoint(canvas, FindLocation(army.LocationId));
+            }
+
+            var route = FindRoute(march.RouteId);
+            var progress = 1f -
+                Mathf.Clamp01(
+                    march.RemainingKilometers /
+                    (float)route.DistanceKilometers);
+            return Vector2.Lerp(
+                MapPoint(canvas, FindLocation(march.OriginLocationId)),
+                MapPoint(canvas, FindLocation(march.DestinationLocationId)),
+                progress);
+        }
+
+        private Vector2 MapPoint(Rect canvas, LocationState location)
+        {
+            return MapPoint(
+                canvas,
+                location.MapXBasisPoints,
+                location.MapYBasisPoints);
+        }
+
+        private Vector2 MapPoint(
+            Rect canvas,
+            int xBasisPoints,
+            int yBasisPoints)
+        {
+            var width = Mathf.Max(100f, canvas.width - 150f) * _mapZoom;
+            var height = Mathf.Max(100f, canvas.height - 120f) * _mapZoom;
+            return canvas.center + _mapPan + new Vector2(
+                (xBasisPoints / 10_000f - 0.5f) * width,
+                (yBasisPoints / 10_000f - 0.5f) * height);
+        }
+
+        private static void DrawMapLine(
+            Vector2 from,
+            Vector2 to,
+            float width,
+            Color color)
+        {
+            var delta = to - from;
+            if (delta.sqrMagnitude < 0.01f)
+            {
+                return;
+            }
+
+            var previousMatrix = GUI.matrix;
+            var previousColor = GUI.color;
+            GUI.color = color;
+            GUIUtility.RotateAroundPivot(
+                Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg,
+                from);
+            GUI.DrawTexture(
+                new Rect(from.x, from.y - width * 0.5f, delta.magnitude, width),
+                Texture2D.whiteTexture);
+            GUI.matrix = previousMatrix;
+            GUI.color = previousColor;
+        }
+
+        private Color RouteColor(RouteState route)
+        {
+            var security = route.SecurityBasisPoints / 10_000f;
+            return Color.Lerp(
+                new Color(0.72f, 0.20f, 0.14f, 1f),
+                new Color(0.78f, 0.72f, 0.42f, 1f),
+                security);
+        }
+
+        private Color LocationColor(LocationState location)
+        {
+            switch (_mapOverlay)
+            {
+                case MapOverlay.PublicOrder:
+                    return Color.Lerp(
+                        new Color(0.88f, 0.24f, 0.16f, 1f),
+                        new Color(0.32f, 0.78f, 0.30f, 1f),
+                        location.PublicOrderBasisPoints / 10_000f);
+                case MapOverlay.GrainPrice:
+                    return Color.Lerp(
+                        new Color(0.32f, 0.72f, 0.30f, 1f),
+                        new Color(0.90f, 0.30f, 0.14f, 1f),
+                        Mathf.InverseLerp(80f, 180f, location.GrainPrice));
+                case MapOverlay.War:
+                    return WarLocationColor(location.Id);
+                default:
+                    return new Color(0.72f, 0.64f, 0.36f, 1f);
+            }
+        }
+
+        private Color WarLocationColor(string locationId)
+        {
+            var hasGovernmentArmy = false;
+            for (var i = 0; i < _world.Armies.Count; i++)
+            {
+                var army = _world.Armies[i];
+                if (army.LocationId != locationId)
+                {
+                    continue;
+                }
+
+                if (army.OrganizationId == "organization.taiping_yellow_turban")
+                {
+                    return new Color(0.90f, 0.34f, 0.15f, 1f);
+                }
+
+                hasGovernmentArmy = true;
+            }
+
+            return hasGovernmentArmy
+                ? new Color(0.28f, 0.58f, 0.88f, 1f)
+                : new Color(0.52f, 0.52f, 0.46f, 1f);
+        }
+
+        private string LocationOverlayLabel(LocationState location)
+        {
+            switch (_mapOverlay)
+            {
+                case MapOverlay.PublicOrder:
+                    return $"治安{location.PublicOrderBasisPoints / 100f:F0}%";
+                case MapOverlay.GrainPrice:
+                    return $"粮价{location.GrainPrice}";
+                case MapOverlay.War:
+                    var armies = 0;
+                    for (var i = 0; i < _world.Armies.Count; i++)
+                    {
+                        if (_world.Armies[i].LocationId == location.Id)
+                        {
+                            armies++;
+                        }
+                    }
+
+                    return armies == 0 ? "无驻军" : $"{armies}支军队";
+                default:
+                    return $"人口{location.Population / 1_000}千";
+            }
+        }
+
+        private static string MapOverlayName(MapOverlay overlay)
+        {
+            switch (overlay)
+            {
+                case MapOverlay.PublicOrder:
+                    return "治安";
+                case MapOverlay.GrainPrice:
+                    return "粮价";
+                case MapOverlay.War:
+                    return "战争";
+                default:
+                    return "地形";
             }
         }
 
@@ -1473,6 +1954,55 @@ namespace Mandate.Presentation
         private string FindLocationName(string locationId)
         {
             return FindLocationName(_world, locationId);
+        }
+
+        private LocationState FindLocation(string locationId)
+        {
+            for (var i = 0; i < _world.Locations.Count; i++)
+            {
+                if (_world.Locations[i].Id == locationId)
+                {
+                    return _world.Locations[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing location {locationId}.");
+        }
+
+        private RouteState FindRoute(string routeId)
+        {
+            for (var i = 0; i < _world.Routes.Count; i++)
+            {
+                if (_world.Routes[i].Id == routeId)
+                {
+                    return _world.Routes[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing route {routeId}.");
+        }
+
+        private RouteState FindRouteBetween(string fromLocationId, string toLocationId)
+        {
+            if (fromLocationId == toLocationId)
+            {
+                return null;
+            }
+
+            for (var i = 0; i < _world.Routes.Count; i++)
+            {
+                var route = _world.Routes[i];
+                if (route.FromLocationId == fromLocationId &&
+                    route.ToLocationId == toLocationId ||
+                    route.Bidirectional &&
+                    route.ToLocationId == fromLocationId &&
+                    route.FromLocationId == toLocationId)
+                {
+                    return route;
+                }
+            }
+
+            return null;
         }
 
         private static string FindLocationName(WorldState world, string locationId)

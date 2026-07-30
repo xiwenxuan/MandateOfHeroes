@@ -8,12 +8,16 @@ namespace Mandate.Simulation
         {
             var world = WorldState.Create(masterSeed);
 
-            AddLocation(world, "location.zhuo", "涿县", 20_000, 100);
-            AddLocation(world, "location.zhongshan", "中山国节点", 35_000, 96);
-            AddLocation(world, "location.anping", "安平国节点", 30_000, 102);
-            AddLocation(world, "location.xiaquyang", "下曲阳", 18_000, 112);
-            AddLocation(world, "location.guangzong", "广宗", 25_000, 118);
-            AddLocation(world, "location.ye", "邺县", 50_000, 94);
+            AddLocation(world, "location.zhuo", "涿县", 20_000, 100, 1_600, 1_300);
+            AddLocation(
+                world, "location.zhongshan", "中山国节点", 35_000, 96, 3_400, 2_800);
+            AddLocation(
+                world, "location.anping", "安平国节点", 30_000, 102, 5_200, 4_000);
+            AddLocation(
+                world, "location.xiaquyang", "下曲阳", 18_000, 112, 6_600, 3_800);
+            AddLocation(
+                world, "location.guangzong", "广宗", 25_000, 118, 7_300, 6_200);
+            AddLocation(world, "location.ye", "邺县", 50_000, 94, 8_700, 8_100);
 
             AddCommodity(world, "commodity.grain", "粮食", 100, 1);
             AddCommodity(world, "commodity.cloth", "布帛", 180, 2);
@@ -503,7 +507,9 @@ namespace Mandate.Simulation
             string id,
             string displayName,
             int population,
-            int grainPrice)
+            int grainPrice,
+            int mapXBasisPoints,
+            int mapYBasisPoints)
         {
             world.Locations.Add(new LocationState
             {
@@ -511,7 +517,9 @@ namespace Mandate.Simulation
                 DisplayName = displayName,
                 Population = population,
                 GrainPrice = grainPrice,
-                PublicOrderBasisPoints = 5_000
+                PublicOrderBasisPoints = 5_000,
+                MapXBasisPoints = mapXBasisPoints,
+                MapYBasisPoints = mapYBasisPoints
             });
         }
 
