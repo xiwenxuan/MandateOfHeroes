@@ -39,10 +39,26 @@
 - `Docs/TASK_M8_CHARACTER_ABILITY_FOUNDATION.md`
 - `Docs/TASK_M9_EDUCATION_AND_PRACTICE.md`
 - `Docs/TASK_M10_REAL_MILITARY_SERVICE_AND_COMMAND.md`
+- `Docs/TASK_PROJECT_UNITY_DEVELOPMENT_SKILL.md`
 - `Docs/UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md`
 - `Docs/WORLD_SIMULATION_FOUNDATION.md`
 - `Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`
 - `Docs/MAP_ART_RESOURCE_PLAN.md`
+
+## 项目开发规则
+
+本仓库提供项目专属 Codex Skill：
+`.codex/skills/mandate-unity-development/`。涉及本项目的 Unity/C# 开发、
+存档、测试和里程碑验收时，应显式使用 `$mandate-unity-development`；
+如果当前会话没有自动发现该 Skill，则按 `AGENTS.md` 手动读取其 `SKILL.md`
+并执行相同流程。
+
+统一验证入口：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File `
+  .codex\skills\mandate-unity-development\scripts\verify-project.ps1
+```
 
 ## 运行可玩原型
 

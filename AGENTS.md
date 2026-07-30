@@ -1,5 +1,25 @@
 # MandateOfHeroes 项目执行规则
 
+## 项目专属开发 Skill
+
+1. 涉及本项目 Unity/C# 功能、领域模型、世界模拟、战斗、人物、地图、任务、
+   经济、存档、场景、Prefab、ScriptableObject、测试或里程碑验收时，必须使用
+   `.codex/skills/mandate-unity-development/`。
+2. 若当前 Codex 会话已发现 `mandate-unity-development`，按正常 Skill 触发规则
+   使用；若未出现在可用 Skill 列表中，必须手动完整读取其 `SKILL.md` 后再行动，
+   不得以“未自动发现”为由跳过。
+3. 按 `SKILL.md` 的路由说明只读取当前任务所需参考文件。存档和确定性任务读取
+   `references/persistence.md`，内容与序列化数据任务读取
+   `references/content-and-data.md`，交付前读取
+   `references/delivery-template.md`。
+4. 代码任务优先通过
+   `.codex/skills/mandate-unity-development/scripts/verify-project.ps1`
+   执行统一验证；纯文档任务使用其 `-DocumentationOnly` 模式。
+5. 本文件和用户当轮指令的优先级高于 Skill。Skill 不得扩大授权、自动提交、
+   自动推送、关闭用户 Unity 编辑器或弱化以下防卡死规则。
+6. Skill、程序集、存档版本、Unity 版本或测试入口发生变化时，必须同步复核
+   Skill 参考资料和验证脚本。
+
 ## 防卡死硬规则
 
 1. 禁止在前台直接执行 Unity、构建工具、测试工具或其他可能长期驻留的进程。
