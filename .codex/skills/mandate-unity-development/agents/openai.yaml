@@ -1,0 +1,4 @@
+interface:
+  display_name: "MandateOfHeroes Unity 开发"
+  short_description: "按项目规则实施、验证并交付 Unity/C# 开发任务"
+  default_prompt: "使用 $mandate-unity-development 完成当前 MandateOfHeroes 开发任务并按项目规则验证。"

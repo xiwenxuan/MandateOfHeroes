@@ -5,6 +5,9 @@ namespace Mandate.Simulation
 {
     public sealed class TravelSystem
     {
+        private readonly PopulationLedgerSystem _populationLedgerSystem =
+            new PopulationLedgerSystem();
+
         public JourneyState StartJourney(
             WorldState world,
             StableId personId,
@@ -75,8 +78,11 @@ namespace Mandate.Simulation
                 }
 
                 var person = FindPerson(world, journey.PersonId);
-                person.LocationId = journey.DestinationLocationId;
                 world.Journeys.RemoveAt(i);
+                _populationLedgerSystem.MoveIndependentPerson(
+                    world,
+                    person,
+                    journey.DestinationLocationId);
             }
         }
 

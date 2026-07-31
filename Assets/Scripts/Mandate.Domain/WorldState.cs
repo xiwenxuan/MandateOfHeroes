@@ -3,6 +3,55 @@ using System.Collections.Generic;
 
 namespace Mandate.Domain
 {
+    public enum LocationKind : byte
+    {
+        Unknown,
+        RegionalSeat,
+        CountySeat,
+        Pass,
+        Port,
+        MarketTown,
+        Village,
+        Camp
+    }
+
+    public enum TerrainKind : byte
+    {
+        Unknown,
+        Plains,
+        Hills,
+        Mountains,
+        Riverland,
+        Forest,
+        Marsh
+    }
+
+    [Flags]
+    public enum LocationFeature : ushort
+    {
+        None = 0,
+        Government = 1 << 0,
+        Market = 1 << 1,
+        Garrison = 1 << 2,
+        Farmland = 1 << 3,
+        Workshop = 1 << 4,
+        Clinic = 1 << 5,
+        Temple = 1 << 6,
+        RelayStation = 1 << 7,
+        Harbor = 1 << 8,
+        Fortification = 1 << 9,
+        All = Government |
+              Market |
+              Garrison |
+              Farmland |
+              Workshop |
+              Clinic |
+              Temple |
+              RelayStation |
+              Harbor |
+              Fortification
+    }
+
     [Serializable]
     public sealed class PersonState
     {
@@ -21,6 +70,13 @@ namespace Mandate.Domain
         public string MotherPersonId;
         public string SpousePersonId;
         public long LastChildbirthDay = -1;
+        public bool CountsTowardPopulation = true;
+        public string PopulationOriginLocationId;
+        public bool AbilityProfileInitialized;
+        public CharacterAptitudeState Aptitudes = new CharacterAptitudeState();
+        public ProfessionalSkillState ProfessionalSkills =
+            new ProfessionalSkillState();
+        public LifeGoalKind LifeGoal = LifeGoalKind.Unknown;
         public PersonalityState Personality = new PersonalityState();
         public NeedState Needs = new NeedState();
     }
@@ -30,9 +86,16 @@ namespace Mandate.Domain
     {
         public string Id;
         public string DisplayName;
+        public LocationKind Kind = LocationKind.CountySeat;
+        public TerrainKind Terrain = TerrainKind.Plains;
+        public LocationFeature Features = LocationFeature.None;
+        public int StrategicImportance = 1;
+        public string ParentLocationId;
         public int Population;
         public int PublicOrderBasisPoints = 5_000;
         public int GrainPrice = 100;
+        public int MapXBasisPoints;
+        public int MapYBasisPoints;
     }
 
     [Serializable]
@@ -49,13 +112,14 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 5;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
         public long AbsoluteDay;
         public byte Segment;
         public long Revision;
+        public string PlayerPersonId;
         public List<PersonState> People = new List<PersonState>();
         public List<LocationState> Locations = new List<LocationState>();
         public List<FamilyState> Families = new List<FamilyState>();
@@ -83,6 +147,25 @@ namespace Mandate.Domain
             new List<MilitarySupplyRecordState>();
         public List<MedicalTreatmentRecordState> MedicalTreatments =
             new List<MedicalTreatmentRecordState>();
+        public List<ConstructionProjectState> ConstructionProjects =
+            new List<ConstructionProjectState>();
+        public bool PopulationLedgerInitialized;
+        public long PopulationOpeningTotal;
+        public List<PopulationCohortState> PopulationCohorts =
+            new List<PopulationCohortState>();
+        public List<PopulationTransactionState> PopulationTransactions =
+            new List<PopulationTransactionState>();
+        public List<EducationPlanState> EducationPlans =
+            new List<EducationPlanState>();
+        public List<LearningRecordState> LearningRecords =
+            new List<LearningRecordState>();
+        public bool MilitaryServiceInitialized;
+        public List<MilitaryFormationState> MilitaryFormations =
+            new List<MilitaryFormationState>();
+        public List<MilitaryServiceState> MilitaryServices =
+            new List<MilitaryServiceState>();
+        public List<MilitaryOrderState> MilitaryOrders =
+            new List<MilitaryOrderState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -148,6 +231,22 @@ namespace Mandate.Domain
             ValidateUniqueIds(MilitarySupplies, item => item.Id, "military supply");
             ValidateUniqueIds(
                 MedicalTreatments, item => item.Id, "medical treatment");
+            ValidateUniqueIds(
+                ConstructionProjects, item => item.Id, "construction project");
+            ValidateUniqueIds(
+                PopulationCohorts, item => item.Id, "population cohort");
+            ValidateUniqueIds(
+                PopulationTransactions, item => item.Id, "population transaction");
+            ValidateUniqueIds(
+                EducationPlans, item => item.Id, "education plan");
+            ValidateUniqueIds(
+                LearningRecords, item => item.Id, "learning record");
+            ValidateUniqueIds(
+                MilitaryFormations, item => item.Id, "military formation");
+            ValidateUniqueIds(
+                MilitaryServices, item => item.Id, "military service");
+            ValidateUniqueIds(
+                MilitaryOrders, item => item.Id, "military order");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -179,6 +278,78 @@ namespace Mandate.Domain
                 ValidateBasisPoints(person.Needs.WarPressure, person.Id, "war pressure");
                 ValidateBasisPoints(
                     person.MedicalSkillBasisPoints, person.Id, "medical skill");
+                if (person.Aptitudes == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing aptitudes for {person.Id}.");
+                }
+
+                if (person.ProfessionalSkills == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing professional skills for {person.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    person.Aptitudes.Constitution, person.Id, "constitution");
+                ValidateBasisPoints(
+                    person.Aptitudes.Strength, person.Id, "strength");
+                ValidateBasisPoints(
+                    person.Aptitudes.Dexterity, person.Id, "dexterity");
+                ValidateBasisPoints(
+                    person.Aptitudes.Perception, person.Id, "perception");
+                ValidateBasisPoints(
+                    person.Aptitudes.Memory, person.Id, "memory");
+                ValidateBasisPoints(
+                    person.Aptitudes.Reasoning, person.Id, "reasoning");
+                ValidateBasisPoints(
+                    person.Aptitudes.Willpower, person.Id, "willpower");
+                ValidateBasisPoints(
+                    person.Aptitudes.Affinity, person.Id, "affinity");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Military, person.Id, "military");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.MartialArts,
+                    person.Id,
+                    "martial arts");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Administration,
+                    person.Id,
+                    "administration");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Commerce, person.Id, "commerce");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Agriculture,
+                    person.Id,
+                    "agriculture");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Craft, person.Id, "craft");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Medicine, person.Id, "medicine");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Scholarship,
+                    person.Id,
+                    "scholarship");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Negotiation,
+                    person.Id,
+                    "negotiation");
+                ValidateBasisPoints(
+                    person.ProfessionalSkills.Intelligence,
+                    person.Id,
+                    "intelligence");
+                if (!Enum.IsDefined(typeof(LifeGoalKind), person.LifeGoal))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid life goal for {person.Id}.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(PlayerPersonId) &&
+                !personIds.Contains(PlayerPersonId))
+            {
+                throw new InvalidOperationException(
+                    $"Player references missing person {PlayerPersonId}.");
             }
 
             for (var i = 0; i < People.Count; i++)
@@ -215,6 +386,59 @@ namespace Mandate.Domain
                     throw new InvalidOperationException(
                         $"Invalid grain price at {location.Id}.");
                 }
+
+                if (location.MapXBasisPoints < 0 ||
+                    location.MapXBasisPoints > 10_000 ||
+                    location.MapYBasisPoints < 0 ||
+                    location.MapYBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid map position at {location.Id}.");
+                }
+
+                if (!Enum.IsDefined(typeof(LocationKind), location.Kind) ||
+                    location.Kind == LocationKind.Unknown)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid location kind at {location.Id}.");
+                }
+
+                if (!Enum.IsDefined(typeof(TerrainKind), location.Terrain) ||
+                    location.Terrain == TerrainKind.Unknown)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid terrain at {location.Id}.");
+                }
+
+                if ((location.Features & ~LocationFeature.All) != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid location features at {location.Id}.");
+                }
+
+                if (location.StrategicImportance < 1 ||
+                    location.StrategicImportance > 5)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid strategic importance at {location.Id}.");
+                }
+            }
+
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                var location = Locations[i];
+                if (string.IsNullOrEmpty(location.ParentLocationId))
+                {
+                    continue;
+                }
+
+                if (location.ParentLocationId == location.Id ||
+                    !locationIds.Contains(location.ParentLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Location {location.Id} references invalid parent " +
+                        $"{location.ParentLocationId}.");
+                }
             }
 
             for (var i = 0; i < People.Count; i++)
@@ -225,7 +449,18 @@ namespace Mandate.Domain
                     throw new InvalidOperationException(
                         $"Person {person.Id} references missing location {person.LocationId}.");
                 }
+
+                if (PopulationLedgerInitialized &&
+                    person.CountsTowardPopulation &&
+                    (string.IsNullOrEmpty(person.PopulationOriginLocationId) ||
+                     !locationIds.Contains(person.PopulationOriginLocationId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has an invalid population origin.");
+                }
             }
+
+            ValidatePopulationLedger(personIds, locationIds);
 
             for (var i = 0; i < Families.Count; i++)
             {
@@ -577,6 +812,53 @@ namespace Mandate.Domain
                 }
             }
 
+            var constructionTargets =
+                new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < ConstructionProjects.Count; i++)
+            {
+                var project = ConstructionProjects[i] ??
+                    throw new InvalidOperationException(
+                        "A construction project cannot be null.");
+                _ = new StableId(project.Id);
+                var featureValue = (ushort)project.TargetFeature;
+                var singleFeature =
+                    featureValue != 0 &&
+                    (featureValue & (featureValue - 1)) == 0 &&
+                    (project.TargetFeature & ~LocationFeature.All) == 0;
+                var targetKey =
+                    project.LocationId + "|" + (ushort)project.TargetFeature;
+                if (!locationIds.Contains(project.LocationId) ||
+                    !personIds.Contains(project.SponsorPersonId) ||
+                    !singleFeature ||
+                    !constructionTargets.Add(targetKey) ||
+                    project.StartedDay < 0 ||
+                    project.StartedDay > AbsoluteDay ||
+                    project.RequiredProgress <= 0 ||
+                    project.Progress < 0 ||
+                    project.Progress > project.RequiredProgress ||
+                    project.MoneyInvested < 0 ||
+                    project.IsCompleted !=
+                    (project.Progress == project.RequiredProgress) ||
+                    project.IsCompleted &&
+                    (project.CompletedDay < project.StartedDay ||
+                     project.CompletedDay > AbsoluteDay) ||
+                    !project.IsCompleted && project.CompletedDay != -1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid construction project {project.Id}.");
+                }
+
+                var location = FindLocation(Locations, project.LocationId);
+                var featureExists =
+                    (location.Features & project.TargetFeature) != 0;
+                if (project.IsCompleted != featureExists)
+                {
+                    throw new InvalidOperationException(
+                        $"Construction project {project.Id} is inconsistent " +
+                        "with its location feature.");
+                }
+            }
+
             var historicalDefinitionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < HistoricalEventDefinitions.Count; i++)
             {
@@ -787,6 +1069,608 @@ namespace Mandate.Domain
                         $"Position {Positions[i].Id} exceeds its capacity.");
                 }
             }
+
+            ValidateEducation(personIds, positionIds);
+            ValidateMilitaryService(personIds, locationIds, armyIds);
+        }
+
+        private void ValidateMilitaryService(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> armyIds)
+        {
+            if (!MilitaryServiceInitialized)
+            {
+                if (MilitaryFormations.Count != 0 ||
+                    MilitaryServices.Count != 0 ||
+                    MilitaryOrders.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Uninitialized military service must not contain records.");
+                }
+
+                return;
+            }
+
+            var formationIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                formationIds.Add(formation.Id);
+                if (!armyIds.Contains(formation.ArmyId) ||
+                    !personIds.Contains(formation.CommanderPersonId) ||
+                    formation.AuthorizedStrength <= 0 ||
+                    formation.DisplayOrder < 0 ||
+                    !Enum.IsDefined(typeof(MilitaryFormationKind), formation.Kind))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military formation {formation.Id}.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                if (string.IsNullOrEmpty(formation.ParentFormationId))
+                {
+                    if (formation.Kind != MilitaryFormationKind.Army)
+                    {
+                        throw new InvalidOperationException(
+                            $"Formation {formation.Id} is not an army root.");
+                    }
+                }
+                else
+                {
+                    var parent = FindMilitaryFormation(
+                        MilitaryFormations, formation.ParentFormationId);
+                    if (parent.ArmyId != formation.ArmyId ||
+                        formation.ParentFormationId == formation.Id)
+                    {
+                        throw new InvalidOperationException(
+                            $"Formation {formation.Id} has an invalid parent.");
+                    }
+                }
+            }
+
+            var servingPeople = new HashSet<string>(StringComparer.Ordinal);
+            var activeByArmy = new Dictionary<string, int>(StringComparer.Ordinal);
+            var woundedByArmy = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryServices.Count; i++)
+            {
+                var service = MilitaryServices[i];
+                if (!servingPeople.Add(service.PersonId) ||
+                    !personIds.Contains(service.PersonId) ||
+                    !armyIds.Contains(service.ArmyId) ||
+                    !formationIds.Contains(service.FormationId) ||
+                    !Enum.IsDefined(typeof(MilitaryServiceRole), service.Role) ||
+                    !Enum.IsDefined(typeof(MilitaryServiceStatus), service.Status) ||
+                    service.Rank < 0 ||
+                    service.EnlistedDay < 0 ||
+                    service.LastStatusChangeDay < service.EnlistedDay ||
+                    service.LastStatusChangeDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military service {service.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    service.DisciplineBasisPoints, service.Id, "discipline");
+                ValidateBasisPoints(
+                    service.LoyaltyBasisPoints, service.Id, "loyalty");
+                ValidateBasisPoints(
+                    service.ServiceExperienceBasisPoints,
+                    service.Id,
+                    "service experience");
+                var formation = FindMilitaryFormation(
+                    MilitaryFormations, service.FormationId);
+                if (formation.ArmyId != service.ArmyId)
+                {
+                    throw new InvalidOperationException(
+                        $"Military service {service.Id} is in another army's formation.");
+                }
+
+                var person = FindPerson(People, service.PersonId);
+                var army = FindArmy(Armies, service.ArmyId);
+                var available =
+                    service.Status == MilitaryServiceStatus.Mustering ||
+                    service.Status == MilitaryServiceStatus.Active ||
+                    service.Status == MilitaryServiceStatus.Wounded;
+                if (available && (!person.IsAlive || person.LocationId != army.LocationId) ||
+                    service.Status == MilitaryServiceStatus.Dead && person.IsAlive)
+                {
+                    throw new InvalidOperationException(
+                        $"Military service {service.Id} disagrees with its person.");
+                }
+
+                if (service.Status == MilitaryServiceStatus.Mustering ||
+                    service.Status == MilitaryServiceStatus.Active)
+                {
+                    AddCount(activeByArmy, service.ArmyId);
+                }
+                else if (service.Status == MilitaryServiceStatus.Wounded)
+                {
+                    AddCount(woundedByArmy, service.ArmyId);
+                }
+            }
+
+            for (var i = 0; i < Armies.Count; i++)
+            {
+                var army = Armies[i];
+                var rootCount = 0;
+                for (var formationIndex = 0;
+                     formationIndex < MilitaryFormations.Count;
+                     formationIndex++)
+                {
+                    var formation = MilitaryFormations[formationIndex];
+                    if (formation.ArmyId == army.Id &&
+                        string.IsNullOrEmpty(formation.ParentFormationId))
+                    {
+                        rootCount++;
+                        if (formation.CommanderPersonId != army.CommanderPersonId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Army {army.Id} root commander does not match.");
+                        }
+                    }
+                }
+
+                activeByArmy.TryGetValue(army.Id, out var active);
+                woundedByArmy.TryGetValue(army.Id, out var wounded);
+                if (rootCount != 1 ||
+                    active != army.Troops ||
+                    wounded != army.WoundedTroops)
+                {
+                    throw new InvalidOperationException(
+                        $"Army {army.Id} military service cache is inconsistent.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryFormations.Count; i++)
+            {
+                var formation = MilitaryFormations[i];
+                MilitaryServiceState commanderService = null;
+                for (var serviceIndex = 0;
+                     serviceIndex < MilitaryServices.Count;
+                     serviceIndex++)
+                {
+                    var service = MilitaryServices[serviceIndex];
+                    if (service.PersonId == formation.CommanderPersonId &&
+                        service.ArmyId == formation.ArmyId &&
+                        service.FormationId == formation.Id)
+                    {
+                        commanderService = service;
+                        break;
+                    }
+                }
+
+                if (commanderService == null ||
+                    formation.Kind == MilitaryFormationKind.Army &&
+                    commanderService.Role != MilitaryServiceRole.Commander ||
+                    formation.Kind != MilitaryFormationKind.Army &&
+                    commanderService.Role != MilitaryServiceRole.Officer)
+                {
+                    throw new InvalidOperationException(
+                        $"Formation {formation.Id} has no available commander.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryOrders.Count; i++)
+            {
+                var order = MilitaryOrders[i];
+                MilitaryFormationState targetFormation = null;
+                if (!string.IsNullOrEmpty(order.FormationId))
+                {
+                    targetFormation = FindMilitaryFormation(
+                        MilitaryFormations, order.FormationId);
+                }
+
+                var shouldAuthorize =
+                    order.ActualAuthority >= order.RequiredAuthority;
+                if (!personIds.Contains(order.IssuerPersonId) ||
+                    !armyIds.Contains(order.ArmyId) ||
+                    targetFormation != null &&
+                    targetFormation.ArmyId != order.ArmyId ||
+                    !string.IsNullOrEmpty(order.TargetLocationId) &&
+                    !locationIds.Contains(order.TargetLocationId) ||
+                    !string.IsNullOrEmpty(order.TargetArmyId) &&
+                    !armyIds.Contains(order.TargetArmyId) ||
+                    order.Day < 0 ||
+                    order.Day > AbsoluteDay ||
+                    !Enum.IsDefined(typeof(MilitaryOrderType), order.Type) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel), order.RequiredAuthority) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel), order.ActualAuthority) ||
+                    !Enum.IsDefined(typeof(MilitaryOrderResult), order.Result) ||
+                    shouldAuthorize !=
+                    (order.Result == MilitaryOrderResult.Authorized) ||
+                    string.IsNullOrWhiteSpace(order.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military order {order.Id}.");
+                }
+            }
+        }
+
+        private static void AddCount(
+            Dictionary<string, int> counts,
+            string key)
+        {
+            counts.TryGetValue(key, out var count);
+            counts[key] = count + 1;
+        }
+
+        private static MilitaryFormationState FindMilitaryFormation(
+            List<MilitaryFormationState> formations,
+            string formationId)
+        {
+            for (var i = 0; i < formations.Count; i++)
+            {
+                if (formations[i].Id == formationId)
+                {
+                    return formations[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing military formation {formationId}.");
+        }
+
+        private void ValidateEducation(
+            HashSet<string> personIds,
+            HashSet<string> positionIds)
+        {
+            var activeStudents = new HashSet<string>(StringComparer.Ordinal);
+            var activeTeacherCounts =
+                new Dictionary<string, int>(StringComparer.Ordinal);
+            var planIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < EducationPlans.Count; i++)
+            {
+                var plan = EducationPlans[i];
+                planIds.Add(plan.Id);
+                if (!personIds.Contains(plan.StudentPersonId) ||
+                    !string.IsNullOrEmpty(plan.TeacherPersonId) &&
+                    !personIds.Contains(plan.TeacherPersonId) ||
+                    plan.StudentPersonId == plan.TeacherPersonId)
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has an invalid person reference.");
+                }
+
+                if (!Enum.IsDefined(
+                        typeof(ProfessionalDiscipline), plan.Discipline) ||
+                    !Enum.IsDefined(
+                        typeof(EducationFundingSource), plan.FundingSource) ||
+                    !Enum.IsDefined(
+                        typeof(EducationPlanStatus), plan.Status) ||
+                    plan.MonthlyStudyDays < 1 ||
+                    plan.MonthlyStudyDays > 20 ||
+                    plan.MonthlyFee < 0 ||
+                    plan.CreatedDay < 0 ||
+                    plan.CreatedDay > AbsoluteDay ||
+                    plan.LastResolvedDay < -1 ||
+                    plan.LastResolvedDay > AbsoluteDay ||
+                    plan.LastResolvedDay >= 0 &&
+                    plan.LastResolvedDay < plan.CreatedDay ||
+                    plan.TotalStudyDays < 0 ||
+                    plan.TotalFeesPaid < 0 ||
+                    plan.TotalSkillGain < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has invalid values.");
+                }
+
+                if (plan.FundingSource == EducationFundingSource.Family)
+                {
+                    if (string.IsNullOrEmpty(plan.FundingFamilyId) ||
+                        !FamilyContainsPerson(
+                            Families,
+                            plan.FundingFamilyId,
+                            plan.StudentPersonId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Education plan {plan.Id} has invalid family funding.");
+                    }
+                }
+                else if (!string.IsNullOrEmpty(plan.FundingFamilyId))
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has unexpected family funding.");
+                }
+
+                if (!string.IsNullOrEmpty(plan.PracticePositionId) &&
+                    (!positionIds.Contains(plan.PracticePositionId) ||
+                     !HasMembershipPosition(
+                         Memberships,
+                         plan.StudentPersonId,
+                         plan.PracticePositionId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Education plan {plan.Id} has invalid practice position.");
+                }
+
+                if (plan.Status != EducationPlanStatus.Active &&
+                    plan.Status != EducationPlanStatus.Suspended)
+                {
+                    continue;
+                }
+
+                if (!activeStudents.Add(plan.StudentPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Person {plan.StudentPersonId} has multiple education plans.");
+                }
+
+                if (string.IsNullOrEmpty(plan.TeacherPersonId))
+                {
+                    continue;
+                }
+
+                activeTeacherCounts.TryGetValue(
+                    plan.TeacherPersonId, out var teacherCount);
+                teacherCount++;
+                if (teacherCount > 3)
+                {
+                    throw new InvalidOperationException(
+                        $"Teacher {plan.TeacherPersonId} exceeds student capacity.");
+                }
+
+                activeTeacherCounts[plan.TeacherPersonId] = teacherCount;
+            }
+
+            for (var i = 0; i < LearningRecords.Count; i++)
+            {
+                var record = LearningRecords[i];
+                if (!planIds.Contains(record.EducationPlanId) ||
+                    !personIds.Contains(record.StudentPersonId) ||
+                    !string.IsNullOrEmpty(record.TeacherPersonId) &&
+                    !personIds.Contains(record.TeacherPersonId) ||
+                    !Enum.IsDefined(
+                        typeof(ProfessionalDiscipline), record.Discipline) ||
+                    !Enum.IsDefined(
+                        typeof(LearningOutcomeKind), record.Outcome) ||
+                    record.Day < 0 ||
+                    record.Day > AbsoluteDay ||
+                    record.MonthIndex < 0 ||
+                    record.StudyDays < 0 ||
+                    record.StudyDays > 20 ||
+                    record.FeePaid < 0 ||
+                    record.SkillGain < 0 ||
+                    record.SkillAfter - record.SkillBefore != record.SkillGain ||
+                    string.IsNullOrWhiteSpace(record.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Learning record {record.Id} has invalid values.");
+                }
+
+                ValidateBasisPoints(
+                    record.SkillBefore, record.Id, "learning skill before");
+                ValidateBasisPoints(
+                    record.SkillAfter, record.Id, "learning skill after");
+                ValidateBasisPoints(
+                    record.CompositeAptitudeBasisPoints,
+                    record.Id,
+                    "learning aptitude");
+                ValidateBasisPoints(
+                    record.SoftPotentialBasisPoints,
+                    record.Id,
+                    "learning soft potential");
+                ValidateOptionalLearningFactor(
+                    record.TeacherFactorBasisPoints,
+                    record.Id,
+                    "teacher factor");
+                ValidateOptionalLearningFactor(
+                    record.FacilityFactorBasisPoints,
+                    record.Id,
+                    "facility factor");
+                ValidateOptionalLearningFactor(
+                    record.HealthFactorBasisPoints,
+                    record.Id,
+                    "health factor");
+                ValidateOptionalLearningFactor(
+                    record.MotivationFactorBasisPoints,
+                    record.Id,
+                    "motivation factor");
+                ValidateOptionalLearningFactor(
+                    record.PracticeFactorBasisPoints,
+                    record.Id,
+                    "practice factor");
+                ValidateOptionalLearningFactor(
+                    record.DiminishingFactorBasisPoints,
+                    record.Id,
+                    "diminishing factor");
+
+                var plan = FindEducationPlan(EducationPlans, record.EducationPlanId);
+                if (plan.StudentPersonId != record.StudentPersonId ||
+                    plan.Discipline != record.Discipline)
+                {
+                    throw new InvalidOperationException(
+                        $"Learning record {record.Id} does not match its plan.");
+                }
+            }
+        }
+
+        private void ValidatePopulationLedger(
+            HashSet<string> personIds,
+            HashSet<string> locationIds)
+        {
+            if (!PopulationLedgerInitialized)
+            {
+                if (PopulationOpeningTotal != 0 ||
+                    PopulationCohorts.Count != 0 ||
+                    PopulationTransactions.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Uninitialized population ledger contains data.");
+                }
+
+                return;
+            }
+
+            if (PopulationOpeningTotal < 0)
+            {
+                throw new InvalidOperationException(
+                    "Population opening total cannot be negative.");
+            }
+
+            var cohortIds = new HashSet<string>(StringComparer.Ordinal);
+            var populationByLocation =
+                new Dictionary<string, long>(StringComparer.Ordinal);
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                populationByLocation.Add(Locations[i].Id, 0);
+            }
+
+            long actualPopulation = 0;
+            for (var i = 0; i < PopulationCohorts.Count; i++)
+            {
+                var cohort = PopulationCohorts[i];
+                cohortIds.Add(cohort.Id);
+                if (!locationIds.Contains(cohort.LocationId) ||
+                    !locationIds.Contains(cohort.OriginLocationId) ||
+                    !Enum.IsDefined(
+                        typeof(PopulationOccupation),
+                        cohort.Occupation) ||
+                    cohort.Population < 0 ||
+                    cohort.Households < 0 ||
+                    cohort.WorkingAgePopulation < 0 ||
+                    cohort.WorkingAgePopulation > cohort.Population ||
+                    cohort.CollectiveWealth < 0 ||
+                    cohort.StableSeed == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid population cohort {cohort.Id}.");
+                }
+
+                ValidateBasisPoints(
+                    cohort.AverageHealthBasisPoints,
+                    cohort.Id,
+                    "average health");
+                ValidateBasisPoints(
+                    cohort.SatisfactionBasisPoints,
+                    cohort.Id,
+                    "satisfaction");
+                ValidateBasisPoints(
+                    cohort.MigrationPressureBasisPoints,
+                    cohort.Id,
+                    "migration pressure");
+                actualPopulation += cohort.Population;
+                populationByLocation[cohort.LocationId] += cohort.Population;
+            }
+
+            for (var i = 0; i < People.Count; i++)
+            {
+                var person = People[i];
+                if (!person.CountsTowardPopulation || !person.IsAlive)
+                {
+                    continue;
+                }
+
+                actualPopulation++;
+                populationByLocation[person.LocationId]++;
+            }
+
+            long expectedPopulation = PopulationOpeningTotal;
+            for (var i = 0; i < PopulationTransactions.Count; i++)
+            {
+                var transaction = PopulationTransactions[i];
+                if (!Enum.IsDefined(
+                        typeof(PopulationTransactionType),
+                        transaction.Type) ||
+                    transaction.Day < 0 ||
+                    transaction.Day > AbsoluteDay ||
+                    transaction.Quantity <= 0 ||
+                    !string.IsNullOrEmpty(transaction.FromLocationId) &&
+                    !locationIds.Contains(transaction.FromLocationId) ||
+                    !string.IsNullOrEmpty(transaction.ToLocationId) &&
+                    !locationIds.Contains(transaction.ToLocationId) ||
+                    !string.IsNullOrEmpty(transaction.FromCohortId) &&
+                    !cohortIds.Contains(transaction.FromCohortId) ||
+                    !string.IsNullOrEmpty(transaction.ToCohortId) &&
+                    !cohortIds.Contains(transaction.ToCohortId) ||
+                    !string.IsNullOrEmpty(transaction.PersonId) &&
+                    !personIds.Contains(transaction.PersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid population transaction {transaction.Id}.");
+                }
+
+                switch (transaction.Type)
+                {
+                    case PopulationTransactionType.Birth:
+                        if (string.IsNullOrEmpty(transaction.ToLocationId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Birth transaction {transaction.Id} is incomplete.");
+                        }
+
+                        expectedPopulation += transaction.Quantity;
+                        break;
+                    case PopulationTransactionType.Death:
+                        if (string.IsNullOrEmpty(transaction.FromLocationId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Death transaction {transaction.Id} is incomplete.");
+                        }
+
+                        expectedPopulation -= transaction.Quantity;
+                        break;
+                    case PopulationTransactionType.Migration:
+                        if (string.IsNullOrEmpty(transaction.FromLocationId) ||
+                            string.IsNullOrEmpty(transaction.ToLocationId) ||
+                            transaction.FromLocationId ==
+                            transaction.ToLocationId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Migration transaction {transaction.Id} is incomplete.");
+                        }
+
+                        break;
+                    case PopulationTransactionType.Instantiation:
+                        if (transaction.Quantity != 1 ||
+                            string.IsNullOrEmpty(transaction.FromCohortId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Instantiation transaction {transaction.Id} " +
+                                "is incomplete.");
+                        }
+
+                        break;
+                    case PopulationTransactionType.Reaggregation:
+                        if (transaction.Quantity != 1 ||
+                            string.IsNullOrEmpty(transaction.ToCohortId) ||
+                            string.IsNullOrEmpty(transaction.PersonId))
+                        {
+                            throw new InvalidOperationException(
+                                $"Reaggregation transaction {transaction.Id} " +
+                                "is incomplete.");
+                        }
+
+                        break;
+                }
+            }
+
+            if (actualPopulation != expectedPopulation)
+            {
+                throw new InvalidOperationException(
+                    $"Population conservation failed: actual {actualPopulation}, " +
+                    $"expected {expectedPopulation}.");
+            }
+
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                var location = Locations[i];
+                if (populationByLocation[location.Id] != location.Population)
+                {
+                    throw new InvalidOperationException(
+                        $"Population summary mismatch at {location.Id}: " +
+                        $"summary {location.Population}, ledger " +
+                        $"{populationByLocation[location.Id]}.");
+                }
+            }
         }
 
         private static void ValidateUniqueIds<T>(
@@ -810,6 +1694,21 @@ namespace Mandate.Domain
                     throw new InvalidOperationException($"Duplicate {entityType} ID: {id}.");
                 }
             }
+        }
+
+        private static LocationState FindLocation(
+            List<LocationState> locations,
+            string locationId)
+        {
+            for (var i = 0; i < locations.Count; i++)
+            {
+                if (locations[i].Id == locationId)
+                {
+                    return locations[i];
+                }
+            }
+
+            return null;
         }
 
         private static void ValidateBasisPoints(int value, string personId, string field)
@@ -913,6 +1812,67 @@ namespace Mandate.Domain
             }
 
             return false;
+        }
+
+        private static bool FamilyContainsPerson(
+            IList<FamilyState> families,
+            string familyId,
+            string personId)
+        {
+            for (var i = 0; i < families.Count; i++)
+            {
+                if (families[i].Id == familyId)
+                {
+                    return families[i].MemberIds.Contains(personId);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasMembershipPosition(
+            IList<MembershipState> memberships,
+            string personId,
+            string positionId)
+        {
+            for (var i = 0; i < memberships.Count; i++)
+            {
+                if (memberships[i].PersonId == personId &&
+                    memberships[i].PositionId == positionId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static EducationPlanState FindEducationPlan(
+            IList<EducationPlanState> plans,
+            string planId)
+        {
+            for (var i = 0; i < plans.Count; i++)
+            {
+                if (plans[i].Id == planId)
+                {
+                    return plans[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing education plan {planId}.");
+        }
+
+        private static void ValidateOptionalLearningFactor(
+            int value,
+            string recordId,
+            string field)
+        {
+            if (value < 0 || value > 12_000)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid {field} for {recordId}: {value}.");
+            }
         }
 
         private static CommodityState FindCommodity(

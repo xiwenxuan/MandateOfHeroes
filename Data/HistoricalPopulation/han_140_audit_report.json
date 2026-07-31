@@ -1,0 +1,65 @@
+{
+    "schema_version":  "han140.audit.v2",
+    "dataset_year":  140,
+    "validation_status":  "passed",
+    "national_anchor":  {
+                            "registered_households":  9698630,
+                            "registered_population":  49150220
+                        },
+    "row_counts":  {
+                       "sources":  4,
+                       "administrative_units":  1301,
+                       "population_records":  105,
+                       "stable_regions":  1336,
+                       "region_mappings":  1287,
+                       "game_location_crosswalks":  95
+                   },
+    "population_totals":  {
+                              "raw_households":  9336665,
+                              "raw_population":  47892413,
+                              "explicit_corrected_households":  411892,
+                              "explicit_corrected_population":  3195624,
+                              "effective_households":  9716482,
+                              "effective_population":  49207358,
+                              "household_difference_from_anchor":  17852,
+                              "population_difference_from_anchor":  57138
+                          },
+    "data_quality":  {
+                         "records_missing_raw_households":  3,
+                         "records_missing_raw_population":  4,
+                         "records_with_corrections":  11,
+                         "provisional_stable_regions":  1336,
+                         "provisional_region_mappings":  1287,
+                         "unresolved_game_locations":  4
+                     },
+    "mapping_audit":  {
+                          "mapped_admin_source_count":  1287,
+                          "population_mapping_source_count":  105,
+                          "county_mapping_source_count":  1182,
+                          "weight_error_count":  0
+                      },
+    "county_catalog_audit":  {
+                                 "common_reference_count":  1180,
+                                 "source_regional_subtotal":  1181,
+                                 "itemized_count":  1182,
+                                 "itemized_difference_from_common_reference":  2,
+                                 "ba_commandery_declared_count":  14,
+                                 "ba_commandery_itemized_count":  15,
+                                 "discrepancy_note":  "Hou Han Shu regional subtotals, the common reference total, and itemized county entries differ; preserve every itemized fact, including the Ba commandery Hanchang entry."
+                             },
+    "game_location_coverage":  {
+                                   "runtime":  6,
+                                   "prototype_catalog":  12,
+                                   "city_catalog":  77,
+                                   "exact":  0,
+                                   "aggregate":  11,
+                                   "approximate":  80,
+                                   "unresolved":  4
+                               },
+    "registered_source_ids":  [
+                                  "source.hou_han_shu.jun_guo_zhi",
+                                  "source.project.historical_population.v0_1",
+                                  "source.project.prototype_location_catalog.v1",
+                                  "source.zae06141.eastern_han_population_audit"
+                              ]
+}

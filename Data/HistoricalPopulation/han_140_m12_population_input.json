@@ -1,0 +1,2641 @@
+{
+    "schema_version":  "han140.m12-input.v1",
+    "dataset_year":  140,
+    "population_source_count":  105,
+    "county_catalog_count":  1182,
+    "national_anchor":  {
+                            "registered_households":  9698630,
+                            "registered_population":  49150220
+                        },
+    "effective_totals":  {
+                             "households":  9716482,
+                             "population":  49207358
+                         },
+    "population_units":  [
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.dingxiang",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.dingxiang.shanwu",
+                                 "registered_households_raw":  3153,
+                                 "registered_population_raw":  13571,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  3153,
+                                 "effective_population":  13571,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·定襄郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yinshansouth.southcentralfoothillplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.shang",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.shang.fushi",
+                                 "registered_households_raw":  5169,
+                                 "registered_population_raw":  28599,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  5169,
+                                 "effective_population":  28599,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·上郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.northshaanxiloess.northeastwudinghills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.shangdang",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.shangdang.changzi",
+                                 "registered_households_raw":  26222,
+                                 "registered_population_raw":  127403,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  26222,
+                                 "effective_population":  127403,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·上党郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.taihangshangdang.southwestbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.shuofang",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.shuofang.linrong",
+                                 "registered_households_raw":  1987,
+                                 "registered_population_raw":  7843,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  1987,
+                                 "effective_population":  7843,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·朔方郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hetaoyellowbend.southwestyellowriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.taiyuan",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.taiyuan.jinyang",
+                                 "registered_households_raw":  30902,
+                                 "registered_population_raw":  200124,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  30902,
+                                 "effective_population":  200124,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·太原郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.fenriverluliang.northcentralbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.wuyuan",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.wuyuan.jiuyuan",
+                                 "registered_households_raw":  4667,
+                                 "registered_population_raw":  22957,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  4667,
+                                 "effective_population":  22957,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·五原郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hetaoyellowbend.northcentraloasisplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.xihe",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.xihe.chishi",
+                                 "registered_households_raw":  5698,
+                                 "registered_population_raw":  20838,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  5698,
+                                 "effective_population":  20838,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·西河郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.fenriverluliang.westernluliangyellowvalleys",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.yanmen",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.yanmen.yinguan",
+                                 "registered_households_raw":  31862,
+                                 "registered_population_raw":  249000,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  31862,
+                                 "effective_population":  249000,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·雁门郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanmensanggan.centraldatongbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.bingzhou.yunzhong",
+                                 "seat_admin_unit_id":  "admin.han140.bingzhou.yunzhong.yunzhong",
+                                 "registered_households_raw":  5351,
+                                 "registered_population_raw":  26430,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  5351,
+                                 "effective_population":  26430,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·云中郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yinshansouth.southeasttumochuanplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.cangwu",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.cangwu.yanxin",
+                                 "registered_households_raw":  111395,
+                                 "registered_population_raw":  466975,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  111395,
+                                 "effective_population":  466975,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·苍梧郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.xijiangyujiang.easternxijiangbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.hepu",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.hepu.hepu",
+                                 "registered_households_raw":  23121,
+                                 "registered_population_raw":  86617,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  23121,
+                                 "effective_population":  86617,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·合浦郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.beibugulfcoast.northeastcoastalplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.jiaozhi",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.jiaozhi.longbian",
+                                 "registered_households_raw":  null,
+                                 "registered_population_raw":  null,
+                                 "registered_households_corrected":  129416,
+                                 "registered_population_corrected":  880560,
+                                 "effective_households":  129416,
+                                 "effective_population":  880560,
+                                 "evidence_grade":  "M",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·交趾郡；现代校录补正⑩",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southeastasia.redriverdelta.centralnortherndelta",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.jiuzhen",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.jiuzhen.xupu",
+                                 "registered_households_raw":  46513,
+                                 "registered_population_raw":  209894,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  46513,
+                                 "effective_population":  209894,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·九真郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southeastasia.northcentralvietnam.northmariverbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.nanhai",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.nanhai.fanyu",
+                                 "registered_households_raw":  71477,
+                                 "registered_population_raw":  250282,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  71477,
+                                 "effective_population":  250282,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·南海郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.pearlriverdelta.eastcentraldeltafoothills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.rinan",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.rinan.xijuan",
+                                 "registered_households_raw":  18263,
+                                 "registered_population_raw":  100676,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  18263,
+                                 "effective_population":  100676,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·日南郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southeastasia.northcentralvietnam.centralcoastalstrip",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jiaozhou.yulin",
+                                 "seat_admin_unit_id":  "admin.han140.jiaozhou.yulin.bushan",
+                                 "registered_households_raw":  null,
+                                 "registered_population_raw":  null,
+                                 "registered_households_corrected":  12415,
+                                 "registered_population_corrected":  71162,
+                                 "effective_households":  12415,
+                                 "effective_population":  71162,
+                                 "evidence_grade":  "M",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·郁林郡；现代校录补正⑨",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.xijiangyujiang.centralyujiangbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.changsha",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.changsha.linxiang",
+                                 "registered_households_raw":  255854,
+                                 "registered_population_raw":  1059372,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  255854,
+                                 "effective_population":  1059372,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·长沙郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.dongtingxiangziyuanli.northeastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.guiyang",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.guiyang.chen",
+                                 "registered_households_raw":  135029,
+                                 "registered_population_raw":  501403,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  135029,
+                                 "effective_population":  501403,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·桂阳郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.nanlingnorth.southeastfoothill",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.jiangxia",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.jiangxia.xiling",
+                                 "registered_households_raw":  58434,
+                                 "registered_population_raw":  265464,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  58434,
+                                 "effective_population":  265464,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·江夏郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.jianghanplain.easternriverlake",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.lingling",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.lingling.quanling",
+                                 "registered_households_raw":  212284,
+                                 "registered_population_raw":  1001578,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  212284,
+                                 "effective_population":  1001578,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·零陵郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.nanlingnorth.southwestbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.nan",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.nan.jiangling",
+                                 "registered_households_raw":  162570,
+                                 "registered_population_raw":  747604,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  162570,
+                                 "effective_population":  747604,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·南郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.jianghanplain.westernplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.nanyang",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.nanyang.wan",
+                                 "registered_households_raw":  528551,
+                                 "registered_population_raw":  2439618,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  528551,
+                                 "effective_population":  2439618,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·南阳郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.hanjianguppermiddle.northeastbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jingzhou.wuling",
+                                 "seat_admin_unit_id":  "admin.han140.jingzhou.wuling.linyuan",
+                                 "registered_households_raw":  46672,
+                                 "registered_population_raw":  250913,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  46672,
+                                 "effective_population":  250913,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·武陵郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.south.china.dongtingxiangziyuanli.northwestbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.anping",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.anping.xindu",
+                                 "registered_households_raw":  91440,
+                                 "registered_population_raw":  655118,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  91440,
+                                 "effective_population":  655118,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·安平国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.centralsoutheastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.bohai",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.bohai.nanpi",
+                                 "registered_households_raw":  132389,
+                                 "registered_population_raw":  1106500,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  132389,
+                                 "effective_population":  1106500,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·勃海郡；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.eastcoastalplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.changshan",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.changshan.yuanshi",
+                                 "registered_households_raw":  97500,
+                                 "registered_population_raw":  631184,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  97500,
+                                 "effective_population":  631184,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·常山国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.centralfoothill",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.hejian",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.hejian.lecheng",
+                                 "registered_households_raw":  93754,
+                                 "registered_population_raw":  634421,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  93754,
+                                 "effective_population":  634421,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·河间条；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.centraleastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.julu",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.julu.yingtao",
+                                 "registered_households_raw":  109517,
+                                 "registered_population_raw":  602096,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  109517,
+                                 "effective_population":  602096,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·钜鹿郡；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.southcentralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.qinghe",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.qinghe.ganling",
+                                 "registered_households_raw":  123964,
+                                 "registered_population_raw":  760418,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  123964,
+                                 "effective_population":  760418,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·清河国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.southeastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.wei",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.wei.ye",
+                                 "registered_households_raw":  129310,
+                                 "registered_population_raw":  695606,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  129310,
+                                 "effective_population":  695606,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·魏郡；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.southwestzhangheplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.zhao",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.zhao.handan",
+                                 "registered_households_raw":  32719,
+                                 "registered_population_raw":  188381,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  32719,
+                                 "effective_population":  188381,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·赵国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.southwesttaihangplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.jizhou.zhongshan",
+                                 "seat_admin_unit_id":  "admin.han140.jizhou.zhongshan.lunu",
+                                 "registered_households_raw":  97412,
+                                 "registered_population_raw":  658195,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  97412,
+                                 "effective_population":  658195,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·中山国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.centralwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.anding",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.anding.linjing",
+                                 "registered_households_raw":  6094,
+                                 "registered_population_raw":  29060,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  6094,
+                                 "effective_population":  29060,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·安定郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.loessnorthwest.southcentraljinghehills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.beidi",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.beidi.fuping",
+                                 "registered_households_raw":  3122,
+                                 "registered_population_raw":  18637,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  3122,
+                                 "effective_population":  18637,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·北地郡；公开校勘转录",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.loessnorthwest.northeastordosmargin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.dunhuang",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.dunhuang.dunhuang",
+                                 "registered_households_raw":  748,
+                                 "registered_population_raw":  29170,
+                                 "registered_households_corrected":  7748,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  7748,
+                                 "effective_population":  29170,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·敦煌郡；现代校录补正⑤",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hexicorridor.westdunhuangshulebasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.hanyang",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.hanyang.ji",
+                                 "registered_households_raw":  27423,
+                                 "registered_population_raw":  130138,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  27423,
+                                 "effective_population":  130138,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·汉阳郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.longyouweishui.southeastweishuibasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.jincheng",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.jincheng.yunwu",
+                                 "registered_households_raw":  3858,
+                                 "registered_population_raw":  18947,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  3858,
+                                 "effective_population":  18947,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·金城郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hehuangyellowupper.easternyellowriverbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.jiuquan",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.jiuquan.fulu",
+                                 "registered_households_raw":  12706,
+                                 "registered_population_raw":  null,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  46631,
+                                 "effective_households":  12706,
+                                 "effective_population":  46631,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·酒泉郡；现代校录补正④",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hexicorridor.centralwestjiuquanoasis",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.longxi",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.longxi.didao",
+                                 "registered_households_raw":  5628,
+                                 "registered_population_raw":  29637,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  5628,
+                                 "effective_population":  29637,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·陇西郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.longyouweishui.centraltaoweivalleys",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.wudu",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.wudu.xiabian",
+                                 "registered_households_raw":  20102,
+                                 "registered_population_raw":  81728,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  20102,
+                                 "effective_population":  81728,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·武都郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.longnanqinba.centraljialingmountaincorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.wuwei",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.wuwei.guzang",
+                                 "registered_households_raw":  10042,
+                                 "registered_population_raw":  34226,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  10042,
+                                 "effective_population":  34226,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·武威郡；公开校勘转录",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hexicorridor.eastshiyanghebasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.zhangye",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.zhangye.lude",
+                                 "registered_households_raw":  6552,
+                                 "registered_population_raw":  26040,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  6552,
+                                 "effective_population":  26040,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·张掖郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hexicorridor.centralheiheoasis",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.zhangyejuyanshuguo",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.zhangyejuyanshuguo.juyan",
+                                 "registered_households_raw":  1560,
+                                 "registered_population_raw":  4733,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  1560,
+                                 "effective_population":  4733,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·张掖居延属国；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.juyanblackriverlower.northernterminaloasis",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.liangzhou.zhangyeshuguo",
+                                 "seat_admin_unit_id":  "admin.han140.liangzhou.zhangyeshuguo.houguan",
+                                 "registered_households_raw":  4656,
+                                 "registered_population_raw":  16952,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  4656,
+                                 "effective_population":  16952,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·张掖属国；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.hexicorridor.centralnorthfrontiercorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.beihai",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.beihai.ju",
+                                 "registered_households_raw":  158641,
+                                 "registered_population_raw":  853604,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  158641,
+                                 "effective_population":  853604,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·北海国；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.ziweijiaolaiplain.easternplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.donglai",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.donglai.huang",
+                                 "registered_households_raw":  104297,
+                                 "registered_population_raw":  484393,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  104297,
+                                 "effective_population":  484393,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·东莱郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.jiaodongpeninsula.northcoastalhills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.jinan",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.jinan.dongpingling",
+                                 "registered_households_raw":  78544,
+                                 "registered_population_raw":  453308,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  78544,
+                                 "effective_population":  453308,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·济南条；公开转录作济南国，四库网页转录作济南郡",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.loweryellowjieastplain.southwestfoothillplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.lean",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.lean.linji",
+                                 "registered_households_raw":  74400,
+                                 "registered_population_raw":  424075,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  74400,
+                                 "effective_population":  424075,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·乐安国；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.loweryellowjieastplain.northeastcoastalplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.pingyuan",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.pingyuan.pingyuan",
+                                 "registered_households_raw":  155588,
+                                 "registered_population_raw":  1002658,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  155588,
+                                 "effective_population":  1002658,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·平原郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.loweryellowjieastplain.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.qingzhou.qi",
+                                 "seat_admin_unit_id":  "admin.han140.qingzhou.qi.linzi",
+                                 "registered_households_raw":  64415,
+                                 "registered_population_raw":  491765,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  64415,
+                                 "effective_population":  491765,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·齐国；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.ziweijiaolaiplain.westernfoothillplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.hedong",
+                                 "seat_admin_unit_id":  "admin.han140.sili.hedong.anyi",
+                                 "registered_households_raw":  93543,
+                                 "registered_population_raw":  570803,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  93543,
+                                 "effective_population":  570803,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·河东郡；维基文库卷029",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.southfenheyellowriver.centralbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.henan",
+                                 "seat_admin_unit_id":  "admin.han140.sili.henan.luoyang",
+                                 "registered_households_raw":  208486,
+                                 "registered_population_raw":  1010827,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  208486,
+                                 "effective_population":  1010827,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·河南尹；维基文库卷029；ODS异录1018217未采用",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.heluo.luoyangbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.henei",
+                                 "seat_admin_unit_id":  "admin.han140.sili.henei.huai",
+                                 "registered_households_raw":  159770,
+                                 "registered_population_raw":  801558,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  159770,
+                                 "effective_population":  801558,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·河内郡；维基文库卷029",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.heluo.northyellowriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.hongnong",
+                                 "seat_admin_unit_id":  "admin.han140.sili.hongnong.hongnong",
+                                 "registered_households_raw":  46815,
+                                 "registered_population_raw":  199113,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  46815,
+                                 "effective_population":  199113,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·弘农郡；维基文库卷029；ODS异录199193未采用",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.heluo.westyellowrivercorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.jingzhao",
+                                 "seat_admin_unit_id":  "admin.han140.sili.jingzhao.changan",
+                                 "registered_households_raw":  53299,
+                                 "registered_population_raw":  285574,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  53299,
+                                 "effective_population":  285574,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·京兆尹；维基文库卷029",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.guanzhong.centralweiriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.youfufeng",
+                                 "seat_admin_unit_id":  "admin.han140.sili.youfufeng.huaili",
+                                 "registered_households_raw":  17352,
+                                 "registered_population_raw":  93091,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  17352,
+                                 "effective_population":  93091,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·右扶风；维基文库卷029",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.guanzhong.westernweiriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.sili.zuopingyi",
+                                 "seat_admin_unit_id":  "admin.han140.sili.zuopingyi.gaoling",
+                                 "registered_households_raw":  37090,
+                                 "registered_population_raw":  145195,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  37090,
+                                 "effective_population":  145195,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷二十九·郡国一·左冯翊；维基文库卷029",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northwest.china.guanzhong.easternweiriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.xuzhou.donghai",
+                                 "seat_admin_unit_id":  "admin.han140.xuzhou.donghai.tan",
+                                 "registered_households_raw":  148784,
+                                 "registered_population_raw":  706416,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  148784,
+                                 "effective_population":  706416,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·东海郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.yishuhuaihai.southeastcoastalplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.xuzhou.guangling",
+                                 "seat_admin_unit_id":  "admin.han140.xuzhou.guangling.yanling",
+                                 "registered_households_raw":  83907,
+                                 "registered_population_raw":  410190,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  83907,
+                                 "effective_population":  410190,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·广陵郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.jianghuaieast.centralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.xuzhou.langya",
+                                 "seat_admin_unit_id":  "admin.han140.xuzhou.langya.kaiyang",
+                                 "registered_households_raw":  20804,
+                                 "registered_population_raw":  570967,
+                                 "registered_households_corrected":  120804,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  120804,
+                                 "effective_population":  570967,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·琅邪国；现代校录补正③",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.yishuhuaihai.northwestfoothill",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.xuzhou.pengcheng",
+                                 "seat_admin_unit_id":  "admin.han140.xuzhou.pengcheng.pengcheng",
+                                 "registered_households_raw":  86170,
+                                 "registered_population_raw":  493027,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  86170,
+                                 "effective_population":  493027,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·彭城国；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.sishuiriverplain.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.xuzhou.xiapi",
+                                 "seat_admin_unit_id":  "admin.han140.xuzhou.xiapi.xiapei",
+                                 "registered_households_raw":  136389,
+                                 "registered_population_raw":  611083,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  136389,
+                                 "effective_population":  611083,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·下邳国；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.sishuiriverplain.southeastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.danyang",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.danyang.wanling",
+                                 "registered_households_raw":  136518,
+                                 "registered_population_raw":  630545,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  136518,
+                                 "effective_population":  630545,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·丹阳郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.loweryangtzetaihu.westernriverhills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.jiujiang",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.jiujiang.yinling",
+                                 "registered_households_raw":  89436,
+                                 "registered_population_raw":  432426,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  89436,
+                                 "effective_population":  432426,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·九江郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.huainanyangtzenorth.northcentralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.kuaiji",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.kuaiji.shanyin",
+                                 "registered_households_raw":  123090,
+                                 "registered_population_raw":  481196,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  123090,
+                                 "effective_population":  481196,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·会稽郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southeast.china.qiantangzhejianghills.eastcoastalriverhills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.lujiang",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.lujiang.shu",
+                                 "registered_households_raw":  101392,
+                                 "registered_population_raw":  424683,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  101392,
+                                 "effective_population":  424683,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·庐江郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.huainanyangtzenorth.southwestfoothillriver",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.wu",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.wu.wu",
+                                 "registered_households_raw":  164164,
+                                 "registered_population_raw":  700782,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  164164,
+                                 "effective_population":  700782,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·吴郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.loweryangtzetaihu.easterntaihuplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yangzhou.yuzhang",
+                                 "seat_admin_unit_id":  "admin.han140.yangzhou.yuzhang.nanchang",
+                                 "registered_households_raw":  406496,
+                                 "registered_population_raw":  1668906,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  406496,
+                                 "effective_population":  1668906,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十二·郡国四·豫章郡；维基文库卷032",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southeast.china.ganpoyang.centralriverlakebasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.chenliu",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.chenliu.chenliu",
+                                 "registered_households_raw":  177529,
+                                 "registered_population_raw":  869433,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  177529,
+                                 "effective_population":  869433,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·陈留郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.loweryellowjishui.southwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.dong",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.dong.puyang",
+                                 "registered_households_raw":  136088,
+                                 "registered_population_raw":  603393,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  136088,
+                                 "effective_population":  603393,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·东郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.loweryellowjishui.northcentralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.dongping",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.dongping.wuyan",
+                                 "registered_households_raw":  79012,
+                                 "registered_population_raw":  448270,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  79012,
+                                 "effective_population":  448270,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·东平国；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.wensishuiriverplain.northplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.jibei",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.jibei.lu",
+                                 "registered_households_raw":  45689,
+                                 "registered_population_raw":  235897,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  45689,
+                                 "effective_population":  235897,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·济北国；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.taiyifoothill.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.jiyin",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.jiyin.dingtao",
+                                 "registered_households_raw":  133715,
+                                 "registered_population_raw":  657554,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  133715,
+                                 "effective_population":  657554,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·济阴郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.loweryellowjishui.southeastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.rencheng",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.rencheng.rencheng",
+                                 "registered_households_raw":  36442,
+                                 "registered_population_raw":  194156,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  36442,
+                                 "effective_population":  194156,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·任城国；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.wensishuiriverplain.centralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.shanyang",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.shanyang.changyi",
+                                 "registered_households_raw":  109898,
+                                 "registered_population_raw":  606091,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  109898,
+                                 "effective_population":  606091,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·山阳郡；维基文库卷031",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.wensishuiriverplain.westplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yanzhou.taishan",
+                                 "seat_admin_unit_id":  "admin.han140.yanzhou.taishan.fenggao",
+                                 "registered_households_raw":  8929,
+                                 "registered_population_raw":  437317,
+                                 "registered_households_corrected":  108929,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  108929,
+                                 "effective_population":  437317,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十一·郡国三·泰山郡；现代校录补正②",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.taiyifoothill.centralbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.ba",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.ba.jiangzhou",
+                                 "registered_households_raw":  310691,
+                                 "registered_population_raw":  1086049,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  310691,
+                                 "effective_population":  1086049,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·巴郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.sichuanbasin.easternfoldbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.guanghan",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.guanghan.luo",
+                                 "registered_households_raw":  139865,
+                                 "registered_population_raw":  509438,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  139865,
+                                 "effective_population":  509438,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·广汉郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.sichuanbasin.northwestchengduplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.guanghanshuguo",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.guanghanshuguo.yinpingdao",
+                                 "registered_households_raw":  37110,
+                                 "registered_population_raw":  205652,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  37110,
+                                 "effective_population":  205652,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·广汉属国；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.westernsichuanmountains.northqiangcorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.hanzhong",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.hanzhong.nanzheng",
+                                 "registered_households_raw":  57344,
+                                 "registered_population_raw":  267402,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  57344,
+                                 "effective_population":  267402,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·汉中郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.hanzhongqinba.centralhanriverbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.jianwei",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.jianwei.wuyang",
+                                 "registered_households_raw":  137713,
+                                 "registered_population_raw":  411378,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  137713,
+                                 "effective_population":  411378,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·犍为郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.sichuanbasin.southernriverhills",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.jianweishuguo",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.jianweishuguo.zhuti",
+                                 "registered_households_raw":  7938,
+                                 "registered_population_raw":  37187,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  7938,
+                                 "effective_population":  37187,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·犍为属国；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.westernsichuanmountains.southmountaincorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.shu",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.shu.chengdu",
+                                 "registered_households_raw":  300452,
+                                 "registered_population_raw":  1350476,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  300452,
+                                 "effective_population":  1350476,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·蜀郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.sichuanbasin.centralchengduplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.shushuguo",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.shushuguo.yijia",
+                                 "registered_households_raw":  111568,
+                                 "registered_population_raw":  475629,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  111568,
+                                 "effective_population":  475629,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·蜀郡属国；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.westernsichuanmountains.centralplateaucorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.yizhou",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.yizhou.dianchi",
+                                 "registered_households_raw":  29036,
+                                 "registered_population_raw":  110802,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  29036,
+                                 "effective_population":  110802,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·益州郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.yunguiplateau.centralyunnanbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.yongchang",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.yongchang.buwei",
+                                 "registered_households_raw":  231897,
+                                 "registered_population_raw":  1897344,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  231897,
+                                 "effective_population":  1897344,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·永昌郡；户均人口异常，现代校录未设修正",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.hengduansouth.southwestlancangfrontier",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.yuexi",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.yuexi.qiongdu",
+                                 "registered_households_raw":  130120,
+                                 "registered_population_raw":  623418,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  130120,
+                                 "effective_population":  623418,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·越巂郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.hengduansouth.northeastanningvalley",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yizhou.zangke",
+                                 "seat_admin_unit_id":  "admin.han140.yizhou.zangke.guqielan",
+                                 "registered_households_raw":  31523,
+                                 "registered_population_raw":  267253,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  31523,
+                                 "effective_population":  267253,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·牂牁郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.southwest.china.yunguiplateau.northeastkarstplateau",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.dai",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.dai.gaoliu",
+                                 "registered_households_raw":  20123,
+                                 "registered_population_raw":  126188,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  20123,
+                                 "effective_population":  126188,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·代郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanbeigreatwall.westernbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.guangyang",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.guangyang.ji",
+                                 "registered_households_raw":  44550,
+                                 "registered_population_raw":  280600,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  44550,
+                                 "effective_population":  280600,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·广阳郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.northcentralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.lelang",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.lelang.chaoxian",
+                                 "registered_households_raw":  61492,
+                                 "registered_population_raw":  257050,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  61492,
+                                 "effective_population":  257050,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·乐浪郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.liaodong",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.liaodong.xiangping",
+                                 "registered_households_raw":  64158,
+                                 "registered_population_raw":  81714,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  281714,
+                                 "effective_households":  64158,
+                                 "effective_population":  281714,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·辽东郡；现代校录补正⑥",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northeast.asia.liaodongkoreanorth.liaoheriverplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.liaodongshuguo",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.liaodongshuguo.changliao",
+                                 "registered_households_raw":  null,
+                                 "registered_population_raw":  null,
+                                 "registered_households_corrected":  22986,
+                                 "registered_population_corrected":  116592,
+                                 "effective_households":  22986,
+                                 "effective_population":  116592,
+                                 "evidence_grade":  "M",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·辽东属国；现代校录补正⑧",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northeast.asia.liaodongkoreanorth.westernfrontier",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.liaoxi",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.liaoxi.yangle",
+                                 "registered_households_raw":  14150,
+                                 "registered_population_raw":  81714,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  14150,
+                                 "effective_population":  81714,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·辽西郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanshanliaoxi.northeastcorridor",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.shanggu",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.shanggu.juyang",
+                                 "registered_households_raw":  10352,
+                                 "registered_population_raw":  51204,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  10352,
+                                 "effective_population":  51204,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·上谷郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanbeigreatwall.easternmountainbasin",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.xuantu",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.xuantu.gaojuli",
+                                 "registered_households_raw":  1594,
+                                 "registered_population_raw":  43163,
+                                 "registered_households_corrected":  9594,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  9594,
+                                 "effective_population":  43163,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·玄菟郡；现代校录补正⑦",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.northeast.asia.liaodongkoreanorth.easternmountainfrontier",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.youbeiping",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.youbeiping.tuyin",
+                                 "registered_households_raw":  9170,
+                                 "registered_population_raw":  53475,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  9170,
+                                 "effective_population":  53475,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·右北平郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanshanliaoxi.centralfoothillplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.yuyang",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.yuyang.yuyang",
+                                 "registered_households_raw":  68456,
+                                 "registered_population_raw":  435740,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  68456,
+                                 "effective_population":  435740,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·渔阳郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.yanshanliaoxi.southwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.youzhou.zhuo",
+                                 "seat_admin_unit_id":  "admin.han140.youzhou.zhuo.zhuo",
+                                 "registered_households_raw":  102218,
+                                 "registered_population_raw":  633754,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  102218,
+                                 "effective_population":  633754,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十三·郡国五·涿郡；维基文库卷033",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.north.china.hebei.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.chen",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.chen.chen",
+                                 "registered_households_raw":  112653,
+                                 "registered_population_raw":  1547572,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  547572,
+                                 "effective_households":  112653,
+                                 "effective_population":  547572,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·陈国；现代校录补正①",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.yingruhuai.centralplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.liang",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.liang.xiayi",
+                                 "registered_households_raw":  83300,
+                                 "registered_population_raw":  431283,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  83300,
+                                 "effective_population":  431283,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·梁国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.suihuainorth.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.lu",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.lu.lu",
+                                 "registered_households_raw":  78447,
+                                 "registered_population_raw":  411590,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  78447,
+                                 "effective_population":  411590,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·鲁国；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.east.china.siyifoothill.westernplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.pei",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.pei.xiang",
+                                 "registered_households_raw":  200495,
+                                 "registered_population_raw":  251393,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  1251393,
+                                 "effective_households":  200495,
+                                 "effective_population":  1251393,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·沛国；现代校录补正①",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.suihuainorth.southeastplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "low",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.runan",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.runan.pingyu",
+                                 "registered_households_raw":  404448,
+                                 "registered_population_raw":  2100788,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  404448,
+                                 "effective_population":  2100788,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·汝南郡；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.yingruhuai.southplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             },
+                             {
+                                 "admin_unit_id":  "admin.han140.yuzhou.yingchuan",
+                                 "seat_admin_unit_id":  "admin.han140.yuzhou.yingchuan.yangdi",
+                                 "registered_households_raw":  263440,
+                                 "registered_population_raw":  1436513,
+                                 "registered_households_corrected":  null,
+                                 "registered_population_corrected":  null,
+                                 "effective_households":  263440,
+                                 "effective_population":  1436513,
+                                 "evidence_grade":  "H",
+                                 "source_ids":  [
+                                                    "source.hou_han_shu.jun_guo_zhi",
+                                                    "source.zae06141.eastern_han_population_audit"
+                                                ],
+                                 "source_locator":  "《后汉书》卷三十·郡国二·颍川郡；维基文库卷030",
+                                 "mappings":  [
+                                                  {
+                                                      "stable_region_id":  "geo.region.central.china.yingruhuai.northwestplain",
+                                                      "weight_basis_points":  10000,
+                                                      "mapping_method":  "single_provisional_commandery_bucket_v1",
+                                                      "confidence":  "medium",
+                                                      "provisional":  true
+                                                  }
+                                              ]
+                             }
+                         ]
+}

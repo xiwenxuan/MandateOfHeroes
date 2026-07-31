@@ -25,6 +25,7 @@ namespace Mandate.Simulation
 
         public BattleOutcome Resolve(
             WorldState world,
+            StableId issuerPersonId,
             StableId attackerArmyId,
             StableId defenderArmyId)
         {
@@ -36,6 +37,18 @@ namespace Mandate.Simulation
             world.Validate();
             var attacker = FindArmy(world, attackerArmyId.Value);
             var defender = FindArmy(world, defenderArmyId.Value);
+            var order = new MilitaryAuthoritySystem().IssueOrder(
+                world,
+                issuerPersonId,
+                attackerArmyId,
+                MilitaryOrderType.Engage,
+                MilitaryAuthorityLevel.Army,
+                targetArmyId: defenderArmyId.Value);
+            if (order.Result == MilitaryOrderResult.Rejected)
+            {
+                throw new InvalidOperationException(order.Summary);
+            }
+
             ValidateBattle(world, attacker, defender);
 
             var attackerInitial = attacker.Troops;
@@ -84,12 +97,19 @@ namespace Mandate.Simulation
                 attacker, attackerCasualties, sequence);
             var defenderWounded = CalculateWounded(
                 defender, defenderCasualties, sequence);
-            attacker.Troops -= attackerCasualties;
-            defender.Troops -= defenderCasualties;
-            attacker.WoundedTroops = checked(
-                attacker.WoundedTroops + attackerWounded);
-            defender.WoundedTroops = checked(
-                defender.WoundedTroops + defenderWounded);
+            var militaryService = new MilitaryServiceSystem();
+            militaryService.ApplyCasualties(
+                world,
+                attackerArmyId,
+                attackerCasualties,
+                attackerWounded,
+                sequence);
+            militaryService.ApplyCasualties(
+                world,
+                defenderArmyId,
+                defenderCasualties,
+                defenderWounded,
+                sequence);
             UpdateMobilization(attacker);
             UpdateMobilization(defender);
             ReduceLocalOrder(

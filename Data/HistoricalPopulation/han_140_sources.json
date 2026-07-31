@@ -1,0 +1,61 @@
+{
+  "schema_version": "han140.sources.v1",
+  "dataset_year": 140,
+  "national_anchor": {
+    "registered_households": 9698630,
+    "registered_population": 49150220,
+    "source_ids": [
+      "source.hou_han_shu.jun_guo_zhi"
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "source.hou_han_shu.jun_guo_zhi",
+      "source_type": "primary_text",
+      "title": "《后汉书》志第二十至二十三·郡国（源出司马彪《续汉书》）",
+      "author_or_editor": "司马彪撰志，刘昭注，后并入《后汉书》",
+      "edition_or_host": "维基文库《四库全书》本卷029、卷030、卷031、卷032、卷033；其他公开古籍转录用于异文核对",
+      "publication_or_access_date": "古代文献；页面访问于2026-07-31",
+      "url_or_bibliographic_locator": "卷029：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷029；卷030：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷030；卷031：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷031；卷032：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷032；卷033：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷033；郡国一公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/109.htm；郡国二公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/110.htm；郡国三公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/111.htm；郡国四公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/112.htm；郡国五公开校勘转录：https://www.guoxuedashi.com/a/32m/113149h.html",
+      "license_or_public_domain_note": "古籍原文属于公共领域；页面贡献遵循维基文库许可。本项目只录历史事实和自有数据结构，不复制现代点校、数据库或研究者受保护的完整表格与注释",
+      "evidence_scope": "140年全国户口锚点；P1十四批105个郡国、尹或属国原始户口与行政层级；郡国志1182条逐项县、邑、道、侯国等县级列项及其郡国隶属和治所顺序；河间、济南郡国异文；辽东属国、酒泉郡、郁林郡和交趾郡户口缺项；沛国、陈国人口，泰山郡、琅邪国、敦煌郡户数原文异常；永昌郡人口疑值与广汉属国旧注讹文",
+      "notes": "全国锚点与现存分项可能存在缺项、讹误和口径差异，必须分别审计；常见约1180县、州部小计1181与逐项校录1182并列保存，巴郡标题十四城但正文列十五项，不为迎合汇总数删除正文事实；简繁显示差异不改变稳定ID；河间类型保留版本异文；济南在卷032四库网页转录作郡、另一公开转录作国，结合126年复封至140年的沿革按国保存；辽东郡人口与玄菟郡户数保留原文异常值；司隶批次以卷029原典值优先；豫州沛国与陈国原值及百万位移置补正分别保存；兖州泰山郡与徐州琅邪国的原值及十万位脱漏补正分别保存；荆州七郡及扬州六郡在两份公开转录中的户口值一致；益州永昌郡人口疑值没有可采用修正，广汉属国旧注所属讹文只记备注；凉州北地、武威网页转录异文分别按公开校勘本3122户、10042户保存；酒泉缺口数和敦煌疑脱千位均保留原值并另存现代校录补正；并州九郡在两份公开古籍转录中的户口值一致；交州郁林、交趾原典户口均缺失，原始字段保持为空"
+    },
+    {
+      "source_id": "source.project.historical_population.v0_1",
+      "source_type": "project_model",
+      "title": "135—260年东汉至三国人口分布基线V0.1",
+      "author_or_editor": "MandateOfHeroes contributors",
+      "edition_or_host": "MandateOfHeroes repository",
+      "publication_or_access_date": "2026-07-31",
+      "url_or_bibliographic_locator": "Docs/HISTORICAL_POPULATION_135_260.md",
+      "license_or_public_domain_note": "项目原创整理，随仓库MIT许可证发布；引用外部事实时仍须追溯原始来源",
+      "evidence_scope": "证据等级、全国锚点采用规则与稳定地理分配方法",
+      "notes": "项目模型不能替代郡国原始史料来源"
+    },
+    {
+      "source_id": "source.project.prototype_location_catalog.v1",
+      "source_type": "project_model",
+      "title": "MandateOfHeroes运行时、184年原型与77城地点目录V1",
+      "author_or_editor": "MandateOfHeroes contributors",
+      "edition_or_host": "MandateOfHeroes repository",
+      "publication_or_access_date": "2026-07-31",
+      "url_or_bibliographic_locator": "Assets/Scripts/Mandate.Simulation/PrototypeWorldFactory.cs；Docs/PROTOTYPE_MAP_184_ZHUO_GUANGZONG.md；Docs/CITY_UNION_MASTER.md",
+      "license_or_public_domain_note": "项目原创代码与整理，随仓库MIT许可证发布；地点命名只吸收公共领域历史事实和系列玩法层级思路，不复制商业游戏坐标、参数、数据库或素材",
+      "evidence_scope": "六个location.*运行时地点、L001-L012原型目录节点及C001-C077城市目录节点的项目身份和对应关系",
+      "notes": "该来源只证明项目内部目录身份；140年县级隶属仍以《后汉书》郡国志原文为证。不能安全对应140年行政身份的节点保持聚合、近似或待考状态，不以商业游戏坐标补齐"
+    },
+    {
+      "source_id": "source.zae06141.eastern_han_population_audit",
+      "source_type": "reference_index",
+      "title": "後漢人口各種集計／郡国志集計表",
+      "author_or_editor": "zae06141（站点标识）",
+      "edition_or_host": "研究者公开网页与eastern_han_population.ods校录表",
+      "publication_or_access_date": "访问于2026-07-31",
+      "url_or_bibliographic_locator": "说明：https://zae06141.client.jp/gunkokushi.html；校录表：https://zae06141.client.jp/eastern_han_population.ods",
+      "license_or_public_domain_note": "页面未声明可再分发表格的开放许可证；本项目仅用其数值作交叉核对，不复制、检入或再分发ODS、公式、注释与完整表格",
+      "evidence_scope": "P1十四批105个郡国、尹或属国户口数的交叉核对；辽东郡、玄菟郡、辽东属国、酒泉郡、敦煌郡、郁林郡和交趾郡七项补正；沛国、陈国百万位移置两项补正；泰山郡、琅邪国户数十万位脱漏两项补正；永昌郡疑值保留判断；全国分项合计与篇末锚点差异的审计线索",
+      "notes": "不作为独立原典；人口记录的H级证据来自《后汉书》原文；表内清河国标签误作清川国；辽东属国、郁林郡和交趾郡补正均为模型估计而非史籍原值；司隶表内河南尹口数1018217与弘农郡口数199193均不同于卷029原典，未采用；豫州沛国与陈国只在修正字段互移百万位；兖州泰山郡与徐州琅邪国只在修正字段补回十万户；永昌郡户均人口虽异常但校录资料未修正，本项目同样只保留原值与疑点；酒泉说明所列29170与3.67倍方法及公开修正总计不一致，后两者支持46631口；敦煌说明同时出现7948与7748，公开修正总计支持7748户；并州九郡未见需要写入修正字段的数值问题；郁林、交趾原始户口留空，区域增长率估算只进入修正字段并标M级"
+    }
+  ]
+}

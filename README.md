@@ -29,10 +29,55 @@
 - `Docs/PROTOTYPE_MAP_184_ZHUO_GUANGZONG.md`
 - `Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md`
 - `Docs/SANDBOX_NPC_AI.md`
+- `Docs/TASK_M1_PLAYABLE_ENTRY.md`
+- `Docs/TASK_M2_VISUAL_REGION_MAP.md`
+- `Docs/TASK_M3_SILK_MAP_ART_SLICE.md`
+- `Docs/TASK_M4_LOCATION_GEOGRAPHY.md`
+- `Docs/TASK_M5_IDENTITY_MAP_PERSPECTIVES.md`
+- `Docs/TASK_M6_IDENTITY_CONSTRUCTION.md`
+- `Docs/TASK_M7_POPULATION_LEDGER.md`
+- `Docs/TASK_M8_CHARACTER_ABILITY_FOUNDATION.md`
+- `Docs/TASK_M9_EDUCATION_AND_PRACTICE.md`
+- `Docs/TASK_M10_REAL_MILITARY_SERVICE_AND_COMMAND.md`
+- `Docs/TASK_PROJECT_UNITY_DEVELOPMENT_SKILL.md`
+- `Docs/UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md`
+- `Docs/WORLD_SIMULATION_FOUNDATION.md`
+- `Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`
+- `Docs/MAP_ART_RESOURCE_PLAN.md`
 
-## 运行开发观察台
+## 项目开发规则
 
-在Unity中打开`Assets/Scenes/SimulationDashboard.unity`，点击播放按钮。观察台可以：
+本仓库提供项目专属 Codex Skill：
+`.codex/skills/mandate-unity-development/`。涉及本项目的 Unity/C# 开发、
+存档、测试和里程碑验收时，应显式使用 `$mandate-unity-development`；
+如果当前会话没有自动发现该 Skill，则按 `AGENTS.md` 手动读取其 `SKILL.md`
+并执行相同流程。
+
+统一验证入口：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File `
+  .codex\skills\mandate-unity-development\scripts\verify-project.ps1
+```
+
+## 运行可玩原型
+
+在Unity中打开`Assets/Scenes/SimulationDashboard.unity`，点击播放按钮。游戏首先进入主菜单，可以：
+
+- 创建姓名、年龄、性别和身份均可自定义的人物；
+- 选择刘备、关羽、张世平、陈医师等世界中的现有人物；
+- 以军人、县吏、商人或医者身份开始；
+- 在可拖动、缩放的地区地图上查看六个地点、河流、道路与军队；
+- 切换地形、治安、粮价和战争图层；
+- 点击相邻地点并沿真实道路旅行，旅途中可看到玩家位置进度；
+- 查看当前人物、家庭、组织职位和地区状态；
+- 查看人物八项基础禀赋、十类专业能力、人生志向和实时派生的五维评价；
+- 为人物安排自修或师承计划，分配月度学习时间并由个人或家庭支付费用；
+- 接受与当前地点和身份匹配的任务；
+- 推进世界时间并使用内存保存和读取；
+- 从游戏内进入开发观察台。
+
+开发观察台继续支持：
 
 - 推进一天或30天；
 - 查看地点粮价与治安；
@@ -45,6 +90,39 @@
 - 在黄巾起事后命令冀州官军进军广宗，观察军粮、士气、伤亡与野战结果。
 - 让商人向驻军售粮、让军队从当地市场采购，或通过运粮任务补充前线军粮。
 - 让医者购买药材并救治战斗产生的伤兵，使恢复者重新返回部队。
+- 查看 240 名真实服役人物、军—队编制树、玩家军令权限和近期军令审计；
+  战斗伤亡、缺粮逃亡及医疗康复会落实到具体人物。
+
+当前界面是验证核心循环的程序员美术版本，正式地图、美术和交互将在后续里程碑替换。
+
+### 军府绢图地图竖切片
+
+地图已经加入原创的程序化绢纹、矿物色地貌、山形图章、封泥城池、军旗木牌和三档缩放细节。进入新游戏后选择“地图”：
+
+- 向下滚轮缩小到0.86倍以下，查看“天下概览”；
+- 0.86至1.55倍为“州郡舆图”，显示道路里程和地点信息；
+- 向上滚轮放大到1.55倍以上，查看“县乡近览”的农田、林地和望楼；
+- 右键或中键拖动地图，点击地点查看和旅行；
+- 地形、治安、粮价和战争图层仍可随时切换。
+
+本阶段没有引入任何商业游戏或第三方美术文件，全部地图纹理和图章由程序在运行时原创生成。
+
+地点现在同时记录层级、地貌、战略重要度和设施。县乡近览中的农田、市场、工坊、医馆和驿站等标记由世界数据决定；地点详情可以查看这些信息，为后续身份专属地图和建设系统提供统一基础。
+
+地图支持通用、军务、政务、商旅和医药五种身份视角。自建人物进入世界时会根据初始身份自动选择推荐视角，也可以随时手动切换；身份视角负责地点标签和设施情报，地形、治安、粮价、战争图层仍独立负责着色。
+
+玩家在地点详情中可以按当前身份视角发起地方建设，投入个人资金和一天劳作。项目进度、累计投资和完工日期进入存档；完工后地点获得真实设施，并立即改变县乡近览和身份视角情报。
+
+世界人口已经拆分为统计人口批次和独立人物，并通过出生、死亡、迁徙和人物实例化事务保持守恒。开发观察台可以查看各地点职业人口、期初与实际人口、最近事务以及守恒审计结果。
+
+人物能力底座已经加入八项基础禀赋、十类专业总能力和统率、武勇、智略、政务、魅力五维摘要。普通人物按稳定世界种子与职业背景生成，重要人物叠加史实角色倾向；自建身份和新生儿也使用同一规则，人物面板可直接查看。
+
+人物培养已经接入真实世界时间与财富。玩家可在人物面板选择专业、月度学习天数、自修或本地教师、个人或家庭支付，并自动匹配真实组织职位作为实践岗位。每30日写入一笔可审计学习记录；旅行、重病、资金不足、教师失效和缺少专家实践都会阻断成长。
+
+战争底座已经由抽象数字升级为缩尺真实服役模型。三支原型军队共包含
+240 名具体人物和 9 个编制节点；只有具有整军权限且现场可用的主将能下达
+行军和主动交战命令，越权命令同样保留审计记录。伤员、阵亡者、逃亡者和
+康复者会同步人物状态、军队缓存与人口总账。
 
 ## 开源策略
 
