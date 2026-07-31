@@ -118,3 +118,7 @@ admin.han140.jiaozhou.hepu,admin.han140.jiaozhou,commandery,合浦郡,合浦郡,
 admin.han140.jiaozhou.jiaozhi,admin.han140.jiaozhou,commandery,交趾郡,交趾郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户口均缺失
 admin.han140.jiaozhou.jiuzhen,admin.han140.jiaozhou,commandery,九真郡,九真郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
 admin.han140.jiaozhou.rinan,admin.han140.jiaozhou,commandery,日南郡,日南郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.zhuo.zhuo,admin.han140.youzhou.zhuo,county,涿,涿县,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五涿郡七城之一；本批只建立县级目录身份
+admin.han140.jizhou.julu.xiaquyang,admin.han140.jizhou.julu,county,下曲陽,下曲阳,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二钜鹿郡十五城之一；与广宗分别保存
+admin.han140.jizhou.julu.guangzong,admin.han140.jizhou.julu,county,廣宗,广宗,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二钜鹿郡十五城之一；与下曲阳分别保存
+admin.han140.jizhou.wei.ye,admin.han140.jizhou.wei,county,鄴,邺县,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二魏郡十五城之一；本批不声明精确古城坐标

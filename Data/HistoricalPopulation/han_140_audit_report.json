@@ -7,12 +7,12 @@
                             "registered_population":  49150220
                         },
     "row_counts":  {
-                       "sources":  3,
-                       "administrative_units":  119,
+                       "sources":  4,
+                       "administrative_units":  123,
                        "population_records":  105,
-                       "stable_regions":  154,
+                       "stable_regions":  158,
                        "region_mappings":  105,
-                       "game_location_crosswalks":  0
+                       "game_location_crosswalks":  15
                    },
     "population_totals":  {
                               "raw_households":  9336665,
@@ -28,7 +28,7 @@
                          "records_missing_raw_households":  3,
                          "records_missing_raw_population":  4,
                          "records_with_corrections":  11,
-                         "provisional_stable_regions":  154,
+                         "provisional_stable_regions":  158,
                          "provisional_region_mappings":  105,
                          "unresolved_game_locations":  0
                      },
@@ -39,6 +39,7 @@
     "registered_source_ids":  [
                                   "source.hou_han_shu.jun_guo_zhi",
                                   "source.project.historical_population.v0_1",
+                                  "source.project.prototype_location_catalog.v1",
                                   "source.zae06141.eastern_han_population_audit"
                               ]
 }
