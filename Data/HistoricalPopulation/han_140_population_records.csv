@@ -1,6 +1,15 @@
 admin_unit_id,registered_households_raw,registered_population_raw,registered_households_corrected,registered_population_corrected,correction_code,correction_note,evidence_grade,source_ids,source_locator,model_version
 admin.han140.youzhou.zhuo,102218,633754,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·涿郡；维基文库卷033,han140.p1.batch1.v1
 admin.han140.youzhou.guangyang,44550,280600,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·广阳郡；维基文库卷033,han140.p1.batch1.v1
+admin.han140.youzhou.dai,20123,126188,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·代郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.shanggu,10352,51204,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·上谷郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.yuyang,68456,435740,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·渔阳郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.youbeiping,9170,53475,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·右北平郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.liaoxi,14150,81714,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·辽西郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.liaodong,64158,81714,,281714,suspected_missing_200000,原文户口比异常且人口与辽西郡完全相同；现代校录据辽西与乐浪户口比推定人口脱二十万位,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·辽东郡；现代校录补正⑥,han140.p1.batch3.v1
+admin.han140.youzhou.xuantu,1594,43163,9594,,suspected_missing_leading_digit,原文每户人口异常；现代校录比较乐浪郡并在11594与9594候选中采用9594户,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·玄菟郡；现代校录补正⑦,han140.p1.batch3.v1
+admin.han140.youzhou.lelang,61492,257050,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·乐浪郡；维基文库卷033,han140.p1.batch3.v1
+admin.han140.youzhou.liaodongshuguo,,,22986,116592,source_omission_regional_estimate,原文独缺户口；现代校录按辽东与辽西每城平均值为六城估算,M,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·辽东属国；现代校录补正⑧,han140.p1.batch3.v1
 admin.han140.jizhou.wei,129310,695606,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·魏郡；维基文库卷030,han140.p1.batch1.v1
 admin.han140.jizhou.julu,109517,602096,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·钜鹿郡；维基文库卷030,han140.p1.batch1.v1
 admin.han140.jizhou.zhongshan,97412,658195,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·中山国；维基文库卷030,han140.p1.batch1.v1

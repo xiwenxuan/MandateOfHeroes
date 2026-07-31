@@ -3,6 +3,15 @@ admin.han140.han,,empire,漢,汉,,140,140,source.hou_han_shu.jun_guo_zhi,high,14
 admin.han140.youzhou,admin.han140.han,province,幽州刺史部,幽州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
 admin.han140.youzhou.zhuo,admin.han140.youzhou,commandery,涿郡,涿郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
 admin.han140.youzhou.guangyang,admin.han140.youzhou,commandery,廣陽郡,广阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.dai,admin.han140.youzhou,commandery,代郡,代郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.shanggu,admin.han140.youzhou,commandery,上谷郡,上谷郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.yuyang,admin.han140.youzhou,commandery,漁陽郡,渔阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.youbeiping,admin.han140.youzhou,commandery,右北平郡,右北平郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.liaoxi,admin.han140.youzhou,commandery,遼西郡,辽西郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.liaodong,admin.han140.youzhou,commandery,遼東郡,辽东郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文人口疑脱二十万位
+admin.han140.youzhou.xuantu,admin.han140.youzhou,commandery,玄菟郡,玄菟郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户数疑脱首位
+admin.han140.youzhou.lelang,admin.han140.youzhou,commandery,樂浪郡,乐浪郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.liaodongshuguo,admin.han140.youzhou,other,遼東屬國,辽东属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领六城；原文独缺户口
 admin.han140.jizhou,admin.han140.han,province,冀州刺史部,冀州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
 admin.han140.jizhou.wei,admin.han140.jizhou,commandery,魏郡,魏郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
 admin.han140.jizhou.julu,admin.han140.jizhou,commandery,鉅鹿郡,钜鹿郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二

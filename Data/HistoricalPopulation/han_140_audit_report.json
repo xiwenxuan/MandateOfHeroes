@@ -8,26 +8,26 @@
                         },
     "row_counts":  {
                        "sources":  3,
-                       "administrative_units":  14,
-                       "population_records":  11,
+                       "administrative_units":  23,
+                       "population_records":  20,
                        "stable_regions":  0,
                        "region_mappings":  0,
                        "game_location_crosswalks":  0
                    },
     "population_totals":  {
-                              "raw_households":  1054773,
-                              "raw_population":  6846273,
-                              "explicit_corrected_households":  0,
-                              "explicit_corrected_population":  0,
-                              "effective_households":  1054773,
-                              "effective_population":  6846273,
-                              "household_difference_from_anchor":  -8643857,
-                              "population_difference_from_anchor":  -42303947
+                              "raw_households":  1304268,
+                              "raw_population":  7976521,
+                              "explicit_corrected_households":  32580,
+                              "explicit_corrected_population":  398306,
+                              "effective_households":  1335254,
+                              "effective_population":  8293113,
+                              "household_difference_from_anchor":  -8363376,
+                              "population_difference_from_anchor":  -40857107
                           },
     "data_quality":  {
-                         "records_missing_raw_households":  0,
-                         "records_missing_raw_population":  0,
-                         "records_with_corrections":  0,
+                         "records_missing_raw_households":  1,
+                         "records_missing_raw_population":  1,
+                         "records_with_corrections":  3,
                          "provisional_stable_regions":  0,
                          "provisional_region_mappings":  0,
                          "unresolved_game_locations":  0
