@@ -1,1 +1,6 @@
 source_id,target_id,relation_type,valid_from_year,valid_to_year,weight_basis_points,mapping_method,confidence,provisional,notes
+admin.han140.youzhou.zhuo,geo.region.north.china.hebei.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
+admin.han140.jizhou.zhongshan,geo.region.north.china.hebei.centralwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡国人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
+admin.han140.jizhou.anping,geo.region.north.china.hebei.centralsoutheastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡国人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
+admin.han140.jizhou.julu,geo.region.north.china.hebei.southcentralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；下曲阳和广宗尚未取得县级分配权重
+admin.han140.jizhou.wei,geo.region.north.china.hebei.southwestzhangheplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；邺县只作为后续P3交叉入口
