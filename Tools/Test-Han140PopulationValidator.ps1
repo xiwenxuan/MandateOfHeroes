@@ -263,12 +263,12 @@ try {
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_households -eq 3) -Message "Raw household missing count is not 3."
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_population -eq 4) -Message "Raw population missing count is not 4."
         Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 11) -Message "Correction record count is not 11."
-        Assert-True -Condition ([int]$audit.row_counts.stable_regions -eq 71) -Message "Audit stable region count is not 71."
-        Assert-True -Condition ([int]$audit.row_counts.region_mappings -eq 52) -Message "Audit region mapping count is not 52."
+        Assert-True -Condition ([int]$audit.row_counts.stable_regions -eq 82) -Message "Audit stable region count is not 82."
+        Assert-True -Condition ([int]$audit.row_counts.region_mappings -eq 59) -Message "Audit region mapping count is not 59."
         Assert-True -Condition ([int]$audit.row_counts.game_location_crosswalks -eq 0) -Message "Audit game location crosswalk count is not 0."
-        Assert-True -Condition ([int]$audit.data_quality.provisional_stable_regions -eq 71) -Message "Provisional stable region count is not 71."
-        Assert-True -Condition ([int]$audit.data_quality.provisional_region_mappings -eq 52) -Message "Provisional region mapping count is not 52."
-        Assert-True -Condition ([int]$audit.mapping_audit.mapped_admin_source_count -eq 52) -Message "Mapped administrative source count is not 52."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_stable_regions -eq 82) -Message "Provisional stable region count is not 82."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_region_mappings -eq 59) -Message "Provisional region mapping count is not 59."
+        Assert-True -Condition ([int]$audit.mapping_audit.mapped_admin_source_count -eq 59) -Message "Mapped administrative source count is not 59."
         Assert-True -Condition ([int]$audit.mapping_audit.weight_error_count -eq 0) -Message "Mapping weight error count is not 0."
 
         $byId = @{}
@@ -975,8 +975,6 @@ try {
         $yingruhuaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.yingruhuai" })
         $suihuaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.suihuainorth" })
         $siyiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.siyifoothill" })
-        $macroRegionRows = @($regionRows | Where-Object { $_.region_type -ceq "macroregion" })
-        $commanderyAreaRows = @($regionRows | Where-Object { $_.region_type -ceq "commandery_area" })
         $yuzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.yuzhou.*" })
         $peiPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.yuzhou.pei" })
         $chenPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.yuzhou.chen" })
@@ -1178,10 +1176,6 @@ try {
             -not [string]::IsNullOrWhiteSpace([string]$_.correction_code)
         })
 
-        Assert-True -Condition ($regionRows.Count -eq 71) -Message "P2 ninth batch must produce seventy-one stable regions in total."
-        Assert-True -Condition ($mappingRows.Count -eq 52) -Message "P2 ninth batch must produce fifty-two region mappings in total."
-        Assert-True -Condition ($macroRegionRows.Count -eq 19) -Message "P2 ninth batch must produce nineteen root macroregions in total."
-        Assert-True -Condition ($commanderyAreaRows.Count -eq 52) -Message "P2 ninth batch must produce fifty-two commandery-area children in total."
         Assert-True -Condition ($batchRegionRows.Count -eq 9) -Message "P2 ninth batch must contain exactly nine new stable regions."
         Assert-True -Condition ($batchMappingRows.Count -eq 6) -Message "P2 ninth batch must contain exactly six new region mappings."
         Assert-True -Condition ($crosswalkRows.Count -eq 0) -Message "P2 must not populate the P3 game location crosswalk."
@@ -1197,6 +1191,84 @@ try {
         Assert-True -Condition ([string]$jinanAdminRows[0].unit_type -ceq "kingdom") -Message "Jinan must remain a kingdom in the 140 administrative slice."
         Assert-True -Condition ([string]$jinanAdminRows[0].confidence -ceq "medium") -Message "Jinan administrative type confidence must remain medium."
         Assert-True -Condition ($adminText.Contains($jinanCommanderyVariant)) -Message "Jinan commandery transcription variant must remain auditable."
+        foreach ($region in $batchRegionRows) {
+            Assert-True -Condition ([string]$region.geometry_status -ceq "provisional") -Message "Stable region '$($region.stable_region_id)' is not provisional geometry."
+            Assert-True -Condition ([string]$region.provisional -ceq "true") -Message "Stable region '$($region.stable_region_id)' is not marked provisional."
+            Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$region.centroid_latitude)) -Message "Stable region '$($region.stable_region_id)' must not contain an unverified latitude."
+            Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$region.centroid_longitude)) -Message "Stable region '$($region.stable_region_id)' must not contain an unverified longitude."
+        }
+        foreach ($mapping in $batchMappingRows) {
+            Assert-True -Condition ([int]$mapping.weight_basis_points -eq 10000) -Message "Mapping for '$($mapping.source_id)' does not preserve 10000 basis points."
+            Assert-True -Condition ([string]$mapping.mapping_method -ceq "single_provisional_commandery_bucket_v1") -Message "Mapping for '$($mapping.source_id)' uses an unexpected method."
+            Assert-True -Condition ([string]$mapping.provisional -ceq "true") -Message "Mapping for '$($mapping.source_id)' is not marked provisional."
+        }
+    }
+
+    Invoke-TestCase -Name "Jingzhou Hanjiang Jianghan Dongting Nanling skeleton preserves hierarchy weights and source readings" -Body {
+        $regionRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "stable_population_regions.csv"))
+        $mappingRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_region_mapping.csv"))
+        $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
+        $crosswalkRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "game_location_crosswalk.csv"))
+        $expectedRegionIds = @(
+            "geo.region.central.china.hanjianguppermiddle",
+            "geo.region.central.china.hanjianguppermiddle.northeastbasin",
+            "geo.region.central.china.jianghanplain",
+            "geo.region.central.china.jianghanplain.westernplain",
+            "geo.region.central.china.jianghanplain.easternriverlake",
+            "geo.region.south.china.dongtingxiangziyuanli",
+            "geo.region.south.china.dongtingxiangziyuanli.northwestbasin",
+            "geo.region.south.china.dongtingxiangziyuanli.northeastplain",
+            "geo.region.south.china.nanlingnorth",
+            "geo.region.south.china.nanlingnorth.southwestbasin",
+            "geo.region.south.china.nanlingnorth.southeastfoothill"
+        )
+        $expectedSourceIds = @(
+            "admin.han140.jingzhou.nanyang",
+            "admin.han140.jingzhou.nan",
+            "admin.han140.jingzhou.jiangxia",
+            "admin.han140.jingzhou.wuling",
+            "admin.han140.jingzhou.changsha",
+            "admin.han140.jingzhou.lingling",
+            "admin.han140.jingzhou.guiyang"
+        )
+        $batchRegionRows = @($regionRows | Where-Object { $expectedRegionIds -ccontains $_.stable_region_id })
+        $batchMappingRows = @($mappingRows | Where-Object { $expectedSourceIds -ccontains $_.source_id })
+        $macroRegionRows = @($regionRows | Where-Object { $_.region_type -ceq "macroregion" })
+        $commanderyAreaRows = @($regionRows | Where-Object { $_.region_type -ceq "commandery_area" })
+        $actualRegionIds = @($batchRegionRows.stable_region_id | Sort-Object)
+        $actualSourceIds = @($batchMappingRows.source_id | Sort-Object)
+        $hanjiangChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.hanjianguppermiddle" })
+        $jianghanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.jianghanplain" })
+        $dongtingChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.dongtingxiangziyuanli" })
+        $nanlingChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.nanlingnorth" })
+        $jingzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.jingzhou.*" })
+        $jingzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.jingzhou.*" })
+        $correctedJingzhouRows = @($jingzhouPopulationRows | Where-Object {
+            -not [string]::IsNullOrWhiteSpace([string]$_.registered_households_corrected) -or
+            -not [string]::IsNullOrWhiteSpace([string]$_.registered_population_corrected) -or
+            -not [string]::IsNullOrWhiteSpace([string]$_.correction_code)
+        })
+        $households = ($jingzhouPopulationRows | Measure-Object -Property registered_households_raw -Sum).Sum
+        $population = ($jingzhouPopulationRows | Measure-Object -Property registered_population_raw -Sum).Sum
+
+        Assert-True -Condition ($regionRows.Count -eq 82) -Message "P2 tenth batch must produce eighty-two stable regions in total."
+        Assert-True -Condition ($mappingRows.Count -eq 59) -Message "P2 tenth batch must produce fifty-nine region mappings in total."
+        Assert-True -Condition ($macroRegionRows.Count -eq 23) -Message "P2 tenth batch must produce twenty-three root macroregions in total."
+        Assert-True -Condition ($commanderyAreaRows.Count -eq 59) -Message "P2 tenth batch must produce fifty-nine commandery-area children in total."
+        Assert-True -Condition ($batchRegionRows.Count -eq 11) -Message "P2 tenth batch must contain exactly eleven new stable regions."
+        Assert-True -Condition ($batchMappingRows.Count -eq 7) -Message "P2 tenth batch must contain exactly seven new region mappings."
+        Assert-True -Condition ($crosswalkRows.Count -eq 0) -Message "P2 must not populate the P3 game location crosswalk."
+        Assert-True -Condition (($actualRegionIds -join "|") -ceq (($expectedRegionIds | Sort-Object) -join "|")) -Message "Tenth-batch stable region IDs do not match the contract."
+        Assert-True -Condition (($actualSourceIds -join "|") -ceq (($expectedSourceIds | Sort-Object) -join "|")) -Message "Tenth-batch administrative sources do not match the contract."
+        Assert-True -Condition ($hanjiangChildRows.Count -eq 1) -Message "Hanjiang upper-middle macroregion must contain exactly one direct child."
+        Assert-True -Condition ($jianghanChildRows.Count -eq 2) -Message "Jianghan Plain macroregion must contain exactly two direct children."
+        Assert-True -Condition ($dongtingChildRows.Count -eq 2) -Message "Dongting-Xiang-Zi-Yuan-Li macroregion must contain exactly two direct children."
+        Assert-True -Condition ($nanlingChildRows.Count -eq 2) -Message "Nanling North macroregion must contain exactly two direct children."
+        Assert-True -Condition ($jingzhouMappingRows.Count -eq 7) -Message "All seven Jingzhou commandery population sources must be mapped after the tenth batch."
+        Assert-True -Condition ($jingzhouPopulationRows.Count -eq 7) -Message "Jingzhou must retain exactly seven population records."
+        Assert-True -Condition ([long]$households -eq 1399394) -Message "Jingzhou raw household total is incorrect."
+        Assert-True -Condition ([long]$population -eq 6265952) -Message "Jingzhou raw population total is incorrect."
+        Assert-True -Condition ($correctedJingzhouRows.Count -eq 0) -Message "Jingzhou must not invent population corrections."
         foreach ($region in $batchRegionRows) {
             Assert-True -Condition ([string]$region.geometry_status -ceq "provisional") -Message "Stable region '$($region.stable_region_id)' is not provisional geometry."
             Assert-True -Condition ([string]$region.provisional -ceq "true") -Message "Stable region '$($region.stable_region_id)' is not marked provisional."
