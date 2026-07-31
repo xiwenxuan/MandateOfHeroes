@@ -10,8 +10,8 @@
                        "sources":  3,
                        "administrative_units":  119,
                        "population_records":  105,
-                       "stable_regions":  92,
-                       "region_mappings":  65,
+                       "stable_regions":  109,
+                       "region_mappings":  77,
                        "game_location_crosswalks":  0
                    },
     "population_totals":  {
@@ -28,12 +28,12 @@
                          "records_missing_raw_households":  3,
                          "records_missing_raw_population":  4,
                          "records_with_corrections":  11,
-                         "provisional_stable_regions":  92,
-                         "provisional_region_mappings":  65,
+                         "provisional_stable_regions":  109,
+                         "provisional_region_mappings":  77,
                          "unresolved_game_locations":  0
                      },
     "mapping_audit":  {
-                          "mapped_admin_source_count":  65,
+                          "mapped_admin_source_count":  77,
                           "weight_error_count":  0
                       },
     "registered_source_ids":  [
