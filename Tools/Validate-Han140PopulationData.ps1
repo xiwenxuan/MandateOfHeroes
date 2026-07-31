@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$DataRoot,
-    [string]$OutputPath
+    [string]$OutputPath,
+    [string]$M12OutputPath
 )
 
 Set-StrictMode -Version Latest
@@ -397,6 +398,18 @@ catch {
     exit 2
 }
 
+if ([string]::IsNullOrWhiteSpace($M12OutputPath)) {
+    $M12OutputPath = Join-Path $resolvedDataRoot "han_140_m12_population_input.json"
+}
+
+try {
+    $resolvedM12OutputPath = [System.IO.Path]::GetFullPath($M12OutputPath)
+}
+catch {
+    Write-Error "Invalid M12OutputPath '$M12OutputPath': $($_.Exception.Message)"
+    exit 2
+}
+
 $sourcePath = Join-Path $resolvedDataRoot "han_140_sources.json"
 $adminPath = Join-Path $resolvedDataRoot "han_140_administrative_units.csv"
 $populationPath = Join-Path $resolvedDataRoot "han_140_population_records.csv"
@@ -569,6 +582,8 @@ $crosswalkTable = Read-ContractCsv -Path $crosswalkPath -Label "game location cr
 
 $adminIds = New-OrdinalIdSet
 $adminParents = @{}
+$adminRowsById = @{}
+$adminTypesById = @{}
 foreach ($row in $adminTable.Rows) {
     $id = [string]$row.admin_unit_id
     if (Test-IdFormat -Value $id -Pattern "^admin\.han140\.[a-z0-9]+(?:\.[a-z0-9]+)*$" -Label "administrative unit ID") {
@@ -589,6 +604,8 @@ foreach ($row in $adminTable.Rows) {
 
     $parentId = ([string]$row.parent_admin_unit_id).Trim()
     $adminParents[$id] = $parentId
+    $adminRowsById[$id] = $row
+    $adminTypesById[$id] = [string]$row.unit_type
 }
 
 foreach ($row in $adminTable.Rows) {
@@ -733,6 +750,8 @@ Test-ParentCycles -Parents $regionParents -Label "stable region hierarchy"
 $mappingKeys = New-OrdinalIdSet
 $mappingWeights = @{}
 $provisionalMappings = 0
+$populationMappingSourceIds = New-OrdinalIdSet
+$countyMappingSourceIds = New-OrdinalIdSet
 foreach ($row in $mappingTable.Rows) {
     $sourceId = [string]$row.source_id
     $targetId = [string]$row.target_id
@@ -748,6 +767,12 @@ foreach ($row in $mappingTable.Rows) {
     }
 
     Test-RequiredText -Value $row.relation_type -Label "region mapping '$key'.relation_type" | Out-Null
+    if ([string]$row.relation_type -ceq "population_coverage") {
+        [void]$populationMappingSourceIds.Add($sourceId)
+    }
+    elseif ([string]$row.relation_type -ceq "county_identity") {
+        [void]$countyMappingSourceIds.Add($sourceId)
+    }
     Test-RequiredHan140YearRange -FromValue $row.valid_from_year -ToValue $row.valid_to_year -Label "region mapping '$key'"
     $weight = Get-NullableNonNegativeInteger -Value $row.weight_basis_points -Label "region mapping '$key'.weight_basis_points" -Required
     if ($null -ne $weight) {
@@ -779,6 +804,17 @@ foreach ($sourceId in @($mappingWeights.Keys | Sort-Object)) {
 
 $crosswalkIds = New-OrdinalIdSet
 $unresolvedGameLocations = 0
+$crosswalkKindCounts = @{
+    runtime = 0
+    prototype_catalog = 0
+    city_catalog = 0
+}
+$crosswalkStatusCounts = @{
+    exact = 0
+    aggregate = 0
+    approximate = 0
+    unresolved = 0
+}
 foreach ($row in $crosswalkTable.Rows) {
     $gameId = [string]$row.game_location_id
     $kind = [string]$row.game_location_kind
@@ -797,11 +833,17 @@ foreach ($row in $crosswalkTable.Rows) {
     if (-not $crosswalkIds.Add($gameId)) {
         Add-ValidationError "Duplicate game location crosswalk ID '$gameId'."
     }
+    elseif ($crosswalkKindCounts.ContainsKey($kind)) {
+        $crosswalkKindCounts[$kind]++
+    }
 
     $status = [string]$row.mapping_status
     Test-EnumValue -Value $status `
         -Allowed @("exact", "aggregate", "approximate", "unresolved") `
         -Label "game location '$gameId'.mapping_status"
+    if ($crosswalkStatusCounts.ContainsKey($status)) {
+        $crosswalkStatusCounts[$status]++
+    }
     Test-EnumValue -Value ([string]$row.confidence) `
         -Allowed @("high", "medium", "low", "unknown") `
         -Label "game location '$gameId'.confidence"
@@ -829,6 +871,74 @@ foreach ($row in $crosswalkTable.Rows) {
     }
 }
 
+$countyAdminRows = @($adminTable.Rows | Where-Object { [string]$_.unit_type -ceq "county" })
+$countyRegionRows = @($regionTable.Rows | Where-Object { [string]$_.region_type -ceq "county_area" })
+$populationMappingRows = @($mappingTable.Rows | Where-Object { [string]$_.relation_type -ceq "population_coverage" })
+$countyMappingRows = @($mappingTable.Rows | Where-Object { [string]$_.relation_type -ceq "county_identity" })
+
+if ($populationTable.Rows.Count -ne 105) {
+    Add-ValidationError "M13 completion requires exactly 105 population records, found $($populationTable.Rows.Count)."
+}
+if ($countyAdminRows.Count -ne 1182) {
+    Add-ValidationError "M13 itemized county catalog requires exactly 1182 rows, found $($countyAdminRows.Count)."
+}
+if ($countyRegionRows.Count -ne 1182) {
+    Add-ValidationError "M13 requires exactly 1182 county-area stable regions, found $($countyRegionRows.Count)."
+}
+if ($populationMappingRows.Count -ne 105 -or $populationMappingSourceIds.Count -ne 105) {
+    Add-ValidationError "M13 requires one population coverage source for each of 105 population records."
+}
+if ($countyMappingRows.Count -ne 1182 -or $countyMappingSourceIds.Count -ne 1182) {
+    Add-ValidationError "M13 requires one county identity mapping for each of 1182 county rows."
+}
+
+foreach ($populationId in @($populationIds | Sort-Object)) {
+    if (-not $adminRowsById.ContainsKey($populationId)) {
+        continue
+    }
+    $seatId = ([string]$adminRowsById[$populationId].seat_admin_unit_id).Trim()
+    if ([string]::IsNullOrWhiteSpace($seatId)) {
+        Add-ValidationError "Population administrative unit '$populationId' must reference its itemized seat."
+    }
+    elseif (-not $adminRowsById.ContainsKey($seatId) -or [string]$adminTypesById[$seatId] -cne "county") {
+        Add-ValidationError "Population administrative unit '$populationId' seat '$seatId' must be a county row."
+    }
+    elseif ([string]$adminParents[$seatId] -cne $populationId) {
+        Add-ValidationError "Population administrative unit '$populationId' seat '$seatId' must be its direct child."
+    }
+}
+
+foreach ($county in $countyAdminRows) {
+    $countyId = [string]$county.admin_unit_id
+    if (-not $countyMappingSourceIds.Contains($countyId)) {
+        Add-ValidationError "County '$countyId' has no county identity stable mapping."
+    }
+}
+
+foreach ($requiredRuntimeId in @(
+    "location.zhuo", "location.zhongshan", "location.anping",
+    "location.xiaquyang", "location.guangzong", "location.ye"
+)) {
+    if (-not $crosswalkIds.Contains($requiredRuntimeId)) {
+        Add-ValidationError "Required runtime crosswalk '$requiredRuntimeId' is missing."
+    }
+}
+foreach ($number in 1..12) {
+    $requiredId = "L{0:D3}" -f $number
+    if (-not $crosswalkIds.Contains($requiredId)) {
+        Add-ValidationError "Required prototype crosswalk '$requiredId' is missing."
+    }
+}
+foreach ($number in 1..77) {
+    $requiredId = "C{0:D3}" -f $number
+    if (-not $crosswalkIds.Contains($requiredId)) {
+        Add-ValidationError "Required city crosswalk '$requiredId' is missing."
+    }
+}
+if ($crosswalkKindCounts.runtime -ne 6 -or $crosswalkKindCounts.prototype_catalog -ne 12 -or $crosswalkKindCounts.city_catalog -ne 77) {
+    Add-ValidationError "M13 crosswalk coverage must be runtime=6 prototype_catalog=12 city_catalog=77."
+}
+
 if ($script:ValidationErrors.Count -gt 0) {
     $orderedErrors = @($script:ValidationErrors | Sort-Object -Unique)
     foreach ($validationError in $orderedErrors) {
@@ -839,7 +949,7 @@ if ($script:ValidationErrors.Count -gt 0) {
 }
 
 $audit = [ordered]@{
-    schema_version = "han140.audit.v1"
+    schema_version = "han140.audit.v2"
     dataset_year = 140
     validation_status = "passed"
     national_anchor = [ordered]@{
@@ -874,9 +984,81 @@ $audit = [ordered]@{
     }
     mapping_audit = [ordered]@{
         mapped_admin_source_count = $mappingWeights.Count
+        population_mapping_source_count = $populationMappingSourceIds.Count
+        county_mapping_source_count = $countyMappingSourceIds.Count
         weight_error_count = $weightErrorCount
     }
+    county_catalog_audit = [ordered]@{
+        common_reference_count = 1180
+        source_regional_subtotal = 1181
+        itemized_count = $countyAdminRows.Count
+        itemized_difference_from_common_reference = $countyAdminRows.Count - 1180
+        ba_commandery_declared_count = 14
+        ba_commandery_itemized_count = 15
+        discrepancy_note = "Hou Han Shu regional subtotals, the common reference total, and itemized county entries differ; preserve every itemized fact, including the Ba commandery Hanchang entry."
+    }
+    game_location_coverage = [ordered]@{
+        runtime = $crosswalkKindCounts.runtime
+        prototype_catalog = $crosswalkKindCounts.prototype_catalog
+        city_catalog = $crosswalkKindCounts.city_catalog
+        exact = $crosswalkStatusCounts.exact
+        aggregate = $crosswalkStatusCounts.aggregate
+        approximate = $crosswalkStatusCounts.approximate
+        unresolved = $crosswalkStatusCounts.unresolved
+    }
     registered_source_ids = @($sourceIds | Sort-Object)
+}
+
+$m12PopulationUnits = @(
+    foreach ($row in @($populationTable.Rows | Sort-Object admin_unit_id)) {
+        $rawHouseholds = if ([string]::IsNullOrWhiteSpace([string]$row.registered_households_raw)) { $null } else { [long]$row.registered_households_raw }
+        $rawPopulation = if ([string]::IsNullOrWhiteSpace([string]$row.registered_population_raw)) { $null } else { [long]$row.registered_population_raw }
+        $correctedHouseholds = if ([string]::IsNullOrWhiteSpace([string]$row.registered_households_corrected)) { $null } else { [long]$row.registered_households_corrected }
+        $correctedPopulation = if ([string]::IsNullOrWhiteSpace([string]$row.registered_population_corrected)) { $null } else { [long]$row.registered_population_corrected }
+        $effectiveHouseholds = if ($null -ne $correctedHouseholds) { $correctedHouseholds } else { $rawHouseholds }
+        $effectiveUnitPopulation = if ($null -ne $correctedPopulation) { $correctedPopulation } else { $rawPopulation }
+        $unitMappings = @(
+            foreach ($mapping in @($populationMappingRows | Where-Object { [string]$_.source_id -ceq [string]$row.admin_unit_id } | Sort-Object target_id)) {
+                [ordered]@{
+                    stable_region_id = [string]$mapping.target_id
+                    weight_basis_points = [int]$mapping.weight_basis_points
+                    mapping_method = [string]$mapping.mapping_method
+                    confidence = [string]$mapping.confidence
+                    provisional = ($mapping.provisional -eq "true")
+                }
+            }
+        )
+        [ordered]@{
+            admin_unit_id = [string]$row.admin_unit_id
+            seat_admin_unit_id = [string]$adminRowsById[[string]$row.admin_unit_id].seat_admin_unit_id
+            registered_households_raw = $rawHouseholds
+            registered_population_raw = $rawPopulation
+            registered_households_corrected = $correctedHouseholds
+            registered_population_corrected = $correctedPopulation
+            effective_households = $effectiveHouseholds
+            effective_population = $effectiveUnitPopulation
+            evidence_grade = [string]$row.evidence_grade
+            source_ids = @(Get-IdList -Value $row.source_ids)
+            source_locator = [string]$row.source_locator
+            mappings = $unitMappings
+        }
+    }
+)
+
+$m12Input = [ordered]@{
+    schema_version = "han140.m12-input.v1"
+    dataset_year = 140
+    population_source_count = $m12PopulationUnits.Count
+    county_catalog_count = $countyAdminRows.Count
+    national_anchor = [ordered]@{
+        registered_households = $anchorHouseholds
+        registered_population = $anchorPopulation
+    }
+    effective_totals = [ordered]@{
+        households = $effectiveHouseholdsTotal
+        population = $effectivePopulationTotal
+    }
+    population_units = $m12PopulationUnits
 }
 
 $outputDirectory = Split-Path -Parent $resolvedOutputPath
@@ -886,6 +1068,13 @@ if (-not [string]::IsNullOrWhiteSpace($outputDirectory) -and -not (Test-Path -Li
 
 $json = ($audit | ConvertTo-Json -Depth 8) -replace "`r`n", "`n"
 [System.IO.File]::WriteAllText($resolvedOutputPath, $json + "`n", $script:Utf8NoBom)
+
+$m12OutputDirectory = Split-Path -Parent $resolvedM12OutputPath
+if (-not [string]::IsNullOrWhiteSpace($m12OutputDirectory) -and -not (Test-Path -LiteralPath $m12OutputDirectory)) {
+    [void](New-Item -ItemType Directory -Path $m12OutputDirectory -Force)
+}
+$m12Json = ($m12Input | ConvertTo-Json -Depth 10) -replace "`r`n", "`n"
+[System.IO.File]::WriteAllText($resolvedM12OutputPath, $m12Json + "`n", $script:Utf8NoBom)
 
 Write-Host (
     "RESULT han140-validation=passed sources={0} admin={1} population={2} regions={3} mappings={4} crosswalks={5}" -f

@@ -34,8 +34,7 @@ $arguments = @(
     "-runTests",
     "-testPlatform", $TestPlatform,
     "-testResults", $resultPath,
-    "-logFile", $logPath,
-    "-quit"
+    "-logFile", $logPath
 )
 
 $process = Start-Process `
@@ -55,10 +54,15 @@ while (-not $process.HasExited -and (Get-Date) -lt $deadline) {
 }
 
 if (-not $process.HasExited) {
-    & "C:\Windows\System32\taskkill.exe" `
-        /PID $process.Id `
-        /T `
-        /F 2>$null | Out-Null
+    try {
+        & "C:\Windows\System32\taskkill.exe" `
+            /PID $process.Id `
+            /T `
+            /F 2>$null | Out-Null
+    }
+    catch {
+        # Continue to the exact owned PID fallback below.
+    }
     Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
     Write-Error "Unity tests exceeded $TimeoutSeconds seconds and PID $($process.Id) was terminated."
     if (Test-Path -LiteralPath $logPath) {

@@ -14,6 +14,7 @@ $repositoryRootPath = [System.IO.Path]::GetFullPath($RepositoryRoot)
 $validatorPath = Join-Path $repositoryRootPath "Tools\Validate-Han140PopulationData.ps1"
 $productionDataPath = Join-Path $repositoryRootPath "Data\HistoricalPopulation"
 $productionAuditPath = Join-Path $productionDataPath "han_140_audit_report.json"
+$productionM12Path = Join-Path $productionDataPath "han_140_m12_population_input.json"
 $temporaryRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("MandateHan140-" + [guid]::NewGuid().ToString("N"))
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $passed = 0
@@ -49,8 +50,13 @@ function Copy-InputData {
 function Invoke-Validator {
     param(
         [string]$CaseRoot,
-        [string]$OutputPath
+        [string]$OutputPath,
+        [string]$M12OutputPath
     )
+
+    if ([string]::IsNullOrWhiteSpace($M12OutputPath)) {
+        $M12OutputPath = Join-Path $CaseRoot "test_m12_population_input.json"
+    }
 
     $previousErrorActionPreference = $ErrorActionPreference
     try {
@@ -58,7 +64,8 @@ function Invoke-Validator {
         $outputLines = @(
             & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $validatorPath `
                 -DataRoot $CaseRoot `
-                -OutputPath $OutputPath 2>&1
+                -OutputPath $OutputPath `
+                -M12OutputPath $M12OutputPath 2>&1
         )
         $exitCode = $LASTEXITCODE
     }
@@ -250,7 +257,7 @@ try {
             Assert-True -Condition ([string]$row.model_version -ceq [string]$values[2]) -Message "Model version differs for '$($row.admin_unit_id)'."
         }
         Assert-True -Condition ([int]$audit.row_counts.sources -eq 4) -Message "Audit source count is not 4."
-        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 133) -Message "Audit administrative unit count is not 133."
+        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 1301) -Message "Audit administrative unit count is not 1301."
         Assert-True -Condition ([int]$audit.row_counts.population_records -eq 105) -Message "Audit population record count is not 105."
         Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 9336665) -Message "Recorded raw household total is incorrect."
         Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 47892413) -Message "Recorded raw population total is incorrect."
@@ -263,14 +270,18 @@ try {
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_households -eq 3) -Message "Raw household missing count is not 3."
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_population -eq 4) -Message "Raw population missing count is not 4."
         Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 11) -Message "Correction record count is not 11."
-        Assert-True -Condition ([int]$audit.row_counts.stable_regions -eq 168) -Message "Audit stable region count is not 168."
-        Assert-True -Condition ([int]$audit.row_counts.region_mappings -eq 105) -Message "Audit region mapping count is not 105."
-        Assert-True -Condition ([int]$audit.row_counts.game_location_crosswalks -eq 31) -Message "Audit game location crosswalk count is not 31."
-        Assert-True -Condition ([int]$audit.data_quality.provisional_stable_regions -eq 168) -Message "Provisional stable region count is not 168."
-        Assert-True -Condition ([int]$audit.data_quality.provisional_region_mappings -eq 105) -Message "Provisional region mapping count is not 105."
-        Assert-True -Condition ([int]$audit.data_quality.unresolved_game_locations -eq 3) -Message "Unresolved game location count is not 3."
-        Assert-True -Condition ([int]$audit.mapping_audit.mapped_admin_source_count -eq 105) -Message "Mapped administrative source count is not 105."
+        Assert-True -Condition ([int]$audit.row_counts.stable_regions -eq 1336) -Message "Audit stable region count is not 1336."
+        Assert-True -Condition ([int]$audit.row_counts.region_mappings -eq 1287) -Message "Audit region mapping count is not 1287."
+        Assert-True -Condition ([int]$audit.row_counts.game_location_crosswalks -eq 95) -Message "Audit game location crosswalk count is not 95."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_stable_regions -eq 1336) -Message "Provisional stable region count is not 1336."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_region_mappings -eq 1287) -Message "Provisional region mapping count is not 1287."
+        Assert-True -Condition ([int]$audit.data_quality.unresolved_game_locations -eq 4) -Message "Unresolved game location count is not 4."
+        Assert-True -Condition ([int]$audit.mapping_audit.mapped_admin_source_count -eq 1287) -Message "Mapped administrative source count is not 1287."
+        Assert-True -Condition ([int]$audit.mapping_audit.population_mapping_source_count -eq 105) -Message "Population mapping source count is not 105."
+        Assert-True -Condition ([int]$audit.mapping_audit.county_mapping_source_count -eq 1182) -Message "County mapping source count is not 1182."
         Assert-True -Condition ([int]$audit.mapping_audit.weight_error_count -eq 0) -Message "Mapping weight error count is not 0."
+        Assert-True -Condition ([int]$audit.county_catalog_audit.itemized_count -eq 1182) -Message "Itemized county count is not 1182."
+        Assert-True -Condition ([int]$audit.game_location_coverage.runtime -eq 6 -and [int]$audit.game_location_coverage.prototype_catalog -eq 12 -and [int]$audit.game_location_coverage.city_catalog -eq 77) -Message "Game location catalog coverage is incomplete."
 
         $byId = @{}
         foreach ($row in $populationRows) {
@@ -794,7 +805,7 @@ try {
         $macroRows = @($regionRows | Where-Object { $_.stable_region_id -ceq "geo.region.north.china.yanshanliaoxi" })
         $yanshanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.yanshanliaoxi" })
         $bohaiRows = @($regionRows | Where-Object { $_.stable_region_id -ceq "geo.region.north.china.hebei.eastcoastalplain" })
-        $jizhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.jizhou.*" })
+        $jizhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.jizhou.*" })
 
         Assert-True -Condition ($batchRegionRows.Count -eq 5) -Message "P2 third batch must contain exactly five new stable regions."
         Assert-True -Condition ($batchMappingRows.Count -eq 4) -Message "P2 third batch must contain exactly four new region mappings."
@@ -849,7 +860,7 @@ try {
         $yanbeiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.yanbeigreatwall" })
         $northeastMacroRows = @($regionRows | Where-Object { $_.stable_region_id -ceq "geo.region.northeast.asia.liaodongkoreanorth" })
         $northeastChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.northeast.asia.liaodongkoreanorth" })
-        $youzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.youzhou.*" })
+        $youzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.youzhou.*" })
         $dependencyPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.youzhou.liaodongshuguo" })
 
         Assert-True -Condition ($batchRegionRows.Count -eq 8) -Message "P2 fourth batch must contain exactly eight new stable regions."
@@ -911,7 +922,7 @@ try {
         $heluoChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.heluo" })
         $hedongChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.southfenheyellowriver" })
         $guanzhongChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.northwest.china.guanzhong" })
-        $siliMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.sili.*" })
+        $siliMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.sili.*" })
         $henanPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.sili.henan" })
         $hongnongPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.sili.hongnong" })
 
@@ -971,7 +982,7 @@ try {
         $yingruhuaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.yingruhuai" })
         $suihuaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.suihuainorth" })
         $siyiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.siyifoothill" })
-        $yuzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.yuzhou.*" })
+        $yuzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.yuzhou.*" })
         $peiPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.yuzhou.pei" })
         $chenPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.yuzhou.chen" })
 
@@ -1037,7 +1048,7 @@ try {
         $lowerYellowChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.loweryellowjishui" })
         $wensiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.wensishuiriverplain" })
         $taiyiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.taiyifoothill" })
-        $yanzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.yanzhou.*" })
+        $yanzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.yanzhou.*" })
         $taishanPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.yanzhou.taishan" })
 
         Assert-True -Condition ($batchRegionRows.Count -eq 11) -Message "P2 seventh batch must contain exactly eleven new stable regions."
@@ -1095,7 +1106,7 @@ try {
         $yishuChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.yishuhuaihai" })
         $sishuiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.sishuiriverplain" })
         $jianghuaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.jianghuaieast" })
-        $xuzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.xuzhou.*" })
+        $xuzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.xuzhou.*" })
         $langyaPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.xuzhou.langya" })
 
         Assert-True -Condition ($batchRegionRows.Count -eq 8) -Message "P2 eighth batch must contain exactly eight new stable regions."
@@ -1157,7 +1168,7 @@ try {
         $lowerYellowJiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.loweryellowjieastplain" })
         $ziweiJiaolaiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.ziweijiaolaiplain" })
         $jiaodongChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.jiaodongpeninsula" })
-        $qingzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.qingzhou.*" })
+        $qingzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.qingzhou.*" })
         $qingzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.qingzhou.*" })
         $jinanAdminRows = @($adminRows | Where-Object { $_.admin_unit_id -ceq "admin.han140.qingzhou.jinan" })
         $jinanCommanderyVariant = [string][char]0x6D4E + [char]0x5357 + [char]0x90E1
@@ -1229,7 +1240,7 @@ try {
         $jianghanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.central.china.jianghanplain" })
         $dongtingChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.dongtingxiangziyuanli" })
         $nanlingChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.nanlingnorth" })
-        $jingzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.jingzhou.*" })
+        $jingzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.jingzhou.*" })
         $jingzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.jingzhou.*" })
         $correctedJingzhouRows = @($jingzhouPopulationRows | Where-Object {
             -not [string]::IsNullOrWhiteSpace([string]$_.registered_households_corrected) -or
@@ -1298,7 +1309,7 @@ try {
         $lowerYangtzeChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.east.china.loweryangtzetaihu" })
         $qiantangChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southeast.china.qiantangzhejianghills" })
         $ganPoyangChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southeast.china.ganpoyang" })
-        $yangzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.yangzhou.*" })
+        $yangzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.yangzhou.*" })
         $yangzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.yangzhou.*" })
         $correctedYangzhouRows = @($yangzhouPopulationRows | Where-Object {
             -not [string]::IsNullOrWhiteSpace([string]$_.registered_households_corrected) -or
@@ -1384,7 +1395,7 @@ try {
         $westernMountainChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southwest.china.westernsichuanmountains" })
         $yunguiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southwest.china.yunguiplateau" })
         $hengduanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southwest.china.hengduansouth" })
-        $yizhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.yizhou.*" })
+        $yizhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.yizhou.*" })
         $yizhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.yizhou.*" })
         $yizhouAdminRows = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.yizhou" })
         $commanderyAdminRows = @($yizhouAdminRows | Where-Object { $_.unit_type -ceq "commandery" })
@@ -1482,7 +1493,7 @@ try {
         $loessChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.northwest.china.loessnorthwest" })
         $hexiChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.northwest.china.hexicorridor" })
         $juyanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.northwest.china.juyanblackriverlower" })
-        $liangzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.liangzhou.*" })
+        $liangzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.liangzhou.*" })
         $liangzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.liangzhou.*" })
         $liangzhouAdminRows = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.liangzhou" })
         $commanderyAdminRows = @($liangzhouAdminRows | Where-Object { $_.unit_type -ceq "commandery" })
@@ -1600,7 +1611,7 @@ try {
         $hetaoChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.hetaoyellowbend" })
         $yinshanChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.yinshansouth" })
         $yanmenChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.yanmensanggan" })
-        $bingzhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.bingzhou.*" })
+        $bingzhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.bingzhou.*" })
         $bingzhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.bingzhou.*" })
         $bingzhouAdminRows = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.bingzhou" })
         $commanderyAdminRows = @($bingzhouAdminRows | Where-Object { $_.unit_type -ceq "commandery" })
@@ -1680,13 +1691,13 @@ try {
         $actualRegionIds = @($batchRegionRows.stable_region_id | Sort-Object)
         $actualSourceIds = @($batchMappingRows.source_id | Sort-Object)
         $allPopulationSourceIds = @($populationRows.admin_unit_id | Sort-Object)
-        $allMappedSourceIds = @($mappingRows.source_id | Sort-Object)
+        $allMappedSourceIds = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" } | Select-Object -ExpandProperty source_id | Sort-Object)
         $pearlChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.pearlriverdelta" })
         $xijiangChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.xijiangyujiang" })
         $beibuChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.south.china.beibugulfcoast" })
         $redRiverChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southeastasia.redriverdelta" })
         $northCentralVietnamChildRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.southeastasia.northcentralvietnam" })
-        $jiaozhouMappingRows = @($mappingRows | Where-Object { $_.source_id -clike "admin.han140.jiaozhou.*" })
+        $jiaozhouMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" -and $_.source_id -clike "admin.han140.jiaozhou.*" })
         $jiaozhouPopulationRows = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.jiaozhou.*" })
         $jiaozhouAdminRows = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.jiaozhou" })
         $commanderyAdminRows = @($jiaozhouAdminRows | Where-Object { $_.unit_type -ceq "commandery" })
@@ -1800,7 +1811,7 @@ try {
 
         Assert-True -Condition ($catalogSourceRows.Count -eq 1) -Message "P3 project location catalog source is missing or duplicated."
         Assert-True -Condition ($populationRows.Count -eq 105) -Message "P3 must not add county population records."
-        Assert-True -Condition ($mappingRows.Count -eq 105) -Message "P3 must not add or duplicate population mappings."
+        Assert-True -Condition (@($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" }).Count -eq 105) -Message "P3 must retain exactly 105 population mappings."
         Assert-True -Condition ($firstBatchRows.Count -eq 15) -Message "P3 first batch must contain exactly fifteen scoped crosswalk rows."
         Assert-True -Condition ($runtimeRows.Count -eq 6) -Message "All six runtime locations must be mapped."
         Assert-True -Condition ($prototypeRows.Count -eq 6) -Message "The six corresponding prototype catalog locations must be mapped."
@@ -1899,7 +1910,7 @@ try {
         }
 
         Assert-True -Condition (@($sourceDocument.sources).Count -eq 4) -Message "P3 second batch must retain four registered sources."
-        Assert-True -Condition ($populationRows.Count -eq 105 -and $mappingRows.Count -eq 105) -Message "P3 second batch must not alter population record or mapping counts."
+        Assert-True -Condition ($populationRows.Count -eq 105 -and @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" }).Count -eq 105) -Message "P3 second batch must not alter population record or population mapping counts."
         Assert-True -Condition (@($crosswalkRows | Where-Object { $_.game_location_kind -ceq "runtime" }).Count -eq 6) -Message "Runtime crosswalk count must remain six."
         Assert-True -Condition ($prototypeRows.Count -eq 12) -Message "All twelve prototype catalog nodes must be classified."
         Assert-True -Condition ((@($prototypeRows.game_location_id | Sort-Object) -join "|") -ceq (@($expectedAllPrototypeIds | Sort-Object) -join "|")) -Message "Prototype catalog IDs must be exactly L001 through L012."
@@ -1955,7 +1966,7 @@ try {
         $mappingRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_region_mapping.csv"))
         $crosswalkRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "game_location_crosswalk.csv"))
         $expectedBatchIds = @("C001", "C002", "C003", "C004", "C005", "C006", "C007", "C008", "C011", "C013")
-        $expectedAllCityIds = 1..13 | ForEach-Object { "C{0:D3}" -f $_ }
+        $expectedAllCityIds = 1..77 | ForEach-Object { "C{0:D3}" -f $_ }
         $adminParents = @{
             "admin.han140.youzhou.liaodong.xiangping" = "admin.han140.youzhou.liaodong"
             "admin.han140.youzhou.lelang.chaoxian" = "admin.han140.youzhou.lelang"
@@ -1998,18 +2009,19 @@ try {
         }
 
         Assert-True -Condition (@($sourceDocument.sources).Count -eq 4) -Message "P3 third batch must retain four registered sources."
-        Assert-True -Condition ($adminRows.Count -eq 133) -Message "P3 third batch must produce one hundred thirty-three administrative units."
-        Assert-True -Condition ($regionRows.Count -eq 168) -Message "P3 third batch must produce one hundred sixty-eight stable regions."
-        Assert-True -Condition ($populationRows.Count -eq 105 -and $mappingRows.Count -eq 105) -Message "P3 third batch must not alter population record or mapping counts."
-        Assert-True -Condition ($crosswalkRows.Count -eq 31) -Message "P3 third batch must produce thirty-one crosswalk rows."
+        Assert-True -Condition ($adminRows.Count -eq 1301) -Message "M13 completion must produce 1301 administrative units."
+        Assert-True -Condition ($regionRows.Count -eq 1336) -Message "M13 completion must produce 1336 stable regions."
+        Assert-True -Condition ($populationRows.Count -eq 105 -and @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" }).Count -eq 105) -Message "M13 completion must retain 105 population records and population mappings."
+        Assert-True -Condition (@($mappingRows | Where-Object { $_.relation_type -ceq "county_identity" }).Count -eq 1182) -Message "M13 completion must produce 1182 county identity mappings."
+        Assert-True -Condition ($crosswalkRows.Count -eq 95) -Message "M13 completion must produce ninety-five crosswalk rows."
         Assert-True -Condition (@($crosswalkRows | Where-Object { $_.game_location_kind -ceq "runtime" }).Count -eq 6) -Message "Runtime crosswalk count must remain six."
         Assert-True -Condition (@($crosswalkRows | Where-Object { $_.game_location_kind -ceq "prototype_catalog" }).Count -eq 12) -Message "Prototype crosswalk count must remain twelve."
-        Assert-True -Condition ($cityRows.Count -eq 13) -Message "The first thirteen city catalog nodes must be classified."
-        Assert-True -Condition ((@($cityRows.game_location_id | Sort-Object) -join "|") -ceq (@($expectedAllCityIds | Sort-Object) -join "|")) -Message "City catalog IDs must be exactly C001 through C013."
+        Assert-True -Condition ($cityRows.Count -eq 77) -Message "All seventy-seven city catalog nodes must be classified."
+        Assert-True -Condition ((@($cityRows.game_location_id | Sort-Object) -join "|") -ceq (@($expectedAllCityIds | Sort-Object) -join "|")) -Message "City catalog IDs must be exactly C001 through C077."
         Assert-True -Condition ($batchRows.Count -eq 10) -Message "P3 northern city batch must contain exactly ten scoped rows."
-        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "approximate" }).Count -eq 20) -Message "Crosswalk must contain twenty approximate mappings."
-        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "aggregate" }).Count -eq 8) -Message "Crosswalk must contain eight aggregate mappings."
-        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "unresolved" }).Count -eq 3) -Message "Crosswalk must contain three unresolved mappings."
+        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "approximate" }).Count -eq 80) -Message "Crosswalk must contain eighty approximate mappings."
+        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "aggregate" }).Count -eq 11) -Message "Crosswalk must contain eleven aggregate mappings."
+        Assert-True -Condition (@($crosswalkRows | Where-Object { $_.mapping_status -ceq "unresolved" }).Count -eq 4) -Message "Crosswalk must contain four unresolved mappings."
         Assert-True -Condition ($countyAdminRows.Count -eq 8 -and @($countyAdminRows | Where-Object { $_.unit_type -cne "county" }).Count -eq 0) -Message "All eight northern county candidates must exist."
         Assert-True -Condition ($countyRegionRows.Count -eq 8 -and @($countyRegionRows | Where-Object { $_.region_type -cne "county_area" }).Count -eq 0) -Message "All eight northern county stable identities must exist."
         Assert-True -Condition ($countyPopulationRows.Count -eq 0) -Message "Northern county catalog nodes must not become population records."
@@ -2045,17 +2057,67 @@ try {
         }
     }
 
-    Invoke-TestCase -Name "deterministic audit output" -Body {
+    Invoke-TestCase -Name "M13 completion county catalog and M12 input contract" -Body {
+        $adminRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_administrative_units.csv"))
+        $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
+        $regionRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "stable_population_regions.csv"))
+        $mappingRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_region_mapping.csv"))
+        $crosswalkRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "game_location_crosswalk.csv"))
+        $m12 = Get-Content -Raw -Encoding UTF8 -LiteralPath $productionM12Path | ConvertFrom-Json
+        $countyAdminRows = @($adminRows | Where-Object { $_.unit_type -ceq "county" })
+        $countyRegionRows = @($regionRows | Where-Object { $_.region_type -ceq "county_area" })
+        $populationMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "population_coverage" })
+        $countyMappingRows = @($mappingRows | Where-Object { $_.relation_type -ceq "county_identity" })
+        $cityRows = @($crosswalkRows | Where-Object { $_.game_location_kind -ceq "city_catalog" })
+        $expectedCityIds = @(1..77 | ForEach-Object { "C{0:D3}" -f $_ })
+        $adminById = @{}
+        foreach ($row in $adminRows) {
+            $adminById[[string]$row.admin_unit_id] = $row
+        }
+
+        Assert-True -Condition ($countyAdminRows.Count -eq 1182) -Message "M13 county administrative catalog must contain 1182 itemized entries."
+        Assert-True -Condition ($countyRegionRows.Count -eq 1182) -Message "M13 stable county catalog must contain 1182 entries."
+        Assert-True -Condition ($countyMappingRows.Count -eq 1182) -Message "Every county must have exactly one county identity mapping."
+        Assert-True -Condition ($populationMappingRows.Count -eq 105) -Message "M13 must retain exactly 105 population coverage mappings."
+        Assert-True -Condition (@($populationRows | Where-Object { $adminById[[string]$_.admin_unit_id].unit_type -ceq "county" }).Count -eq 0) -Message "County identities must not become independent population records."
+        Assert-True -Condition ($cityRows.Count -eq 77 -and (@($cityRows.game_location_id | Sort-Object) -join "|") -ceq (@($expectedCityIds | Sort-Object) -join "|")) -Message "City catalog coverage must be exactly C001 through C077."
+
+        foreach ($populationRow in $populationRows) {
+            $adminRow = $adminById[[string]$populationRow.admin_unit_id]
+            $seatId = [string]$adminRow.seat_admin_unit_id
+            Assert-True -Condition ($adminById.ContainsKey($seatId)) -Message "Population unit '$($populationRow.admin_unit_id)' has no cataloged county seat."
+            Assert-True -Condition ([string]$adminById[$seatId].parent_admin_unit_id -ceq [string]$populationRow.admin_unit_id) -Message "Seat '$seatId' is not a direct child of '$($populationRow.admin_unit_id)'."
+        }
+
+        Assert-True -Condition ([string]$m12.schema_version -ceq "han140.m12-input.v1") -Message "M12 input schema version is incorrect."
+        Assert-True -Condition ([int]$m12.population_source_count -eq 105 -and [int]$m12.county_catalog_count -eq 1182) -Message "M12 input catalog counts are incorrect."
+        Assert-True -Condition (@($m12.population_units).Count -eq 105) -Message "M12 input must contain 105 population units."
+        foreach ($unit in @($m12.population_units)) {
+            Assert-True -Condition (-not [string]::IsNullOrWhiteSpace([string]$unit.seat_admin_unit_id)) -Message "M12 population unit '$($unit.admin_unit_id)' is missing its county seat."
+            $weightTotal = 0
+            foreach ($mapping in @($unit.mappings)) {
+                $weightTotal += [int]$mapping.weight_basis_points
+            }
+            Assert-True -Condition ($weightTotal -eq 10000) -Message "M12 population unit '$($unit.admin_unit_id)' does not map to exactly 10000 basis points."
+        }
+    }
+
+    Invoke-TestCase -Name "deterministic audit and M12 output" -Body {
         $caseRoot = Join-Path $temporaryRoot "deterministic"
         Copy-InputData -Destination $caseRoot
         $firstAudit = Join-Path $caseRoot "audit_first.json"
         $secondAudit = Join-Path $caseRoot "audit_second.json"
-        $first = Invoke-Validator -CaseRoot $caseRoot -OutputPath $firstAudit
-        $second = Invoke-Validator -CaseRoot $caseRoot -OutputPath $secondAudit
+        $firstM12 = Join-Path $caseRoot "m12_first.json"
+        $secondM12 = Join-Path $caseRoot "m12_second.json"
+        $first = Invoke-Validator -CaseRoot $caseRoot -OutputPath $firstAudit -M12OutputPath $firstM12
+        $second = Invoke-Validator -CaseRoot $caseRoot -OutputPath $secondAudit -M12OutputPath $secondM12
         Assert-True -Condition ($first.ExitCode -eq 0 -and $second.ExitCode -eq 0) -Message "Deterministic audit setup failed."
         $firstHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $firstAudit).Hash
         $secondHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondAudit).Hash
         Assert-True -Condition ($firstHash -ceq $secondHash) -Message "Repeated validation produced different audit files."
+        $firstM12Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $firstM12).Hash
+        $secondM12Hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondM12).Hash
+        Assert-True -Condition ($firstM12Hash -ceq $secondM12Hash) -Message "Repeated validation produced different M12 input files."
     }
 
     Invoke-TestCase -Name "duplicate source ID rejected" -Body {
@@ -2141,6 +2203,18 @@ try {
         $expectedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $productionAuditPath).Hash
         $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $generatedAudit).Hash
         Assert-True -Condition ($expectedHash -ceq $actualHash) -Message "Checked-in audit does not match validator output."
+    }
+
+    Invoke-TestCase -Name "checked-in M12 input is current" -Body {
+        $caseRoot = Join-Path $temporaryRoot "checked-in-m12"
+        Copy-InputData -Destination $caseRoot
+        $generatedAudit = Join-Path $caseRoot "generated_audit.json"
+        $generatedM12 = Join-Path $caseRoot "generated_m12.json"
+        $result = Invoke-Validator -CaseRoot $caseRoot -OutputPath $generatedAudit -M12OutputPath $generatedM12
+        Assert-True -Condition ($result.ExitCode -eq 0) -Message "Could not regenerate production M12 input."
+        $expectedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $productionM12Path).Hash
+        $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $generatedM12).Hash
+        Assert-True -Condition ($expectedHash -ceq $actualHash) -Message "Checked-in M12 input does not match validator output."
     }
 }
 finally {
