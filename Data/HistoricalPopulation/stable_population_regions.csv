@@ -81,3 +81,13 @@ geo.region.south.china.dongtingxiangziyuanli.northeastplain,geo.region.south.chi
 geo.region.south.china.nanlingnorth,,macroregion,南岭北麓与湘水上游宏区,今湖南中南部、南岭北麓及湘水上游邻接一带,,,provisional,low,true,P2第十批父级索引；表达湘水上游盆地和南岭北麓连续地理，不等同于零陵郡或桂阳郡行政边界
 geo.region.south.china.nanlingnorth.southwestbasin,geo.region.south.china.nanlingnorth,commandery_area,湘水上游与零陵盆地地理区,今湖南永州、邵阳南部及湘水上游邻接一带,,,provisional,low,true,承接140年零陵郡人口的临时稳定地理桶；泉陵等县级节点与湘水上游权重留至P3
 geo.region.south.china.nanlingnorth.southeastfoothill,geo.region.south.china.nanlingnorth,commandery_area,南岭北麓与湘东南地理区,今湖南郴州、衡阳南部及南岭北麓邻接一带,,,provisional,low,true,承接140年桂阳郡人口的临时稳定地理桶；郴县等县级节点与岭南通道关系留至P3
+geo.region.east.china.huainanyangtzenorth,,macroregion,淮南与长江北岸宏区,今安徽淮河以南、长江以北及大别山东南麓邻接一带,,,provisional,low,true,P2第十一批父级索引；表达淮南平原、巢湖水系与长江北岸联系，不等同于扬州或九江郡行政边界
+geo.region.east.china.huainanyangtzenorth.northcentralplain,geo.region.east.china.huainanyangtzenorth,commandery_area,淮河以南与巢湖以北平原地理区,今安徽淮南、寿县、合肥北部及巢湖以北邻接一带,,,provisional,medium,true,承接140年九江郡人口的临时稳定地理桶；寿春、合肥等县城与游戏节点不单独承接全郡人口
+geo.region.east.china.huainanyangtzenorth.southwestfoothillriver,geo.region.east.china.huainanyangtzenorth,commandery_area,大别山东南麓与皖江西部地理区,今安徽六安南部、安庆、巢湖西南及长江北岸邻接一带,,,provisional,low,true,承接140年庐江郡人口的临时稳定地理桶；皖县、舒县与江淮古水道分配留至P3
+geo.region.east.china.loweryangtzetaihu,,macroregion,长江下游与太湖水网宏区,今安徽沿江东部、江苏南部、上海、浙江北部及太湖流域邻接一带,,,provisional,low,true,P2第十一批父级索引；表达长江下游、皖南丘陵与太湖水网联系，不使用丹阳郡或吴郡行政名称作为稳定身份
+geo.region.east.china.loweryangtzetaihu.westernriverhills,geo.region.east.china.loweryangtzetaihu,commandery_area,皖南丘陵与长江下游西段地理区,今安徽宣城、芜湖、池州东部、南京及长江下游西段邻接一带,,,provisional,low,true,承接140年丹阳郡人口的临时稳定地理桶；宛陵、秣陵等县级节点与皖南山地边界留至P3
+geo.region.east.china.loweryangtzetaihu.easterntaihuplain,geo.region.east.china.loweryangtzetaihu,commandery_area,太湖平原与长江下游东段地理区,今江苏苏南、上海、浙江湖州嘉兴及太湖水网邻接一带,,,provisional,medium,true,承接140年吴郡人口的临时稳定地理桶；吴县及C057游戏城市节点不单独承接全郡人口
+geo.region.southeast.china.qiantangzhejianghills,,macroregion,钱塘江与浙东丘陵宏区,今浙江钱塘江南岸、浙东沿海丘陵及邻接河谷一带,,,provisional,low,true,P2第十一批父级索引；表达钱塘江南岸与浙东河谷丘陵联系，不等同于会稽郡行政边界或现代浙江省界
+geo.region.southeast.china.qiantangzhejianghills.eastcoastalriverhills,geo.region.southeast.china.qiantangzhejianghills,commandery_area,钱塘江南岸与浙东沿海丘陵地理区,今浙江绍兴、宁波、台州及钱塘江南岸邻接一带,,,provisional,low,true,承接140年会稽郡人口的临时稳定地理桶；山阴、会稽及东南沿海县邑分配留至P3
+geo.region.southeast.china.ganpoyang,,macroregion,赣江与鄱阳湖盆地宏区,今江西赣江流域、鄱阳湖盆地及周缘丘陵邻接一带,,,provisional,low,true,P2第十一批父级索引；表达赣江水系与鄱阳湖盆地联系，不使用豫章郡行政名称作为稳定身份
+geo.region.southeast.china.ganpoyang.centralriverlakebasin,geo.region.southeast.china.ganpoyang,commandery_area,赣江中下游与鄱阳湖盆地地理区,今江西南昌、九江南部、吉安北部及赣江鄱阳湖水系邻接一带,,,provisional,medium,true,承接140年豫章郡人口的临时稳定地理桶；南昌、柴桑、鄱阳等城市和县级节点分配留至P3
