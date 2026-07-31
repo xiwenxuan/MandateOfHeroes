@@ -100,3 +100,13 @@ admin.han140.liangzhou.jiuquan,admin.han140.liangzhou,commandery,酒泉郡,酒�
 admin.han140.liangzhou.dunhuang,admin.han140.liangzhou,commandery,敦煌郡,敦煌郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户数疑脱千位，原值与现代校录补正分存
 admin.han140.liangzhou.zhangyeshuguo,admin.han140.liangzhou,other,張掖屬國,张掖属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领五城
 admin.han140.liangzhou.zhangyejuyanshuguo,admin.han140.liangzhou,other,張掖居延屬國,张掖居延属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领一城
+admin.han140.bingzhou,admin.han140.han,province,并州刺史部,并州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.bingzhou.shangdang,admin.han140.bingzhou,commandery,上黨郡,上党郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.taiyuan,admin.han140.bingzhou,commandery,太原郡,太原郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.shang,admin.han140.bingzhou,commandery,上郡,上郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.xihe,admin.han140.bingzhou,commandery,西河郡,西河郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.wuyuan,admin.han140.bingzhou,commandery,五原郡,五原郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.yunzhong,admin.han140.bingzhou,commandery,雲中郡,云中郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.dingxiang,admin.han140.bingzhou,commandery,定襄郡,定襄郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.yanmen,admin.han140.bingzhou,commandery,鴈門郡,雁门郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.bingzhou.shuofang,admin.han140.bingzhou,commandery,朔方郡,朔方郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
