@@ -32,3 +32,11 @@ admin.han140.yuzhou.liang,83300,431283,,,,,H,source.hou_han_shu.jun_guo_zhi|sour
 admin.han140.yuzhou.pei,200495,251393,,1251393,suspected_transposed_million_digit,沛国原文口数过低而相邻陈国过高；现代校录认为陈国人口首位一百万误置并移回沛国,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·沛国；现代校录补正①,han140.p1.batch5.v1
 admin.han140.yuzhou.chen,112653,1547572,,547572,suspected_transposed_million_digit,陈国原文口数过高而相邻沛国过低；现代校录将误置的一百万移回沛国,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·陈国；现代校录补正①,han140.p1.batch5.v1
 admin.han140.yuzhou.lu,78447,411590,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·鲁国；维基文库卷030,han140.p1.batch5.v1
+admin.han140.yanzhou.chenliu,177529,869433,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·陈留郡；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.dong,136088,603393,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·东郡；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.dongping,79012,448270,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·东平国；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.rencheng,36442,194156,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·任城国；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.taishan,8929,437317,108929,,suspected_missing_leading_digit,原文户数与人口比异常；现代校录认为户数脱漏十万位并补为108929户,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·泰山郡；现代校录补正②,han140.p1.batch6.v1
+admin.han140.yanzhou.jibei,45689,235897,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·济北国；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.shanyang,109898,606091,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·山阳郡；维基文库卷031,han140.p1.batch6.v1
+admin.han140.yanzhou.jiyin,133715,657554,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·济阴郡；维基文库卷031,han140.p1.batch6.v1
