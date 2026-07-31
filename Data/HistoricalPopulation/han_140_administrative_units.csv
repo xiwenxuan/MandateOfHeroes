@@ -110,3 +110,11 @@ admin.han140.bingzhou.yunzhong,admin.han140.bingzhou,commandery,雲中郡,云中
 admin.han140.bingzhou.dingxiang,admin.han140.bingzhou,commandery,定襄郡,定襄郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
 admin.han140.bingzhou.yanmen,admin.han140.bingzhou,commandery,鴈門郡,雁门郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
 admin.han140.bingzhou.shuofang,admin.han140.bingzhou,commandery,朔方郡,朔方郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jiaozhou,admin.han140.han,province,交州刺史部,交州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.jiaozhou.nanhai,admin.han140.jiaozhou,commandery,南海郡,南海郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jiaozhou.cangwu,admin.han140.jiaozhou,commandery,蒼梧郡,苍梧郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jiaozhou.yulin,admin.han140.jiaozhou,commandery,鬱林郡,郁林郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户口均缺失
+admin.han140.jiaozhou.hepu,admin.han140.jiaozhou,commandery,合浦郡,合浦郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jiaozhou.jiaozhi,admin.han140.jiaozhou,commandery,交趾郡,交趾郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户口均缺失
+admin.han140.jiaozhou.jiuzhen,admin.han140.jiaozhou,commandery,九真郡,九真郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jiaozhou.rinan,admin.han140.jiaozhou,commandery,日南郡,日南郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五

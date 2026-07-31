@@ -97,3 +97,10 @@ admin.han140.bingzhou.yunzhong,5351,26430,,,,,H,source.hou_han_shu.jun_guo_zhi|s
 admin.han140.bingzhou.dingxiang,3153,13571,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·定襄郡；维基文库卷033,han140.p1.batch13.v1
 admin.han140.bingzhou.yanmen,31862,249000,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·雁门郡；维基文库卷033,han140.p1.batch13.v1
 admin.han140.bingzhou.shuofang,1987,7843,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·朔方郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.jiaozhou.nanhai,71477,250282,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·南海郡；维基文库卷033,han140.p1.batch14.v1
+admin.han140.jiaozhou.cangwu,111395,466975,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·苍梧郡；维基文库卷033,han140.p1.batch14.v1
+admin.han140.jiaozhou.yulin,,,12415,71162,source_omission_regional_estimate,原文户口均缺失；现代校录按南海、苍梧、合浦的前后汉增长率作用于前汉郁林数据估算,M,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·郁林郡；现代校录补正⑨,han140.p1.batch14.v1
+admin.han140.jiaozhou.hepu,23121,86617,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·合浦郡；维基文库卷033,han140.p1.batch14.v1
+admin.han140.jiaozhou.jiaozhi,,,129416,880560,source_omission_regional_estimate,原文户口均缺失；现代校录按合浦、九真的前后汉增长率作用于前汉交趾数据估算,M,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·交趾郡；现代校录补正⑩,han140.p1.batch14.v1
+admin.han140.jiaozhou.jiuzhen,46513,209894,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·九真郡；维基文库卷033,han140.p1.batch14.v1
+admin.han140.jiaozhou.rinan,18263,100676,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·日南郡；维基文库卷033,han140.p1.batch14.v1
