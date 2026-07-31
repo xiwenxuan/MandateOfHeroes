@@ -74,3 +74,16 @@ admin.han140.yangzhou.lujiang,admin.han140.yangzhou,commandery,廬江郡,庐江�
 admin.han140.yangzhou.kuaiji,admin.han140.yangzhou,commandery,㑹稽郡,会稽郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
 admin.han140.yangzhou.wu,admin.han140.yangzhou,commandery,吳郡,吴郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
 admin.han140.yangzhou.yuzhang,admin.han140.yangzhou,commandery,豫章郡,豫章郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.yizhou,admin.han140.han,province,益州刺史部,益州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.yizhou.hanzhong,admin.han140.yizhou,commandery,漢中郡,汉中郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.ba,admin.han140.yizhou,commandery,巴郡,巴郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.guanghan,admin.han140.yizhou,commandery,廣漢郡,广汉郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.shu,admin.han140.yizhou,commandery,蜀郡,蜀郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.jianwei,admin.han140.yizhou,commandery,犍為郡,犍为郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.zangke,admin.han140.yizhou,commandery,牂牁郡,牂牁郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.yuexi,admin.han140.yizhou,commandery,越嶲郡,越巂郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.yizhou,admin.han140.yizhou,commandery,益州郡,益州郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.yizhou.yongchang,admin.han140.yizhou,commandery,永昌郡,永昌郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户均人口异常但无可采用修正
+admin.han140.yizhou.guanghanshuguo,admin.han140.yizhou,other,廣漢屬國,广汉属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领三城；旧注作属蜀郡，校勘据辖县改属广汉郡
+admin.han140.yizhou.shushuguo,admin.han140.yizhou,other,蜀郡屬國,蜀郡属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领四城
+admin.han140.yizhou.jianweishuguo,admin.han140.yizhou,other,犍為屬國,犍为属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领二城
