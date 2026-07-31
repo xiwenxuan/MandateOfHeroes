@@ -26,3 +26,9 @@ admin.han140.sili.hedong,geo.region.north.china.southfenheyellowriver.centralbas
 admin.han140.sili.jingzhao,geo.region.northwest.china.guanzhong.centralweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,京兆尹人口暂归渭河中部平原桶；长安城不单独承接全部京畿人口
 admin.han140.sili.zuopingyi,geo.region.northwest.china.guanzhong.easternweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,左冯翊人口暂归渭河东部平原桶；三辅县级边界留待P3
 admin.han140.sili.youfufeng,geo.region.northwest.china.guanzhong.westernweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,右扶风人口暂归渭河西部平原桶；陈仓与陇右通道留待P3
+admin.han140.yuzhou.yingchuan,geo.region.central.china.yingruhuai.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,颍川郡人口暂归颍水上游与许昌平原桶；许县与许昌游戏节点留至P3交叉
+admin.han140.yuzhou.runan,geo.region.central.china.yingruhuai.southplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,汝南郡人口暂归汝水下游与淮河北岸平原桶；平舆治所不单独承接整郡人口
+admin.han140.yuzhou.liang,geo.region.central.china.suihuainorth.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,梁国人口暂归睢水上中游平原桶；睢阳等县邑分配留至P3
+admin.han140.yuzhou.pei,geo.region.central.china.suihuainorth.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,沛国有效人口暂归淮北北部与泗水西岸平原桶；原始251393口与修正1251393口继续分别保存
+admin.han140.yuzhou.chen,geo.region.central.china.yingruhuai.centralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,陈国有效人口暂归颍水中下游平原桶；原始1547572口与修正547572口继续分别保存
+admin.han140.yuzhou.lu,geo.region.east.china.siyifoothill.westernplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,鲁国人口暂归泗水上游西部山前平原桶；鲁县与游戏城市目录交叉留至P3
