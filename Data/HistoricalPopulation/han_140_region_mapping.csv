@@ -51,3 +51,10 @@ admin.han140.qingzhou.lean,geo.region.east.china.loweryellowjieastplain.northeas
 admin.han140.qingzhou.qi,geo.region.east.china.ziweijiaolaiplain.westernfoothillplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,齐国人口暂归淄水中游与鲁山北麓桶；临淄等县级节点与游戏城市目录交叉留至P3
 admin.han140.qingzhou.beihai,geo.region.east.china.ziweijiaolaiplain.easternplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,北海国人口暂归潍水流域与胶莱西部平原桶；剧县与C014北海节点不单独承接整国人口
 admin.han140.qingzhou.donglai,geo.region.east.china.jiaodongpeninsula.northcoastalhills,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,东莱郡人口暂归胶莱东部与胶东北岸丘陵桶；掖县及半岛沿海县邑分配留至P3
+admin.han140.jingzhou.nanyang,geo.region.central.china.hanjianguppermiddle.northeastbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,南阳郡人口暂归南阳盆地与汉水上游桶；宛县及游戏城市节点不单独承接全郡人口
+admin.han140.jingzhou.nan,geo.region.central.china.jianghanplain.westernplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,南郡人口暂归江汉平原西部与长江中游桶；江陵、襄阳等县级节点与古水道分配留至P3
+admin.han140.jingzhou.jiangxia,geo.region.central.china.jianghanplain.easternriverlake,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,江夏郡人口暂归江汉平原东部与江湖交汇桶；西陵、沙羡等县级节点分配留至P3
+admin.han140.jingzhou.wuling,geo.region.south.china.dongtingxiangziyuanli.northwestbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,武陵郡人口暂归沅澧流域与洞庭湖西部桶；临沅等县级节点与水道权重留至P3
+admin.han140.jingzhou.changsha,geo.region.south.china.dongtingxiangziyuanli.northeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,长沙郡人口暂归湘水下游与洞庭湖南部平原桶；临湘及游戏城市节点不单独承接全郡人口
+admin.han140.jingzhou.lingling,geo.region.south.china.nanlingnorth.southwestbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,零陵郡人口暂归湘水上游与零陵盆地桶；泉陵等县级节点与河谷权重留至P3
+admin.han140.jingzhou.guiyang,geo.region.south.china.nanlingnorth.southeastfoothill,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,桂阳郡人口暂归南岭北麓与湘东南桶；郴县等县级节点与岭南通道关系留至P3

@@ -70,3 +70,14 @@ geo.region.east.china.ziweijiaolaiplain.westernfoothillplain,geo.region.east.chi
 geo.region.east.china.ziweijiaolaiplain.easternplain,geo.region.east.china.ziweijiaolaiplain,commandery_area,潍水流域与胶莱西部平原地理区,今山东潍坊、昌乐、寿光及胶莱平原西部邻接一带,,,provisional,medium,true,承接140年北海国人口的临时稳定地理桶；剧县与C014北海节点不单独承接整国人口
 geo.region.east.china.jiaodongpeninsula,,macroregion,胶东半岛与北部海岸宏区,今山东胶莱河以东、烟台、威海及半岛沿海一带,,,provisional,low,true,P2第九批父级索引；表达胶东半岛及北部海岸连续地理，不等同于东莱郡行政边界
 geo.region.east.china.jiaodongpeninsula.northcoastalhills,geo.region.east.china.jiaodongpeninsula,commandery_area,胶莱东部与胶东北岸丘陵地理区,今山东莱州、烟台、威海及胶东半岛北部邻接一带,,,provisional,low,true,承接140年东莱郡人口的临时稳定地理桶；掖县、黄县与沿海县邑分配留至P3
+geo.region.central.china.hanjianguppermiddle,,macroregion,汉水中上游与南阳盆地宏区,今河南西南部南阳盆地、湖北西北部及汉水中上游邻接一带,,,provisional,low,true,P2第十批父级索引；表达南阳盆地与汉水中上游的物理联系，不等同于荆州或南阳郡行政边界
+geo.region.central.china.hanjianguppermiddle.northeastbasin,geo.region.central.china.hanjianguppermiddle,commandery_area,南阳盆地与汉水上游地理区,今河南南阳盆地、湖北襄阳北部及汉水上游邻接一带,,,provisional,medium,true,承接140年南阳郡人口的临时稳定地理桶；宛县及南阳游戏城市节点不单独承接全郡人口
+geo.region.central.china.jianghanplain,,macroregion,汉水下游与江汉平原宏区,今湖北中南部江汉平原、长江中游与汉水下游邻接一带,,,provisional,low,true,P2第十批父级索引；表达汉水下游、长江中游和江汉平原联系，不等同于南郡或江夏郡行政边界
+geo.region.central.china.jianghanplain.westernplain,geo.region.central.china.jianghanplain,commandery_area,江汉平原西部与长江中游地理区,今湖北荆州、宜昌东部、襄阳南部及江汉平原西缘邻接一带,,,provisional,medium,true,承接140年南郡人口的临时稳定地理桶；江陵、襄阳等县城与长江古水道分配留至P3
+geo.region.central.china.jianghanplain.easternriverlake,geo.region.central.china.jianghanplain,commandery_area,江汉平原东部与江湖交汇地理区,今湖北武汉、孝感、黄冈西部及江汉平原东缘邻接一带,,,provisional,medium,true,承接140年江夏郡人口的临时稳定地理桶；西陵、沙羡等县级节点与湖泽边界留至P3
+geo.region.south.china.dongtingxiangziyuanli,,macroregion,洞庭湖与湘资沅澧水系宏区,今湖南北部洞庭湖盆地及湘水、资水、沅水、澧水流域邻接一带,,,provisional,low,true,P2第十批父级索引；表达洞庭盆地与四水水系联系，不使用武陵郡或长沙郡行政名称作为稳定身份
+geo.region.south.china.dongtingxiangziyuanli.northwestbasin,geo.region.south.china.dongtingxiangziyuanli,commandery_area,沅澧流域与洞庭湖西部地理区,今湖南常德、张家界、湘西及洞庭湖西部邻接一带,,,provisional,low,true,承接140年武陵郡人口的临时稳定地理桶；临沅等县级节点与沅澧水道分配留至P3
+geo.region.south.china.dongtingxiangziyuanli.northeastplain,geo.region.south.china.dongtingxiangziyuanli,commandery_area,湘水下游与洞庭湖南部平原地理区,今湖南长沙、岳阳南部、益阳东部及湘水下游邻接一带,,,provisional,medium,true,承接140年长沙郡人口的临时稳定地理桶；临湘及长沙游戏城市节点不单独承接全郡人口
+geo.region.south.china.nanlingnorth,,macroregion,南岭北麓与湘水上游宏区,今湖南中南部、南岭北麓及湘水上游邻接一带,,,provisional,low,true,P2第十批父级索引；表达湘水上游盆地和南岭北麓连续地理，不等同于零陵郡或桂阳郡行政边界
+geo.region.south.china.nanlingnorth.southwestbasin,geo.region.south.china.nanlingnorth,commandery_area,湘水上游与零陵盆地地理区,今湖南永州、邵阳南部及湘水上游邻接一带,,,provisional,low,true,承接140年零陵郡人口的临时稳定地理桶；泉陵等县级节点与湘水上游权重留至P3
+geo.region.south.china.nanlingnorth.southeastfoothill,geo.region.south.china.nanlingnorth,commandery_area,南岭北麓与湘东南地理区,今湖南郴州、衡阳南部及南岭北麓邻接一带,,,provisional,low,true,承接140年桂阳郡人口的临时稳定地理桶；郴县等县级节点与岭南通道关系留至P3
