@@ -23,3 +23,13 @@ geo.region.northeast.asia.liaodongkoreanorth.liaoheriverplain,geo.region.northea
 geo.region.northeast.asia.liaodongkoreanorth.easternmountainfrontier,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,辽东东部山地边缘地理区,今辽宁东部及吉林南部邻接一带,,,provisional,low,true,承接140年玄菟郡人口的临时稳定地理桶；郡治迁徙与辖境变化留待分期映射
 geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,朝鲜半岛西北部平原地理区,今朝鲜半岛西北部及邻接河谷一带,,,provisional,low,true,承接140年乐浪郡人口的临时稳定地理桶；不以现代国界裁切东汉人口事实
 geo.region.northeast.asia.liaodongkoreanorth.westernfrontier,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,辽东西部边缘地理区,今辽宁西部至辽河下游过渡地带,,,provisional,low,true,承接140年辽东属国有效人口估算的临时稳定地理桶；六城位置与原文户口缺项均保留争议
+geo.region.central.china.heluo,,macroregion,河洛与黄河北岸宏区,今河南洛阳、三门峡东部及黄河北岸焦作一带,,,provisional,low,true,P2第五批父级索引；表达洛阳盆地、河内平原与弘农通道的物理联系，不等同于司隶行政边界
+geo.region.central.china.heluo.luoyangbasin,geo.region.central.china.heluo,commandery_area,洛阳盆地地理区,今河南洛阳盆地及邻接伊洛河谷一带,,,provisional,medium,true,承接140年河南尹人口的临时稳定地理桶；雒阳城与京畿县级分配留至P3
+geo.region.central.china.heluo.northyellowriverplain,geo.region.central.china.heluo,commandery_area,黄河北岸河内平原地理区,今河南焦作、新乡西部及山西东南邻接一带,,,provisional,medium,true,承接140年河内郡人口的临时稳定地理桶；怀县只作为后续县级和游戏节点线索
+geo.region.central.china.heluo.westyellowrivercorridor,geo.region.central.china.heluo,commandery_area,河洛西部黄河走廊地理区,今河南三门峡、灵宝及陕西潼关东部邻接一带,,,provisional,low,true,承接140年弘农郡人口的临时稳定地理桶；函谷关、弘农县与郡界留待P3考证
+geo.region.north.china.southfenheyellowriver,,macroregion,汾河南段与黄河东岸宏区,今山西临汾、运城及黄河东岸一带,,,provisional,low,true,P2第五批父级索引；表达河东盆地与盐运交通区域，不使用140年行政名称作为稳定身份
+geo.region.north.china.southfenheyellowriver.centralbasin,geo.region.north.china.southfenheyellowriver,commandery_area,汾河南段与运城盆地地理区,今山西临汾南部、运城盆地及黄河东岸一带,,,provisional,medium,true,承接140年河东郡人口的临时稳定地理桶；安邑及盐池关系留待县级和资源系统交叉
+geo.region.northwest.china.guanzhong,,macroregion,关中渭河平原宏区,今陕西关中盆地及渭河平原一带,,,provisional,low,true,P2第五批父级索引；关中作为物理区域索引，不替代京兆与三辅行政身份
+geo.region.northwest.china.guanzhong.centralweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河中部平原地理区,今陕西西安、咸阳中部及渭河平原一带,,,provisional,medium,true,承接140年京兆尹人口的临时稳定地理桶；长安城与京畿县级分配留至P3
+geo.region.northwest.china.guanzhong.easternweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河东部平原地理区,今陕西渭南及关中东部一带,,,provisional,low,true,承接140年左冯翊人口的临时稳定地理桶；与现代地市边界无关
+geo.region.northwest.china.guanzhong.westernweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河西部平原地理区,今陕西宝鸡、咸阳西部及关中西部一带,,,provisional,low,true,承接140年右扶风人口的临时稳定地理桶；陈仓与陇右通道留待县级交叉
