@@ -124,3 +124,11 @@ admin.han140.jizhou.julu.guangzong,admin.han140.jizhou.julu,county,廣宗,广宗
 admin.han140.jizhou.wei.ye,admin.han140.jizhou.wei,county,鄴,邺县,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二魏郡十五城之一；本批不声明精确古城坐标
 admin.han140.youzhou.guangyang.ji,admin.han140.youzhou.guangyang,county,薊,蓟县,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五广阳郡五城之一且原文注明刺史治；本批不声明精确古城范围
 admin.han140.jizhou.julu.yingtao,admin.han140.jizhou.julu,county,廮陶,瘿陶,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二钜鹿郡十五城之一；L009郡治代理与L010县级身份分别保存
+admin.han140.youzhou.liaodong.xiangping,admin.han140.youzhou.liaodong,county,襄平,襄平,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五辽东郡十一城之一；C001目录身份不承接整郡人口
+admin.han140.youzhou.lelang.chaoxian,admin.han140.youzhou.lelang,county,朝鮮,朝鲜,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五乐浪郡十八城之一；C002目录身份不承接整郡人口
+admin.han140.youzhou.youbeiping.tuyin,admin.han140.youzhou.youbeiping,county,土垠,土垠,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五右北平郡四城之一；C003北平显示名与土垠县级身份分别保存
+admin.han140.bingzhou.taiyuan.jinyang,admin.han140.bingzhou.taiyuan,county,晉陽,晋阳,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五太原郡十六城之一并注明刺史治；C005不承接整郡人口
+admin.han140.bingzhou.shangdang.huguan,admin.han140.bingzhou.shangdang,county,壺關,壶关,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五上党郡十三城之一；C006上党显示名按壶关区域近似映射
+admin.han140.jizhou.bohai.nanpi,admin.han140.jizhou.bohai,county,南皮,南皮,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二勃海郡八城之一；C007目录身份不承接整郡人口
+admin.han140.qingzhou.pingyuan.pingyuan,admin.han140.qingzhou.pingyuan,county,平原,平原,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四平原郡九城之一；C008目录身份不承接整郡人口
+admin.han140.jizhou.qinghe.ganling,admin.han140.jizhou.qinghe,county,甘陵,甘陵,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二清河国七城之一；郡国后改名与140年县级身份分别保存
