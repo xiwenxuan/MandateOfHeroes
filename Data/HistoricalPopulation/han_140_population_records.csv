@@ -88,3 +88,12 @@ admin.han140.liangzhou.jiuquan,12706,,,46631,source_omission_regional_estimate,�
 admin.han140.liangzhou.dunhuang,748,29170,7748,,suspected_missing_leading_digit,原文户数仅748且户口比异常；现代校录“7748脱首位”说明及公开修正总计共同支持补为7748户,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·敦煌郡；现代校录补正⑤,han140.p1.batch12.v1
 admin.han140.liangzhou.zhangyeshuguo,4656,16952,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·张掖属国；维基文库卷033,han140.p1.batch12.v1
 admin.han140.liangzhou.zhangyejuyanshuguo,1560,4733,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·张掖居延属国；维基文库卷033,han140.p1.batch12.v1
+admin.han140.bingzhou.shangdang,26222,127403,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·上党郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.taiyuan,30902,200124,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·太原郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.shang,5169,28599,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·上郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.xihe,5698,20838,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·西河郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.wuyuan,4667,22957,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·五原郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.yunzhong,5351,26430,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·云中郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.dingxiang,3153,13571,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·定襄郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.yanmen,31862,249000,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·雁门郡；维基文库卷033,han140.p1.batch13.v1
+admin.han140.bingzhou.shuofang,1987,7843,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·朔方郡；维基文库卷033,han140.p1.batch13.v1
