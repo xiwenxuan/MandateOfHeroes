@@ -109,14 +109,39 @@ try {
     Assert-True -Condition (Test-Path -LiteralPath $productionDataPath -PathType Container) -Message "Production data directory is missing."
     [void](New-Item -ItemType Directory -Path $temporaryRoot -Force)
 
-    Invoke-TestCase -Name "valid P0 templates" -Body {
+    Invoke-TestCase -Name "valid production dataset" -Body {
         $caseRoot = Join-Path $temporaryRoot "valid"
         Copy-InputData -Destination $caseRoot
         $firstAudit = Join-Path $caseRoot "audit_first.json"
         $result = Invoke-Validator -CaseRoot $caseRoot -OutputPath $firstAudit
-        Assert-True -Condition ($result.ExitCode -eq 0) -Message "Valid templates failed: $($result.Output)"
-        Assert-True -Condition (Test-Path -LiteralPath $firstAudit -PathType Leaf) -Message "Valid templates did not create an audit report."
-        Assert-True -Condition ($result.Output -match "han140-validation=passed") -Message "Valid templates did not emit a passing RESULT summary."
+        Assert-True -Condition ($result.ExitCode -eq 0) -Message "Valid dataset failed: $($result.Output)"
+        Assert-True -Condition (Test-Path -LiteralPath $firstAudit -PathType Leaf) -Message "Valid dataset did not create an audit report."
+        Assert-True -Condition ($result.Output -match "han140-validation=passed") -Message "Valid dataset did not emit a passing RESULT summary."
+    }
+
+    Invoke-TestCase -Name "first batch facts and audit totals" -Body {
+        $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
+        $audit = Get-Content -Raw -Encoding UTF8 -LiteralPath $productionAuditPath | ConvertFrom-Json
+        $expectedIds = @(
+            "admin.han140.jizhou.anping",
+            "admin.han140.jizhou.julu",
+            "admin.han140.jizhou.wei",
+            "admin.han140.jizhou.zhongshan",
+            "admin.han140.youzhou.guangyang",
+            "admin.han140.youzhou.zhuo"
+        )
+        $actualIds = @($populationRows.admin_unit_id | Sort-Object)
+
+        Assert-True -Condition (($actualIds -join "|") -ceq ($expectedIds -join "|")) -Message "Production population IDs do not match the first batch."
+        Assert-True -Condition (@($populationRows | Where-Object { $_.model_version -cne "han140.p1.batch1.v1" }).Count -eq 0) -Message "First-batch model versions are inconsistent."
+        Assert-True -Condition ([int]$audit.row_counts.sources -eq 3) -Message "Audit source count is not 3."
+        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 9) -Message "Audit administrative unit count is not 9."
+        Assert-True -Condition ([int]$audit.row_counts.population_records -eq 6) -Message "Audit population record count is not 6."
+        Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 574447) -Message "First-batch household total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 3525369) -Message "First-batch population total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.household_difference_from_anchor -eq -9124183) -Message "Household anchor difference is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.population_difference_from_anchor -eq -45624851) -Message "Population anchor difference is incorrect."
+        Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 0) -Message "First batch unexpectedly contains corrections."
     }
 
     Invoke-TestCase -Name "deterministic audit output" -Body {
@@ -167,9 +192,19 @@ try {
             $populationPath = Join-Path $caseRoot "han_140_population_records.csv"
             [System.IO.File]::AppendAllText(
                 $populationPath,
-                "admin.han140.invalid,1,-1,,,fixture,negative population,H,source.hou_han_shu.jun_guo_zhi,test locator,han140.p0.v1" + [Environment]::NewLine,
+                "admin.han140.invalid,1,-1,,,fixture,negative population,H,source.hou_han_shu.jun_guo_zhi,test locator,han140.p1.batch1.v1" + [Environment]::NewLine,
                 $utf8NoBom
             )
+        }
+    }
+
+    Invoke-TestCase -Name "invalid model version rejected" -Body {
+        Assert-Rejected -Name "invalid-model-version" -Mutate {
+            param($caseRoot)
+            $path = Join-Path $caseRoot "han_140_population_records.csv"
+            $text = [System.IO.File]::ReadAllText($path)
+            $text = $text.Replace("han140.p1.batch1.v1", "invalid-model-version")
+            [System.IO.File]::WriteAllText($path, $text, $utf8NoBom)
         }
     }
 

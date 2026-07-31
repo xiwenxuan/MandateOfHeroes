@@ -682,8 +682,11 @@ foreach ($row in $populationTable.Rows) {
     Test-References -Ids (Get-IdList -Value $row.source_ids) -KnownIds $sourceIds `
         -Label "population '$id'.source_ids" -RequireAtLeastOne
     Test-RequiredText -Value $row.source_locator -Label "population '$id'.source_locator" | Out-Null
-    if ([string]$row.model_version -cne "han140.p0.v1") {
-        Add-ValidationError "Population '$id'.model_version must be 'han140.p0.v1'."
+    $modelVersion = [string]$row.model_version
+    if (Test-RequiredText -Value $modelVersion -Label "population '$id'.model_version") {
+        if ($modelVersion -cnotmatch "^han140\.p[0-9]+(?:\.[a-z0-9][a-z0-9_-]*)*\.v[1-9][0-9]*$") {
+            Add-ValidationError "Population '$id'.model_version has invalid format '$modelVersion'."
+        }
     }
 }
 

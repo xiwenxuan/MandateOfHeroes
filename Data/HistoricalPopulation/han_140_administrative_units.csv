@@ -1,1 +1,10 @@
 admin_unit_id,parent_admin_unit_id,unit_type,name_140,canonical_name,seat_admin_unit_id,valid_from_year,valid_to_year,source_ids,confidence,notes
+admin.han140.han,,empire,漢,汉,,140,140,source.hou_han_shu.jun_guo_zhi,high,140年行政截面根节点
+admin.han140.youzhou,admin.han140.han,province,幽州刺史部,幽州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.youzhou.zhuo,admin.han140.youzhou,commandery,涿郡,涿郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.youzhou.guangyang,admin.han140.youzhou,commandery,廣陽郡,广阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.jizhou,admin.han140.han,province,冀州刺史部,冀州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.jizhou.wei,admin.han140.jizhou,commandery,魏郡,魏郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.jizhou.julu,admin.han140.jizhou,commandery,鉅鹿郡,钜鹿郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.jizhou.zhongshan,admin.han140.jizhou,kingdom,中山國,中山国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.jizhou.anping,admin.han140.jizhou,kingdom,安平國,安平国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二

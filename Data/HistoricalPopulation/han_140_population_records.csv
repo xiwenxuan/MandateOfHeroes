@@ -1,1 +1,7 @@
 admin_unit_id,registered_households_raw,registered_population_raw,registered_households_corrected,registered_population_corrected,correction_code,correction_note,evidence_grade,source_ids,source_locator,model_version
+admin.han140.youzhou.zhuo,102218,633754,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·涿郡；维基文库卷033,han140.p1.batch1.v1
+admin.han140.youzhou.guangyang,44550,280600,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·广阳郡；维基文库卷033,han140.p1.batch1.v1
+admin.han140.jizhou.wei,129310,695606,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·魏郡；维基文库卷030,han140.p1.batch1.v1
+admin.han140.jizhou.julu,109517,602096,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·钜鹿郡；维基文库卷030,han140.p1.batch1.v1
+admin.han140.jizhou.zhongshan,97412,658195,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·中山国；维基文库卷030,han140.p1.batch1.v1
+admin.han140.jizhou.anping,91440,655118,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十·郡国二·安平国；维基文库卷030,han140.p1.batch1.v1
