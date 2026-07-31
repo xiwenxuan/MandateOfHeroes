@@ -19,3 +19,10 @@ admin.han140.youzhou.liaodong,geo.region.northeast.asia.liaodongkoreanorth.liaoh
 admin.han140.youzhou.xuantu,geo.region.northeast.asia.liaodongkoreanorth.easternmountainfrontier,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡有效人口暂归单一稳定地理桶；原文户数与修正户数仍由人口记录分别保存
 admin.han140.youzhou.lelang,geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；县级与现代国界关系留待专门考证
 admin.han140.youzhou.liaodongshuguo,geo.region.northeast.asia.liaodongkoreanorth.westernfrontier,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,原文户口缺失；本映射仅承接显式M级有效估算且不把估算冒充史籍原值
+admin.han140.sili.henan,geo.region.central.china.heluo.luoyangbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,河南尹有效人口暂归洛阳盆地桶；卷029原典值不因现代ODS异录而改变
+admin.han140.sili.henei,geo.region.central.china.heluo.northyellowriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；怀县与黄河北岸县级分配留至P3
+admin.han140.sili.hongnong,geo.region.central.china.heluo.westyellowrivercorridor,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡有效人口暂归黄河走廊桶；卷029原典值不因现代ODS异录而改变
+admin.han140.sili.hedong,geo.region.north.china.southfenheyellowriver.centralbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；安邑与盐池县级、资源分配留待后续
+admin.han140.sili.jingzhao,geo.region.northwest.china.guanzhong.centralweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,京兆尹人口暂归渭河中部平原桶；长安城不单独承接全部京畿人口
+admin.han140.sili.zuopingyi,geo.region.northwest.china.guanzhong.easternweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,左冯翊人口暂归渭河东部平原桶；三辅县级边界留待P3
+admin.han140.sili.youfufeng,geo.region.northwest.china.guanzhong.westernweiriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,右扶风人口暂归渭河西部平原桶；陈仓与陇右通道留待P3
