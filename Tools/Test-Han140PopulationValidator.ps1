@@ -119,29 +119,54 @@ try {
         Assert-True -Condition ($result.Output -match "han140-validation=passed") -Message "Valid dataset did not emit a passing RESULT summary."
     }
 
-    Invoke-TestCase -Name "first batch facts and audit totals" -Body {
+    Invoke-TestCase -Name "recorded facts and audit totals" -Body {
         $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
         $audit = Get-Content -Raw -Encoding UTF8 -LiteralPath $productionAuditPath | ConvertFrom-Json
-        $expectedIds = @(
-            "admin.han140.jizhou.anping",
-            "admin.han140.jizhou.julu",
-            "admin.han140.jizhou.wei",
-            "admin.han140.jizhou.zhongshan",
-            "admin.han140.youzhou.guangyang",
-            "admin.han140.youzhou.zhuo"
-        )
+        $expected = @{
+            "admin.han140.jizhou.anping" = @(91440, 655118, "han140.p1.batch1.v1")
+            "admin.han140.jizhou.bohai" = @(132389, 1106500, "han140.p1.batch2.v1")
+            "admin.han140.jizhou.changshan" = @(97500, 631184, "han140.p1.batch2.v1")
+            "admin.han140.jizhou.hejian" = @(93754, 634421, "han140.p1.batch2.v1")
+            "admin.han140.jizhou.julu" = @(109517, 602096, "han140.p1.batch1.v1")
+            "admin.han140.jizhou.qinghe" = @(123964, 760418, "han140.p1.batch2.v1")
+            "admin.han140.jizhou.wei" = @(129310, 695606, "han140.p1.batch1.v1")
+            "admin.han140.jizhou.zhao" = @(32719, 188381, "han140.p1.batch2.v1")
+            "admin.han140.jizhou.zhongshan" = @(97412, 658195, "han140.p1.batch1.v1")
+            "admin.han140.youzhou.guangyang" = @(44550, 280600, "han140.p1.batch1.v1")
+            "admin.han140.youzhou.zhuo" = @(102218, 633754, "han140.p1.batch1.v1")
+        }
+        $expectedIds = @($expected.Keys | Sort-Object)
         $actualIds = @($populationRows.admin_unit_id | Sort-Object)
 
-        Assert-True -Condition (($actualIds -join "|") -ceq ($expectedIds -join "|")) -Message "Production population IDs do not match the first batch."
-        Assert-True -Condition (@($populationRows | Where-Object { $_.model_version -cne "han140.p1.batch1.v1" }).Count -eq 0) -Message "First-batch model versions are inconsistent."
+        Assert-True -Condition (($actualIds -join "|") -ceq ($expectedIds -join "|")) -Message "Production population IDs do not match the recorded batches."
+        foreach ($row in $populationRows) {
+            $values = $expected[[string]$row.admin_unit_id]
+            Assert-True -Condition ([long]$row.registered_households_raw -eq [long]$values[0]) -Message "Households differ for '$($row.admin_unit_id)'."
+            Assert-True -Condition ([long]$row.registered_population_raw -eq [long]$values[1]) -Message "Population differs for '$($row.admin_unit_id)'."
+            Assert-True -Condition ([string]$row.model_version -ceq [string]$values[2]) -Message "Model version differs for '$($row.admin_unit_id)'."
+        }
         Assert-True -Condition ([int]$audit.row_counts.sources -eq 3) -Message "Audit source count is not 3."
-        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 9) -Message "Audit administrative unit count is not 9."
-        Assert-True -Condition ([int]$audit.row_counts.population_records -eq 6) -Message "Audit population record count is not 6."
-        Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 574447) -Message "First-batch household total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 3525369) -Message "First-batch population total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.household_difference_from_anchor -eq -9124183) -Message "Household anchor difference is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.population_difference_from_anchor -eq -45624851) -Message "Population anchor difference is incorrect."
-        Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 0) -Message "First batch unexpectedly contains corrections."
+        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 14) -Message "Audit administrative unit count is not 14."
+        Assert-True -Condition ([int]$audit.row_counts.population_records -eq 11) -Message "Audit population record count is not 11."
+        Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 1054773) -Message "Recorded household total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 6846273) -Message "Recorded population total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.household_difference_from_anchor -eq -8643857) -Message "Household anchor difference is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.population_difference_from_anchor -eq -42303947) -Message "Population anchor difference is incorrect."
+        Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 0) -Message "Recorded batches unexpectedly contain corrections."
+    }
+
+    Invoke-TestCase -Name "Jizhou commandery slice complete" -Body {
+        $adminRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_administrative_units.csv"))
+        $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
+        $jizhouAdmins = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.jizhou" })
+        $jizhouPopulation = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.jizhou.*" })
+        $households = [long](($jizhouPopulation | Measure-Object -Property registered_households_raw -Sum).Sum)
+        $population = [long](($jizhouPopulation | Measure-Object -Property registered_population_raw -Sum).Sum)
+
+        Assert-True -Condition ($jizhouAdmins.Count -eq 9) -Message "Jizhou does not contain exactly nine direct commandery/state units."
+        Assert-True -Condition ($jizhouPopulation.Count -eq 9) -Message "Jizhou does not contain exactly nine population records."
+        Assert-True -Condition ($households -eq 908005) -Message "Jizhou household total is incorrect."
+        Assert-True -Condition ($population -eq 5931919) -Message "Jizhou population total is incorrect."
     }
 
     Invoke-TestCase -Name "deterministic audit output" -Body {

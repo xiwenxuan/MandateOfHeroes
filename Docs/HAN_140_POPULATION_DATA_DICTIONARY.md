@@ -21,7 +21,7 @@
 | 年份 | 公元纪年正整数；起始年不得晚于终止年 |
 | 置信度 | `high`、`medium`、`low`或`unknown` |
 | 证据等级 | `H`、`R`、`M`、`I`或组合`R/M` |
-| 模型版本 | `han140.p<阶段>[.<批次>].v<版本>`；当前首批使用`han140.p1.batch1.v1` |
+| 模型版本 | `han140.p<阶段>[.<批次>].v<版本>`；当前使用`han140.p1.batch1.v1`与`han140.p1.batch2.v1` |
 
 ## 3. ID命名空间
 
@@ -110,7 +110,7 @@ admin_unit_id,registered_households_raw,registered_population_raw,registered_hou
 | `evidence_grade` | 必需证据等级 |
 | `source_ids` | 至少一个有效来源 |
 | `source_locator` | 卷、页、行、表或URL定位 |
-| `model_version` | 使用`han140.p<阶段>[.<批次>].v<版本>`格式；当前为`han140.p1.batch1.v1` |
+| `model_version` | 使用`han140.p<阶段>[.<批次>].v<版本>`格式；当前按录入批次使用`han140.p1.batch1.v1`或`han140.p1.batch2.v1` |
 
 修正值不覆盖原始值。审计报告同时输出原始合计、显式修正合计，以及
 “有修正取修正、无修正取原始”的有效合计。
@@ -201,5 +201,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 
 只有M13总任务书的完整条件全部满足，才能把140年郡国人口状态从“待研究”升级。
 
-当前P1首批已录入汉、幽州、冀州层级及涿郡、广阳郡、魏郡、钜鹿郡、中山国、
-安平国6条人口记录。稳定地理、映射和游戏地点交叉表仍为空，分别保留至P2、P3。
+当前P1前两批已录入汉、幽州、冀州层级及11条人口记录，其中冀州九郡国已经完成。
+稳定地理、映射和游戏地点交叉表仍为空，分别保留至P2、P3；不得把冀州完成描述为
+全国P1完成。
