@@ -45,3 +45,9 @@ admin.han140.xuzhou.donghai,geo.region.east.china.yishuhuaihai.southeastcoastalp
 admin.han140.xuzhou.pengcheng,geo.region.east.china.sishuiriverplain.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,彭城国人口暂归泗水中游西部平原桶；彭城城市节点不单独承接整国人口
 admin.han140.xuzhou.xiapi,geo.region.east.china.sishuiriverplain.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,下邳国人口暂归泗水下游与淮河北岸平原桶；下邳城市节点与县级分配留至P3
 admin.han140.xuzhou.guangling,geo.region.east.china.jianghuaieast.centralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,广陵郡人口暂归江淮东部与下游水网平原桶；广陵城市节点与江岸古水网分配留至P3
+admin.han140.qingzhou.pingyuan,geo.region.east.china.loweryellowjieastplain.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,平原郡人口暂归黄河下游西北部平原桶；平原县与C008城市目录节点交叉留至P3
+admin.han140.qingzhou.jinan,geo.region.east.china.loweryellowjieastplain.southwestfoothillplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,济南国人口暂归济水南岸与泰山北麓平原桶；140年按国保存，济南郡转录异文继续仅作行政备注
+admin.han140.qingzhou.lean,geo.region.east.china.loweryellowjieastplain.northeastcoastalplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,乐安国人口暂归济水下游东北部与滨海平原桶；古河道、海岸与县级权重留至P3
+admin.han140.qingzhou.qi,geo.region.east.china.ziweijiaolaiplain.westernfoothillplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,齐国人口暂归淄水中游与鲁山北麓桶；临淄等县级节点与游戏城市目录交叉留至P3
+admin.han140.qingzhou.beihai,geo.region.east.china.ziweijiaolaiplain.easternplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,北海国人口暂归潍水流域与胶莱西部平原桶；剧县与C014北海节点不单独承接整国人口
+admin.han140.qingzhou.donglai,geo.region.east.china.jiaodongpeninsula.northcoastalhills,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,东莱郡人口暂归胶莱东部与胶东北岸丘陵桶；掖县及半岛沿海县邑分配留至P3
