@@ -172,12 +172,14 @@ game_location_id,game_location_kind,stable_region_id,admin_unit_id,mapping_statu
 | `notes` | 可空 |
 
 P0允许只有表头；M13-P3必须覆盖现有6个`location.*`和77个`C###`目录。
-P3第一批使用以下稳定关系代码：
+P3第一、二批使用以下稳定关系代码：
 
 - `runtime_county_identity`：运行时县级地点对应临时县级稳定身份；
 - `runtime_regional_proxy`：运行时区域代理对应郡国尺度稳定身份；
 - `prototype_catalog_alias`：`L###`县级目录与运行时地点共用身份；
+- `prototype_catalog_county_identity`：`L###`县级目录直接对应临时县级稳定身份；
 - `prototype_catalog_regional_proxy`：`L###`区域代理；
+- `prototype_catalog_unresolved`：`L###`尚不能安全归入行政或稳定地理身份；
 - `city_catalog_alias`：`C###`城市目录与县级地点共用身份；
 - `city_catalog_regional_proxy`：`C###`郡域级战略代理。
 
@@ -322,3 +324,11 @@ P3第一批新增涿、下曲阳、广宗、邺四个140年县级行政候选和
 158项稳定地理和15条地点交叉；人口记录与人口映射仍分别保持105项和105条。
 中山、安平继续作为区域代理，`C010`钜鹿不等同于下曲阳或广宗，P3全国县级目录
 及其余74个`C###`状态仍未完成。
+
+P3第二批新增蓟、廮陶两个140年县级行政候选与两个`county_area`稳定地理身份，
+并补齐其余6个184年原型目录节点。当前累计4项来源、125项行政单位、160项稳定
+地理和21条地点交叉，其中`runtime=6`、`prototype_catalog=12`、
+`city_catalog=3`；状态为`approximate=11`、`aggregate=8`、`unresolved=2`。
+至此`L001`至`L012`全部具备显式状态。广阳战区、钜鹿郡治只作郡域代理；
+博陵中继与黄河—洛阳出口保持待考。人口记录与人口映射仍分别为105项和105条，
+77城其余74个`C###`及全国县级目录仍未完成。
