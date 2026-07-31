@@ -40,3 +40,8 @@ admin.han140.yanzhou.taishan,8929,437317,108929,,suspected_missing_leading_digit
 admin.han140.yanzhou.jibei,45689,235897,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·济北国；维基文库卷031,han140.p1.batch6.v1
 admin.han140.yanzhou.shanyang,109898,606091,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·山阳郡；维基文库卷031,han140.p1.batch6.v1
 admin.han140.yanzhou.jiyin,133715,657554,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·济阴郡；维基文库卷031,han140.p1.batch6.v1
+admin.han140.xuzhou.donghai,148784,706416,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·东海郡；维基文库卷031,han140.p1.batch7.v1
+admin.han140.xuzhou.langya,20804,570967,120804,,suspected_missing_leading_digit,原文户数与人口比异常；现代校录认为户数脱漏十万位并补为120804户,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·琅邪国；现代校录补正③,han140.p1.batch7.v1
+admin.han140.xuzhou.pengcheng,86170,493027,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·彭城国；维基文库卷031,han140.p1.batch7.v1
+admin.han140.xuzhou.guangling,83907,410190,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·广陵郡；维基文库卷031,han140.p1.batch7.v1
+admin.han140.xuzhou.xiapi,136389,611083,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十一·郡国三·下邳国；维基文库卷031,han140.p1.batch7.v1

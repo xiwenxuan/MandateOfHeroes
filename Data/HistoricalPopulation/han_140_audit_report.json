@@ -8,26 +8,26 @@
                         },
     "row_counts":  {
                        "sources":  3,
-                       "administrative_units":  47,
-                       "population_records":  41,
+                       "administrative_units":  53,
+                       "population_records":  46,
                        "stable_regions":  0,
                        "region_mappings":  0,
                        "game_location_crosswalks":  0
                    },
     "population_totals":  {
-                              "raw_households":  3790708,
-                              "raw_population":  21313932,
-                              "explicit_corrected_households":  141509,
+                              "raw_households":  4266762,
+                              "raw_population":  24105615,
+                              "explicit_corrected_households":  262313,
                               "explicit_corrected_population":  2197271,
-                              "effective_households":  3921694,
-                              "effective_population":  21630524,
-                              "household_difference_from_anchor":  -5776936,
-                              "population_difference_from_anchor":  -27519696
+                              "effective_households":  4497748,
+                              "effective_population":  24422207,
+                              "household_difference_from_anchor":  -5200882,
+                              "population_difference_from_anchor":  -24728013
                           },
     "data_quality":  {
                          "records_missing_raw_households":  1,
                          "records_missing_raw_population":  1,
-                         "records_with_corrections":  6,
+                         "records_with_corrections":  7,
                          "provisional_stable_regions":  0,
                          "provisional_region_mappings":  0,
                          "unresolved_game_locations":  0
