@@ -33,3 +33,12 @@ geo.region.northwest.china.guanzhong,,macroregion,关中渭河平原宏区,今�
 geo.region.northwest.china.guanzhong.centralweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河中部平原地理区,今陕西西安、咸阳中部及渭河平原一带,,,provisional,medium,true,承接140年京兆尹人口的临时稳定地理桶；长安城与京畿县级分配留至P3
 geo.region.northwest.china.guanzhong.easternweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河东部平原地理区,今陕西渭南及关中东部一带,,,provisional,low,true,承接140年左冯翊人口的临时稳定地理桶；与现代地市边界无关
 geo.region.northwest.china.guanzhong.westernweiriverplain,geo.region.northwest.china.guanzhong,commandery_area,渭河西部平原地理区,今陕西宝鸡、咸阳西部及关中西部一带,,,provisional,low,true,承接140年右扶风人口的临时稳定地理桶；陈仓与陇右通道留待县级交叉
+geo.region.central.china.yingruhuai,,macroregion,颍汝与淮河北岸宏区,今河南许昌、周口、驻马店及淮河北岸邻接一带,,,provisional,low,true,P2第六批父级索引；表达颍水、汝水和淮河北岸平原的物理连续性，不等同于豫州行政边界
+geo.region.central.china.yingruhuai.northwestplain,geo.region.central.china.yingruhuai,commandery_area,颍水上游与许昌平原地理区,今河南许昌、禹州及郑州南部邻接一带,,,provisional,medium,true,承接140年颍川郡人口的临时稳定地理桶；许县、阳翟等县级节点留至P3
+geo.region.central.china.yingruhuai.centralplain,geo.region.central.china.yingruhuai,commandery_area,颍水中下游平原地理区,今河南周口、淮阳及颍水中下游一带,,,provisional,low,true,承接140年陈国人口的临时稳定地理桶；陈县与侯国分配留待县级校录
+geo.region.central.china.yingruhuai.southplain,geo.region.central.china.yingruhuai,commandery_area,汝水下游与淮河北岸平原地理区,今河南驻马店、信阳北部及安徽西北邻接一带,,,provisional,medium,true,承接140年汝南郡人口的临时稳定地理桶；平舆等治所和县域边界留至P3
+geo.region.central.china.suihuainorth,,macroregion,睢水与淮北北部平原宏区,今河南商丘、安徽亳州和江苏徐州西部邻接一带,,,provisional,low,true,P2第六批父级索引；表达睢水与淮北北部平原联系，不使用梁国或沛国行政名称作为稳定身份
+geo.region.central.china.suihuainorth.northwestplain,geo.region.central.china.suihuainorth,commandery_area,睢水上中游平原地理区,今河南商丘及睢水上中游邻接一带,,,provisional,medium,true,承接140年梁国人口的临时稳定地理桶；睢阳等县级节点留至P3
+geo.region.central.china.suihuainorth.southeastplain,geo.region.central.china.suihuainorth,commandery_area,淮北北部与泗水西岸平原地理区,今安徽亳州北部、宿州及江苏徐州西部邻接一带,,,provisional,low,true,承接140年沛国人口的临时稳定地理桶；谯、沛等城市节点不单独承接整国人口
+geo.region.east.china.siyifoothill,,macroregion,泗沂西缘与山前宏区,今山东西南部泗水、沂水流域西缘及山前一带,,,provisional,low,true,P2第六批父级索引；表达鲁西南山前与河谷过渡区，不等同于鲁国行政边界
+geo.region.east.china.siyifoothill.westernplain,geo.region.east.china.siyifoothill,commandery_area,泗水上游西部山前平原地理区,今山东曲阜、兖州、邹城北部及邻接山前一带,,,provisional,medium,true,承接140年鲁国人口的临时稳定地理桶；鲁县与周边县邑关系留至P3
