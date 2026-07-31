@@ -40,3 +40,8 @@ admin.han140.yanzhou.rencheng,geo.region.east.china.wensishuiriverplain.centralp
 admin.han140.yanzhou.shanyang,geo.region.east.china.wensishuiriverplain.westplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,山阳郡人口暂归巨野泽与鲁西南西部平原桶；古湖泽与县级权重留待后续
 admin.han140.yanzhou.taishan,geo.region.east.china.taiyifoothill.centralbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,泰山郡有效人口暂归泰沂中部山地盆地桶；原始8929户与修正108929户继续分别保存
 admin.han140.yanzhou.jibei,geo.region.east.china.taiyifoothill.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,济北国人口暂归泰山西北麓与济水东部平原桶；济北城市目录节点留至P3
+admin.han140.xuzhou.langya,geo.region.east.china.yishuhuaihai.northwestfoothill,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,琅邪国有效人口暂归沂蒙西南缘与山前桶；原始20804户与修正120804户继续分别保存，570967口不变
+admin.han140.xuzhou.donghai,geo.region.east.china.yishuhuaihai.southeastcoastalplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,东海郡人口暂归沭水下游与淮海北部平原桶；郯县等县级节点与游戏地点交叉留至P3
+admin.han140.xuzhou.pengcheng,geo.region.east.china.sishuiriverplain.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,彭城国人口暂归泗水中游西部平原桶；彭城城市节点不单独承接整国人口
+admin.han140.xuzhou.xiapi,geo.region.east.china.sishuiriverplain.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,下邳国人口暂归泗水下游与淮河北岸平原桶；下邳城市节点与县级分配留至P3
+admin.han140.xuzhou.guangling,geo.region.east.china.jianghuaieast.centralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,广陵郡人口暂归江淮东部与下游水网平原桶；广陵城市节点与江岸古水网分配留至P3

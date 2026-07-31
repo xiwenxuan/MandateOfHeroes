@@ -53,3 +53,11 @@ geo.region.east.china.wensishuiriverplain.westplain,geo.region.east.china.wensis
 geo.region.east.china.taiyifoothill,,macroregion,泰沂山地与西部山前宏区,今山东泰山、鲁中南山地及西部山前邻接一带,,,provisional,low,true,P2第七批父级索引；表达山地、盆地与西部山前过渡，不等同于泰山郡或济北国行政范围
 geo.region.east.china.taiyifoothill.centralbasin,geo.region.east.china.taiyifoothill,commandery_area,泰沂中部山地盆地地理区,今山东泰安、莱芜及临沂北部邻接一带,,,provisional,low,true,承接140年泰山郡有效人口的临时稳定地理桶；郡域跨度与奉高等县级分配留待P3
 geo.region.east.china.taiyifoothill.northwestplain,geo.region.east.china.taiyifoothill,commandery_area,泰山西北麓与济水东部平原地理区,今山东济南西南、长清、平阴及泰山西北麓一带,,,provisional,medium,true,承接140年济北国人口的临时稳定地理桶；卢县等治所与边界留待后续
+geo.region.east.china.yishuhuaihai,,macroregion,沂沭水系与淮海北部宏区,今山东东南、江苏北部及沂沭水系下游邻接一带,,,provisional,low,true,P2第八批父级索引；表达沂沭水系、山前与淮海北部平原联系，不等同于徐州或东海行政边界
+geo.region.east.china.yishuhuaihai.northwestfoothill,geo.region.east.china.yishuhuaihai,commandery_area,沂蒙西南缘与山前地理区,今山东临沂中北部、沂蒙山南麓及邻接山前一带,,,provisional,low,true,承接140年琅邪国有效人口的临时稳定地理桶；原始20804户与修正120804户继续分别保存
+geo.region.east.china.yishuhuaihai.southeastcoastalplain,geo.region.east.china.yishuhuaihai,commandery_area,沭水下游与淮海北部平原地理区,今山东临沂东南、江苏连云港及淮海北部邻接一带,,,provisional,low,true,承接140年东海郡人口的临时稳定地理桶；郯县、朐县等县级关系与海岸线复原留至P3
+geo.region.east.china.sishuiriverplain,,macroregion,泗水中下游平原宏区,今江苏徐州、宿迁北部及泗水古河道邻接一带,,,provisional,low,true,P2第八批父级索引；表达泗水中下游与淮河北岸平原联系，不使用彭城或下邳行政名称作为稳定身份
+geo.region.east.china.sishuiriverplain.northwestplain,geo.region.east.china.sishuiriverplain,commandery_area,泗水中游西部平原地理区,今江苏徐州及山东枣庄南部邻接平原一带,,,provisional,medium,true,承接140年彭城国人口的临时稳定地理桶；彭城城市节点不单独承接整国人口
+geo.region.east.china.sishuiriverplain.southeastplain,geo.region.east.china.sishuiriverplain,commandery_area,泗水下游与淮河北岸平原地理区,今江苏邳州、宿迁北部及淮河北岸邻接一带,,,provisional,low,true,承接140年下邳国人口的临时稳定地理桶；下邳城市节点与县级权重留至P3
+geo.region.east.china.jianghuaieast,,macroregion,江淮东部与下游水网宏区,今江苏中部、里下河及长江下游北岸邻接一带,,,provisional,low,true,P2第八批父级索引；表达江淮东部平原与下游水网联系，不等同于广陵郡行政边界
+geo.region.east.china.jianghuaieast.centralplain,geo.region.east.china.jianghuaieast,commandery_area,江淮东部与下游水网平原地理区,今江苏扬州、淮安南部、泰州及长江下游北岸邻接一带,,,provisional,low,true,承接140年广陵郡人口的临时稳定地理桶；广陵城市节点与江岸古水网分配留至P3
