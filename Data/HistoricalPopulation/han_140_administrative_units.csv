@@ -87,3 +87,16 @@ admin.han140.yizhou.yongchang,admin.han140.yizhou,commandery,永昌郡,永昌郡
 admin.han140.yizhou.guanghanshuguo,admin.han140.yizhou,other,廣漢屬國,广汉属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领三城；旧注作属蜀郡，校勘据辖县改属广汉郡
 admin.han140.yizhou.shushuguo,admin.han140.yizhou,other,蜀郡屬國,蜀郡属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领四城
 admin.han140.yizhou.jianweishuguo,admin.han140.yizhou,other,犍為屬國,犍为属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领二城
+admin.han140.liangzhou,admin.han140.han,province,涼州刺史部,凉州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.liangzhou.longxi,admin.han140.liangzhou,commandery,隴西郡,陇西郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.hanyang,admin.han140.liangzhou,commandery,漢陽郡,汉阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.wudu,admin.han140.liangzhou,commandery,武都郡,武都郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.jincheng,admin.han140.liangzhou,commandery,金城郡,金城郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.anding,admin.han140.liangzhou,commandery,安定郡,安定郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.beidi,admin.han140.liangzhou,commandery,北地郡,北地郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；四库网页转录缺“三”，公开校勘转录作户三千一百二十二
+admin.han140.liangzhou.wuwei,admin.han140.liangzhou,commandery,武威郡,武威郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；四库网页转录作万四十三，公开校勘转录及影印整理作万四十二
+admin.han140.liangzhou.zhangye,admin.han140.liangzhou,commandery,張掖郡,张掖郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
+admin.han140.liangzhou.jiuquan,admin.han140.liangzhou,commandery,酒泉郡,酒泉郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文只载户数，口数缺失
+admin.han140.liangzhou.dunhuang,admin.han140.liangzhou,commandery,敦煌郡,敦煌郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五；原文户数疑脱千位，原值与现代校录补正分存
+admin.han140.liangzhou.zhangyeshuguo,admin.han140.liangzhou,other,張掖屬國,张掖属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领五城
+admin.han140.liangzhou.zhangyejuyanshuguo,admin.han140.liangzhou,other,張掖居延屬國,张掖居延属国,,140,140,source.hou_han_shu.jun_guo_zhi,high,属国都尉别领一城

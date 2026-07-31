@@ -200,6 +200,18 @@ try {
             "admin.han140.yizhou.guanghanshuguo" = @(37110, 205652, "han140.p1.batch11.v1")
             "admin.han140.yizhou.shushuguo" = @(111568, 475629, "han140.p1.batch11.v1")
             "admin.han140.yizhou.jianweishuguo" = @(7938, 37187, "han140.p1.batch11.v1")
+            "admin.han140.liangzhou.longxi" = @(5628, 29637, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.hanyang" = @(27423, 130138, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.wudu" = @(20102, 81728, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.jincheng" = @(3858, 18947, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.anding" = @(6094, 29060, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.beidi" = @(3122, 18637, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.wuwei" = @(10042, 34226, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.zhangye" = @(6552, 26040, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.jiuquan" = @(12706, "", "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.dunhuang" = @(748, 29170, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.zhangyeshuguo" = @(4656, 16952, "han140.p1.batch12.v1")
+            "admin.han140.liangzhou.zhangyejuyanshuguo" = @(1560, 4733, "han140.p1.batch12.v1")
         }
         $expectedIds = @($expected.Keys | Sort-Object)
         $actualIds = @($populationRows.admin_unit_id | Sort-Object)
@@ -222,17 +234,19 @@ try {
             Assert-True -Condition ([string]$row.model_version -ceq [string]$values[2]) -Message "Model version differs for '$($row.admin_unit_id)'."
         }
         Assert-True -Condition ([int]$audit.row_counts.sources -eq 3) -Message "Audit source count is not 3."
-        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 88) -Message "Audit administrative unit count is not 88."
-        Assert-True -Condition ([int]$audit.row_counts.population_records -eq 77) -Message "Audit population record count is not 77."
-        Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 8848394) -Message "Recorded raw household total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 45661936) -Message "Recorded raw population total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.effective_households -eq 9079380) -Message "Recorded effective household total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.effective_population -eq 45978528) -Message "Recorded effective population total is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.household_difference_from_anchor -eq -619250) -Message "Household anchor difference is incorrect."
-        Assert-True -Condition ([long]$audit.population_totals.population_difference_from_anchor -eq -3171692) -Message "Population anchor difference is incorrect."
+        Assert-True -Condition ([int]$audit.row_counts.administrative_units -eq 101) -Message "Audit administrative unit count is not 101."
+        Assert-True -Condition ([int]$audit.row_counts.population_records -eq 89) -Message "Audit population record count is not 89."
+        Assert-True -Condition ([long]$audit.population_totals.raw_households -eq 8950885) -Message "Recorded raw household total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.raw_population -eq 46081204) -Message "Recorded raw population total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.explicit_corrected_households -eq 270061) -Message "Recorded explicit corrected household total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.explicit_corrected_population -eq 2243902) -Message "Recorded explicit corrected population total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.effective_households -eq 9188871) -Message "Recorded effective household total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.effective_population -eq 46444427) -Message "Recorded effective population total is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.household_difference_from_anchor -eq -509759) -Message "Household anchor difference is incorrect."
+        Assert-True -Condition ([long]$audit.population_totals.population_difference_from_anchor -eq -2705793) -Message "Population anchor difference is incorrect."
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_households -eq 1) -Message "Raw household missing count is not 1."
-        Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_population -eq 1) -Message "Raw population missing count is not 1."
-        Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 7) -Message "Correction record count is not 7."
+        Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_population -eq 2) -Message "Raw population missing count is not 2."
+        Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 9) -Message "Correction record count is not 9."
 
         $byId = @{}
         foreach ($row in $populationRows) {
@@ -247,6 +261,8 @@ try {
         Assert-True -Condition ([long]$byId["admin.han140.yuzhou.chen"].registered_population_corrected -eq 547572) -Message "Chen corrected population is incorrect."
         Assert-True -Condition ([long]$byId["admin.han140.yanzhou.taishan"].registered_households_corrected -eq 108929) -Message "Taishan corrected households are incorrect."
         Assert-True -Condition ([long]$byId["admin.han140.xuzhou.langya"].registered_households_corrected -eq 120804) -Message "Langya corrected households are incorrect."
+        Assert-True -Condition ([long]$byId["admin.han140.liangzhou.jiuquan"].registered_population_corrected -eq 46631) -Message "Jiuquan corrected population is incorrect."
+        Assert-True -Condition ([long]$byId["admin.han140.liangzhou.dunhuang"].registered_households_corrected -eq 7748) -Message "Dunhuang corrected households are incorrect."
     }
 
     Invoke-TestCase -Name "Jizhou commandery slice complete" -Body {
@@ -483,6 +499,58 @@ try {
         Assert-True -Condition ($yongchang.Count -eq 1) -Message "Yongchang population record is missing."
         Assert-True -Condition ([long]$yongchang[0].registered_population_raw -eq 1897344) -Message "Yongchang raw population anomaly was not retained."
         Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$yongchang[0].registered_population_corrected)) -Message "Yongchang must not have an unsupported corrected population."
+    }
+
+    Invoke-TestCase -Name "Liangzhou commandery and dependency slice preserves source gaps and corrections" -Body {
+        $adminRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_administrative_units.csv"))
+        $populationRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_population_records.csv"))
+        $liangzhouAdmins = @($adminRows | Where-Object { $_.parent_admin_unit_id -ceq "admin.han140.liangzhou" })
+        $liangzhouPopulation = @($populationRows | Where-Object { $_.admin_unit_id -clike "admin.han140.liangzhou.*" })
+        $rawHouseholds = [long](($liangzhouPopulation | Measure-Object -Property registered_households_raw -Sum).Sum)
+        $rawPopulation = [long](($liangzhouPopulation | Measure-Object -Property registered_population_raw -Sum).Sum)
+        $effectiveHouseholds = [long]0
+        $effectivePopulation = [long]0
+        foreach ($row in $liangzhouPopulation) {
+            $effectiveHouseholds += if ([string]::IsNullOrWhiteSpace([string]$row.registered_households_corrected)) {
+                [long]$row.registered_households_raw
+            }
+            else {
+                [long]$row.registered_households_corrected
+            }
+            $effectivePopulation += if ([string]::IsNullOrWhiteSpace([string]$row.registered_population_corrected)) {
+                if ([string]::IsNullOrWhiteSpace([string]$row.registered_population_raw)) { [long]0 } else { [long]$row.registered_population_raw }
+            }
+            else {
+                [long]$row.registered_population_corrected
+            }
+        }
+        $correctedRows = @(
+            $liangzhouPopulation |
+                Where-Object {
+                    -not [string]::IsNullOrWhiteSpace([string]$_.registered_households_corrected) -or
+                    -not [string]::IsNullOrWhiteSpace([string]$_.registered_population_corrected)
+                }
+        )
+        $commanderies = @($liangzhouAdmins | Where-Object { $_.unit_type -ceq "commandery" })
+        $dependencies = @($liangzhouAdmins | Where-Object { $_.unit_type -ceq "other" })
+        $jiuquan = @($liangzhouPopulation | Where-Object { $_.admin_unit_id -ceq "admin.han140.liangzhou.jiuquan" })
+        $dunhuang = @($liangzhouPopulation | Where-Object { $_.admin_unit_id -ceq "admin.han140.liangzhou.dunhuang" })
+
+        Assert-True -Condition ($liangzhouAdmins.Count -eq 12) -Message "Liangzhou does not contain exactly twelve direct commandery/dependency units."
+        Assert-True -Condition ($liangzhouPopulation.Count -eq 12) -Message "Liangzhou does not contain exactly twelve population records."
+        Assert-True -Condition ($commanderies.Count -eq 10) -Message "Liangzhou must contain exactly ten commanderies."
+        Assert-True -Condition ($dependencies.Count -eq 2) -Message "Liangzhou must contain exactly two dependency units."
+        Assert-True -Condition ($rawHouseholds -eq 102491) -Message "Liangzhou raw household total is incorrect."
+        Assert-True -Condition ($rawPopulation -eq 419268) -Message "Liangzhou raw population total is incorrect."
+        Assert-True -Condition ($effectiveHouseholds -eq 109491) -Message "Liangzhou effective household total is incorrect."
+        Assert-True -Condition ($effectivePopulation -eq 465899) -Message "Liangzhou effective population total is incorrect."
+        Assert-True -Condition ($correctedRows.Count -eq 2) -Message "Liangzhou must contain exactly two correction records."
+        Assert-True -Condition ($jiuquan.Count -eq 1) -Message "Jiuquan population record is missing."
+        Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$jiuquan[0].registered_population_raw)) -Message "Jiuquan raw population must remain missing."
+        Assert-True -Condition ([long]$jiuquan[0].registered_population_corrected -eq 46631) -Message "Jiuquan corrected population is incorrect."
+        Assert-True -Condition ($dunhuang.Count -eq 1) -Message "Dunhuang population record is missing."
+        Assert-True -Condition ([long]$dunhuang[0].registered_households_raw -eq 748) -Message "Dunhuang raw households were not retained."
+        Assert-True -Condition ([long]$dunhuang[0].registered_households_corrected -eq 7748) -Message "Dunhuang corrected households are incorrect."
     }
 
     Invoke-TestCase -Name "Youzhou commandery slice complete with explicit source gap" -Body {
