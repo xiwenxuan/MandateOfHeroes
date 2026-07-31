@@ -4,3 +4,8 @@ admin.han140.jizhou.zhongshan,geo.region.north.china.hebei.centralwestplain,popu
 admin.han140.jizhou.anping,geo.region.north.china.hebei.centralsoutheastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡国人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
 admin.han140.jizhou.julu,geo.region.north.china.hebei.southcentralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；下曲阳和广宗尚未取得县级分配权重
 admin.han140.jizhou.wei,geo.region.north.china.hebei.southwestzhangheplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；邺县只作为后续P3交叉入口
+admin.han140.youzhou.guangyang,geo.region.north.china.hebei.northcentralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；现代北京定位只作近似索引
+admin.han140.jizhou.hejian,geo.region.north.china.hebei.centraleastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡国人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
+admin.han140.jizhou.changshan,geo.region.north.china.hebei.centralfoothill,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡国人口暂归单一稳定地理桶；山地与平原分配尚未取得县级权重
+admin.han140.jizhou.qinghe,geo.region.north.china.hebei.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡国人口暂归单一稳定地理桶；未来县级拆分必须保持总权重10000
+admin.han140.jizhou.zhao,geo.region.north.china.hebei.southwesttaihangplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡国人口暂归单一稳定地理桶；古界与治所争议不在本批裁定
