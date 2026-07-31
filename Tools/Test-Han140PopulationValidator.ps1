@@ -263,6 +263,13 @@ try {
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_households -eq 3) -Message "Raw household missing count is not 3."
         Assert-True -Condition ([int]$audit.data_quality.records_missing_raw_population -eq 4) -Message "Raw population missing count is not 4."
         Assert-True -Condition ([int]$audit.data_quality.records_with_corrections -eq 11) -Message "Correction record count is not 11."
+        Assert-True -Condition ([int]$audit.row_counts.stable_regions -eq 6) -Message "Audit stable region count is not 6."
+        Assert-True -Condition ([int]$audit.row_counts.region_mappings -eq 5) -Message "Audit region mapping count is not 5."
+        Assert-True -Condition ([int]$audit.row_counts.game_location_crosswalks -eq 0) -Message "Audit game location crosswalk count is not 0."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_stable_regions -eq 6) -Message "Provisional stable region count is not 6."
+        Assert-True -Condition ([int]$audit.data_quality.provisional_region_mappings -eq 5) -Message "Provisional region mapping count is not 5."
+        Assert-True -Condition ([int]$audit.mapping_audit.mapped_admin_source_count -eq 5) -Message "Mapped administrative source count is not 5."
+        Assert-True -Condition ([int]$audit.mapping_audit.weight_error_count -eq 0) -Message "Mapping weight error count is not 0."
 
         $byId = @{}
         foreach ($row in $populationRows) {
@@ -678,6 +685,50 @@ try {
         Assert-True -Condition ($effectivePopulation -eq 2361194) -Message "Youzhou effective population total is incorrect."
     }
 
+    Invoke-TestCase -Name "prototype corridor stable geography preserves hierarchy and population weights" -Body {
+        $regionRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "stable_population_regions.csv"))
+        $mappingRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "han_140_region_mapping.csv"))
+        $crosswalkRows = @(Import-Csv -LiteralPath (Join-Path $productionDataPath "game_location_crosswalk.csv"))
+        $expectedRegionIds = @(
+            "geo.region.north.china.hebei",
+            "geo.region.north.china.hebei.centralsoutheastplain",
+            "geo.region.north.china.hebei.centralwestplain",
+            "geo.region.north.china.hebei.northwestplain",
+            "geo.region.north.china.hebei.southcentralplain",
+            "geo.region.north.china.hebei.southwestzhangheplain"
+        )
+        $expectedSourceIds = @(
+            "admin.han140.jizhou.anping",
+            "admin.han140.jizhou.julu",
+            "admin.han140.jizhou.wei",
+            "admin.han140.jizhou.zhongshan",
+            "admin.han140.youzhou.zhuo"
+        )
+        $actualRegionIds = @($regionRows.stable_region_id | Sort-Object)
+        $actualSourceIds = @($mappingRows.source_id | Sort-Object)
+        $parentRows = @($regionRows | Where-Object { $_.stable_region_id -ceq "geo.region.north.china.hebei" })
+        $childRows = @($regionRows | Where-Object { $_.parent_stable_region_id -ceq "geo.region.north.china.hebei" })
+
+        Assert-True -Condition ($regionRows.Count -eq 6) -Message "Prototype corridor must contain exactly six stable regions."
+        Assert-True -Condition ($mappingRows.Count -eq 5) -Message "Prototype corridor must contain exactly five region mappings."
+        Assert-True -Condition ($crosswalkRows.Count -eq 0) -Message "P2 must not populate the P3 game location crosswalk."
+        Assert-True -Condition (($actualRegionIds -join "|") -ceq (($expectedRegionIds | Sort-Object) -join "|")) -Message "Stable region IDs do not match the prototype corridor contract."
+        Assert-True -Condition (($actualSourceIds -join "|") -ceq (($expectedSourceIds | Sort-Object) -join "|")) -Message "Mapped administrative sources do not match the prototype corridor contract."
+        Assert-True -Condition ($parentRows.Count -eq 1) -Message "Hebei macroregion parent is missing."
+        Assert-True -Condition ($childRows.Count -eq 5) -Message "Hebei macroregion must contain exactly five direct stable children."
+        foreach ($region in $regionRows) {
+            Assert-True -Condition ([string]$region.geometry_status -ceq "provisional") -Message "Stable region '$($region.stable_region_id)' is not provisional geometry."
+            Assert-True -Condition ([string]$region.provisional -ceq "true") -Message "Stable region '$($region.stable_region_id)' is not marked provisional."
+            Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$region.centroid_latitude)) -Message "Stable region '$($region.stable_region_id)' must not contain an unverified latitude."
+            Assert-True -Condition ([string]::IsNullOrWhiteSpace([string]$region.centroid_longitude)) -Message "Stable region '$($region.stable_region_id)' must not contain an unverified longitude."
+        }
+        foreach ($mapping in $mappingRows) {
+            Assert-True -Condition ([int]$mapping.weight_basis_points -eq 10000) -Message "Mapping for '$($mapping.source_id)' does not preserve 10000 basis points."
+            Assert-True -Condition ([string]$mapping.mapping_method -ceq "single_provisional_commandery_bucket_v1") -Message "Mapping for '$($mapping.source_id)' uses an unexpected method."
+            Assert-True -Condition ([string]$mapping.provisional -ceq "true") -Message "Mapping for '$($mapping.source_id)' is not marked provisional."
+        }
+    }
+
     Invoke-TestCase -Name "deterministic audit output" -Body {
         $caseRoot = Join-Path $temporaryRoot "deterministic"
         Copy-InputData -Destination $caseRoot
@@ -751,6 +802,17 @@ try {
                 "admin.han140.invalid,,commandery,测试郡,测试郡,,1,9999,source.missing,low,missing source fixture" + [Environment]::NewLine,
                 $utf8NoBom
             )
+        }
+    }
+
+    Invoke-TestCase -Name "incomplete mapping weight rejected" -Body {
+        Assert-Rejected -Name "incomplete-mapping-weight" -Mutate {
+            param($caseRoot)
+            $path = Join-Path $caseRoot "han_140_region_mapping.csv"
+            $rows = @(Import-Csv -LiteralPath $path)
+            $rows[0].weight_basis_points = "9999"
+            $lines = @($rows | ConvertTo-Csv -NoTypeInformation)
+            [System.IO.File]::WriteAllLines($path, $lines, $utf8NoBom)
         }
     }
 

@@ -1,1 +1,7 @@
 stable_region_id,parent_stable_region_id,region_type,canonical_name,modern_reference,centroid_latitude,centroid_longitude,geometry_status,confidence,provisional,notes
+geo.region.north.china.hebei,,macroregion,河北平原与太行山东麓宏区,今河北省平原区及邻接北京西南和河南北部,,,provisional,low,true,P2首批父级索引；不表示精确历史边界，后续随全国稳定地理扩展拆分复核
+geo.region.north.china.hebei.northwestplain,geo.region.north.china.hebei,commandery_area,冀北西部平原地理区,今河北涿州及北京西南一带,,,provisional,medium,true,承接140年涿郡人口的临时稳定地理桶；县级校录后可拆分但ID不改名
+geo.region.north.china.hebei.centralwestplain,geo.region.north.china.hebei,commandery_area,冀中西部平原地理区,今河北定州及太行山东麓中部一带,,,provisional,medium,true,承接140年中山国人口的临时稳定地理桶；不等同于任何单一治所或现代行政区
+geo.region.north.china.hebei.centralsoutheastplain,geo.region.north.china.hebei,commandery_area,冀中东南平原地理区,今河北衡水和冀州一带,,,provisional,medium,true,承接140年安平国人口的临时稳定地理桶；不等同于运行时安平代理节点
+geo.region.north.china.hebei.southcentralplain,geo.region.north.china.hebei,commandery_area,冀南中部平原地理区,今河北邢台东北及衡水南部一带,,,provisional,low,true,承接140年钜鹿郡人口的临时稳定地理桶；下曲阳与广宗的县级拆分留至P3
+geo.region.north.china.hebei.southwestzhangheplain,geo.region.north.china.hebei,commandery_area,漳河下游西部平原地理区,今河北临漳及河南安阳北部一带,,,provisional,medium,true,承接140年魏郡人口的临时稳定地理桶；古河道与郡界留待专门考证
