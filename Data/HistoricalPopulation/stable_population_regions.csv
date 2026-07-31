@@ -153,3 +153,7 @@ geo.region.southeastasia.redriverdelta.centralnortherndelta,geo.region.southeast
 geo.region.southeastasia.northcentralvietnam,,macroregion,越南北中部河谷与沿海走廊宏区,今越南清化、乂安、河静、广平、广治及北中部山地海岸邻接一带,,,provisional,low,true,P2第十五批父级索引；表达马江流域、长山山脉东麓与狭长沿海联系，不等同于九真郡或日南郡行政边界
 geo.region.southeastasia.northcentralvietnam.northmariverbasin,geo.region.southeastasia.northcentralvietnam,commandery_area,马江流域与越北中部盆谷地理区,今越南清化、乂安北部及马江流域邻接一带,,,provisional,low,true,承接140年九真郡人口的临时稳定地理桶；胥浦等县级节点、河道与海岸关系留至P3
 geo.region.southeastasia.northcentralvietnam.centralcoastalstrip,geo.region.southeastasia.northcentralvietnam,commandery_area,越南北中部沿海与山地走廊地理区,今越南乂安南部、河静、广平、广治及长山山脉东麓沿海邻接一带,,,provisional,low,true,承接140年日南郡人口的临时稳定地理桶；西卷等县级节点和郡域南界保持争议
+geo.region.north.china.hebei.northwestplain.zhuocounty,geo.region.north.china.hebei.northwestplain,county_area,涿县聚落与邻接县域地理区,今河北涿州及邻接平原约址,,,provisional,medium,true,P3第一批县级稳定身份；承接涿县项目地点交叉但不单独分配涿郡人口
+geo.region.north.china.hebei.southcentralplain.xiaquyangcounty,geo.region.north.china.hebei.southcentralplain,county_area,下曲阳聚落与邻接县域地理区,今河北晋州西部及邻接滹沱河平原约址,,,provisional,low,true,P3第一批县级稳定身份；古城址与县界未精确复原且不单独分配钜鹿郡人口
+geo.region.north.china.hebei.southcentralplain.guangzongcounty,geo.region.north.china.hebei.southcentralplain,county_area,广宗聚落与邻接县域地理区,今河北威县、广宗邻接平原约址,,,provisional,low,true,P3第一批县级稳定身份；古城址存在定位精度限制且不单独分配钜鹿郡人口
+geo.region.north.china.hebei.southwestzhangheplain.yecounty,geo.region.north.china.hebei.southwestzhangheplain,county_area,邺县聚落与漳河邻接地理区,今河北临漳及漳河邻接平原约址,,,provisional,medium,true,P3第一批县级稳定身份；不把现代县界或邺城遗址范围伪装为140年精确县界

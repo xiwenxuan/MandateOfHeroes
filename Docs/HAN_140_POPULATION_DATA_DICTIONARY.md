@@ -172,6 +172,17 @@ game_location_id,game_location_kind,stable_region_id,admin_unit_id,mapping_statu
 | `notes` | 可空 |
 
 P0允许只有表头；M13-P3必须覆盖现有6个`location.*`和77个`C###`目录。
+P3第一批使用以下稳定关系代码：
+
+- `runtime_county_identity`：运行时县级地点对应临时县级稳定身份；
+- `runtime_regional_proxy`：运行时区域代理对应郡国尺度稳定身份；
+- `prototype_catalog_alias`：`L###`县级目录与运行时地点共用身份；
+- `prototype_catalog_regional_proxy`：`L###`区域代理；
+- `city_catalog_alias`：`C###`城市目录与县级地点共用身份；
+- `city_catalog_regional_proxy`：`C###`郡域级战略代理。
+
+关系代码不表示边界已经精确复原；空间精度仍由`mapping_status`、`confidence`和
+`provisional`共同表达。
 
 ## 10. `han_140_audit_report.json`
 
@@ -304,3 +315,10 @@ P2第十五批新建“珠江三角洲与岭南东部河网”“西江—郁江
 10,000基点守恒映射，至此全国105项郡国、尹、属国人口来源全部拥有P2临时
 映射。郁林、交趾原典户口继续为空，M级有效估算不覆盖原值；游戏地点交叉表
 仍为空，P3县级目录与`location.*`、`L###`、`C###`交叉尚未开始。
+
+P3第一批新增涿、下曲阳、广宗、邺四个140年县级行政候选和四个
+`county_area`稳定地理身份，并建立当前6个运行时地点、对应6个184年原型目录
+节点及相关3个77城节点共15条交叉映射。当前累计4项来源、123项行政单位、
+158项稳定地理和15条地点交叉；人口记录与人口映射仍分别保持105项和105条。
+中山、安平继续作为区域代理，`C010`钜鹿不等同于下曲阳或广宗，P3全国县级目录
+及其余74个`C###`状态仍未完成。
