@@ -61,3 +61,12 @@ geo.region.east.china.sishuiriverplain.northwestplain,geo.region.east.china.sish
 geo.region.east.china.sishuiriverplain.southeastplain,geo.region.east.china.sishuiriverplain,commandery_area,泗水下游与淮河北岸平原地理区,今江苏邳州、宿迁北部及淮河北岸邻接一带,,,provisional,low,true,承接140年下邳国人口的临时稳定地理桶；下邳城市节点与县级权重留至P3
 geo.region.east.china.jianghuaieast,,macroregion,江淮东部与下游水网宏区,今江苏中部、里下河及长江下游北岸邻接一带,,,provisional,low,true,P2第八批父级索引；表达江淮东部平原与下游水网联系，不等同于广陵郡行政边界
 geo.region.east.china.jianghuaieast.centralplain,geo.region.east.china.jianghuaieast,commandery_area,江淮东部与下游水网平原地理区,今江苏扬州、淮安南部、泰州及长江下游北岸邻接一带,,,provisional,low,true,承接140年广陵郡人口的临时稳定地理桶；广陵城市节点与江岸古水网分配留至P3
+geo.region.east.china.loweryellowjieastplain,,macroregion,黄河下游与济水东部平原宏区,今山东德州、济南北部、滨州、东营及邻接平原一带,,,provisional,low,true,P2第九批父级索引；表达黄河下游、古济水东部与滨海平原联系，不等同于青州行政边界
+geo.region.east.china.loweryellowjieastplain.northwestplain,geo.region.east.china.loweryellowjieastplain,commandery_area,黄河下游西北部平原地理区,今山东德州、聊城北部及黄河下游邻接平原一带,,,provisional,medium,true,承接140年平原郡人口的临时稳定地理桶；平原县与C008城市节点交叉留至P3
+geo.region.east.china.loweryellowjieastplain.southwestfoothillplain,geo.region.east.china.loweryellowjieastplain,commandery_area,济水南岸与泰山北麓平原地理区,今山东济南中西部及泰山北麓邻接平原一带,,,provisional,medium,true,承接140年济南国人口的临时稳定地理桶；济南郡国转录异文不改变稳定地理身份
+geo.region.east.china.loweryellowjieastplain.northeastcoastalplain,geo.region.east.china.loweryellowjieastplain,commandery_area,济水下游东北部与滨海平原地理区,今山东滨州、东营、淄博北部及潍坊西北邻接一带,,,provisional,low,true,承接140年乐安国人口的临时稳定地理桶；古海岸、河道与县级权重留至P3
+geo.region.east.china.ziweijiaolaiplain,,macroregion,淄潍水系与胶莱西部平原宏区,今山东淄博、潍坊及胶莱平原西部邻接一带,,,provisional,low,true,P2第九批父级索引；表达淄水、潍水与胶莱西部平原联系，不使用齐国或北海国行政名称作为稳定身份
+geo.region.east.china.ziweijiaolaiplain.westernfoothillplain,geo.region.east.china.ziweijiaolaiplain,commandery_area,淄水中游与鲁山北麓地理区,今山东淄博、临淄及鲁中北部山前邻接一带,,,provisional,medium,true,承接140年齐国人口的临时稳定地理桶；临淄与济南等城市目录关系留至P3
+geo.region.east.china.ziweijiaolaiplain.easternplain,geo.region.east.china.ziweijiaolaiplain,commandery_area,潍水流域与胶莱西部平原地理区,今山东潍坊、昌乐、寿光及胶莱平原西部邻接一带,,,provisional,medium,true,承接140年北海国人口的临时稳定地理桶；剧县与C014北海节点不单独承接整国人口
+geo.region.east.china.jiaodongpeninsula,,macroregion,胶东半岛与北部海岸宏区,今山东胶莱河以东、烟台、威海及半岛沿海一带,,,provisional,low,true,P2第九批父级索引；表达胶东半岛及北部海岸连续地理，不等同于东莱郡行政边界
+geo.region.east.china.jiaodongpeninsula.northcoastalhills,geo.region.east.china.jiaodongpeninsula,commandery_area,胶莱东部与胶东北岸丘陵地理区,今山东莱州、烟台、威海及胶东半岛北部邻接一带,,,provisional,low,true,承接140年东莱郡人口的临时稳定地理桶；掖县、黄县与沿海县邑分配留至P3
