@@ -141,3 +141,15 @@ geo.region.north.china.yinshansouth.southeasttumochuanplain,geo.region.north.chi
 geo.region.north.china.yinshansouth.southcentralfoothillplain,geo.region.north.china.yinshansouth,commandery_area,阴山南麓中部与山前平原地理区,今内蒙古呼和浩特南部、乌兰察布西南及阴山南麓邻接一带,,,provisional,low,true,承接140年定襄郡人口的临时稳定地理桶；善无等县级节点与边塞道路留至P3
 geo.region.north.china.yanmensanggan,,macroregion,雁门山地与桑干河盆地宏区,今山西北部雁门山、大同朔州盆地及桑干河上游邻接一带,,,provisional,low,true,P2第十四批父级索引；表达雁门山地、大同盆地与桑干河联系，不等同于雁门郡行政边界
 geo.region.north.china.yanmensanggan.centraldatongbasin,geo.region.north.china.yanmensanggan,commandery_area,雁门山北部与桑干河大同盆地地理区,今山西大同、朔州、忻州北部及桑干河上游邻接一带,,,provisional,medium,true,承接140年雁门郡人口的临时稳定地理桶；31862户、249000口原值保持不变，阴馆等县级节点留至P3
+geo.region.south.china.pearlriverdelta,,macroregion,珠江三角洲与岭南东部河网宏区,今广东珠江三角洲、东江北江下游及岭南东部丘陵邻接一带,,,provisional,low,true,P2第十五批父级索引；表达珠江三角洲河网与岭南东部丘陵联系，不等同于交州或南海郡行政边界
+geo.region.south.china.pearlriverdelta.eastcentraldeltafoothills,geo.region.south.china.pearlriverdelta,commandery_area,珠江三角洲中东部与岭南东部丘陵地理区,今广东广州、佛山、东莞、惠州及珠江东江下游邻接一带,,,provisional,medium,true,承接140年南海郡人口的临时稳定地理桶；番禺等县级节点与古海岸河网留至P3
+geo.region.south.china.xijiangyujiang,,macroregion,西江—郁江水系与桂中东盆谷宏区,今广西中东部西江郁江流域、广东西部及周缘盆谷邻接一带,,,provisional,low,true,P2第十五批父级索引；表达西江中下游、郁江和桂中东盆谷联系，不使用苍梧郡或郁林郡行政名称作为稳定身份
+geo.region.south.china.xijiangyujiang.easternxijiangbasin,geo.region.south.china.xijiangyujiang,commandery_area,西江中下游与桂东盆谷地理区,今广西梧州、贺州南部、广东肇庆西部及西江中下游邻接一带,,,provisional,medium,true,承接140年苍梧郡人口的临时稳定地理桶；广信等县级节点和西江古河道留至P3
+geo.region.south.china.xijiangyujiang.centralyujiangbasin,geo.region.south.china.xijiangyujiang,commandery_area,郁江流域与桂中南盆谷地理区,今广西南宁、贵港、玉林北部及郁江浔江邻接一带,,,provisional,low,true,承接140年郁林郡M级有效人口的临时稳定地理桶；原典户口继续为空且布山等县级节点留至P3
+geo.region.south.china.beibugulfcoast,,macroregion,北部湾沿海与桂南滨海平原宏区,今广西北海、钦州、防城港、广东雷州半岛西缘及北部湾东北岸邻接一带,,,provisional,low,true,P2第十五批父级索引；表达桂南入海河流、港湾与滨海平原联系，不等同于合浦郡行政边界
+geo.region.south.china.beibugulfcoast.northeastcoastalplain,geo.region.south.china.beibugulfcoast,commandery_area,北部湾东北岸与桂南滨海平原地理区,今广西北海、钦州、玉林南部及北部湾东北岸邻接一带,,,provisional,low,true,承接140年合浦郡人口的临时稳定地理桶；合浦县、徐闻以南关系与古海岸线留至P3
+geo.region.southeastasia.redriverdelta,,macroregion,红河三角洲与越北低地宏区,今越南北部河内、北宁、兴安、海防及红河中下游三角洲邻接一带,,,provisional,low,true,P2第十五批父级索引；表达红河中下游和三角洲低地联系，不等同于交趾郡行政边界或现代越南省界
+geo.region.southeastasia.redriverdelta.centralnortherndelta,geo.region.southeastasia.redriverdelta,commandery_area,红河中下游与越北三角洲地理区,今越南河内、北宁、兴安、海阳及红河三角洲中北部邻接一带,,,provisional,low,true,承接140年交趾郡M级有效人口的临时稳定地理桶；原典户口继续为空且龙编位置留至P3
+geo.region.southeastasia.northcentralvietnam,,macroregion,越南北中部河谷与沿海走廊宏区,今越南清化、乂安、河静、广平、广治及北中部山地海岸邻接一带,,,provisional,low,true,P2第十五批父级索引；表达马江流域、长山山脉东麓与狭长沿海联系，不等同于九真郡或日南郡行政边界
+geo.region.southeastasia.northcentralvietnam.northmariverbasin,geo.region.southeastasia.northcentralvietnam,commandery_area,马江流域与越北中部盆谷地理区,今越南清化、乂安北部及马江流域邻接一带,,,provisional,low,true,承接140年九真郡人口的临时稳定地理桶；胥浦等县级节点、河道与海岸关系留至P3
+geo.region.southeastasia.northcentralvietnam.centralcoastalstrip,geo.region.southeastasia.northcentralvietnam,commandery_area,越南北中部沿海与山地走廊地理区,今越南乂安南部、河静、广平、广治及长山山脉东麓沿海邻接一带,,,provisional,low,true,承接140年日南郡人口的临时稳定地理桶；西卷等县级节点和郡域南界保持争议
