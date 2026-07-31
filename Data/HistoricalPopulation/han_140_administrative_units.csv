@@ -46,3 +46,9 @@ admin.han140.yanzhou.taishan,admin.han140.yanzhou,commandery,泰山郡,泰山郡
 admin.han140.yanzhou.jibei,admin.han140.yanzhou,kingdom,濟北國,济北国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
 admin.han140.yanzhou.shanyang,admin.han140.yanzhou,commandery,山陽郡,山阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
 admin.han140.yanzhou.jiyin,admin.han140.yanzhou,commandery,濟陰郡,济阴郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
+admin.han140.xuzhou,admin.han140.han,province,徐州刺史部,徐州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.xuzhou.donghai,admin.han140.xuzhou,commandery,東海郡,东海郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
+admin.han140.xuzhou.langya,admin.han140.xuzhou,kingdom,琅邪國,琅邪国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三；原文户数疑脱十万位
+admin.han140.xuzhou.pengcheng,admin.han140.xuzhou,kingdom,彭城國,彭城国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
+admin.han140.xuzhou.guangling,admin.han140.xuzhou,commandery,廣陵郡,广陵郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
+admin.han140.xuzhou.xiapi,admin.han140.xuzhou,kingdom,下邳國,下邳国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
