@@ -5,3 +5,8 @@ geo.region.north.china.hebei.centralwestplain,geo.region.north.china.hebei,comma
 geo.region.north.china.hebei.centralsoutheastplain,geo.region.north.china.hebei,commandery_area,冀中东南平原地理区,今河北衡水和冀州一带,,,provisional,medium,true,承接140年安平国人口的临时稳定地理桶；不等同于运行时安平代理节点
 geo.region.north.china.hebei.southcentralplain,geo.region.north.china.hebei,commandery_area,冀南中部平原地理区,今河北邢台东北及衡水南部一带,,,provisional,low,true,承接140年钜鹿郡人口的临时稳定地理桶；下曲阳与广宗的县级拆分留至P3
 geo.region.north.china.hebei.southwestzhangheplain,geo.region.north.china.hebei,commandery_area,漳河下游西部平原地理区,今河北临漳及河南安阳北部一带,,,provisional,medium,true,承接140年魏郡人口的临时稳定地理桶；古河道与郡界留待专门考证
+geo.region.north.china.hebei.northcentralplain,geo.region.north.china.hebei,commandery_area,冀北中部平原地理区,今北京城区及近郊一带,,,provisional,low,true,承接140年广阳郡人口的临时稳定地理桶；不等同于现代北京市界或已考定古郡界
+geo.region.north.china.hebei.centraleastplain,geo.region.north.china.hebei,commandery_area,冀中东部平原地理区,今河北河间及献县一带,,,provisional,medium,true,承接140年河间国人口的临时稳定地理桶；县级校录后可拆分但ID不改名
+geo.region.north.china.hebei.centralfoothill,geo.region.north.china.hebei,commandery_area,太行山东麓中段地理区,今河北石家庄西部及太行山东麓一带,,,provisional,low,true,承接140年常山国人口的临时稳定地理桶；山地与平原分界留待县级证据复核
+geo.region.north.china.hebei.southeastplain,geo.region.north.china.hebei,commandery_area,冀东南平原地理区,今河北清河及山东临清周边一带,,,provisional,medium,true,承接140年清河国人口的临时稳定地理桶；不采用现代省界切割历史人口
+geo.region.north.china.hebei.southwesttaihangplain,geo.region.north.china.hebei,commandery_area,太行山东麓南段平原地理区,今河北邯郸西部及太行山东麓南段一带,,,provisional,low,true,承接140年赵国人口的临时稳定地理桶；古城与郡国边界留待专门考证
