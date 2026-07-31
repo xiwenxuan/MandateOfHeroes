@@ -8,11 +8,11 @@
                         },
     "row_counts":  {
                        "sources":  4,
-                       "administrative_units":  123,
+                       "administrative_units":  125,
                        "population_records":  105,
-                       "stable_regions":  158,
+                       "stable_regions":  160,
                        "region_mappings":  105,
-                       "game_location_crosswalks":  15
+                       "game_location_crosswalks":  21
                    },
     "population_totals":  {
                               "raw_households":  9336665,
@@ -28,9 +28,9 @@
                          "records_missing_raw_households":  3,
                          "records_missing_raw_population":  4,
                          "records_with_corrections":  11,
-                         "provisional_stable_regions":  158,
+                         "provisional_stable_regions":  160,
                          "provisional_region_mappings":  105,
-                         "unresolved_game_locations":  0
+                         "unresolved_game_locations":  2
                      },
     "mapping_audit":  {
                           "mapped_admin_source_count":  105,

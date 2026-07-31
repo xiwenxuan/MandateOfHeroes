@@ -157,3 +157,5 @@ geo.region.north.china.hebei.northwestplain.zhuocounty,geo.region.north.china.he
 geo.region.north.china.hebei.southcentralplain.xiaquyangcounty,geo.region.north.china.hebei.southcentralplain,county_area,下曲阳聚落与邻接县域地理区,今河北晋州西部及邻接滹沱河平原约址,,,provisional,low,true,P3第一批县级稳定身份；古城址与县界未精确复原且不单独分配钜鹿郡人口
 geo.region.north.china.hebei.southcentralplain.guangzongcounty,geo.region.north.china.hebei.southcentralplain,county_area,广宗聚落与邻接县域地理区,今河北威县、广宗邻接平原约址,,,provisional,low,true,P3第一批县级稳定身份；古城址存在定位精度限制且不单独分配钜鹿郡人口
 geo.region.north.china.hebei.southwestzhangheplain.yecounty,geo.region.north.china.hebei.southwestzhangheplain,county_area,邺县聚落与漳河邻接地理区,今河北临漳及漳河邻接平原约址,,,provisional,medium,true,P3第一批县级稳定身份；不把现代县界或邺城遗址范围伪装为140年精确县界
+geo.region.north.china.hebei.northcentralplain.jicounty,geo.region.north.china.hebei.northcentralplain,county_area,蓟县聚落与幽州治邻接地理区,今北京城区西南部及邻接平原约址,,,provisional,medium,true,P3第二批县级稳定身份；承接L002目录交叉但不单独分配广阳郡人口
+geo.region.north.china.hebei.southcentralplain.yingtaocounty,geo.region.north.china.hebei.southcentralplain,county_area,瘿陶聚落与冀南平原邻接地理区,今河北宁晋及邻接冀南平原约址,,,provisional,low,true,P3第二批县级稳定身份；古城址与钜鹿郡治关系仍待细化且不单独分配郡人口
