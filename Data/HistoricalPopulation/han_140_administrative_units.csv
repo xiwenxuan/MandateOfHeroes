@@ -52,3 +52,10 @@ admin.han140.xuzhou.langya,admin.han140.xuzhou,kingdom,琅邪國,琅邪国,,140,
 admin.han140.xuzhou.pengcheng,admin.han140.xuzhou,kingdom,彭城國,彭城国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
 admin.han140.xuzhou.guangling,admin.han140.xuzhou,commandery,廣陵郡,广陵郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
 admin.han140.xuzhou.xiapi,admin.han140.xuzhou,kingdom,下邳國,下邳国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十一郡国三
+admin.han140.qingzhou,admin.han140.han,province,青州刺史部,青州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.qingzhou.jinan,admin.han140.qingzhou,kingdom,濟南國,济南国,,140,140,source.hou_han_shu.jun_guo_zhi,medium,卷三十二郡国四；公开转录作济南国，四库网页转录作济南郡；126年复封后140年按国
+admin.han140.qingzhou.pingyuan,admin.han140.qingzhou,commandery,平原郡,平原郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.qingzhou.lean,admin.han140.qingzhou,kingdom,樂安國,乐安国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.qingzhou.beihai,admin.han140.qingzhou,kingdom,北海國,北海国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.qingzhou.donglai,admin.han140.qingzhou,commandery,東萊郡,东莱郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.qingzhou.qi,admin.han140.qingzhou,kingdom,齊國,齐国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
