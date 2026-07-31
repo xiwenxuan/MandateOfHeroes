@@ -32,3 +32,11 @@ admin.han140.yuzhou.liang,geo.region.central.china.suihuainorth.northwestplain,p
 admin.han140.yuzhou.pei,geo.region.central.china.suihuainorth.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,沛国有效人口暂归淮北北部与泗水西岸平原桶；原始251393口与修正1251393口继续分别保存
 admin.han140.yuzhou.chen,geo.region.central.china.yingruhuai.centralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,陈国有效人口暂归颍水中下游平原桶；原始1547572口与修正547572口继续分别保存
 admin.han140.yuzhou.lu,geo.region.east.china.siyifoothill.westernplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,鲁国人口暂归泗水上游西部山前平原桶；鲁县与游戏城市目录交叉留至P3
+admin.han140.yanzhou.chenliu,geo.region.central.china.loweryellowjishui.southwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,陈留郡人口暂归黄河下游西南部平原桶；陈留城市节点与县级分配留至P3
+admin.han140.yanzhou.dong,geo.region.central.china.loweryellowjishui.northcentralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,东郡人口暂归黄河下游北中部平原桶；濮阳时期治所不单独承接整郡人口
+admin.han140.yanzhou.jiyin,geo.region.central.china.loweryellowjishui.southeastplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,济阴郡人口暂归济水西部与菏泽平原桶；定陶等县邑留至P3
+admin.han140.yanzhou.dongping,geo.region.east.china.wensishuiriverplain.northplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,东平国人口暂归汶水下游与东平湖平原桶；游戏城市目录交叉留至P3
+admin.han140.yanzhou.rencheng,geo.region.east.china.wensishuiriverplain.centralplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,任城国人口暂归汶泗交汇与济宁平原桶；任城县不单独承接整国人口
+admin.han140.yanzhou.shanyang,geo.region.east.china.wensishuiriverplain.westplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,山阳郡人口暂归巨野泽与鲁西南西部平原桶；古湖泽与县级权重留待后续
+admin.han140.yanzhou.taishan,geo.region.east.china.taiyifoothill.centralbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,泰山郡有效人口暂归泰沂中部山地盆地桶；原始8929户与修正108929户继续分别保存
+admin.han140.yanzhou.jibei,geo.region.east.china.taiyifoothill.northwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,济北国人口暂归泰山西北麓与济水东部平原桶；济北城市目录节点留至P3

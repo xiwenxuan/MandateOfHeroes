@@ -42,3 +42,14 @@ geo.region.central.china.suihuainorth.northwestplain,geo.region.central.china.su
 geo.region.central.china.suihuainorth.southeastplain,geo.region.central.china.suihuainorth,commandery_area,淮北北部与泗水西岸平原地理区,今安徽亳州北部、宿州及江苏徐州西部邻接一带,,,provisional,low,true,承接140年沛国人口的临时稳定地理桶；谯、沛等城市节点不单独承接整国人口
 geo.region.east.china.siyifoothill,,macroregion,泗沂西缘与山前宏区,今山东西南部泗水、沂水流域西缘及山前一带,,,provisional,low,true,P2第六批父级索引；表达鲁西南山前与河谷过渡区，不等同于鲁国行政边界
 geo.region.east.china.siyifoothill.westernplain,geo.region.east.china.siyifoothill,commandery_area,泗水上游西部山前平原地理区,今山东曲阜、兖州、邹城北部及邻接山前一带,,,provisional,medium,true,承接140年鲁国人口的临时稳定地理桶；鲁县与周边县邑关系留至P3
+geo.region.central.china.loweryellowjishui,,macroregion,黄河下游与济水西部平原宏区,今河南开封、濮阳、山东菏泽及黄河下游邻接一带,,,provisional,low,true,P2第七批父级索引；表达黄河下游与古济水西部平原联系，不等同于兖州行政边界
+geo.region.central.china.loweryellowjishui.southwestplain,geo.region.central.china.loweryellowjishui,commandery_area,黄河下游西南部平原地理区,今河南开封东部及黄河南岸邻接一带,,,provisional,medium,true,承接140年陈留郡人口的临时稳定地理桶；陈留县与游戏城市节点留至P3
+geo.region.central.china.loweryellowjishui.northcentralplain,geo.region.central.china.loweryellowjishui,commandery_area,黄河下游北中部平原地理区,今河南濮阳、山东聊城西南及黄河两岸邻接一带,,,provisional,medium,true,承接140年东郡人口的临时稳定地理桶；濮阳等时期治所不单独承接整郡人口
+geo.region.central.china.loweryellowjishui.southeastplain,geo.region.central.china.loweryellowjishui,commandery_area,济水西部与菏泽平原地理区,今山东菏泽中西部及河南东北邻接一带,,,provisional,low,true,承接140年济阴郡人口的临时稳定地理桶；定陶等县邑分配留至P3
+geo.region.east.china.wensishuiriverplain,,macroregion,汶泗水系与鲁西南平原宏区,今山东东平湖、济宁及菏泽东部邻接一带,,,provisional,low,true,P2第七批父级索引；表达汶水、泗水及湖泽平原联系，不使用东平或任城行政名称作为稳定身份
+geo.region.east.china.wensishuiriverplain.northplain,geo.region.east.china.wensishuiriverplain,commandery_area,汶水下游与东平湖平原地理区,今山东东平、汶上及东平湖邻接一带,,,provisional,medium,true,承接140年东平国人口的临时稳定地理桶；无盐等县级关系留待后续校录
+geo.region.east.china.wensishuiriverplain.centralplain,geo.region.east.china.wensishuiriverplain,commandery_area,汶泗交汇与济宁平原地理区,今山东济宁、汶上南部及泗水西部邻接一带,,,provisional,low,true,承接140年任城国人口的临时稳定地理桶；任城县与周边县邑留至P3
+geo.region.east.china.wensishuiriverplain.westplain,geo.region.east.china.wensishuiriverplain,commandery_area,巨野泽与鲁西南西部平原地理区,今山东巨野、金乡及菏泽东部邻接一带,,,provisional,low,true,承接140年山阳郡人口的临时稳定地理桶；湖泽古水系与县级分配仍需考证
+geo.region.east.china.taiyifoothill,,macroregion,泰沂山地与西部山前宏区,今山东泰山、鲁中南山地及西部山前邻接一带,,,provisional,low,true,P2第七批父级索引；表达山地、盆地与西部山前过渡，不等同于泰山郡或济北国行政范围
+geo.region.east.china.taiyifoothill.centralbasin,geo.region.east.china.taiyifoothill,commandery_area,泰沂中部山地盆地地理区,今山东泰安、莱芜及临沂北部邻接一带,,,provisional,low,true,承接140年泰山郡有效人口的临时稳定地理桶；郡域跨度与奉高等县级分配留待P3
+geo.region.east.china.taiyifoothill.northwestplain,geo.region.east.china.taiyifoothill,commandery_area,泰山西北麓与济水东部平原地理区,今山东济南西南、长清、平阴及泰山西北麓一带,,,provisional,medium,true,承接140年济北国人口的临时稳定地理桶；卢县等治所与边界留待后续
