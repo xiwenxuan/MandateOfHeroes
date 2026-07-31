@@ -13,3 +13,9 @@ admin.han140.jizhou.bohai,geo.region.north.china.hebei.eastcoastalplain,populati
 admin.han140.youzhou.yuyang,geo.region.north.china.yanshanliaoxi.southwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；蓟城与渔阳郡范围不得视为同一对象
 admin.han140.youzhou.youbeiping,geo.region.north.china.yanshanliaoxi.centralfoothillplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡人口暂归单一稳定地理桶；土垠与北平游戏显示名留至P3交叉
 admin.han140.youzhou.liaoxi,geo.region.north.china.yanshanliaoxi.northeastcorridor,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；辽西走廊内部地形分配尚未取得县级权重
+admin.han140.youzhou.dai,geo.region.north.china.yanbeigreatwall.westernbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；塞内外与县级分配尚未取得可靠权重
+admin.han140.youzhou.shanggu,geo.region.north.china.yanbeigreatwall.easternmountainbasin,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；长城沿线与山间盆地范围留待县级证据复核
+admin.han140.youzhou.liaodong,geo.region.northeast.asia.liaodongkoreanorth.liaoheriverplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,medium,true,全郡有效人口暂归单一稳定地理桶；原文人口与修正人口仍由人口记录分别保存
+admin.han140.youzhou.xuantu,geo.region.northeast.asia.liaodongkoreanorth.easternmountainfrontier,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡有效人口暂归单一稳定地理桶；原文户数与修正户数仍由人口记录分别保存
+admin.han140.youzhou.lelang,geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,全郡人口暂归单一稳定地理桶；县级与现代国界关系留待专门考证
+admin.han140.youzhou.liaodongshuguo,geo.region.northeast.asia.liaodongkoreanorth.westernfrontier,population_coverage,140,140,10000,single_provisional_commandery_bucket_v1,low,true,原文户口缺失；本映射仅承接显式M级有效估算且不把估算冒充史籍原值

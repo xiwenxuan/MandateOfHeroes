@@ -15,3 +15,11 @@ geo.region.north.china.hebei.eastcoastalplain,geo.region.north.china.hebei,comma
 geo.region.north.china.yanshanliaoxi.southwestplain,geo.region.north.china.yanshanliaoxi,commandery_area,燕山西南麓平原地理区,今北京东北及天津北部一带,,,provisional,low,true,承接140年渔阳郡人口的临时稳定地理桶；不等同于蓟城或现代行政边界
 geo.region.north.china.yanshanliaoxi.centralfoothillplain,geo.region.north.china.yanshanliaoxi,commandery_area,燕山中东段山前平原地理区,今河北唐山北部及燕山东段山前一带,,,provisional,medium,true,承接140年右北平郡人口的临时稳定地理桶；土垠只作为后续县级交叉线索
 geo.region.north.china.yanshanliaoxi.northeastcorridor,geo.region.north.china.yanshanliaoxi,commandery_area,辽西走廊地理区,今辽宁锦州、朝阳及河北东北邻接一带,,,provisional,low,true,承接140年辽西郡人口的临时稳定地理桶；山地、河谷与滨海范围留待县级证据复核
+geo.region.north.china.yanbeigreatwall,,macroregion,燕北山地与长城走廊宏区,今河北西北、山西北部及北京西北邻接一带,,,provisional,low,true,P2第四批父级索引；只表达燕山西段、坝下盆地与长城走廊的物理连续性
+geo.region.north.china.yanbeigreatwall.westernbasin,geo.region.north.china.yanbeigreatwall,commandery_area,燕北西部盆地地理区,今河北蔚县及山西大同东部一带,,,provisional,low,true,承接140年代郡人口的临时稳定地理桶；塞内外范围与县级分配留待后续考证
+geo.region.north.china.yanbeigreatwall.easternmountainbasin,geo.region.north.china.yanbeigreatwall,commandery_area,燕北东部山间盆地地理区,今河北张家口、怀来及北京延庆一带,,,provisional,low,true,承接140年上谷郡人口的临时稳定地理桶；不等同于任何现代行政边界
+geo.region.northeast.asia.liaodongkoreanorth,,macroregion,辽东与朝鲜半岛北部宏区,今辽宁中东部、吉林南部及朝鲜半岛北部一带,,,provisional,low,true,P2第四批父级索引；跨现代国界只作历史空间索引，不表达现代主权或精确古界
+geo.region.northeast.asia.liaodongkoreanorth.liaoheriverplain,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,辽河下游与辽东平原地理区,今辽宁辽阳、沈阳及辽河下游邻接一带,,,provisional,medium,true,承接140年辽东郡人口的临时稳定地理桶；襄平只作为后续县级和游戏节点交叉线索
+geo.region.northeast.asia.liaodongkoreanorth.easternmountainfrontier,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,辽东东部山地边缘地理区,今辽宁东部及吉林南部邻接一带,,,provisional,low,true,承接140年玄菟郡人口的临时稳定地理桶；郡治迁徙与辖境变化留待分期映射
+geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,朝鲜半岛西北部平原地理区,今朝鲜半岛西北部及邻接河谷一带,,,provisional,low,true,承接140年乐浪郡人口的临时稳定地理桶；不以现代国界裁切东汉人口事实
+geo.region.northeast.asia.liaodongkoreanorth.westernfrontier,geo.region.northeast.asia.liaodongkoreanorth,commandery_area,辽东西部边缘地理区,今辽宁西部至辽河下游过渡地带,,,provisional,low,true,承接140年辽东属国有效人口估算的临时稳定地理桶；六城位置与原文户口缺项均保留争议
