@@ -30,3 +30,10 @@ admin.han140.jizhou.hejian,admin.han140.jizhou,kingdom,河間國,河间国,,140,
 admin.han140.jizhou.qinghe,admin.han140.jizhou,kingdom,清河國,清河国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二；现代校录表误作清川国
 admin.han140.jizhou.zhao,admin.han140.jizhou,kingdom,趙國,赵国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
 admin.han140.jizhou.bohai,admin.han140.jizhou,commandery,勃海郡,勃海郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二；与后世常见渤海写法分离
+admin.han140.yuzhou,admin.han140.han,province,豫州刺史部,豫州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.yuzhou.yingchuan,admin.han140.yuzhou,commandery,潁川郡,颍川郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.yuzhou.runan,admin.han140.yuzhou,commandery,汝南郡,汝南郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.yuzhou.liang,admin.han140.yuzhou,kingdom,梁國,梁国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
+admin.han140.yuzhou.pei,admin.han140.yuzhou,kingdom,沛國,沛国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二；原文人口疑与相邻陈国误置百万位
+admin.han140.yuzhou.chen,admin.han140.yuzhou,kingdom,陳國,陈国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二；原文人口疑与相邻沛国误置百万位
+admin.han140.yuzhou.lu,admin.han140.yuzhou,kingdom,魯國,鲁国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十郡国二
