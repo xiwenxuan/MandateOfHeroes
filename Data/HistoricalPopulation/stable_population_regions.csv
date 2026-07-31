@@ -10,3 +10,8 @@ geo.region.north.china.hebei.centraleastplain,geo.region.north.china.hebei,comma
 geo.region.north.china.hebei.centralfoothill,geo.region.north.china.hebei,commandery_area,太行山东麓中段地理区,今河北石家庄西部及太行山东麓一带,,,provisional,low,true,承接140年常山国人口的临时稳定地理桶；山地与平原分界留待县级证据复核
 geo.region.north.china.hebei.southeastplain,geo.region.north.china.hebei,commandery_area,冀东南平原地理区,今河北清河及山东临清周边一带,,,provisional,medium,true,承接140年清河国人口的临时稳定地理桶；不采用现代省界切割历史人口
 geo.region.north.china.hebei.southwesttaihangplain,geo.region.north.china.hebei,commandery_area,太行山东麓南段平原地理区,今河北邯郸西部及太行山东麓南段一带,,,provisional,low,true,承接140年赵国人口的临时稳定地理桶；古城与郡国边界留待专门考证
+geo.region.north.china.yanshanliaoxi,,macroregion,燕山与辽西走廊宏区,今北京东北、天津北部、河北东北及辽宁西部一带,,,provisional,low,true,P2第三批父级索引；不表示精确历史边界或单一行政区，后续随县级证据拆分复核
+geo.region.north.china.hebei.eastcoastalplain,geo.region.north.china.hebei,commandery_area,冀东滨海平原地理区,今河北沧州及渤海西岸一带,,,provisional,medium,true,承接140年勃海郡人口的临时稳定地理桶；南皮等县级节点与沿海边界留至P3
+geo.region.north.china.yanshanliaoxi.southwestplain,geo.region.north.china.yanshanliaoxi,commandery_area,燕山西南麓平原地理区,今北京东北及天津北部一带,,,provisional,low,true,承接140年渔阳郡人口的临时稳定地理桶；不等同于蓟城或现代行政边界
+geo.region.north.china.yanshanliaoxi.centralfoothillplain,geo.region.north.china.yanshanliaoxi,commandery_area,燕山中东段山前平原地理区,今河北唐山北部及燕山东段山前一带,,,provisional,medium,true,承接140年右北平郡人口的临时稳定地理桶；土垠只作为后续县级交叉线索
+geo.region.north.china.yanshanliaoxi.northeastcorridor,geo.region.north.china.yanshanliaoxi,commandery_area,辽西走廊地理区,今辽宁锦州、朝阳及河北东北邻接一带,,,provisional,low,true,承接140年辽西郡人口的临时稳定地理桶；山地、河谷与滨海范围留待县级证据复核
