@@ -181,7 +181,9 @@ P3第一、二批使用以下稳定关系代码：
 - `prototype_catalog_regional_proxy`：`L###`区域代理；
 - `prototype_catalog_unresolved`：`L###`尚不能安全归入行政或稳定地理身份；
 - `city_catalog_alias`：`C###`城市目录与县级地点共用身份；
-- `city_catalog_regional_proxy`：`C###`郡域级战略代理。
+- `city_catalog_county_identity`：`C###`显示节点对应140年县级候选与临时县域；
+- `city_catalog_regional_proxy`：`C###`郡域级战略代理；
+- `city_catalog_unresolved`：`C###`尚不能安全归入140年行政或稳定地理身份。
 
 关系代码不表示边界已经精确复原；空间精度仍由`mapping_status`、`confidence`和
 `provisional`共同表达。
@@ -332,3 +334,12 @@ P3第二批新增蓟、廮陶两个140年县级行政候选与两个`county_area
 至此`L001`至`L012`全部具备显式状态。广阳战区、钜鹿郡治只作郡域代理；
 博陵中继与黄河—洛阳出口保持待考。人口记录与人口映射仍分别为105项和105条，
 77城其余74个`C###`及全国县级目录仍未完成。
+
+P3第三批开始扩展77城目录，为`C001-C008`、`C011`、`C013`十个北方节点
+建立显式状态；新增襄平、朝鲜、土垠、晋阳、壶关、南皮、平原、甘陵八个
+140年县级行政候选与八个`county_area`稳定地理身份。当前累计4项来源、
+133项行政单位、168项稳定地理和31条地点交叉，其中`runtime=6`、
+`prototype_catalog=12`、`city_catalog=13`；状态为`approximate=20`、
+`aggregate=8`、`unresolved=3`。人口记录与人口映射仍分别为105项和105条。
+`C001-C013`现已全部覆盖，`C013`城阳保持待考；`C014-C077`与全国县级目录
+仍未完成。
