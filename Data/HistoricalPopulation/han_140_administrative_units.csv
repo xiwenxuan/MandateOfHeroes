@@ -59,3 +59,11 @@ admin.han140.qingzhou.lean,admin.han140.qingzhou,kingdom,樂安國,乐安国,,14
 admin.han140.qingzhou.beihai,admin.han140.qingzhou,kingdom,北海國,北海国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
 admin.han140.qingzhou.donglai,admin.han140.qingzhou,commandery,東萊郡,东莱郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
 admin.han140.qingzhou.qi,admin.han140.qingzhou,kingdom,齊國,齐国,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou,admin.han140.han,province,荊州刺史部,荆州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
+admin.han140.jingzhou.nanyang,admin.han140.jingzhou,commandery,南陽郡,南阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.nan,admin.han140.jingzhou,commandery,南郡,南郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.jiangxia,admin.han140.jingzhou,commandery,江夏郡,江夏郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.lingling,admin.han140.jingzhou,commandery,零陵郡,零陵郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.guiyang,admin.han140.jingzhou,commandery,桂陽郡,桂阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.wuling,admin.han140.jingzhou,commandery,武陵郡,武陵郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
+admin.han140.jingzhou.changsha,admin.han140.jingzhou,commandery,長沙郡,长沙郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十二郡国四
