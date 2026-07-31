@@ -1,5 +1,13 @@
 admin_unit_id,parent_admin_unit_id,unit_type,name_140,canonical_name,seat_admin_unit_id,valid_from_year,valid_to_year,source_ids,confidence,notes
 admin.han140.han,,empire,漢,汉,,140,140,source.hou_han_shu.jun_guo_zhi,high,140年行政截面根节点
+admin.han140.sili,admin.han140.han,province,司隸校尉部,司隶校尉部,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志区域汇总层；不是刺史部
+admin.han140.sili.henan,admin.han140.sili,other,河南尹,河南尹,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一；京畿尹级单位
+admin.han140.sili.henei,admin.han140.sili,commandery,河內郡,河内郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一
+admin.han140.sili.hedong,admin.han140.sili,commandery,河東郡,河东郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一
+admin.han140.sili.hongnong,admin.han140.sili,commandery,弘農郡,弘农郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一
+admin.han140.sili.jingzhao,admin.han140.sili,other,京兆尹,京兆尹,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一；三辅尹级单位
+admin.han140.sili.zuopingyi,admin.han140.sili,other,左馮翊,左冯翊,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一；三辅单位
+admin.han140.sili.youfufeng,admin.han140.sili,other,右扶風,右扶风,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷二十九郡国一；三辅单位
 admin.han140.youzhou,admin.han140.han,province,幽州刺史部,幽州,,140,140,source.hou_han_shu.jun_guo_zhi,high,郡国志州级汇总层
 admin.han140.youzhou.zhuo,admin.han140.youzhou,commandery,涿郡,涿郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五
 admin.han140.youzhou.guangyang,admin.han140.youzhou,commandery,廣陽郡,广阳郡,,140,140,source.hou_han_shu.jun_guo_zhi,high,卷三十三郡国五

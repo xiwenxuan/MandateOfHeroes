@@ -1,4 +1,11 @@
 admin_unit_id,registered_households_raw,registered_population_raw,registered_households_corrected,registered_population_corrected,correction_code,correction_note,evidence_grade,source_ids,source_locator,model_version
+admin.han140.sili.henan,208486,1010827,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·河南尹；维基文库卷029；ODS异录1018217未采用,han140.p1.batch4.v1
+admin.han140.sili.henei,159770,801558,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·河内郡；维基文库卷029,han140.p1.batch4.v1
+admin.han140.sili.hedong,93543,570803,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·河东郡；维基文库卷029,han140.p1.batch4.v1
+admin.han140.sili.hongnong,46815,199113,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·弘农郡；维基文库卷029；ODS异录199193未采用,han140.p1.batch4.v1
+admin.han140.sili.jingzhao,53299,285574,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·京兆尹；维基文库卷029,han140.p1.batch4.v1
+admin.han140.sili.zuopingyi,37090,145195,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·左冯翊；维基文库卷029,han140.p1.batch4.v1
+admin.han140.sili.youfufeng,17352,93091,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷二十九·郡国一·右扶风；维基文库卷029,han140.p1.batch4.v1
 admin.han140.youzhou.zhuo,102218,633754,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·涿郡；维基文库卷033,han140.p1.batch1.v1
 admin.han140.youzhou.guangyang,44550,280600,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·广阳郡；维基文库卷033,han140.p1.batch1.v1
 admin.han140.youzhou.dai,20123,126188,,,,,H,source.hou_han_shu.jun_guo_zhi|source.zae06141.eastern_han_population_audit,《后汉书》卷三十三·郡国五·代郡；维基文库卷033,han140.p1.batch3.v1

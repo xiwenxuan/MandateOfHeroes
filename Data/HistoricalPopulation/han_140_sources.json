@@ -14,12 +14,12 @@
       "source_type": "primary_text",
       "title": "《后汉书》志第二十至二十三·郡国（源出司马彪《续汉书》）",
       "author_or_editor": "司马彪撰志，刘昭注，后并入《后汉书》",
-      "edition_or_host": "维基文库《四库全书》本卷030、卷033；其他公开古籍转录用于异文核对",
+      "edition_or_host": "维基文库《四库全书》本卷029、卷030、卷033；其他公开古籍转录用于异文核对",
       "publication_or_access_date": "古代文献；页面访问于2026-07-31",
-      "url_or_bibliographic_locator": "卷030：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷030；卷033：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷033；郡国二公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/110.htm",
+      "url_or_bibliographic_locator": "卷029：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷029；卷030：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷030；卷033：https://zh.wikisource.org/wiki/後漢書_(四庫全書本)/卷033；郡国一公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/109.htm；郡国二公开转录：https://ancient-china-books.github.io/houhanshu/OEBPS/Text/110.htm",
       "license_or_public_domain_note": "古籍原文属于公共领域；页面贡献遵循维基文库许可。本项目只录历史事实和自有数据结构，不复制现代点校、数据库或研究者受保护的完整表格与注释",
-      "evidence_scope": "140年全国户口锚点；前三批20个郡国或属国原始户口与行政层级；河间郡国异文；辽东属国户口缺项",
-      "notes": "全国锚点与现存分项可能存在缺项、讹误和口径差异，必须分别审计；简繁显示差异不改变稳定ID；河间类型保留版本异文；辽东郡人口与玄菟郡户数保留原文异常值"
+      "evidence_scope": "140年全国户口锚点；前四批27个郡国、尹或属国原始户口与行政层级；河间郡国异文；辽东属国户口缺项",
+      "notes": "全国锚点与现存分项可能存在缺项、讹误和口径差异，必须分别审计；简繁显示差异不改变稳定ID；河间类型保留版本异文；辽东郡人口与玄菟郡户数保留原文异常值；司隶批次以卷029原典值优先"
     },
     {
       "source_id": "source.project.historical_population.v0_1",
@@ -42,8 +42,8 @@
       "publication_or_access_date": "访问于2026-07-31",
       "url_or_bibliographic_locator": "说明：https://zae06141.client.jp/gunkokushi.html；校录表：https://zae06141.client.jp/eastern_han_population.ods",
       "license_or_public_domain_note": "页面未声明可再分发表格的开放许可证；本项目仅用其数值作交叉核对，不复制、检入或再分发ODS、公式、注释与完整表格",
-      "evidence_scope": "P1前三批20个郡国或属国户口数的交叉核对；辽东郡、玄菟郡和辽东属国三项补正；全国分项合计与篇末锚点差异的审计线索",
-      "notes": "不作为独立原典；人口记录的H级证据来自《后汉书》原文；表内清河国标签误作清川国；辽东属国补正为模型估计而非史籍原值"
+      "evidence_scope": "P1前四批27个郡国、尹或属国户口数的交叉核对；辽东郡、玄菟郡和辽东属国三项补正；全国分项合计与篇末锚点差异的审计线索",
+      "notes": "不作为独立原典；人口记录的H级证据来自《后汉书》原文；表内清河国标签误作清川国；辽东属国补正为模型估计而非史籍原值；司隶表内河南尹口数1018217与弘农郡口数199193均不同于卷029原典，未采用"
     }
   ]
 }
