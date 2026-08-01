@@ -202,6 +202,7 @@ namespace Mandate.Simulation
                     "person.generated.farmer_002"
                 }
             });
+            SynchronizeFamilyReferences(world);
 
             AddRelationship(
                 world, "person.liu_bei", "person.guan_yu", 6_000, 5_500, 5_000);
@@ -635,6 +636,7 @@ namespace Mandate.Simulation
                 Id = id,
                 DisplayName = displayName,
                 LocationId = locationId,
+                BirthLocationId = locationId,
                 BirthDay = birthDay,
                 Wealth = wealth,
                 Gender = gender,
@@ -642,6 +644,27 @@ namespace Mandate.Simulation
                 CargoCapacity = cargoCapacity,
                 MedicalSkillBasisPoints = medicalSkillBasisPoints
             });
+        }
+
+        private static void SynchronizeFamilyReferences(WorldState world)
+        {
+            for (var familyIndex = 0;
+                 familyIndex < world.Families.Count;
+                 familyIndex++)
+            {
+                var family = world.Families[familyIndex];
+                var head = world.People.Find(
+                    person => person.Id == family.HeadPersonId);
+                family.LocationId = head.LocationId;
+                for (var memberIndex = 0;
+                     memberIndex < family.MemberIds.Count;
+                     memberIndex++)
+                {
+                    world.People.Find(
+                        person => person.Id == family.MemberIds[memberIndex])
+                        .FamilyId = family.Id;
+                }
+            }
         }
 
         private static void AddCommodity(

@@ -178,6 +178,8 @@ namespace Mandate.Simulation
                     Id = childId,
                     DisplayName = $"新生儿{childIndex}",
                     LocationId = mother.LocationId,
+                    BirthLocationId = mother.LocationId,
+                    FamilyId = family.Id,
                     BirthDay = world.AbsoluteDay,
                     Gender = _random.CheckBasisPoints(
                         "life", motherId, monthIndex, "child_gender", 5_000)
@@ -185,7 +187,12 @@ namespace Mandate.Simulation
                         : PersonGender.Male,
                     FatherPersonId = father.Id,
                     MotherPersonId = mother.Id,
-                    Provisions = 0
+                    Provisions = 0,
+                    VillageOccupation = VillageOccupation.Dependent,
+                    LaborCapacityBasisPoints = 0,
+                    NextIndependentEventDay = world.AbsoluteDay + 30,
+                    NextIndependentEventReason =
+                        "monthly_household_settlement"
                 };
                 CharacterAbilityBootstrap.InitializeChild(
                     world,
@@ -193,8 +200,8 @@ namespace Mandate.Simulation
                     father,
                     mother);
                 world.People.Add(child);
-                _populationLedgerSystem.RecordBirth(world, child);
                 family.MemberIds.Add(child.Id);
+                _populationLedgerSystem.RecordBirth(world, child);
                 mother.LastChildbirthDay = world.AbsoluteDay;
                 AddEvent(
                     world,

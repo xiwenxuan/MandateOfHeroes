@@ -58,6 +58,8 @@ namespace Mandate.Domain
         public string Id;
         public string DisplayName;
         public string LocationId;
+        public string BirthLocationId;
+        public string FamilyId;
         public long BirthDay;
         public bool IsAlive = true;
         public int HealthBasisPoints = 10_000;
@@ -72,6 +74,12 @@ namespace Mandate.Domain
         public long LastChildbirthDay = -1;
         public bool CountsTowardPopulation = true;
         public string PopulationOriginLocationId;
+        public VillageOccupation VillageOccupation = VillageOccupation.Unknown;
+        public int LaborCapacityBasisPoints = 10_000;
+        public long NextIndependentEventDay = -1;
+        public string NextIndependentEventReason;
+        public LocalDutyKind LocalDuty = LocalDutyKind.None;
+        public long LocalDutyUntilDay = -1;
         public bool AbilityProfileInitialized;
         public CharacterAptitudeState Aptitudes = new CharacterAptitudeState();
         public ProfessionalSkillState ProfessionalSkills =
@@ -106,13 +114,26 @@ namespace Mandate.Domain
         public string HeadPersonId;
         public long Wealth;
         public long Debt;
+        public string LocationId;
+        public string VillageId;
+        public long Grain;
+        public long SeedGrain;
+        public int FarmlandUnits;
+        public int CultivatedLandUnits;
+        public long PlantedSeedGrain;
+        public int ToolConditionBasisPoints = 10_000;
+        public int FoodSecurityBasisPoints = 10_000;
+        public long TaxArrearsGrain;
+        public int CorveeDaysThisYear;
+        public long LastHarvestGrain;
+        public long LastConsumptionGrain;
         public List<string> MemberIds = new List<string>();
     }
 
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 5;
+        public const int CurrentSchemaVersion = 6;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -166,6 +187,11 @@ namespace Mandate.Domain
             new List<MilitaryServiceState>();
         public List<MilitaryOrderState> MilitaryOrders =
             new List<MilitaryOrderState>();
+        public List<VillageState> Villages = new List<VillageState>();
+        public List<VillageFacilityState> VillageFacilities =
+            new List<VillageFacilityState>();
+        public List<VillageLedgerEntryState> VillageLedgerEntries =
+            new List<VillageLedgerEntryState>();
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -247,6 +273,11 @@ namespace Mandate.Domain
                 MilitaryServices, item => item.Id, "military service");
             ValidateUniqueIds(
                 MilitaryOrders, item => item.Id, "military order");
+            ValidateUniqueIds(Villages, item => item.Id, "village");
+            ValidateUniqueIds(
+                VillageFacilities, item => item.Id, "village facility");
+            ValidateUniqueIds(
+                VillageLedgerEntries, item => item.Id, "village ledger entry");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -263,6 +294,18 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid cargo capacity for {person.Id}.");
+                }
+
+                if (person.LaborCapacityBasisPoints < 0 ||
+                    person.LaborCapacityBasisPoints > 10_000 ||
+                    !Enum.IsDefined(
+                        typeof(VillageOccupation), person.VillageOccupation) ||
+                    !Enum.IsDefined(typeof(LocalDutyKind), person.LocalDuty) ||
+                    person.NextIndependentEventDay < -1 ||
+                    person.LocalDutyUntilDay < -1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid village profile for {person.Id}.");
                 }
 
                 ValidateBasisPoints(person.Personality.Ambition, person.Id, "ambition");
@@ -458,10 +501,19 @@ namespace Mandate.Domain
                     throw new InvalidOperationException(
                         $"Person {person.Id} has an invalid population origin.");
                 }
+
+                if (!string.IsNullOrEmpty(person.BirthLocationId) &&
+                    !locationIds.Contains(person.BirthLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has an invalid birth location.");
+                }
             }
 
             ValidatePopulationLedger(personIds, locationIds);
 
+            var assignedFamilyByPerson =
+                new Dictionary<string, string>(StringComparer.Ordinal);
             for (var i = 0; i < Families.Count; i++)
             {
                 var family = Families[i] ?? throw new InvalidOperationException("A family cannot be null.");
@@ -472,7 +524,26 @@ namespace Mandate.Domain
                         $"Family {family.Id} references missing head {family.HeadPersonId}.");
                 }
 
-                if (family.Wealth < 0 || family.Debt < 0)
+                if (!family.MemberIds.Contains(family.HeadPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Family {family.Id} does not contain its head.");
+                }
+
+                if (family.Wealth < 0 || family.Debt < 0 ||
+                    family.Grain < 0 || family.SeedGrain < 0 ||
+                    family.FarmlandUnits < 0 ||
+                    family.CultivatedLandUnits < 0 ||
+                    family.CultivatedLandUnits > family.FarmlandUnits ||
+                    family.PlantedSeedGrain < 0 ||
+                    family.ToolConditionBasisPoints < 0 ||
+                    family.ToolConditionBasisPoints > 10_000 ||
+                    family.FoodSecurityBasisPoints < 0 ||
+                    family.FoodSecurityBasisPoints > 10_000 ||
+                    family.TaxArrearsGrain < 0 ||
+                    family.CorveeDaysThisYear < 0 ||
+                    family.LastHarvestGrain < 0 ||
+                    family.LastConsumptionGrain < 0)
                 {
                     throw new InvalidOperationException(
                         $"Family {family.Id} has invalid finances.");
@@ -485,8 +556,59 @@ namespace Mandate.Domain
                         throw new InvalidOperationException(
                             $"Family {family.Id} references missing member {family.MemberIds[memberIndex]}.");
                     }
+
+                    var memberId = family.MemberIds[memberIndex];
+                    if (assignedFamilyByPerson.ContainsKey(memberId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Person {memberId} belongs to multiple families.");
+                    }
+
+                    assignedFamilyByPerson.Add(memberId, family.Id);
+                }
+
+                if (!string.IsNullOrEmpty(family.LocationId) &&
+                    !locationIds.Contains(family.LocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Family {family.Id} references a missing location.");
                 }
             }
+
+            for (var i = 0; i < People.Count; i++)
+            {
+                var person = People[i];
+                var isAssigned = assignedFamilyByPerson.TryGetValue(
+                    person.Id, out var assignedFamilyId);
+                if (string.IsNullOrEmpty(person.FamilyId))
+                {
+                    if (isAssigned)
+                    {
+                        for (var familyIndex = 0;
+                             familyIndex < Families.Count;
+                             familyIndex++)
+                        {
+                            if (Families[familyIndex].Id == assignedFamilyId &&
+                                !string.IsNullOrEmpty(
+                                    Families[familyIndex].VillageId))
+                            {
+                                throw new InvalidOperationException(
+                                    $"Village person {person.Id} lacks a family reference.");
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (!isAssigned || assignedFamilyId != person.FamilyId)
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has an inconsistent family reference.");
+                }
+            }
+
+            ValidateVillages(personIds, locationIds);
 
             var routeIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Routes.Count; i++)
@@ -1798,6 +1920,141 @@ namespace Mandate.Domain
             {
                 throw new InvalidOperationException(
                     $"Person {ownerId} has a missing {field} reference.");
+            }
+        }
+
+        private void ValidateVillages(
+            HashSet<string> personIds,
+            HashSet<string> locationIds)
+        {
+            var familyIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < Families.Count; i++)
+            {
+                familyIds.Add(Families[i].Id);
+            }
+
+            var villageIds = new HashSet<string>(StringComparer.Ordinal);
+            var assignedHouseholds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                var village = Villages[i] ??
+                    throw new InvalidOperationException("A village cannot be null.");
+                _ = new StableId(village.Id);
+                villageIds.Add(village.Id);
+                if (!locationIds.Contains(village.LocationId) ||
+                    !string.IsNullOrEmpty(village.ParentLocationId) &&
+                    !locationIds.Contains(village.ParentLocationId) ||
+                    village.PublicGranaryGrain < 0 ||
+                    village.TaxGrainCollected < 0 ||
+                    village.CorveeDaysCompleted < 0 ||
+                    village.LevyPersonDays < 0 ||
+                    village.LivingResidentCount < 0 ||
+                    village.WorkingResidentCount < 0 ||
+                    village.HouseholdCount < 0 ||
+                    village.FoodSecurityBasisPoints < 0 ||
+                    village.FoodSecurityBasisPoints > 10_000 ||
+                    village.LastSettlementDay < -1 ||
+                    village.NextSettlementDay < 0 ||
+                    village.LedgerOpeningFamilyGrain < 0 ||
+                    village.LedgerOpeningPublicGrain < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid village {village.Id}.");
+                }
+
+                if (village.HouseholdCount != village.HouseholdIds.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"Village {village.Id} has a stale household cache.");
+                }
+
+                for (var householdIndex = 0;
+                     householdIndex < village.HouseholdIds.Count;
+                     householdIndex++)
+                {
+                    var familyId = village.HouseholdIds[householdIndex];
+                    if (!familyIds.Contains(familyId) ||
+                        !assignedHouseholds.Add(familyId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Village {village.Id} has an invalid household {familyId}.");
+                    }
+
+                    FamilyState family = null;
+                    for (var familyIndex = 0;
+                         familyIndex < Families.Count;
+                         familyIndex++)
+                    {
+                        if (Families[familyIndex].Id == familyId)
+                        {
+                            family = Families[familyIndex];
+                            break;
+                        }
+                    }
+
+                    if (family == null ||
+                        family.VillageId != village.Id ||
+                        family.LocationId != village.LocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Village {village.Id} and household {familyId} disagree.");
+                    }
+                }
+            }
+
+            for (var i = 0; i < Families.Count; i++)
+            {
+                var family = Families[i];
+                if (!string.IsNullOrEmpty(family.VillageId) &&
+                    (!villageIds.Contains(family.VillageId) ||
+                     !assignedHouseholds.Contains(family.Id)))
+                {
+                    throw new InvalidOperationException(
+                        $"Family {family.Id} has an invalid village reference.");
+                }
+            }
+
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                var facility = VillageFacilities[i] ??
+                    throw new InvalidOperationException(
+                        "A village facility cannot be null.");
+                if (!villageIds.Contains(facility.VillageId) ||
+                    !Enum.IsDefined(
+                        typeof(VillageFacilityKind), facility.Kind) ||
+                    !string.IsNullOrEmpty(facility.OwnerFamilyId) &&
+                    !familyIds.Contains(facility.OwnerFamilyId) ||
+                    !string.IsNullOrEmpty(facility.ManagerPersonId) &&
+                    !personIds.Contains(facility.ManagerPersonId) ||
+                    facility.Capacity < 0 ||
+                    facility.ConditionBasisPoints < 0 ||
+                    facility.ConditionBasisPoints > 10_000 ||
+                    facility.InventoryUnits < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid village facility {facility.Id}.");
+                }
+            }
+
+            for (var i = 0; i < VillageLedgerEntries.Count; i++)
+            {
+                var entry = VillageLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A village ledger entry cannot be null.");
+                if (entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !villageIds.Contains(entry.VillageId) ||
+                    !Enum.IsDefined(
+                        typeof(VillageLedgerEntryType), entry.Type) ||
+                    !string.IsNullOrEmpty(entry.FamilyId) &&
+                    !familyIds.Contains(entry.FamilyId) ||
+                    !string.IsNullOrEmpty(entry.PersonId) &&
+                    !personIds.Contains(entry.PersonId) ||
+                    entry.Quantity < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid village ledger entry {entry.Id}.");
+                }
+
             }
         }
 

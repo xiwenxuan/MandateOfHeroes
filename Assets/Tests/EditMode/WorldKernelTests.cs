@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mandate.Domain;
 using Mandate.Persistence;
 using Mandate.Simulation;
@@ -2709,7 +2710,9 @@ namespace Mandate.Tests
             var loaded = WorldSnapshotSerializer.Deserialize(
                 WorldSnapshotSerializer.Serialize(world));
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(5));
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.MilitaryServiceInitialized, Is.True);
             Assert.That(
                 loaded.MilitaryServices.Count,
@@ -2775,7 +2778,9 @@ namespace Mandate.Tests
 
             var loaded = WorldSnapshotSerializer.Deserialize(legacyJson);
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(5));
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.MilitaryServiceInitialized, Is.False);
             Assert.That(loaded.MilitaryServices.Count, Is.EqualTo(0));
             Assert.That(loaded.Armies.Count, Is.EqualTo(1));
@@ -2808,6 +2813,254 @@ namespace Mandate.Tests
             var cacheWorld = PrototypeWorldFactory.Create184World(184);
             cacheWorld.Armies[0].Troops--;
             Assert.Throws<InvalidOperationException>(cacheWorld.Validate);
+        }
+
+        [Test]
+        public void VillagePrototype_CreatesThreeHundredPermanentPeople()
+        {
+            var world = VillagePrototypeFactory.Create();
+            var village = world.Villages[0];
+            var audit = new VillageLifeSystem(world.MasterSeed).Audit(
+                world, village.Id);
+            var personIds = new HashSet<string>(StringComparer.Ordinal);
+
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                Assert.That(personIds.Add(world.People[i].Id), Is.True);
+                Assert.That(world.People[i].FamilyId, Is.Not.Empty);
+                Assert.That(world.People[i].BirthLocationId, Is.EqualTo(village.LocationId));
+            }
+
+            Assert.That(world.People.Count, Is.EqualTo(300));
+            Assert.That(world.Families.Count, Is.InRange(40, 100));
+            Assert.That(audit.PermanentPeople, Is.EqualTo(300));
+            Assert.That(audit.LivingResidents, Is.EqualTo(300));
+            Assert.That(audit.HouseholdMembers, Is.EqualTo(300));
+            Assert.That(audit.AbstractPopulation, Is.EqualTo(0));
+            Assert.That(audit.IsValid, Is.True);
+            Assert.That(world.PopulationCohorts.Count, Is.EqualTo(0));
+            world.Validate();
+        }
+
+        [Test]
+        public void VillagePrototype_SameSeedProducesSamePermanentFacts()
+        {
+            var first = VillagePrototypeFactory.Create(240, 7_777);
+            var second = VillagePrototypeFactory.Create(240, 7_777);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(first),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(second)));
+        }
+
+        [Test]
+        public void VillageLife_WorldSimulatorRunsMonthlySettlement()
+        {
+            var world = VillagePrototypeFactory.Create(200, 7_778);
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 30);
+
+            Assert.That(world.Villages[0].LastSettlementDay, Is.EqualTo(30));
+            Assert.That(world.VillageLedgerEntries.Count, Is.GreaterThan(0));
+            Assert.That(world.AbsoluteDay, Is.EqualTo(30));
+            world.Validate();
+        }
+
+        [Test]
+        public void VillageLife_OneYearClosesHouseholdLoopWithoutDeletingPeople()
+        {
+            var world = VillagePrototypeFactory.Create();
+            var originalIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                originalIds.Add(world.People[i].Id);
+            }
+
+            SimulateVillageMonths(world, 12);
+
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                originalIds.Remove(world.People[i].Id);
+            }
+
+            var types = new HashSet<VillageLedgerEntryType>();
+            for (var i = 0; i < world.VillageLedgerEntries.Count; i++)
+            {
+                types.Add(world.VillageLedgerEntries[i].Type);
+            }
+
+            var audit = new VillageLifeSystem(world.MasterSeed).Audit(
+                world, world.Villages[0].Id);
+            var populationAudit = new PopulationLedgerSystem().Audit(world);
+            Assert.That(originalIds, Is.Empty);
+            Assert.That(world.People.Count, Is.GreaterThanOrEqualTo(300));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Planting));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Harvest));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.FoodConsumption));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.GrainRelief));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.TaxPayment));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Corvee));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Levy));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Marriage));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.Migration));
+            Assert.That(types, Does.Contain(VillageLedgerEntryType.MedicalCare));
+            Assert.That(
+                world.LifeEvents.Exists(item => item.Type == LifeEventType.Birth),
+                Is.True);
+            Assert.That(audit.IsValid, Is.True);
+            Assert.That(populationAudit.IsBalanced, Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void VillageLife_DeathKeepsPermanentPersonAndTransfersHeadship()
+        {
+            var world = VillagePrototypeFactory.Create(200, 10_002);
+            var family = world.Families[0];
+            var formerHead = world.People.Find(
+                person => person.Id == family.HeadPersonId);
+            formerHead.HealthBasisPoints = 0;
+            world.AbsoluteDay = 30;
+
+            new LifeSimulationSystem(world.MasterSeed).ResolveMonthly(world);
+            VillageLifeSystem.RefreshAllCaches(world);
+
+            Assert.That(formerHead.IsAlive, Is.False);
+            Assert.That(world.People.Exists(item => item.Id == formerHead.Id), Is.True);
+            Assert.That(family.HeadPersonId, Is.Not.EqualTo(formerHead.Id));
+            Assert.That(
+                world.LifeEvents.Exists(
+                    item =>
+                        item.Type == LifeEventType.Death &&
+                        item.PrimaryPersonId == formerHead.Id),
+                Is.True);
+            Assert.That(
+                world.LifeEvents.Exists(
+                    item =>
+                        item.Type == LifeEventType.Succession &&
+                        item.FamilyId == family.Id),
+                Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void VillageLife_MissingBlacksmithCausesGreaterToolLoss()
+        {
+            var staffed = VillagePrototypeFactory.Create(200, 8_888);
+            var missing = VillagePrototypeFactory.Create(200, 8_888);
+            var smithy = missing.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Smithy);
+            var smith = missing.People.Find(
+                item => item.Id == smithy.ManagerPersonId);
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                missing, smith, missing.Villages[0].ParentLocationId);
+
+            SimulateVillageMonths(staffed, 6);
+            SimulateVillageMonths(missing, 6);
+
+            Assert.That(
+                AverageToolCondition(missing),
+                Is.LessThan(AverageToolCondition(staffed)));
+            Assert.That(
+                missing.VillageLedgerEntries.Exists(
+                    item => item.Type == VillageLedgerEntryType.ToolRepair),
+                Is.False);
+            Assert.That(
+                staffed.VillageLedgerEntries.Exists(
+                    item => item.Type == VillageLedgerEntryType.ToolRepair),
+                Is.True);
+        }
+
+        [Test]
+        public void VillageAttention_ChangesReportDetailButNotWorldFacts()
+        {
+            var world = VillagePrototypeFactory.Create(200, 9_999);
+            SimulateVillageMonths(world, 2);
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var system = new VillageLifeSystem(world.MasterSeed);
+            var none = system.BuildAttentionReport(
+                world, world.Villages[0].Id, VillageAttentionLevel.None);
+            var deep = system.BuildAttentionReport(
+                world, world.Villages[0].Id, VillageAttentionLevel.Deep);
+            var after = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.That(none.PermanentPeople, Is.EqualTo(deep.PermanentPeople));
+            Assert.That(none.LivingResidents, Is.EqualTo(deep.LivingResidents));
+            Assert.That(none.FamilyGrain, Is.EqualTo(deep.FamilyGrain));
+            Assert.That(none.HouseholdDetails.Count, Is.EqualTo(0));
+            Assert.That(deep.HouseholdDetails.Count, Is.GreaterThan(0));
+            Assert.That(after, Is.EqualTo(before));
+        }
+
+        [Test]
+        public void VillageSnapshot_RoundTripPreservesPermanentHouseholdFacts()
+        {
+            var world = VillagePrototypeFactory.Create(200, 10_001);
+            SimulateVillageMonths(world, 12);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(6));
+            Assert.That(loaded.People.Count, Is.EqualTo(world.People.Count));
+            Assert.That(loaded.Families.Count, Is.EqualTo(world.Families.Count));
+            Assert.That(loaded.Villages.Count, Is.EqualTo(1));
+            Assert.That(
+                loaded.VillageFacilities.Count,
+                Is.EqualTo(world.VillageFacilities.Count));
+            Assert.That(
+                loaded.VillageLedgerEntries.Count,
+                Is.EqualTo(world.VillageLedgerEntries.Count));
+            Assert.That(
+                loaded.People[0].FamilyId,
+                Is.EqualTo(world.People[0].FamilyId));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiveFamilyReferencesToVersionSix()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": 6", "\"SchemaVersion\": 5");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+            var family = loaded.Families[0];
+            var member = loaded.People.Find(
+                person => person.Id == family.MemberIds[0]);
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(6));
+            Assert.That(loaded.Villages, Is.Not.Null);
+            Assert.That(loaded.VillageFacilities, Is.Not.Null);
+            Assert.That(loaded.VillageLedgerEntries, Is.Not.Null);
+            Assert.That(member.FamilyId, Is.EqualTo(family.Id));
+            Assert.That(member.BirthLocationId, Is.Not.Empty);
+            loaded.Validate();
+        }
+
+        private static void SimulateVillageMonths(WorldState world, int months)
+        {
+            var village = new VillageLifeSystem(world.MasterSeed);
+            var life = new LifeSimulationSystem(world.MasterSeed);
+            for (var month = 1; month <= months; month++)
+            {
+                world.AbsoluteDay = month * 30L;
+                village.ResolveMonthly(world);
+                life.ResolveMonthly(world);
+                VillageLifeSystem.RefreshAllCaches(world);
+                world.Validate();
+            }
+        }
+
+        private static int AverageToolCondition(WorldState world)
+        {
+            var total = 0;
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                total += world.Families[i].ToolConditionBasisPoints;
+            }
+
+            return total / world.Families.Count;
         }
 
         private static WorldState BuildGuangzongBattleWorld()
