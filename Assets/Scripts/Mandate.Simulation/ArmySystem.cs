@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -9,6 +10,7 @@ namespace Mandate.Simulation
 
         public ArmyMarchState StartMarch(
             WorldState world,
+            StableId issuerPersonId,
             StableId armyId,
             StableId routeId,
             StableId destinationId)
@@ -20,6 +22,18 @@ namespace Mandate.Simulation
 
             world.Validate();
             var army = FindArmy(world, armyId.Value);
+            var order = new MilitaryAuthoritySystem().IssueOrder(
+                world,
+                issuerPersonId,
+                armyId,
+                MilitaryOrderType.March,
+                MilitaryAuthorityLevel.Army,
+                targetLocationId: destinationId.Value);
+            if (order.Result == MilitaryOrderResult.Rejected)
+            {
+                throw new InvalidOperationException(order.Summary);
+            }
+
             if (!army.IsMobilized || army.Troops <= 0)
             {
                 throw new InvalidOperationException(
@@ -71,9 +85,32 @@ namespace Mandate.Simulation
                     continue;
                 }
 
+                world.ArmyMarches.RemoveAt(i);
                 var army = FindArmy(world, march.ArmyId);
                 army.LocationId = march.DestinationLocationId;
-                world.ArmyMarches.RemoveAt(i);
+                if (world.MilitaryServiceInitialized)
+                {
+                    var personnel = new List<PersonState>();
+                    for (var serviceIndex = 0;
+                         serviceIndex < world.MilitaryServices.Count;
+                         serviceIndex++)
+                    {
+                        var service = world.MilitaryServices[serviceIndex];
+                        if (service.ArmyId == army.Id &&
+                            (service.Status == MilitaryServiceStatus.Mustering ||
+                             service.Status == MilitaryServiceStatus.Active ||
+                             service.Status == MilitaryServiceStatus.Wounded))
+                        {
+                            personnel.Add(FindPerson(world, service.PersonId));
+                        }
+                    }
+
+                    new PopulationLedgerSystem().MovePeople(
+                        world,
+                        personnel,
+                        march.DestinationLocationId,
+                        false);
+                }
             }
         }
 
@@ -93,7 +130,11 @@ namespace Mandate.Simulation
                 army.MoraleBasisPoints = Math.Max(
                     0, army.MoraleBasisPoints - 150);
                 var deserters = Math.Max(1, army.Troops / 500);
-                army.Troops = Math.Max(0, army.Troops - deserters);
+                new MilitaryServiceSystem().ApplyDesertion(
+                    world,
+                    new StableId(army.Id),
+                    deserters,
+                    world.Revision);
                 if (army.Troops == 0)
                 {
                     army.IsMobilized = false;
@@ -126,6 +167,21 @@ namespace Mandate.Simulation
             }
 
             return null;
+        }
+
+        private static PersonState FindPerson(
+            WorldState world,
+            string personId)
+        {
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                if (world.People[i].Id == personId)
+                {
+                    return world.People[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing person {personId}.");
         }
 
         private static RouteState FindRoute(WorldState world, string routeId)

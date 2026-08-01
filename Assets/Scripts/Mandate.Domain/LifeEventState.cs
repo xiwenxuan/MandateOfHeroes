@@ -16,7 +16,9 @@ namespace Mandate.Domain
         Recovery,
         Birth,
         Death,
-        Succession
+        Succession,
+        Marriage,
+        Migration
     }
 
     [Serializable]

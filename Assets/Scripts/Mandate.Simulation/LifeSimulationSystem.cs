@@ -8,6 +8,8 @@ namespace Mandate.Simulation
     {
         private const int DaysPerYear = 360;
         private readonly NamedRandom _random;
+        private readonly PopulationLedgerSystem _populationLedgerSystem =
+            new PopulationLedgerSystem();
 
         public LifeSimulationSystem(ulong masterSeed)
         {
@@ -176,6 +178,8 @@ namespace Mandate.Simulation
                     Id = childId,
                     DisplayName = $"新生儿{childIndex}",
                     LocationId = mother.LocationId,
+                    BirthLocationId = mother.LocationId,
+                    FamilyId = family.Id,
                     BirthDay = world.AbsoluteDay,
                     Gender = _random.CheckBasisPoints(
                         "life", motherId, monthIndex, "child_gender", 5_000)
@@ -183,10 +187,21 @@ namespace Mandate.Simulation
                         : PersonGender.Male,
                     FatherPersonId = father.Id,
                     MotherPersonId = mother.Id,
-                    Provisions = 0
+                    Provisions = 0,
+                    VillageOccupation = VillageOccupation.Dependent,
+                    LaborCapacityBasisPoints = 0,
+                    NextIndependentEventDay = world.AbsoluteDay + 30,
+                    NextIndependentEventReason =
+                        "monthly_household_settlement"
                 };
+                CharacterAbilityBootstrap.InitializeChild(
+                    world,
+                    child,
+                    father,
+                    mother);
                 world.People.Add(child);
                 family.MemberIds.Add(child.Id);
+                _populationLedgerSystem.RecordBirth(world, child);
                 mother.LastChildbirthDay = world.AbsoluteDay;
                 AddEvent(
                     world,
@@ -199,14 +214,14 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveDeathsAndSuccession(WorldState world)
+        private void ResolveDeathsAndSuccession(WorldState world)
         {
             for (var i = 0; i < world.People.Count; i++)
             {
                 var person = world.People[i];
                 if (person.IsAlive && person.HealthBasisPoints <= 0)
                 {
-                    person.IsAlive = false;
+                    _populationLedgerSystem.RecordDeath(world, person);
                     AddEvent(
                         world,
                         LifeEventType.Death,
