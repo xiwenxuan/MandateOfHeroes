@@ -8,6 +8,7 @@ Outcome:
 
 Changed:
 - Important file and behavior changes.
+- Working-tree changes deliberately left outside the task.
 
 Validation:
 - Full compile: passed/failed/not run; command and summary.
@@ -22,4 +23,4 @@ Next:
 - The single most useful next action, when applicable.
 ```
 
-Never write “all tests passed” when a required stage was blocked or not run.
+Never write “all tests passed” when a required stage was blocked or not run. State whether changes were committed or intentionally left uncommitted.

@@ -1,6 +1,6 @@
 # Persistence and determinism
 
-Read `Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md` before changing persistence or deterministic behavior.
+Read `Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md` before changing persistence or deterministic behavior. Also read `Docs/TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md` when work affects permanent people, households, attention tiers, event scheduling, or partitioned storage.
 
 ## Current sources of truth
 
@@ -23,6 +23,8 @@ Verify these symbols in source because versions and fields can change.
 7. Do not derive persistent identity from list positions, runtime instance IDs, current time, or unstable hashes.
 8. Route random decisions through named deterministic streams with stable entity IDs and explicit time/action coordinates.
 9. Preserve deterministic iteration order when collection order affects outcomes.
+10. Treat every person's stable identity and life history as permanent state from birth; a summary or cache may optimize access but may not replace, merge, rerandomize, or erase that identity.
+11. When partitioning world data, preserve cross-partition references and provide a deterministic reconstruction path.
 
 ## Required tests
 
@@ -31,4 +33,5 @@ Verify these symbols in source because versions and fields can change.
 - reject zero, negative, future, or unsupported versions as appropriate;
 - load missing optional collections safely when compatibility requires it;
 - produce identical results from the same seed and starting state;
-- preserve identity and cross-references after round trip.
+- preserve identity and cross-references after round trip;
+- preserve permanent people across attention-tier changes and partition load/unload cycles.

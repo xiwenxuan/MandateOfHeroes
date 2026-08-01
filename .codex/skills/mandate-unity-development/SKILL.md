@@ -1,79 +1,60 @@
 ---
 name: mandate-unity-development
-description: Develop, diagnose, refactor, test, and deliver Unity/C# changes in the MandateOfHeroes repository. Use for work involving its domain model, world simulation, combat, characters, maps, missions, economy, persistence, ScriptableObjects, scenes, prefabs, editor integration, milestone task documents, compilation, core regression tests, or controlled Unity tests.
+description: Develop, diagnose, review, plan, test, and deliver Unity/C# work in the MandateOfHeroes repository. Use for domain, world simulation, combat, characters, maps, missions, economy, production, construction, research, governance, permanent population, persistence, content data, ScriptableObjects, scenes, prefabs, editor integration, milestone documents, compilation, core regression tests, or controlled Unity tests.
 ---
 
 # MandateOfHeroes Unity Development
 
-Follow the repository's rules and leave evidence for every validation claim.
+Use this skill as the project's execution workflow. `AGENTS.md` remains the authoritative repository rule set.
 
-## Establish authority and scope
+## Start
 
-1. Locate the repository root from the current workspace.
-2. Read `AGENTS.md` completely before taking task actions.
-3. Treat `AGENTS.md` and the user's current request as authoritative. Never weaken them with this skill.
-4. Read the task's directly related files under `Docs/`.
-5. Inspect `git status` before editing. Preserve unrelated and user-authored changes.
-6. Search existing production code and tests before designing a new abstraction.
-7. State any assumption that changes persistence, architecture, public behavior, or task scope.
+1. Locate the repository root and read `AGENTS.md` completely.
+2. Inspect `git status` and preserve unrelated or user-authored changes.
+3. Classify the request as read-only review/diagnosis, documentation, or implementation/fix.
+4. Read [task-routing.md](references/task-routing.md), then load only the relevant design documents and references. Use `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` whenever the task decides system status, cross-system boundaries, production/construction/research rules, or the next development milestone.
+5. Inspect existing production code and tests before proposing a new abstraction.
+6. State assumptions that change persistence, architecture, public behavior, or task scope.
 
-Read references conditionally:
+## Load references
 
-- Read [architecture.md](references/architecture.md) to locate code or decide dependency placement.
+- Always use [task-routing.md](references/task-routing.md) for substantive project work.
+- Read [architecture.md](references/architecture.md) before choosing code placement or dependencies.
 - Read [testing.md](references/testing.md) before compiling or running tests.
-- Read [persistence.md](references/persistence.md) for saves, DTOs, migrations, random behavior, time progression, or world-state changes.
-- Read [content-and-data.md](references/content-and-data.md) for ScriptableObjects, static content, historical data, scenes, prefabs, or third-party assets.
+- Read [persistence.md](references/persistence.md) for saves, DTOs, migrations, stable identity, deterministic random, time, permanent population, or partitioned storage.
+- Read [content-and-data.md](references/content-and-data.md) for historical content, assets, ScriptableObjects, scenes, prefabs, and serialized Unity content.
 - Read [delivery-template.md](references/delivery-template.md) before reporting completion.
 
-## Choose the workflow
+## Execute
 
-- For implementation or fixes: inspect, edit, compile, run core tests, run one controlled Unity test when required, then review the diff.
-- For diagnosis only: use read-only inspection and report evidence; do not implement unless asked.
-- For document-only changes: edit and run `git diff --check`; record compilation and tests as not run because only documentation changed.
-- For review or explanation: inspect and report; do not mutate external systems or the repository unless requested.
+- For review or explanation, inspect and report without modifying the repository.
+- For diagnosis, gather evidence and explain the cause; implement only when requested.
+- For documentation work, keep edits scoped and run documentation-mode validation.
+- For implementation or fixes, make the smallest coherent change and add proportionate tests.
+- Keep hard invariants in `AGENTS.md`; do not duplicate or weaken them in task documents.
+- Do not infer priority from milestone numbers. The user's current request and active plan determine priority.
 
-## Implement safely
+## Validate
 
-1. Keep domain rules in pure C# where practical.
-2. Do not make presentation state the sole source of authoritative game state.
-3. Use the project's deterministic random and stable-ID mechanisms.
-4. Serialize independent DTO/state structures rather than complex runtime objects.
-5. Add a migration and round-trip coverage when changing persisted state.
-6. Add a regression test that reproduces a fixed defect.
-7. Avoid unrelated formatting, cleanup, or refactors.
-8. Do not add code, data, or assets without compatible and recorded licensing.
+Use the unified verification entry point:
 
-## Validate in order
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File `
+  .codex\skills\mandate-unity-development\scripts\verify-project.ps1
+```
 
-For code changes, perform these steps in order:
+For documentation-only work:
 
-1. Compile the whole solution.
-2. Run the fast core regression suite based on `Tools/CoreTestRunner.cs`.
-3. Run one controlled Unity test through `Tools/Run-UnityTestsSafe.ps1`.
-4. Run `git diff --check` and inspect the scoped diff.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File `
+  .codex\skills\mandate-unity-development\scripts\verify-project.ps1 `
+  -DocumentationOnly
+```
 
-Use [verify-project.ps1](scripts/verify-project.ps1) as the unified entry point. Use `-SkipUnity` only for document-only work or when Unity is blocked, and record why.
-
-Stop on failure and fix the failing stage before continuing. Do not substitute compilation for testing. Never call a test passed without a result file or explicit test summary.
-
-## Protect long-running tools
-
-1. Never run Unity, a build, or a test tool as an unbounded foreground process.
-2. Use a 300-second default hard timeout.
-3. Start long tools in the background and poll at intervals no longer than five seconds.
-4. Retain the process ID, log path, and result path while polling.
-5. On timeout, terminate only the process tree started for the current task and report the log tail.
-6. Check for an existing Unity process before batch tests. Report a project-lock conflict and do not close the user's editor.
-7. After an interrupted outer call, inspect and clean up only stale, over-time processes created by that task.
+Use `-SkipUnity` only when Unity integration is not required or is environmentally blocked, and report the reason. Stop at a failed stage; never merge `passed`, `failed`, `blocked`, and `not run` into one claim.
 
 ## Deliver
 
-Report:
-
-- the outcome and scoped files changed;
-- compilation status and evidence;
-- core-test status and explicit summary;
-- Unity-test status, result path, or blocking evidence;
-- known limitations and the most relevant next step.
+Follow [delivery-template.md](references/delivery-template.md). Report the outcome, scoped files, compilation, core tests, Unity tests, diff validation, limitations, and the most relevant next step.
 
 Do not commit, push, create a pull request, delete user data, close Unity, or expand the task without authorization.

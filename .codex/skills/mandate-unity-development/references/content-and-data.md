@@ -1,12 +1,14 @@
 # Content and data
 
-Read the directly relevant design document before adding content. Common sources include:
+Use [task-routing.md](task-routing.md) to select the directly relevant design before adding content. Common sources include:
 
 - `Docs/DATA_AND_CONTENT_FOUNDATION.md`
+- `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` for production, construction, agriculture, industry, or technology data
 - `Docs/LEGAL_AND_ASSETS.md`
 - `Docs/HISTORICAL_CITY_LIST.md`
 - `Docs/HISTORICAL_CHARACTERS_FIRST_50.md`
 - `Docs/HISTORICAL_EVENTS_182_190.md`
+- `Docs/HISTORICAL_POPULATION_135_260.md`
 
 ## Rules
 
@@ -18,6 +20,7 @@ Read the directly relevant design document before adding content. Common sources
 6. Keep historical facts, original game expression, and third-party source material distinguishable.
 7. Record license, source, author, and modification status for every external asset.
 8. Do not copy proprietary game UI, maps, text, data, audio, or art.
+9. Population-scale source data may guide generation and validation, but it must not silently overwrite established permanent identities or household histories.
 
 ## Unity acceptance
 
