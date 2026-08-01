@@ -14,44 +14,56 @@
 
 ## 当前阶段
 
-项目处于预制作阶段。详细方案见：
+项目处于“核心系统原型与长期架构重构阶段”。已经存在人物开局、地图旅行、
+任务、家庭、市场、建设、教育、军队、军令、伤亡和医疗等缩尺原型；永久人口、
+超大存储、完整生产链、科研、治理和统一战争仍需按正式设计继续建设。
 
-- `Docs/DEVELOPMENT_PLAN.md`
-- `Docs/GAME_VISION_AND_GAMEPLAY.md`
-- `Docs/DATA_AND_CONTENT_FOUNDATION.md`
-- `Docs/PREPRODUCTION_BACKLOG.md`
-- `Docs/HISTORICAL_CITY_LIST.md`
-- `Docs/CITY_UNION_MASTER.md`
-- `Docs/SERIES_REFERENCE_AUDIT.md`
-- `Docs/LEGAL_AND_ASSETS.md`
-- `Docs/HISTORICAL_EVENTS_182_190.md`
-- `Docs/HISTORICAL_CHARACTERS_FIRST_50.md`
-- `Docs/PROTOTYPE_MAP_184_ZHUO_GUANGZONG.md`
-- `Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md`
-- `Docs/SANDBOX_NPC_AI.md`
-- `Docs/TASK_M1_PLAYABLE_ENTRY.md`
-- `Docs/TASK_M2_VISUAL_REGION_MAP.md`
-- `Docs/TASK_M3_SILK_MAP_ART_SLICE.md`
-- `Docs/TASK_M4_LOCATION_GEOGRAPHY.md`
-- `Docs/TASK_M5_IDENTITY_MAP_PERSPECTIVES.md`
-- `Docs/TASK_M6_IDENTITY_CONSTRUCTION.md`
-- `Docs/TASK_M7_POPULATION_LEDGER.md`
-- `Docs/TASK_M8_CHARACTER_ABILITY_FOUNDATION.md`
-- `Docs/TASK_M9_EDUCATION_AND_PRACTICE.md`
-- `Docs/TASK_M10_REAL_MILITARY_SERVICE_AND_COMMAND.md`
-- `Docs/TASK_PROJECT_UNITY_DEVELOPMENT_SKILL.md`
-- `Docs/UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md`
-- `Docs/WORLD_SIMULATION_FOUNDATION.md`
-- `Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`
-- `Docs/MAP_ART_RESOURCE_PLAN.md`
+### 核心设计文档
+
+按以下顺序阅读：
+
+1. [核心玩法与游戏愿景](Docs/GAME_VISION_AND_GAMEPLAY.md)
+2. [系统总纲、当前状态与生产科研](Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md)
+3. [世界模拟、人口经济与地方战争](Docs/WORLD_SIMULATION_FOUNDATION.md)
+4. [人物属性、词条与家族培养](Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md)
+5. [统一战斗、军团与战争权限](Docs/UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md)
+6. [M12：永久人口、分级模拟与关注演出](Docs/TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md)
+7. [135—260年历史人口基线](Docs/HISTORICAL_POPULATION_135_260.md)
+
+系统总纲负责统一索引、状态定义、技术债和全局推荐建设顺序。人物、战争等
+文档中的 P1、P2 或阶段编号只表示本领域内部依赖，不自动决定项目优先级。
+
+### 专项设计与资料
+
+- [确定性模拟与存档](Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md)
+- [数据与内容底座](Docs/DATA_AND_CONTENT_FOUNDATION.md)
+- [沙盒NPC AI](Docs/SANDBOX_NPC_AI.md)
+- [历史城市清单](Docs/HISTORICAL_CITY_LIST.md)
+- [城市并集](Docs/CITY_UNION_MASTER.md)
+- [184年原型地图](Docs/PROTOTYPE_MAP_184_ZHUO_GUANGZONG.md)
+- [地图美术资源方案](Docs/MAP_ART_RESOURCE_PLAN.md)
+- [历史事件与人物资料](Docs/HISTORICAL_EVENTS_182_190.md)
+- [首批历史人物](Docs/HISTORICAL_CHARACTERS_FIRST_50.md)
+- [许可证与素材规则](Docs/LEGAL_AND_ASSETS.md)
+
+`Docs/TASK_M1_*.md` 至 `Docs/TASK_M16_*.md` 是里程碑任务书、设计整合和实现记录；
+任务编号不表示已经实现，具体状态以任务书和系统总纲为准。
+[早期开发方案](Docs/DEVELOPMENT_PLAN.md)与
+[引擎安装期预制作清单](Docs/PREPRODUCTION_BACKLOG.md)保留为历史计划，
+不再作为当前开发顺序。
 
 ## 项目开发规则
 
-本仓库提供项目专属 Codex Skill：
-`.codex/skills/mandate-unity-development/`。涉及本项目的 Unity/C# 开发、
-存档、测试和里程碑验收时，应显式使用 `$mandate-unity-development`；
-如果当前会话没有自动发现该 Skill，则按 `AGENTS.md` 手动读取其 `SKILL.md`
-并执行相同流程。
+`AGENTS.md` 是仓库硬规则入口；项目专属 Skill
+`.codex/skills/mandate-unity-development/` 提供每次任务的执行流程。涉及本项目的
+Unity/C# 开发、诊断、设计文档、存档、测试和里程碑验收时，应使用
+`$mandate-unity-development`。如果当前会话没有自动发现该 Skill，则按
+`AGENTS.md` 手动读取其 `SKILL.md` 并执行相同流程。
+
+领域文档不再由任务编号推断优先级。统一从
+`.codex/skills/mandate-unity-development/references/task-routing.md`
+选择本次任务必须读取的设计文档；`Docs/TASK_PROJECT_UNITY_DEVELOPMENT_SKILL.md`
+仅保留 Skill 的建设和验证历史，不再作为运行时规则来源。
 
 统一验证入口：
 

@@ -1,5 +1,11 @@
 # 开发方案
 
+> 文档状态：历史初期开发方案。本文保留项目从单武将小型剧本起步时的范围与
+> 里程碑设想，不再代表当前系统状态或全局开发顺序。当前状态、技术债和推荐
+> 建设顺序以 [`GAME_SYSTEMS_MASTER_AND_STATUS.md`](GAME_SYSTEMS_MASTER_AND_STATUS.md)
+> 为准；游戏愿景以 [`GAME_VISION_AND_GAMEPLAY.md`](GAME_VISION_AND_GAMEPLAY.md)
+> 为准。
+
 ## 1. 产品定位
 
 ### 参考优先级
