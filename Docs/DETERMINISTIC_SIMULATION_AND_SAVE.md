@@ -19,6 +19,33 @@ Unity Editor: 2022.3.62f3c1
 
 版本来源为工程自身的`ProjectSettings/ProjectVersion.txt`。
 
+### 1.1 确定性世界创世
+
+创世是世界模拟的第一次确定性事务，不是玩家观察地点时反复运行的内容生成器。创世配置
+至少保存：
+
+```text
+WorldCreationProfile
+  scenario_id
+  start_date
+  population_profile_id
+  historical_evidence_policy
+  resource_abundance_parameters
+  geography_rules_version
+  resource_rules_version
+  content_schema_version
+  rng_algorithm_version
+  master_seed
+```
+
+资源的史料依据与丰度分开设置。每个资源体保存稳定ID、地理锚点、来源等级、生成规则版本
+和真实初始状态；人物或组织是否知道它，由独立认知记录决定。相同内容、规则、算法、配置
+和种子必须得到相同初始世界。
+
+创世结束后，缩放地图、切换专题视图、进入场景和开始关注只能加载或展开已有实体。新增矿脉、
+设施、文档和人物必须来自有明确时间与原因的运行期发现、建设、抄录、出生或其他领域事务，
+不能通过再次调用创世规则偷偷替换事实。
+
 ## 2. 时间模型
 
 ### 2.1 核心时间
@@ -37,7 +64,8 @@ WorldTime
 
 ### 2.2 历史历法
 
-东汉使用的历法、闰月与现代公历不能简单等同。首版采用两层日期：
+东汉使用的历法、闰月与现代公历不能简单等同。基础实现采用两层日期，历史标签的内容
+精度可以随资料继续扩展：
 
 ```text
 SimulationDate       // 稳定整数日，用于全部计算
@@ -93,22 +121,23 @@ AdvanceTime(command, duration)
 
 ### 3.1 聚合与展开
 
-远方村庄可以保存“120户、劳力结构、疾病率、财富分布”，而不是120个完整NPC。
-当玩家接近时，由稳定种子展开为具体家庭；玩家认识、雇佣、伤害或留下契约的人物立即
-升级为永久实体，之后不得重新随机生成。
+远方村庄可以使用“120户、劳力结构、疾病率、财富分布”作为结算缓存，但每个出生人物
+从出生起已经拥有永久ID和基础档案。玩家接近时，只展开具体家庭的详细资料和表现；
+离开后可以释放详细视图，但永久人物不得删除、合并或重新随机生成。
 
 ```text
-AggregatePopulation
+PopulationSummaryCache
+  permanent_person_ids / partition_range
   cohort_counts
-  households
+  household_ids
   wealth_bands
   health_bands
   occupations
   generation_seed
-  materialized_person_ids[]
+  summary_revision
 ```
 
-这能同时支持天下规模和普通人生活。
+该缓存用于加速天下规模结算，不能成为人口事实来源。人物事实仍以永久人物档案为准。
 
 ## 4. 确定性随机数
 
@@ -237,7 +266,8 @@ HistoricalAnchorState
 
 ### 7.1 存档包
 
-首版使用一个目录或压缩包，逻辑上包含：
+基础存档实现使用一个目录或压缩包，逻辑上包含；未来可以替换物理存储，不能削弱同一
+兼容合同：
 
 ```text
 save/
@@ -264,6 +294,9 @@ SaveManifest
   world_rules_version
   rng_algorithm_version
   master_seed
+  world_creation_profile_id
+  world_creation_profile_hash
+  knowledge_schema_version
   current_time
   player_person_id
   active_heir_id
@@ -275,6 +308,9 @@ SaveManifest
 ```
 
 现实世界保存时间只写入元数据，绝不参与模拟随机数。
+
+世界快照还必须保存资源体、设施网络、建设委任、人物观察、文档资产、档案访问权及其稳定
+引用。观察记录的过时不允许回头修改当时保存的观察内容；加载后依据当前世界时间计算时效。
 
 ### 7.3 身份与引用
 
@@ -361,7 +397,7 @@ Simulate(seed, start_date, years, command_script)
 - 无效引用、负数资源和死循环报告；
 - 同种子重复运行的一致性结果。
 
-首批自动测试：
+基础自动测试批次：
 
 1. 同种子运行10年两次，年度哈希完全一致。
 2. 改变市场随机流，不改变无关的生育与战斗抽签。
@@ -369,6 +405,9 @@ Simulate(seed, start_date, years, command_script)
 4. V1存档迁移到V2后，人物、家族、财产和历史事实不丢失。
 5. 模拟135—300年，无ID重复、无无效继承人、无负人口。
 6. 玩家本人死亡后，指定继承人能继续推进时间。
+7. 相同创世配置和种子生成相同资源体、设施、人口与初始认知哈希。
+8. 切换地图比例尺或专题视图前后，世界事实哈希保持不变。
+9. 组织档案抄录为家族副本后，原档案更新不自动修改副本，往返存档保持来源与时间。
 
 ## 11. Unity工程边界
 
