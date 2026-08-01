@@ -1,6 +1,8 @@
 # Testing
 
-## Required sequence
+`AGENTS.md` is authoritative for timeouts and process ownership. This reference defines test evidence and task-appropriate coverage.
+
+## Standard sequence
 
 For code changes, run:
 
@@ -26,7 +28,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
   -DocumentationOnly
 ```
 
-Use `-SkipUnity` only when Unity integration is not required or is blocked. State the reason in the delivery report.
+Use `-SkipUnity` only when Unity integration is not required or is blocked. State the reason in the delivery report. Do not use it to hide a Unity-facing regression.
 
 ## Result vocabulary
 
@@ -37,15 +39,15 @@ Use `-SkipUnity` only when Unity integration is not required or is blocked. Stat
 
 Do not infer Unity success from its process exit alone. Require its test-result XML. Do not infer core-test success without a `RESULT passed=N failed=0` summary.
 
-## Unity safety
+## Unity evidence
 
-- Check existing `Unity` processes before launch.
-- Never close the user's editor.
 - Invoke only `Tools/Run-UnityTestsSafe.ps1`.
-- Keep the default timeout at 300 seconds unless the user approves an extension.
 - Preserve the emitted PID, log path, and result path.
-- Poll at intervals of at most five seconds.
-- On timeout, stop only the process tree created by the current run and show the log tail.
+- A project lock caused by the user's open Unity editor is `blocked`, not `failed`.
+- On timeout, retain the log tail and identify the owned process tree that was stopped.
+- If Unity creates no startup log before the safe runner's startup watchdog while running in the
+  workspace sandbox, stop that owned process and retry the same safe runner at most once with the
+  required sandbox escalation. Do not weaken the process, timeout, log, or XML requirements.
 
 ## Minimum coverage
 
