@@ -76,6 +76,9 @@ namespace Mandate.Persistence
                     case 16:
                         MigrateVersionSixteenToSeventeen(world, content);
                         break;
+                    case 17:
+                        MigrateVersionSeventeenToEighteen(world, content);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -426,6 +429,40 @@ namespace Mandate.Persistence
         {
             world.ProductionContentManifest = productionContent.CreateManifest();
             world.SchemaVersion = 17;
+        }
+
+        private static void MigrateVersionSeventeenToEighteen(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.ProductionPracticeLedgerEntries =
+                new System.Collections.Generic.List<
+                    ProductionPracticeLedgerEntryState>();
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                var product = productionContent.GetProduct(
+                    batch.ProductDefinitionId);
+                batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                    product, batch.QualityBasisPoints);
+            }
+
+            for (var i = 0; i < world.ProcessingWorkOrders.Count; i++)
+            {
+                var order = world.ProcessingWorkOrders[i];
+                var method = productionContent.GetMethod(
+                    order.MethodDefinitionId);
+                order.PracticeTrackingEnabled = false;
+                order.PracticeSkillDefinitionId =
+                    method.PracticeSkillDefinitionId;
+                order.ManagerSkillBasisPointsAtStart = 0;
+                order.PracticeGainBasisPoints = 0;
+                order.OutputQualityBasisPoints = 0;
+            }
+
+            world.ProductionContentManifest =
+                productionContent.CreateManifest();
+            world.SchemaVersion = 18;
         }
 
         private static void SetRepair(

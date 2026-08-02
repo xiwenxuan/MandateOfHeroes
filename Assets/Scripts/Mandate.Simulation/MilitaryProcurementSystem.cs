@@ -335,6 +335,10 @@ namespace Mandate.Simulation
                 QualityBasisPoints = 8_500,
                 FreshnessBasisPoints = 10_000
             };
+            var product = ProductionContentRegistry.CreateCore().GetProduct(
+                definition.ProductDefinitionId);
+            batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                product, batch.QualityBasisPoints);
             world.ProductBatches.Add(batch);
             world.InventoryTransactions.Add(new InventoryTransactionState
             {

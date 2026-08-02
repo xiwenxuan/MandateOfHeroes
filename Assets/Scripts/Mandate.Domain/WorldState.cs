@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 17;
+        public const int CurrentSchemaVersion = 18;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -235,6 +235,9 @@ namespace Mandate.Domain
             new List<InventoryTransactionState>();
         public List<ProcessingWorkOrderState> ProcessingWorkOrders =
             new List<ProcessingWorkOrderState>();
+        public List<ProductionPracticeLedgerEntryState>
+            ProductionPracticeLedgerEntries =
+                new List<ProductionPracticeLedgerEntryState>();
         public List<ResourceBodyState> ResourceBodies =
             new List<ResourceBodyState>();
         public List<ResourceExtractionOrderState> ResourceExtractionOrders =
@@ -397,6 +400,10 @@ namespace Mandate.Domain
                 InventoryTransactions, item => item.Id, "inventory transaction");
             ValidateUniqueIds(
                 ProcessingWorkOrders, item => item.Id, "processing work order");
+            ValidateUniqueIds(
+                ProductionPracticeLedgerEntries,
+                item => item.Id,
+                "production practice ledger entry");
             ValidateUniqueIds(
                 ResourceBodies, item => item.Id, "resource body");
             ValidateUniqueIds(
@@ -3571,6 +3578,36 @@ namespace Mandate.Domain
                         batch.CropVarietyDefinitionId, "batch variety", batch.Id);
                 }
 
+                if (batch.QualityDimensions == null ||
+                    batch.QualityDimensions.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Product batch {batch.Id} has no quality dimensions.");
+                }
+
+                var qualityDimensionIds = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var dimensionIndex = 0;
+                     dimensionIndex < batch.QualityDimensions.Count;
+                     dimensionIndex++)
+                {
+                    var dimension = batch.QualityDimensions[dimensionIndex];
+                    if (dimension == null ||
+                        dimension.ValueBasisPoints < 0 ||
+                        dimension.ValueBasisPoints > 10_000 ||
+                        !qualityDimensionIds.Add(
+                            dimension.QualityDimensionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Product batch {batch.Id} has invalid quality dimensions.");
+                    }
+
+                    ValidateContentReference(
+                        dimension.QualityDimensionId,
+                        "quality dimension",
+                        batch.Id);
+                }
+
                 var familyStored = !string.IsNullOrEmpty(batch.OwnerFamilyId) &&
                     string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
                     !string.IsNullOrEmpty(batch.StorageFacilityId) &&
@@ -3603,6 +3640,9 @@ namespace Mandate.Domain
                     batch.ReservedQuantity > batch.Quantity ||
                     batch.QualityBasisPoints < 0 ||
                     batch.QualityBasisPoints > 10_000 ||
+                    batch.QualityBasisPoints !=
+                        ProductQualityRules.CalculateSummary(
+                            batch.QualityDimensions) ||
                     batch.FreshnessBasisPoints < 0 ||
                     batch.FreshnessBasisPoints > 10_000 ||
                     batch.SeedVigorBasisPoints < 0 ||
@@ -3634,6 +3674,10 @@ namespace Mandate.Domain
                     order.RecipeDefinitionId, "processing recipe", order.Id);
                 ValidateContentReference(
                     order.MethodDefinitionId, "processing method", order.Id);
+                ValidateContentReference(
+                    order.PracticeSkillDefinitionId,
+                    "processing practice skill",
+                    order.Id);
                 var familyOrder =
                     !string.IsNullOrEmpty(order.OwnerFamilyId) &&
                     string.IsNullOrEmpty(order.OwnerOrganizationId);
@@ -3669,8 +3713,16 @@ namespace Mandate.Domain
                     order.RunCount <= 0 || order.InputReservations == null ||
                     order.InputReservations.Count == 0 ||
                     order.OutputBatchIds == null ||
+                    order.ManagerSkillBasisPointsAtStart < 0 ||
+                    order.ManagerSkillBasisPointsAtStart > 10_000 ||
+                    order.PracticeGainBasisPoints < 0 ||
+                    order.PracticeGainBasisPoints > 10_000 ||
+                    order.OutputQualityBasisPoints < 0 ||
+                    order.OutputQualityBasisPoints > 10_000 ||
                     order.Status == ProductionOrderStatus.Active &&
-                    (order.SettledDay != -1 || order.OutputBatchIds.Count != 0) ||
+                    (order.SettledDay != -1 || order.OutputBatchIds.Count != 0 ||
+                     order.PracticeGainBasisPoints != 0 ||
+                     order.OutputQualityBasisPoints != 0) ||
                     order.Status == ProductionOrderStatus.Completed &&
                     (order.SettledDay < order.FinishDay ||
                      order.OutputBatchIds.Count == 0))
@@ -3705,6 +3757,7 @@ namespace Mandate.Domain
                 }
 
                 var outputIds = new HashSet<string>(StringComparer.Ordinal);
+                var minimumOutputQuality = 10_000;
                 for (var outputIndex = 0;
                      outputIndex < order.OutputBatchIds.Count;
                      outputIndex++)
@@ -3725,6 +3778,69 @@ namespace Mandate.Domain
                         throw new InvalidOperationException(
                             $"Invalid output batch on {order.Id}.");
                     }
+
+                    minimumOutputQuality = Math.Min(
+                        minimumOutputQuality, output.QualityBasisPoints);
+                }
+
+                if (order.PracticeTrackingEnabled &&
+                    order.Status == ProductionOrderStatus.Completed &&
+                    order.OutputQualityBasisPoints != minimumOutputQuality)
+                {
+                    throw new InvalidOperationException(
+                        $"Processing work order {order.Id} has an invalid " +
+                        "output quality summary.");
+                }
+            }
+
+            var practiceOrders = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < ProductionPracticeLedgerEntries.Count; i++)
+            {
+                var entry = ProductionPracticeLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A production practice ledger entry cannot be null.");
+                ValidateContentReference(
+                    entry.SkillDefinitionId,
+                    "practice ledger skill",
+                    entry.Id);
+                if (!processingOrders.TryGetValue(
+                        entry.ProcessingWorkOrderId, out var order) ||
+                    order.Status != ProductionOrderStatus.Completed ||
+                    !order.PracticeTrackingEnabled ||
+                    entry.PersonId != order.ManagerPersonId ||
+                    entry.SkillDefinitionId !=
+                        order.PracticeSkillDefinitionId ||
+                    entry.Day != order.SettledDay ||
+                    entry.GainBasisPoints != order.PracticeGainBasisPoints ||
+                    entry.OutputQualityBasisPoints !=
+                        order.OutputQualityBasisPoints ||
+                    entry.MasteryBeforeBasisPoints < 0 ||
+                    entry.MasteryBeforeBasisPoints > 10_000 ||
+                    entry.GainBasisPoints < 0 ||
+                    entry.MasteryAfterBasisPoints != checked(
+                        entry.MasteryBeforeBasisPoints +
+                        entry.GainBasisPoints) ||
+                    entry.MasteryAfterBasisPoints > 10_000 ||
+                    string.IsNullOrWhiteSpace(entry.Summary) ||
+                    !practiceOrders.Add(order.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid production practice ledger entry {entry.Id}.");
+                }
+            }
+
+            for (var i = 0; i < ProcessingWorkOrders.Count; i++)
+            {
+                var order = ProcessingWorkOrders[i];
+                var requiresPractice = order.PracticeTrackingEnabled &&
+                    order.Status == ProductionOrderStatus.Completed;
+                if (requiresPractice != practiceOrders.Contains(order.Id) ||
+                    !order.PracticeTrackingEnabled &&
+                    (order.PracticeGainBasisPoints != 0 ||
+                     order.OutputQualityBasisPoints != 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Processing work order {order.Id} has inconsistent practice history.");
                 }
             }
 
@@ -4544,7 +4660,7 @@ namespace Mandate.Domain
         private void ValidateProductionContentManifest()
         {
             var manifest = ProductionContentManifest;
-            if (manifest == null || manifest.ContentSchemaVersion != 2 ||
+            if (manifest == null || manifest.ContentSchemaVersion != 3 ||
                 string.IsNullOrWhiteSpace(manifest.ResolvedHash) ||
                 manifest.Packages == null || manifest.Packages.Count == 0)
             {

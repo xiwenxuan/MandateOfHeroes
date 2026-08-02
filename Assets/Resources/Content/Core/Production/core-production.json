@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "7.0.0",
+  "Version": "8.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -28,6 +28,62 @@
       ]
     }
   ],
+  "QualityDimensions": [
+    {
+      "Id": "quality.purity",
+      "DisplayName": "纯净度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.integrity",
+      "DisplayName": "完整度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.uniformity",
+      "DisplayName": "均一度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.durability",
+      "DisplayName": "耐久度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.workmanship",
+      "DisplayName": "工艺度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.health",
+      "DisplayName": "健康度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.hygiene",
+      "DisplayName": "洁净度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.nutrition",
+      "DisplayName": "营养度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    },
+    {
+      "Id": "quality.viability",
+      "DisplayName": "活力度",
+      "HistoricalStatus": "gameplay_completion",
+      "SourceNote": "多维品质的原创玩法抽象；具体数值由世界事实确定。"
+    }
+  ],
   "Products": [
     {
       "Id": "product.wheat_seed",
@@ -36,6 +92,10 @@
       "CategoryTags": [
         "product.seed",
         "product.agriculture_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.viability"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 1000
@@ -50,6 +110,10 @@
         "product.market",
         "product.military_supply"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 600
     },
@@ -62,6 +126,10 @@
         "product.processed",
         "product.market"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.uniformity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 800
     },
@@ -73,6 +141,10 @@
         "product.byproduct",
         "product.fodder",
         "product.market"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.nutrition"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 700
@@ -87,6 +159,10 @@
         "product.market",
         "product.military_supply"
       ],
+      "QualityDimensionIds": [
+        "quality.hygiene",
+        "quality.nutrition"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 250
     },
@@ -98,6 +174,10 @@
         "product.material",
         "product.market",
         "product.manufacturing_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -111,6 +191,10 @@
         "product.market",
         "product.manufacturing_input"
       ],
+      "QualityDimensionIds": [
+        "quality.integrity",
+        "quality.durability"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -122,6 +206,10 @@
         "product.material",
         "product.market",
         "product.manufacturing_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.durability"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -135,6 +223,10 @@
         "product.market",
         "product.manufacturing_input"
       ],
+      "QualityDimensionIds": [
+        "quality.integrity",
+        "quality.workmanship"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -146,6 +238,10 @@
         "product.material",
         "product.market",
         "product.manufacturing_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -159,6 +255,10 @@
         "product.market",
         "product.manufacturing_input"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -170,6 +270,10 @@
         "product.byproduct",
         "product.material",
         "product.market"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -183,6 +287,10 @@
         "product.material",
         "product.market"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -194,6 +302,10 @@
         "product.fodder",
         "product.market",
         "product.livestock_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.nutrition",
+        "quality.purity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 900
@@ -207,6 +319,10 @@
         "product.market",
         "product.living_asset"
       ],
+      "QualityDimensionIds": [
+        "quality.health",
+        "quality.uniformity"
+      ],
       "BaseWeight": 10,
       "PerishabilityBasisPoints": 0
     },
@@ -218,6 +334,10 @@
         "product.food",
         "product.market",
         "product.perishable"
+      ],
+      "QualityDimensionIds": [
+        "quality.hygiene",
+        "quality.nutrition"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 2500
@@ -231,6 +351,10 @@
         "product.market",
         "product.tanning_input"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 1500
     },
@@ -242,6 +366,10 @@
         "product.raw",
         "product.market",
         "product.horn_input"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -255,6 +383,10 @@
         "product.material",
         "product.market"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -266,6 +398,10 @@
         "product.food",
         "product.byproduct",
         "product.perishable"
+      ],
+      "QualityDimensionIds": [
+        "quality.hygiene",
+        "quality.nutrition"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 3000
@@ -279,6 +415,10 @@
         "product.market",
         "product.tanning_input"
       ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -289,6 +429,10 @@
       "CategoryTags": [
         "product.byproduct",
         "product.waste"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -301,6 +445,10 @@
         "product.byproduct",
         "product.material",
         "product.market"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
@@ -315,6 +463,10 @@
         "product.military_supply",
         "product.equipment.melee"
       ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
+      ],
       "BaseWeight": 3,
       "PerishabilityBasisPoints": 0
     },
@@ -327,6 +479,10 @@
         "product.market",
         "product.military_supply",
         "product.equipment.shield"
+      ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
       ],
       "BaseWeight": 5,
       "PerishabilityBasisPoints": 0
@@ -341,6 +497,10 @@
         "product.military_supply",
         "product.equipment.melee"
       ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
+      ],
       "BaseWeight": 5,
       "PerishabilityBasisPoints": 0
     },
@@ -353,6 +513,10 @@
         "product.market",
         "product.military_supply",
         "product.equipment.ranged"
+      ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
       ],
       "BaseWeight": 2,
       "PerishabilityBasisPoints": 0
@@ -367,6 +531,10 @@
         "product.military_supply",
         "product.equipment.ammunition"
       ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
+      ],
       "BaseWeight": 2,
       "PerishabilityBasisPoints": 0
     },
@@ -379,6 +547,10 @@
         "product.market",
         "product.military_supply",
         "product.equipment.armor"
+      ],
+      "QualityDimensionIds": [
+        "quality.durability",
+        "quality.workmanship"
       ],
       "BaseWeight": 10,
       "PerishabilityBasisPoints": 0
@@ -780,6 +952,9 @@
       "RecipeDefinitionIds": [
         "recipe.field.grow_wheat"
       ],
+      "PracticeSkillDefinitionId": "skill.agriculture",
+      "PracticeDifficultyBasisPoints": 10000,
+      "QualityDimensionModifiers": [],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "gameplay_completion"
@@ -790,6 +965,18 @@
       "RecipeDefinitionIds": [
         "recipe.processing.hand_mill_wheat"
       ],
+      "PracticeSkillDefinitionId": "skill.production.food_processing",
+      "PracticeDifficultyBasisPoints": 7000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.uniformity",
+          "ModifierBasisPoints": 150
+        },
+        {
+          "QualityDimensionId": "quality.purity",
+          "ModifierBasisPoints": 50
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -799,6 +986,18 @@
       "DisplayName": "干粮制作",
       "RecipeDefinitionIds": [
         "recipe.processing.make_dry_ration"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.food_processing",
+      "PracticeDifficultyBasisPoints": 8000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.hygiene",
+          "ModifierBasisPoints": 150
+        },
+        {
+          "QualityDimensionId": "quality.nutrition",
+          "ModifierBasisPoints": 50
+        }
       ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
@@ -811,6 +1010,18 @@
         "recipe.manufacturing.forge_ring_sword",
         "recipe.manufacturing.forge_long_spear"
       ],
+      "PracticeSkillDefinitionId": "skill.production.metalworking",
+      "PracticeDifficultyBasisPoints": 12000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.workmanship",
+          "ModifierBasisPoints": 200
+        },
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 100
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -822,6 +1033,18 @@
         "recipe.manufacturing.make_wooden_shield",
         "recipe.manufacturing.make_arrow_bundle"
       ],
+      "PracticeSkillDefinitionId": "skill.production.woodworking",
+      "PracticeDifficultyBasisPoints": 10000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.workmanship",
+          "ModifierBasisPoints": 150
+        },
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 100
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -831,6 +1054,18 @@
       "DisplayName": "制弓",
       "RecipeDefinitionIds": [
         "recipe.manufacturing.make_horn_bow"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.bowmaking",
+      "PracticeDifficultyBasisPoints": 14000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.workmanship",
+          "ModifierBasisPoints": 250
+        },
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 100
+        }
       ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
@@ -842,6 +1077,18 @@
       "RecipeDefinitionIds": [
         "recipe.manufacturing.make_lamellar_armor"
       ],
+      "PracticeSkillDefinitionId": "skill.production.armoring",
+      "PracticeDifficultyBasisPoints": 15000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 200
+        },
+        {
+          "QualityDimensionId": "quality.workmanship",
+          "ModifierBasisPoints": 200
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -851,6 +1098,18 @@
       "DisplayName": "土窑烧炭",
       "RecipeDefinitionIds": [
         "recipe.primary_processing.burn_charcoal"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.woodworking",
+      "PracticeDifficultyBasisPoints": 8000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.purity",
+          "ModifierBasisPoints": 150
+        },
+        {
+          "QualityDimensionId": "quality.uniformity",
+          "ModifierBasisPoints": 100
+        }
       ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
@@ -862,6 +1121,18 @@
       "RecipeDefinitionIds": [
         "recipe.primary_processing.smelt_bloomery_iron"
       ],
+      "PracticeSkillDefinitionId": "skill.production.metalworking",
+      "PracticeDifficultyBasisPoints": 13000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.purity",
+          "ModifierBasisPoints": 250
+        },
+        {
+          "QualityDimensionId": "quality.integrity",
+          "ModifierBasisPoints": 100
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -871,6 +1142,18 @@
       "DisplayName": "牧场繁育",
       "RecipeDefinitionIds": [
         "recipe.livestock.breed_sheep"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.husbandry",
+      "PracticeDifficultyBasisPoints": 9000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.health",
+          "ModifierBasisPoints": 150
+        },
+        {
+          "QualityDimensionId": "quality.uniformity",
+          "ModifierBasisPoints": 50
+        }
       ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
@@ -882,6 +1165,18 @@
       "RecipeDefinitionIds": [
         "recipe.livestock.slaughter_sheep"
       ],
+      "PracticeSkillDefinitionId": "skill.production.husbandry",
+      "PracticeDifficultyBasisPoints": 8000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.hygiene",
+          "ModifierBasisPoints": 200
+        },
+        {
+          "QualityDimensionId": "quality.integrity",
+          "ModifierBasisPoints": 100
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -892,6 +1187,18 @@
       "RecipeDefinitionIds": [
         "recipe.primary_processing.vegetable_tan_hide"
       ],
+      "PracticeSkillDefinitionId": "skill.production.tanning",
+      "PracticeDifficultyBasisPoints": 11000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 200
+        },
+        {
+          "QualityDimensionId": "quality.purity",
+          "ModifierBasisPoints": 100
+        }
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -901,6 +1208,18 @@
       "DisplayName": "角料整理",
       "RecipeDefinitionIds": [
         "recipe.primary_processing.finish_horn"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.bowmaking",
+      "PracticeDifficultyBasisPoints": 9000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.workmanship",
+          "ModifierBasisPoints": 250
+        },
+        {
+          "QualityDimensionId": "quality.durability",
+          "ModifierBasisPoints": 100
+        }
       ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
@@ -914,6 +1233,55 @@
       "FieldId": "field.agriculture_water",
       "HistoricalStatus": "system_bridge",
       "SourceNote": "映射既有人物农业能力；后续子技艺继续使用稳定ID扩展。"
+    },
+    {
+      "Id": "skill.production.food_processing",
+      "DisplayName": "食物加工",
+      "FieldId": "field.production.food_processing",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.metalworking",
+      "DisplayName": "金属工艺",
+      "FieldId": "field.production.metalworking",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.woodworking",
+      "DisplayName": "木作工艺",
+      "FieldId": "field.production.woodworking",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.bowmaking",
+      "DisplayName": "弓角工艺",
+      "FieldId": "field.production.bowmaking",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.armoring",
+      "DisplayName": "甲作工艺",
+      "FieldId": "field.production.armoring",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.husbandry",
+      "DisplayName": "畜牧与屠宰",
+      "FieldId": "field.production.husbandry",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.tanning",
+      "DisplayName": "鞣革工艺",
+      "FieldId": "field.production.tanning",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
     }
   ],
   "Knowledge": [

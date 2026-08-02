@@ -15,7 +15,7 @@
 ## 当前阶段
 
 项目处于“核心系统原型与长期架构重构阶段”。已经存在人物开局、地图旅行、
-任务、家庭、市场、建设、教育、军队、军令、军械兵种、资源采集、烧炭冶铁、组织工坊制造、军械采购运输、耗材维修、伤亡和医疗等缩尺原型；永久人口、
+任务、家庭、市场、建设、教育、军队、军令、军械兵种、资源采集、烧炭冶铁、组织工坊制造、多维品质、工匠实践成长、军械采购运输、耗材维修、伤亡和医疗等缩尺原型；永久人口、
 超大存储、完整生产链、科研、治理和统一战争仍需按正式设计继续建设。
 
 ### 核心设计文档
@@ -33,6 +33,7 @@
 9. [M23-P1：军械制造、维修与组织工坊](Docs/TASK_M23_P1_EQUIPMENT_MANUFACTURING_REPAIR_AND_WORKSHOP.md)
 10. [M23-P2：上游资源采集与初级加工](Docs/TASK_M23_P2_UPSTREAM_RESOURCE_EXTRACTION_AND_PRIMARY_PROCESSING.md)
 11. [M23-P3：畜牧、屠宰、制革与角料副产物](Docs/TASK_M23_P3_LIVESTOCK_SLAUGHTER_TANNING_AND_HORN.md)
+12. [M23-P4：多维品质、工匠技艺成长与制造反馈](Docs/TASK_M23_P4_MULTIDIMENSIONAL_QUALITY_AND_ARTISAN_GROWTH.md)
 
 系统总纲负责统一索引、状态定义、技术债和全局推荐建设顺序。人物、战争等
 文档中的 P1、P2 或阶段编号只表示本领域内部依赖，不自动决定项目优先级。

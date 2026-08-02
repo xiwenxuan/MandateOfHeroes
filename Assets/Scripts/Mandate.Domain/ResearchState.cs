@@ -174,6 +174,13 @@ namespace Mandate.Domain
     public static class CoreSkillIds
     {
         public const string Agriculture = "skill.agriculture";
+        public const string FoodProcessing = "skill.production.food_processing";
+        public const string Metalworking = "skill.production.metalworking";
+        public const string Woodworking = "skill.production.woodworking";
+        public const string Bowmaking = "skill.production.bowmaking";
+        public const string Armoring = "skill.production.armoring";
+        public const string Husbandry = "skill.production.husbandry";
+        public const string Tanning = "skill.production.tanning";
     }
 
     public static class CoreKnowledgeIds

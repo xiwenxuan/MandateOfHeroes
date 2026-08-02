@@ -43,6 +43,13 @@ namespace Mandate.Domain
     }
 
     [Serializable]
+    public sealed class ProductQualityDimensionState
+    {
+        public string QualityDimensionId;
+        public int ValueBasisPoints;
+    }
+
+    [Serializable]
     public sealed class ProductBatchState
     {
         public string Id;
@@ -64,6 +71,8 @@ namespace Mandate.Domain
         public int FreshnessBasisPoints = 10_000;
         public int SeedVigorBasisPoints;
         public int SeedPurityBasisPoints;
+        public List<ProductQualityDimensionState> QualityDimensions =
+            new List<ProductQualityDimensionState>();
     }
 
     [Serializable]
@@ -124,9 +133,122 @@ namespace Mandate.Domain
         public long FinishDay;
         public long SettledDay = -1;
         public int RunCount;
+        public bool PracticeTrackingEnabled;
+        public string PracticeSkillDefinitionId;
+        public int ManagerSkillBasisPointsAtStart;
+        public int PracticeGainBasisPoints;
+        public int OutputQualityBasisPoints;
         public List<BatchReservationState> InputReservations =
             new List<BatchReservationState>();
         public List<string> OutputBatchIds = new List<string>();
+    }
+
+    [Serializable]
+    public sealed class ProductionPracticeLedgerEntryState
+    {
+        public string Id;
+        public long Day;
+        public string ProcessingWorkOrderId;
+        public string PersonId;
+        public string SkillDefinitionId;
+        public int MasteryBeforeBasisPoints;
+        public int MasteryAfterBasisPoints;
+        public int GainBasisPoints;
+        public int OutputQualityBasisPoints;
+        public string Summary;
+    }
+
+    public static class ProductQualityRules
+    {
+        public static List<ProductQualityDimensionState> CreateUniform(
+            ProductDefinition product,
+            int valueBasisPoints)
+        {
+            if (product == null)
+            {
+                throw new ArgumentNullException(nameof(product));
+            }
+
+            if (valueBasisPoints < 0 || valueBasisPoints > 10_000 ||
+                product.QualityDimensionIds == null ||
+                product.QualityDimensionIds.Count == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(valueBasisPoints));
+            }
+
+            var result = new List<ProductQualityDimensionState>(
+                product.QualityDimensionIds.Count);
+            for (var i = 0; i < product.QualityDimensionIds.Count; i++)
+            {
+                result.Add(new ProductQualityDimensionState
+                {
+                    QualityDimensionId = product.QualityDimensionIds[i],
+                    ValueBasisPoints = valueBasisPoints
+                });
+            }
+
+            return result;
+        }
+
+        public static int CalculateSummary(
+            IList<ProductQualityDimensionState> dimensions)
+        {
+            if (dimensions == null || dimensions.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "A product batch must have quality dimensions.");
+            }
+
+            long total = 0;
+            for (var i = 0; i < dimensions.Count; i++)
+            {
+                var dimension = dimensions[i] ??
+                    throw new InvalidOperationException(
+                        "A product quality dimension cannot be null.");
+                if (dimension.ValueBasisPoints < 0 ||
+                    dimension.ValueBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        "A product quality value is outside basis-point bounds.");
+                }
+
+                total += dimension.ValueBasisPoints;
+            }
+
+            return (int)(total / dimensions.Count);
+        }
+
+        public static bool MatchesDefinition(
+            ProductBatchState batch,
+            ProductDefinition product)
+        {
+            if (batch == null || product == null ||
+                batch.QualityDimensions == null ||
+                product.QualityDimensionIds == null ||
+                batch.QualityDimensions.Count !=
+                    product.QualityDimensionIds.Count)
+            {
+                return false;
+            }
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < batch.QualityDimensions.Count; i++)
+            {
+                var dimension = batch.QualityDimensions[i];
+                if (dimension == null ||
+                    dimension.QualityDimensionId !=
+                        product.QualityDimensionIds[i] ||
+                    dimension.ValueBasisPoints < 0 ||
+                    dimension.ValueBasisPoints > 10_000 ||
+                    !ids.Add(dimension.QualityDimensionId))
+                {
+                    return false;
+                }
+            }
+
+            return batch.QualityBasisPoints ==
+                CalculateSummary(batch.QualityDimensions);
+        }
     }
 
     public enum ResourceExtractionLedgerEntryType : byte

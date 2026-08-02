@@ -41,6 +41,8 @@ namespace Mandate.Domain
         public List<CropDefinition> Crops = new List<CropDefinition>();
         public List<CropVarietyDefinition> CropVarieties =
             new List<CropVarietyDefinition>();
+        public List<QualityDimensionDefinition> QualityDimensions =
+            new List<QualityDimensionDefinition>();
         public List<ProductDefinition> Products = new List<ProductDefinition>();
         public List<RecipeDefinition> Recipes = new List<RecipeDefinition>();
         public List<ProductionMethodDefinition> Methods =
@@ -73,12 +75,22 @@ namespace Mandate.Domain
     }
 
     [Serializable]
+    public sealed class QualityDimensionDefinition
+    {
+        public string Id;
+        public string DisplayName;
+        public string HistoricalStatus;
+        public string SourceNote;
+    }
+
+    [Serializable]
     public sealed class ProductDefinition
     {
         public string Id;
         public string DisplayName;
         public string UnitId;
         public List<string> CategoryTags = new List<string>();
+        public List<string> QualityDimensionIds = new List<string>();
         public int BaseWeight = 1;
         public int PerishabilityBasisPoints;
     }
@@ -110,9 +122,21 @@ namespace Mandate.Domain
         public string Id;
         public string DisplayName;
         public List<string> RecipeDefinitionIds = new List<string>();
+        public string PracticeSkillDefinitionId;
+        public int PracticeDifficultyBasisPoints = 10_000;
+        public List<QualityDimensionModifierDefinition>
+            QualityDimensionModifiers =
+                new List<QualityDimensionModifierDefinition>();
         public int YieldBasisPoints = 10_000;
         public int LaborBasisPoints = 10_000;
         public string HistoricalStatus;
+    }
+
+    [Serializable]
+    public sealed class QualityDimensionModifierDefinition
+    {
+        public string QualityDimensionId;
+        public int ModifierBasisPoints;
     }
 
     [Serializable]
@@ -148,6 +172,10 @@ namespace Mandate.Domain
             new Dictionary<string, CropDefinition>(StringComparer.Ordinal);
         private Dictionary<string, CropVarietyDefinition> _varieties =
             new Dictionary<string, CropVarietyDefinition>(StringComparer.Ordinal);
+        private Dictionary<string, QualityDimensionDefinition>
+            _qualityDimensions =
+                new Dictionary<string, QualityDimensionDefinition>(
+                    StringComparer.Ordinal);
         private Dictionary<string, ProductDefinition> _products =
             new Dictionary<string, ProductDefinition>(StringComparer.Ordinal);
         private Dictionary<string, RecipeDefinition> _recipes =
@@ -164,6 +192,7 @@ namespace Mandate.Domain
 
         public int CropCount => _crops.Count;
         public int CropVarietyCount => _varieties.Count;
+        public int QualityDimensionCount => _qualityDimensions.Count;
         public int ProductCount => _products.Count;
         public int RecipeCount => _recipes.Count;
         public int MethodCount => _methods.Count;
@@ -224,6 +253,7 @@ namespace Mandate.Domain
 
             var crops = Copy(_crops);
             var varieties = Copy(_varieties);
+            var qualityDimensions = Copy(_qualityDimensions);
             var products = Copy(_products);
             var recipes = Copy(_recipes);
             var methods = Copy(_methods);
@@ -233,6 +263,11 @@ namespace Mandate.Domain
             AddDefinitions(crops, package.Crops, item => item.Id, "crop");
             AddDefinitions(
                 varieties, package.CropVarieties, item => item.Id, "crop variety");
+            AddDefinitions(
+                qualityDimensions,
+                package.QualityDimensions,
+                item => item.Id,
+                "quality dimension");
             AddDefinitions(products, package.Products, item => item.Id, "product");
             AddDefinitions(recipes, package.Recipes, item => item.Id, "recipe");
             AddDefinitions(methods, package.Methods, item => item.Id, "method");
@@ -247,6 +282,7 @@ namespace Mandate.Domain
             ValidateDefinitions(
                 crops,
                 varieties,
+                qualityDimensions,
                 products,
                 recipes,
                 methods,
@@ -261,6 +297,7 @@ namespace Mandate.Domain
             packages.Sort(ComparePackages);
             _crops = crops;
             _varieties = varieties;
+            _qualityDimensions = qualityDimensions;
             _products = products;
             _recipes = recipes;
             _methods = methods;
@@ -283,6 +320,11 @@ namespace Mandate.Domain
         public ProductDefinition GetProduct(string id)
         {
             return Get(_products, id, "product");
+        }
+
+        public QualityDimensionDefinition GetQualityDimension(string id)
+        {
+            return Get(_qualityDimensions, id, "quality dimension");
         }
 
         public RecipeDefinition GetRecipe(string id)
@@ -314,7 +356,7 @@ namespace Mandate.Domain
         {
             var manifest = new ProductionContentManifestState
             {
-                ContentSchemaVersion = 2,
+                ContentSchemaVersion = 3,
                 ResolvedHash = ResolvedHash
             };
             for (var i = 0; i < _packages.Count; i++)
@@ -335,7 +377,7 @@ namespace Mandate.Domain
 
         public void ValidateManifest(ProductionContentManifestState manifest)
         {
-            if (manifest == null || manifest.ContentSchemaVersion != 2 ||
+            if (manifest == null || manifest.ContentSchemaVersion != 3 ||
                 manifest.Packages == null)
             {
                 throw new ProductionContentException(
@@ -492,10 +534,11 @@ namespace Mandate.Domain
                 var batch = world.ProductBatches[i];
                 var product = GetProduct(batch.ProductDefinitionId);
                 if (product.UnitId != batch.UnitId ||
-                    product.BaseWeight != batch.UnitWeight)
+                    product.BaseWeight != batch.UnitWeight ||
+                    !ProductQualityRules.MatchesDefinition(batch, product))
                 {
                     throw new ProductionContentException(
-                        $"Product batch {batch.Id} has an invalid unit.");
+                        $"Product batch {batch.Id} has invalid physical or quality content.");
                 }
 
                 if (!string.IsNullOrEmpty(batch.CropVarietyDefinitionId))
@@ -515,7 +558,9 @@ namespace Mandate.Domain
                 var recipe = GetRecipe(order.RecipeDefinitionId);
                 var method = GetMethod(order.MethodDefinitionId);
                 if (!string.IsNullOrEmpty(recipe.CropDefinitionId) ||
-                    !method.RecipeDefinitionIds.Contains(recipe.Id))
+                    !method.RecipeDefinitionIds.Contains(recipe.Id) ||
+                    order.PracticeSkillDefinitionId !=
+                        method.PracticeSkillDefinitionId)
                 {
                     throw new ProductionContentException(
                         $"Processing work order {order.Id} has incompatible content.");
@@ -525,6 +570,12 @@ namespace Mandate.Domain
             for (var i = 0; i < world.ResourceBodies.Count; i++)
             {
                 GetProduct(world.ResourceBodies[i].OutputProductDefinitionId);
+            }
+
+            for (var i = 0; i < world.ProductionPracticeLedgerEntries.Count; i++)
+            {
+                GetSkill(world.ProductionPracticeLedgerEntries[i]
+                    .SkillDefinitionId);
             }
 
             for (var i = 0; i < world.InventoryTransactions.Count; i++)
@@ -573,6 +624,7 @@ namespace Mandate.Domain
         private static void ValidateDefinitions(
             Dictionary<string, CropDefinition> crops,
             Dictionary<string, CropVarietyDefinition> varieties,
+            Dictionary<string, QualityDimensionDefinition> qualityDimensions,
             Dictionary<string, ProductDefinition> products,
             Dictionary<string, RecipeDefinition> recipes,
             Dictionary<string, ProductionMethodDefinition> methods,
@@ -600,15 +652,40 @@ namespace Mandate.Domain
                 }
             }
 
+            foreach (var pair in qualityDimensions)
+            {
+                if (string.IsNullOrWhiteSpace(pair.Value.DisplayName))
+                {
+                    throw new ProductionContentException(
+                        $"Quality dimension {pair.Key} has no display name.");
+                }
+            }
+
             foreach (var pair in products)
             {
                 ValidateId(pair.Value.UnitId, $"unit for product {pair.Key}");
                 if (pair.Value.BaseWeight <= 0 ||
                     pair.Value.PerishabilityBasisPoints < 0 ||
-                    pair.Value.PerishabilityBasisPoints > 10_000)
+                    pair.Value.PerishabilityBasisPoints > 10_000 ||
+                    pair.Value.QualityDimensionIds == null ||
+                    pair.Value.QualityDimensionIds.Count == 0)
                 {
                     throw new ProductionContentException(
                         $"Product {pair.Key} has invalid physical values.");
+                }
+
+
+                var dimensionIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var i = 0; i < pair.Value.QualityDimensionIds.Count; i++)
+                {
+                    var dimensionId = pair.Value.QualityDimensionIds[i];
+                    if (!qualityDimensions.ContainsKey(dimensionId) ||
+                        !dimensionIds.Add(dimensionId))
+                    {
+                        throw new ProductionContentException(
+                            $"Product {pair.Key} has invalid quality dimension " +
+                            $"{dimensionId}.");
+                    }
                 }
             }
 
@@ -642,8 +719,12 @@ namespace Mandate.Domain
                 var method = pair.Value;
                 if (method.YieldBasisPoints <= 0 ||
                     method.LaborBasisPoints <= 0 ||
+                    method.PracticeDifficultyBasisPoints <= 0 ||
+                    method.PracticeDifficultyBasisPoints > 20_000 ||
+                    !skills.ContainsKey(method.PracticeSkillDefinitionId) ||
                     method.RecipeDefinitionIds == null ||
-                    method.RecipeDefinitionIds.Count == 0)
+                    method.RecipeDefinitionIds.Count == 0 ||
+                    method.QualityDimensionModifiers == null)
                 {
                     throw new ProductionContentException(
                         $"Production method {method.Id} has invalid factors or no recipes.");
@@ -656,6 +737,28 @@ namespace Mandate.Domain
                     {
                         throw new ProductionContentException(
                             $"Production method {method.Id} references missing recipe {recipeId}.");
+                    }
+                }
+
+
+                var modifiedDimensionIds = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var i = 0;
+                     i < method.QualityDimensionModifiers.Count;
+                     i++)
+                {
+                    var modifier = method.QualityDimensionModifiers[i];
+                    if (modifier == null ||
+                        !qualityDimensions.ContainsKey(
+                            modifier.QualityDimensionId) ||
+                        !modifiedDimensionIds.Add(
+                            modifier.QualityDimensionId) ||
+                        modifier.ModifierBasisPoints < -5_000 ||
+                        modifier.ModifierBasisPoints > 5_000)
+                    {
+                        throw new ProductionContentException(
+                            $"Production method {method.Id} has an invalid " +
+                            $"quality modifier at index {i}.");
                     }
                 }
             }
@@ -1016,6 +1119,15 @@ namespace Mandate.Domain
     public static class CoreProductionContent
     {
         public const string PackageId = "content.core.production";
+        public const string PurityQualityDimensionId = "quality.purity";
+        public const string IntegrityQualityDimensionId = "quality.integrity";
+        public const string UniformityQualityDimensionId = "quality.uniformity";
+        public const string DurabilityQualityDimensionId = "quality.durability";
+        public const string WorkmanshipQualityDimensionId = "quality.workmanship";
+        public const string HealthQualityDimensionId = "quality.health";
+        public const string HygieneQualityDimensionId = "quality.hygiene";
+        public const string NutritionQualityDimensionId = "quality.nutrition";
+        public const string ViabilityQualityDimensionId = "quality.viability";
         public const string WheatCropId = "crop.wheat";
         public const string PrototypeNorthernWheatVarietyId =
             "crop_variety.wheat.prototype_northern";
@@ -1148,10 +1260,28 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "7.0.0",
+                Version = "8.0.0",
                 LoadOrder = 0,
                 Required = true
             };
+            AddQualityDimension(
+                package, PurityQualityDimensionId, "纯净度");
+            AddQualityDimension(
+                package, IntegrityQualityDimensionId, "完整度");
+            AddQualityDimension(
+                package, UniformityQualityDimensionId, "均一度");
+            AddQualityDimension(
+                package, DurabilityQualityDimensionId, "耐久度");
+            AddQualityDimension(
+                package, WorkmanshipQualityDimensionId, "工艺度");
+            AddQualityDimension(
+                package, HealthQualityDimensionId, "健康度");
+            AddQualityDimension(
+                package, HygieneQualityDimensionId, "洁净度");
+            AddQualityDimension(
+                package, NutritionQualityDimensionId, "营养度");
+            AddQualityDimension(
+                package, ViabilityQualityDimensionId, "活力度");
             package.Crops.Add(new CropDefinition
             {
                 Id = WheatCropId,
@@ -1181,6 +1311,9 @@ namespace Mandate.Domain
                 UnitId = GrainUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 1_000,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    ViabilityQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.seed",
@@ -1194,6 +1327,9 @@ namespace Mandate.Domain
                 UnitId = GrainUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 600,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    IntegrityQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.food",
@@ -1209,6 +1345,9 @@ namespace Mandate.Domain
                 UnitId = GrainUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 800,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    UniformityQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.food",
@@ -1223,6 +1362,9 @@ namespace Mandate.Domain
                 UnitId = GrainUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 700,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    NutritionQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.byproduct",
@@ -1237,6 +1379,9 @@ namespace Mandate.Domain
                 UnitId = GrainUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 250,
+                QualityDimensionIds = QualityDimensions(
+                    HygieneQualityDimensionId,
+                    NutritionQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.food",
@@ -1517,6 +1662,8 @@ namespace Mandate.Domain
                 Id = PrototypeDrylandMethodId,
                 DisplayName = "原型旱作法",
                 RecipeDefinitionIds = new List<string> { GrowWheatRecipeId },
+                PracticeSkillDefinitionId = CoreSkillIds.Agriculture,
+                PracticeDifficultyBasisPoints = 10_000,
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "gameplay_completion"
@@ -1529,6 +1676,11 @@ namespace Mandate.Domain
                 {
                     HandMillWheatRecipeId
                 },
+                PracticeSkillDefinitionId = CoreSkillIds.FoodProcessing,
+                PracticeDifficultyBasisPoints = 7_000,
+                QualityDimensionModifiers = QualityModifiers(
+                    UniformityQualityDimensionId, 150,
+                    PurityQualityDimensionId, 50),
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "historical_inference"
@@ -1541,6 +1693,11 @@ namespace Mandate.Domain
                 {
                     MakeDryRationRecipeId
                 },
+                PracticeSkillDefinitionId = CoreSkillIds.FoodProcessing,
+                PracticeDifficultyBasisPoints = 8_000,
+                QualityDimensionModifiers = QualityModifiers(
+                    HygieneQualityDimensionId, 150,
+                    NutritionQualityDimensionId, 50),
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "historical_inference"
@@ -1583,6 +1740,41 @@ namespace Mandate.Domain
                 HistoricalStatus = "system_bridge",
                 SourceNote = "映射既有人物农业能力；后续子技艺继续使用稳定ID扩展。"
             });
+            AddProductionSkill(
+                package,
+                CoreSkillIds.FoodProcessing,
+                "食物加工",
+                "field.production.food_processing");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Metalworking,
+                "金属工艺",
+                "field.production.metalworking");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Woodworking,
+                "木作工艺",
+                "field.production.woodworking");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Bowmaking,
+                "弓角工艺",
+                "field.production.bowmaking");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Armoring,
+                "甲作工艺",
+                "field.production.armoring");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Husbandry,
+                "畜牧与屠宰",
+                "field.production.husbandry");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.Tanning,
+                "鞣革工艺",
+                "field.production.tanning");
             package.Knowledge.Add(new KnowledgeDefinition
             {
                 Id = CoreKnowledgeIds.SeasonalObservation,
@@ -1641,6 +1833,9 @@ namespace Mandate.Domain
                 UnitId = ItemUnitId,
                 BaseWeight = weight,
                 PerishabilityBasisPoints = 0,
+                QualityDimensionIds = QualityDimensions(
+                    DurabilityQualityDimensionId,
+                    WorkmanshipQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.equipment",
@@ -1656,6 +1851,31 @@ namespace Mandate.Domain
             string id,
             string displayName)
         {
+            List<string> qualityDimensions;
+            switch (id)
+            {
+                case TimberMaterialProductId:
+                    qualityDimensions = QualityDimensions(
+                        IntegrityQualityDimensionId,
+                        DurabilityQualityDimensionId);
+                    break;
+                case LeatherMaterialProductId:
+                    qualityDimensions = QualityDimensions(
+                        PurityQualityDimensionId,
+                        DurabilityQualityDimensionId);
+                    break;
+                case HornMaterialProductId:
+                    qualityDimensions = QualityDimensions(
+                        IntegrityQualityDimensionId,
+                        WorkmanshipQualityDimensionId);
+                    break;
+                default:
+                    qualityDimensions = QualityDimensions(
+                        PurityQualityDimensionId,
+                        IntegrityQualityDimensionId);
+                    break;
+            }
+
             package.Products.Add(new ProductDefinition
             {
                 Id = id,
@@ -1663,6 +1883,7 @@ namespace Mandate.Domain
                 UnitId = ItemUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 0,
+                QualityDimensionIds = qualityDimensions,
                 CategoryTags = new List<string>
                 {
                     "product.material",
@@ -1684,6 +1905,9 @@ namespace Mandate.Domain
                 UnitId = ItemUnitId,
                 BaseWeight = 1,
                 PerishabilityBasisPoints = 0,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    IntegrityQualityDimensionId),
                 CategoryTags = new List<string>
                 {
                     "product.byproduct",
@@ -1701,6 +1925,7 @@ namespace Mandate.Domain
             int perishabilityBasisPoints,
             params string[] categoryTags)
         {
+            var tags = new List<string>(categoryTags);
             package.Products.Add(new ProductDefinition
             {
                 Id = id,
@@ -1708,7 +1933,56 @@ namespace Mandate.Domain
                 UnitId = ItemUnitId,
                 BaseWeight = baseWeight,
                 PerishabilityBasisPoints = perishabilityBasisPoints,
-                CategoryTags = new List<string>(categoryTags)
+                QualityDimensionIds = QualityDimensionsForOpenProduct(tags),
+                CategoryTags = tags
+            });
+        }
+
+        private static List<string> QualityDimensionsForOpenProduct(
+            List<string> categoryTags)
+        {
+            if (categoryTags.Contains("product.livestock"))
+            {
+                return QualityDimensions(
+                    HealthQualityDimensionId,
+                    UniformityQualityDimensionId);
+            }
+
+            if (categoryTags.Contains("product.food"))
+            {
+                return QualityDimensions(
+                    HygieneQualityDimensionId,
+                    NutritionQualityDimensionId);
+            }
+
+            if (categoryTags.Contains("product.fodder"))
+            {
+                return QualityDimensions(
+                    NutritionQualityDimensionId,
+                    PurityQualityDimensionId);
+            }
+
+            return QualityDimensions(
+                PurityQualityDimensionId,
+                IntegrityQualityDimensionId);
+        }
+
+        private static List<string> QualityDimensions(params string[] ids)
+        {
+            return new List<string>(ids);
+        }
+
+        private static void AddQualityDimension(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName)
+        {
+            package.QualityDimensions.Add(new QualityDimensionDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                HistoricalStatus = "gameplay_completion",
+                SourceNote = "多维品质的原创玩法抽象；具体数值由世界事实确定。"
             });
         }
 
@@ -1826,14 +2100,134 @@ namespace Mandate.Domain
             string displayName,
             params string[] recipeIds)
         {
+            string skillId;
+            int difficulty;
+            List<QualityDimensionModifierDefinition> modifiers;
+            switch (id)
+            {
+                case BlacksmithingMethodId:
+                    skillId = CoreSkillIds.Metalworking;
+                    difficulty = 12_000;
+                    modifiers = QualityModifiers(
+                        WorkmanshipQualityDimensionId, 200,
+                        DurabilityQualityDimensionId, 100);
+                    break;
+                case BloomerySmeltingMethodId:
+                    skillId = CoreSkillIds.Metalworking;
+                    difficulty = 13_000;
+                    modifiers = QualityModifiers(
+                        PurityQualityDimensionId, 250,
+                        IntegrityQualityDimensionId, 100);
+                    break;
+                case WoodworkingMethodId:
+                    skillId = CoreSkillIds.Woodworking;
+                    difficulty = 10_000;
+                    modifiers = QualityModifiers(
+                        WorkmanshipQualityDimensionId, 150,
+                        DurabilityQualityDimensionId, 100);
+                    break;
+                case EarthKilnCharcoalMethodId:
+                    skillId = CoreSkillIds.Woodworking;
+                    difficulty = 8_000;
+                    modifiers = QualityModifiers(
+                        PurityQualityDimensionId, 150,
+                        UniformityQualityDimensionId, 100);
+                    break;
+                case BowmakingMethodId:
+                case HornFinishingMethodId:
+                    skillId = CoreSkillIds.Bowmaking;
+                    difficulty = id == BowmakingMethodId ? 14_000 : 9_000;
+                    modifiers = QualityModifiers(
+                        WorkmanshipQualityDimensionId, 250,
+                        DurabilityQualityDimensionId, 100);
+                    break;
+                case ArmoringMethodId:
+                    skillId = CoreSkillIds.Armoring;
+                    difficulty = 15_000;
+                    modifiers = QualityModifiers(
+                        DurabilityQualityDimensionId, 200,
+                        WorkmanshipQualityDimensionId, 200);
+                    break;
+                case VegetableTanningMethodId:
+                    skillId = CoreSkillIds.Tanning;
+                    difficulty = 11_000;
+                    modifiers = QualityModifiers(
+                        DurabilityQualityDimensionId, 200,
+                        PurityQualityDimensionId, 100);
+                    break;
+                case PastureBreedingMethodId:
+                    skillId = CoreSkillIds.Husbandry;
+                    difficulty = 9_000;
+                    modifiers = QualityModifiers(
+                        HealthQualityDimensionId, 150,
+                        UniformityQualityDimensionId, 50);
+                    break;
+                case ManualSlaughterMethodId:
+                    skillId = CoreSkillIds.Husbandry;
+                    difficulty = 8_000;
+                    modifiers = QualityModifiers(
+                        HygieneQualityDimensionId, 200,
+                        IntegrityQualityDimensionId, 100);
+                    break;
+                default:
+                    throw new ProductionContentException(
+                        $"Core method {id} has no practice contract.");
+            }
+
             package.Methods.Add(new ProductionMethodDefinition
             {
                 Id = id,
                 DisplayName = displayName,
                 RecipeDefinitionIds = new List<string>(recipeIds),
+                PracticeSkillDefinitionId = skillId,
+                PracticeDifficultyBasisPoints = difficulty,
+                QualityDimensionModifiers = modifiers,
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "historical_inference"
+            });
+        }
+
+        private static List<QualityDimensionModifierDefinition>
+            QualityModifiers(
+                string firstDimensionId,
+                int firstModifier,
+                string secondDimensionId = null,
+                int secondModifier = 0)
+        {
+            var result = new List<QualityDimensionModifierDefinition>
+            {
+                new QualityDimensionModifierDefinition
+                {
+                    QualityDimensionId = firstDimensionId,
+                    ModifierBasisPoints = firstModifier
+                }
+            };
+            if (!string.IsNullOrEmpty(secondDimensionId))
+            {
+                result.Add(new QualityDimensionModifierDefinition
+                {
+                    QualityDimensionId = secondDimensionId,
+                    ModifierBasisPoints = secondModifier
+                });
+            }
+
+            return result;
+        }
+
+        private static void AddProductionSkill(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            string fieldId)
+        {
+            package.Skills.Add(new SkillDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                FieldId = fieldId,
+                HistoricalStatus = "system_bridge",
+                SourceNote = "由真实生产工单积累的开放式专门技艺。"
             });
         }
 

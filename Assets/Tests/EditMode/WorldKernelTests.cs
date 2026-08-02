@@ -3071,7 +3071,7 @@ namespace Mandate.Tests
             var families = world.Families.Count;
             var services = world.MilitaryServices.Count;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 12");
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 12");
             var equipmentStart = json.IndexOf(
                 "  \"MilitaryEquipmentInitialized\":",
                 StringComparison.Ordinal);
@@ -3832,7 +3832,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 17", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 18", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3855,7 +3855,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 17", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 18", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3893,10 +3893,11 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
+            Assert.That(fromResource.QualityDimensionCount, Is.EqualTo(9));
             Assert.That(fromResource.ProductCount, Is.EqualTo(29));
             Assert.That(fromResource.RecipeCount, Is.EqualTo(15));
             Assert.That(fromResource.MethodCount, Is.EqualTo(13));
-            Assert.That(fromResource.SkillCount, Is.EqualTo(1));
+            Assert.That(fromResource.SkillCount, Is.EqualTo(8));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
             Assert.That(
@@ -4487,7 +4488,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 17", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 18", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4514,9 +4515,9 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 8")
                 .Replace(
-                    "\"ContentSchemaVersion\": 2",
+                    "\"ContentSchemaVersion\": 3",
                     "\"ContentSchemaVersion\": 1")
                 .Replace("\"SkillMasteries\": []", "\"SkillMasteries\": null")
                 .Replace(
@@ -4546,7 +4547,7 @@ namespace Mandate.Tests
             Assert.That(loaded.People[0].TechnologyMasteries, Is.Not.Null);
             Assert.That(
                 loaded.ProductionContentManifest.ContentSchemaVersion,
-                Is.EqualTo(2));
+                Is.EqualTo(3));
             loaded.Validate();
         }
 
@@ -4751,7 +4752,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4783,7 +4784,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -5062,7 +5063,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -5246,7 +5247,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -6058,7 +6059,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 14");
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 14");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6202,7 +6203,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 15");
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 15");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6332,7 +6333,7 @@ namespace Mandate.Tests
             RemoveM23P3Prototype(world);
             world.Validate();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 16");
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 16");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6347,6 +6348,180 @@ namespace Mandate.Tests
             Assert.That(loaded.ProductionSites.Exists(item =>
                 item.Id == LivestockProductionSystem.PrototypePastureSiteId),
                 Is.False);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ProductQuality_CoreProductsAndMethodsDeclareOpenContracts()
+        {
+            var content = ProductionContentRegistry.CreateCore();
+            var sword = content.GetProduct(
+                CoreProductionContent.RingSwordProductId);
+            var blacksmithing = content.GetMethod(
+                CoreProductionContent.BlacksmithingMethodId);
+
+            Assert.That(content.QualityDimensionCount, Is.EqualTo(9));
+            Assert.That(sword.QualityDimensionIds, Is.EqualTo(new[]
+            {
+                CoreProductionContent.DurabilityQualityDimensionId,
+                CoreProductionContent.WorkmanshipQualityDimensionId
+            }));
+            Assert.That(blacksmithing.PracticeSkillDefinitionId,
+                Is.EqualTo(CoreSkillIds.Metalworking));
+            Assert.That(blacksmithing.PracticeDifficultyBasisPoints,
+                Is.GreaterThan(10_000));
+            Assert.That(blacksmithing.QualityDimensionModifiers.Count,
+                Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ArtisanPractice_RealOrderGrowsTrackedSkillAndShapesQuality()
+        {
+            var lowWorld = PrototypeWorldFactory.Create184World(184);
+            var highWorld = PrototypeWorldFactory.Create184World(184);
+            var lowManager = lowWorld.People.Find(item =>
+                item.Id == "person.su_shuang");
+            var highManager = highWorld.People.Find(item =>
+                item.Id == "person.su_shuang");
+            lowManager.ProfessionalSkills.Craft = 2_000;
+            highManager.ProfessionalSkills.Craft = 8_000;
+            var lowSystem = new ProcessingProductionSystem();
+            var repository = new WorldStatePersonRepository(highWorld);
+            var highSystem = new ProcessingProductionSystem(null, repository);
+
+            var lowOrder = CreatePrototypeSpearOrder(lowWorld, lowSystem);
+            var highOrder = CreatePrototypeSpearOrder(highWorld, highSystem);
+            Assert.That(lowOrder.ManagerSkillBasisPointsAtStart,
+                Is.EqualTo(2_000));
+            Assert.That(highOrder.ManagerSkillBasisPointsAtStart,
+                Is.EqualTo(8_000));
+            Assert.That(highWorld.ProductionPracticeLedgerEntries, Is.Empty);
+            Assert.That(SkillMasteryAccess.Get(
+                    highManager, CoreSkillIds.Metalworking),
+                Is.EqualTo(0));
+            lowWorld.AbsoluteDay = lowOrder.FinishDay;
+            highWorld.AbsoluteDay = highOrder.FinishDay;
+            lowSystem.ResolveDueOrders(lowWorld);
+            highSystem.ResolveDueOrders(highWorld);
+
+            var lowOutput = lowWorld.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == lowOrder.Id);
+            var highOutput = highWorld.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == highOrder.Id);
+            Assert.That(highOutput.QualityBasisPoints,
+                Is.GreaterThan(lowOutput.QualityBasisPoints));
+            Assert.That(highOutput.QualityDimensions[0].ValueBasisPoints,
+                Is.Not.EqualTo(
+                    highOutput.QualityDimensions[1].ValueBasisPoints));
+            Assert.That(highOrder.PracticeGainBasisPoints,
+                Is.GreaterThan(0));
+            Assert.That(highWorld.ProductionPracticeLedgerEntries.Count,
+                Is.EqualTo(1));
+            Assert.That(repository.GetChangedPersonIds(),
+                Does.Contain(highManager.Id));
+            Assert.That(SkillMasteryAccess.Get(
+                    highManager, CoreSkillIds.Metalworking),
+                Is.GreaterThan(8_000));
+            highWorld.Validate();
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(highWorld));
+            Assert.That(loaded.ProductionPracticeLedgerEntries.Count,
+                Is.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ArtisanPractice_OrderQualityUsesSkillSnapshotAtCreation()
+        {
+            var baseline = PrototypeWorldFactory.Create184World(184);
+            var changed = PrototypeWorldFactory.Create184World(184);
+            var baselineManager = baseline.People.Find(item =>
+                item.Id == "person.su_shuang");
+            var changedManager = changed.People.Find(item =>
+                item.Id == "person.su_shuang");
+            baselineManager.ProfessionalSkills.Craft = 7_000;
+            changedManager.ProfessionalSkills.Craft = 7_000;
+            var baselineSystem = new ProcessingProductionSystem();
+            var changedSystem = new ProcessingProductionSystem();
+            var baselineOrder = CreatePrototypeSpearOrder(
+                baseline, baselineSystem);
+            var changedOrder = CreatePrototypeSpearOrder(
+                changed, changedSystem);
+            changedManager.ProfessionalSkills.Craft = 1_000;
+            baseline.AbsoluteDay = baselineOrder.FinishDay;
+            changed.AbsoluteDay = changedOrder.FinishDay;
+            baselineSystem.ResolveDueOrders(baseline);
+            changedSystem.ResolveDueOrders(changed);
+
+            var baselineOutput = baseline.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == baselineOrder.Id);
+            var changedOutput = changed.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == changedOrder.Id);
+            Assert.That(changedOutput.QualityBasisPoints,
+                Is.EqualTo(baselineOutput.QualityBasisPoints));
+            Assert.That(changedOutput.QualityDimensions.Count,
+                Is.EqualTo(baselineOutput.QualityDimensions.Count));
+            for (var i = 0; i < changedOutput.QualityDimensions.Count; i++)
+            {
+                Assert.That(
+                    changedOutput.QualityDimensions[i].QualityDimensionId,
+                    Is.EqualTo(baselineOutput.QualityDimensions[i]
+                        .QualityDimensionId));
+                Assert.That(
+                    changedOutput.QualityDimensions[i].ValueBasisPoints,
+                    Is.EqualTo(baselineOutput.QualityDimensions[i]
+                        .ValueBasisPoints));
+            }
+
+            Assert.That(
+                changed.ProductionPracticeLedgerEntries[0]
+                    .MasteryBeforeBasisPoints,
+                Is.EqualTo(1_000));
+        }
+
+        [Test]
+        public void ProductQuality_ValidationRejectsTamperedSummary()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            world.ProductBatches[0].QualityBasisPoints--;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void ArtisanPractice_ValidationRejectsTamperedLedgerQuality()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var processing = new ProcessingProductionSystem();
+            var order = CreatePrototypeSpearOrder(world, processing);
+            world.AbsoluteDay = order.FinishDay;
+            processing.ResolveDueOrders(world);
+            world.ProductionPracticeLedgerEntries[0]
+                .OutputQualityBasisPoints--;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSeventeenWithoutInventingPractice()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var summaries = world.ProductBatches.ConvertAll(item =>
+                item.QualityBasisPoints);
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 17");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ProductionPracticeLedgerEntries, Is.Empty);
+            Assert.That(loaded.ProductBatches.ConvertAll(item =>
+                    item.QualityBasisPoints),
+                Is.EqualTo(summaries));
+            Assert.That(loaded.ProductBatches.TrueForAll(item =>
+                    item.QualityDimensions.Count > 0),
+                Is.True);
             loaded.Validate();
         }
 
@@ -6562,7 +6737,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 13");
+                .Replace("\"SchemaVersion\": 18", "\"SchemaVersion\": 13");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6672,6 +6847,22 @@ namespace Mandate.Tests
                 2);
             world.AbsoluteDay = spears.FinishDay;
             processing.ResolveDueOrders(world);
+        }
+
+        private static ProcessingWorkOrderState CreatePrototypeSpearOrder(
+            WorldState world,
+            ProcessingProductionSystem processing)
+        {
+            return processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.ForgeLongSpearRecipeId,
+                CoreProductionContent.BlacksmithingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                1);
         }
 
         private static void ExecutePrototypeLivestockChain(WorldState world)
@@ -6882,6 +7073,11 @@ namespace Mandate.Tests
                 Id = "product.mod_test.example_seed",
                 DisplayName = "测试种子",
                 UnitId = CoreProductionContent.GrainUnitId,
+                QualityDimensionIds = new List<string>
+                {
+                    CoreProductionContent.PurityQualityDimensionId,
+                    CoreProductionContent.ViabilityQualityDimensionId
+                },
                 CategoryTags = new List<string> { "product.seed" }
             });
             package.Products.Add(new ProductDefinition
@@ -6889,6 +7085,11 @@ namespace Mandate.Tests
                 Id = "product.mod_test.example_harvest",
                 DisplayName = "测试收获物",
                 UnitId = CoreProductionContent.GrainUnitId,
+                QualityDimensionIds = new List<string>
+                {
+                    CoreProductionContent.PurityQualityDimensionId,
+                    CoreProductionContent.IntegrityQualityDimensionId
+                },
                 CategoryTags = new List<string> { "product.test" }
             });
             package.Recipes.Add(new RecipeDefinition
@@ -6923,6 +7124,8 @@ namespace Mandate.Tests
                 {
                     "recipe.mod_test.grow_example"
                 },
+                PracticeSkillDefinitionId = CoreSkillIds.Agriculture,
+                PracticeDifficultyBasisPoints = 10_000,
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "test_only"

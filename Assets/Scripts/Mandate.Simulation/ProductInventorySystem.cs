@@ -230,7 +230,7 @@ namespace Mandate.Simulation
             int seedPurity)
         {
             var village = FindVillage(world, storage.VillageId);
-            return new ProductBatchState
+            var batch = new ProductBatchState
             {
                 Id = $"product_batch.{world.AbsoluteDay}." +
                      $"{world.ProductBatches.Count:D6}",
@@ -250,6 +250,9 @@ namespace Mandate.Simulation
                 SeedVigorBasisPoints = seedVigor,
                 SeedPurityBasisPoints = seedPurity
             };
+            batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                product, batch.QualityBasisPoints);
+            return batch;
         }
 
         internal static ProductBatchState NewOrganizationBatch(
@@ -261,7 +264,7 @@ namespace Mandate.Simulation
             long quantity,
             int qualityBasisPoints)
         {
-            return new ProductBatchState
+            var batch = new ProductBatchState
             {
                 Id = $"product_batch.{world.AbsoluteDay}." +
                      $"{world.ProductBatches.Count:D6}",
@@ -278,6 +281,9 @@ namespace Mandate.Simulation
                 QualityBasisPoints = qualityBasisPoints,
                 FreshnessBasisPoints = 10_000
             };
+            batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                product, qualityBasisPoints);
+            return batch;
         }
 
         internal static void RequireWorld(WorldState world)
@@ -346,10 +352,14 @@ namespace Mandate.Simulation
     public sealed class ProcessingProductionSystem
     {
         private readonly ProductionContentRegistry _content;
+        private readonly IPersonRepository _personRepository;
 
-        public ProcessingProductionSystem(ProductionContentRegistry content = null)
+        public ProcessingProductionSystem(
+            ProductionContentRegistry content = null,
+            IPersonRepository personRepository = null)
         {
             _content = content ?? ProductionContentRegistry.CreateCore();
+            _personRepository = personRepository;
         }
 
         public ProcessingWorkOrderState CreateOrder(
@@ -407,6 +417,11 @@ namespace Mandate.Simulation
                 FinishDay = checked(world.AbsoluteDay +
                     (long)recipe.DurationDays * runCount),
                 RunCount = runCount,
+                PracticeTrackingEnabled = true,
+                PracticeSkillDefinitionId =
+                    method.PracticeSkillDefinitionId,
+                ManagerSkillBasisPointsAtStart =
+                    GetPracticeBaseline(manager, method.PracticeSkillDefinitionId),
                 InputReservations = reservations
             };
             var transaction = ProductInventorySystem.NewTransaction(
@@ -494,6 +509,11 @@ namespace Mandate.Simulation
                 FinishDay = checked(world.AbsoluteDay +
                     (long)recipe.DurationDays * runCount),
                 RunCount = runCount,
+                PracticeTrackingEnabled = true,
+                PracticeSkillDefinitionId =
+                    method.PracticeSkillDefinitionId,
+                ManagerSkillBasisPointsAtStart =
+                    GetPracticeBaseline(manager, method.PracticeSkillDefinitionId),
                 InputReservations = reservations
             };
             Reserve(world, order, reservations);
@@ -552,14 +572,18 @@ namespace Mandate.Simulation
         private void Settle(WorldState world, ProcessingWorkOrderState order)
         {
             var recipe = _content.GetRecipe(order.RecipeDefinitionId);
+            var method = _content.GetMethod(order.MethodDefinitionId);
             var organizationOrder =
                 !string.IsNullOrEmpty(order.OwnerOrganizationId);
             FamilyState family = null;
             VillageFacilityState storage = null;
             InventoryContainerState container = null;
+            var siteConditionBasisPoints = 8_000;
             if (organizationOrder)
             {
                 container = FindContainer(world, order.InventoryContainerId);
+                siteConditionBasisPoints = FindProductionSite(
+                    world, order.ProductionSiteId).ConditionBasisPoints;
             }
             else
             {
@@ -587,6 +611,7 @@ namespace Mandate.Simulation
             }
 
             long outputWeight = 0;
+            var minimumOutputQuality = 10_000;
             for (var i = 0; i < recipe.Outputs.Count; i++)
             {
                 var output = recipe.Outputs[i];
@@ -633,7 +658,28 @@ namespace Mandate.Simulation
                     : ProductInventorySystem.NewBatch(
                         world, product, family, storage, transaction.Id,
                         order.Id, quantity, string.Empty, 0, 0);
-                batch.QualityBasisPoints = minimumQuality;
+                if (order.PracticeTrackingEnabled)
+                {
+                    batch.QualityDimensions = BuildOutputQuality(
+                        world,
+                        order,
+                        product,
+                        method,
+                        minimumQuality,
+                        siteConditionBasisPoints);
+                    batch.QualityBasisPoints =
+                        ProductQualityRules.CalculateSummary(
+                            batch.QualityDimensions);
+                }
+                else
+                {
+                    batch.QualityBasisPoints = minimumQuality;
+                    batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                        product, minimumQuality);
+                }
+
+                minimumOutputQuality = Math.Min(
+                    minimumOutputQuality, batch.QualityBasisPoints);
                 world.ProductBatches.Add(batch);
                 order.OutputBatchIds.Add(batch.Id);
                 transaction.Lines.Add(ProductInventorySystem.Line(
@@ -642,7 +688,233 @@ namespace Mandate.Simulation
 
             order.Status = ProductionOrderStatus.Completed;
             order.SettledDay = world.AbsoluteDay;
+            if (order.PracticeTrackingEnabled)
+            {
+                RecordPractice(
+                    world,
+                    order,
+                    recipe,
+                    method,
+                    minimumOutputQuality);
+            }
             world.InventoryTransactions.Add(transaction);
+        }
+
+        private List<ProductQualityDimensionState> BuildOutputQuality(
+            WorldState world,
+            ProcessingWorkOrderState order,
+            ProductDefinition product,
+            ProductionMethodDefinition method,
+            int fallbackInputQuality,
+            int siteConditionBasisPoints)
+        {
+            var result = new List<ProductQualityDimensionState>(
+                product.QualityDimensionIds.Count);
+            var skillAdjustment =
+                (order.ManagerSkillBasisPointsAtStart - 5_000) / 20;
+            var siteAdjustment = (siteConditionBasisPoints - 8_000) / 20;
+            for (var i = 0; i < product.QualityDimensionIds.Count; i++)
+            {
+                var dimensionId = product.QualityDimensionIds[i];
+                var inputQuality = FindMinimumInputDimension(
+                    world, order, dimensionId, fallbackInputQuality);
+                var methodAdjustment = FindMethodQualityModifier(
+                    method, dimensionId);
+                result.Add(new ProductQualityDimensionState
+                {
+                    QualityDimensionId = dimensionId,
+                    ValueBasisPoints = ClampBasisPoints(
+                        inputQuality + skillAdjustment + siteAdjustment +
+                        methodAdjustment)
+                });
+            }
+
+            return result;
+        }
+
+        private static int FindMinimumInputDimension(
+            WorldState world,
+            ProcessingWorkOrderState order,
+            string qualityDimensionId,
+            int fallback)
+        {
+            var found = false;
+            var minimum = 10_000;
+            for (var reservationIndex = 0;
+                 reservationIndex < order.InputReservations.Count;
+                 reservationIndex++)
+            {
+                var batch = FindBatch(
+                    world, order.InputReservations[reservationIndex].BatchId);
+                for (var dimensionIndex = 0;
+                     dimensionIndex < batch.QualityDimensions.Count;
+                     dimensionIndex++)
+                {
+                    var dimension = batch.QualityDimensions[dimensionIndex];
+                    if (dimension.QualityDimensionId != qualityDimensionId)
+                    {
+                        continue;
+                    }
+
+                    minimum = Math.Min(minimum, dimension.ValueBasisPoints);
+                    found = true;
+                }
+            }
+
+            return found ? minimum : fallback;
+        }
+
+        private static int FindMethodQualityModifier(
+            ProductionMethodDefinition method,
+            string qualityDimensionId)
+        {
+            for (var i = 0; i < method.QualityDimensionModifiers.Count; i++)
+            {
+                if (method.QualityDimensionModifiers[i].QualityDimensionId ==
+                    qualityDimensionId)
+                {
+                    return method.QualityDimensionModifiers[i]
+                        .ModifierBasisPoints;
+                }
+            }
+
+            return 0;
+        }
+
+        private void RecordPractice(
+            WorldState world,
+            ProcessingWorkOrderState order,
+            RecipeDefinition recipe,
+            ProductionMethodDefinition method,
+            int outputQualityBasisPoints)
+        {
+            var current = _personRepository == null
+                ? ProductInventorySystem.FindPerson(
+                    world, order.ManagerPersonId)
+                : _personRepository.GetRequired(order.ManagerPersonId);
+            var masteryBefore = GetPracticeBaseline(
+                current, order.PracticeSkillDefinitionId);
+            var gain = CalculatePracticeGain(
+                current,
+                masteryBefore,
+                recipe.DurationDays,
+                order.RunCount,
+                method.PracticeDifficultyBasisPoints);
+            var masteryAfter = Math.Min(10_000, masteryBefore + gain);
+            gain = masteryAfter - masteryBefore;
+            if (gain > 0)
+            {
+                var person = _personRepository == null
+                    ? current
+                    : _personRepository.GetRequiredForUpdate(current.Id);
+                SetSpecializedMastery(
+                    person,
+                    order.PracticeSkillDefinitionId,
+                    masteryAfter,
+                    world.AbsoluteDay,
+                    order.Id);
+            }
+
+            order.PracticeGainBasisPoints = gain;
+            order.OutputQualityBasisPoints = outputQualityBasisPoints;
+            world.ProductionPracticeLedgerEntries.Add(
+                new ProductionPracticeLedgerEntryState
+                {
+                    Id = $"production_practice.{world.AbsoluteDay}." +
+                         $"{world.ProductionPracticeLedgerEntries.Count:D6}",
+                    Day = world.AbsoluteDay,
+                    ProcessingWorkOrderId = order.Id,
+                    PersonId = order.ManagerPersonId,
+                    SkillDefinitionId = order.PracticeSkillDefinitionId,
+                    MasteryBeforeBasisPoints = masteryBefore,
+                    MasteryAfterBasisPoints = masteryAfter,
+                    GainBasisPoints = gain,
+                    OutputQualityBasisPoints = outputQualityBasisPoints,
+                    Summary = $"Completed {order.Id} with " +
+                              $"{order.PracticeSkillDefinitionId}."
+                });
+        }
+
+        private static int GetPracticeBaseline(
+            PersonState person,
+            string skillDefinitionId)
+        {
+            if (skillDefinitionId == CoreSkillIds.Agriculture)
+            {
+                return SkillMasteryAccess.Get(person, skillDefinitionId);
+            }
+
+            for (var i = 0; i < person.SkillMasteries.Count; i++)
+            {
+                if (person.SkillMasteries[i].SkillDefinitionId ==
+                    skillDefinitionId)
+                {
+                    return person.SkillMasteries[i].MasteryBasisPoints;
+                }
+            }
+
+            return person.ProfessionalSkills?.Craft ?? 0;
+        }
+
+        private static int CalculatePracticeGain(
+            PersonState person,
+            int masteryBasisPoints,
+            int durationDays,
+            int runCount,
+            int difficultyBasisPoints)
+        {
+            if (masteryBasisPoints >= 10_000)
+            {
+                return 0;
+            }
+
+            var aptitude = person.Aptitudes == null
+                ? 5_000
+                : (person.Aptitudes.Dexterity + person.Aptitudes.Perception +
+                   person.Aptitudes.Memory + person.Aptitudes.Willpower) / 4;
+            var aptitudeFactor = 5_000L + aptitude / 2L;
+            var diminishingFactor = 1_000L + 10_000 - masteryBasisPoints;
+            var weightedDays = checked(
+                (long)durationDays * runCount * difficultyBasisPoints /
+                10_000);
+            var gain = weightedDays * aptitudeFactor * diminishingFactor /
+                5_000_000L;
+            return (int)Math.Max(1, Math.Min(10_000 - masteryBasisPoints, gain));
+        }
+
+        private static void SetSpecializedMastery(
+            PersonState person,
+            string skillDefinitionId,
+            int valueBasisPoints,
+            long day,
+            string sourceId)
+        {
+            for (var i = 0; i < person.SkillMasteries.Count; i++)
+            {
+                var mastery = person.SkillMasteries[i];
+                if (mastery.SkillDefinitionId != skillDefinitionId)
+                {
+                    continue;
+                }
+
+                mastery.MasteryBasisPoints = valueBasisPoints;
+                mastery.LastChangedDay = day;
+                mastery.SourceId = sourceId;
+                return;
+            }
+
+            person.SkillMasteries.Add(new SkillMasteryState
+            {
+                SkillDefinitionId = skillDefinitionId,
+                MasteryBasisPoints = valueBasisPoints,
+                LastChangedDay = day,
+                SourceId = sourceId
+            });
+        }
+
+        private static int ClampBasisPoints(int value)
+        {
+            return Math.Max(0, Math.Min(10_000, value));
         }
 
         private List<BatchReservationState> BuildReservations(

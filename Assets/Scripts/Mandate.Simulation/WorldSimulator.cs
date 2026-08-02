@@ -44,7 +44,8 @@ namespace Mandate.Simulation
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent, personRepository);
             _researchSystem = new ResearchSystem(productionContent);
-            _processingSystem = new ProcessingProductionSystem(productionContent);
+            _processingSystem = new ProcessingProductionSystem(
+                productionContent, personRepository);
             _upstreamResourceSystem =
                 new UpstreamResourceProductionSystem(
                     productionContent, personRepository);
