@@ -604,6 +604,7 @@ namespace Mandate.Simulation
 
             new MilitaryServiceSystem(people).InitializePrototype(world);
             new MilitaryEquipmentSystem(people).InitializePrototype(world);
+            new MilitaryProcurementSystem(people).InitializePrototypeSupply(world);
             world.Validate();
             return world;
         }

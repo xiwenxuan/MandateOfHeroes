@@ -64,6 +64,9 @@ namespace Mandate.Persistence
                     case 12:
                         MigrateVersionTwelveToThirteen(world);
                         break;
+                    case 13:
+                        MigrateVersionThirteenToFourteen(world, content);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -249,6 +252,64 @@ namespace Mandate.Persistence
                 new System.Collections.Generic.List<
                     MilitaryEquipmentTransactionState>();
             world.SchemaVersion = 13;
+        }
+
+        private static void MigrateVersionThirteenToFourteen(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.InventoryContainers =
+                new System.Collections.Generic.List<InventoryContainerState>();
+            world.MilitaryProcurementOrders =
+                new System.Collections.Generic.List<
+                    MilitaryProcurementOrderState>();
+            world.MilitaryProcurementLedgerEntries =
+                new System.Collections.Generic.List<
+                    MilitaryProcurementLedgerEntryState>();
+
+            world.ProductBatches.RemoveAll(batch =>
+                !string.IsNullOrEmpty(batch.OwnerOrganizationId) ||
+                !string.IsNullOrEmpty(batch.InventoryContainerId));
+            world.InventoryTransactions.RemoveAll(transaction =>
+                !string.IsNullOrEmpty(
+                    transaction.SourceMilitaryProcurementId) ||
+                transaction.Type == InventoryTransactionType.OpeningBalance ||
+                transaction.Type ==
+                    InventoryTransactionType.MilitaryProcurementDispatched);
+
+            for (var i = 0;
+                 i < world.MilitaryEquipmentDefinitions.Count;
+                 i++)
+            {
+                var definition = world.MilitaryEquipmentDefinitions[i];
+                definition.ProductDefinitionId =
+                    ProductForEquipment(definition.Id);
+            }
+
+            world.ProductionContentManifest = productionContent.CreateManifest();
+            world.SchemaVersion = 14;
+        }
+
+        private static string ProductForEquipment(string equipmentId)
+        {
+            switch (equipmentId)
+            {
+                case "equipment.han_ring_sword":
+                    return CoreProductionContent.RingSwordProductId;
+                case "equipment.wooden_shield":
+                    return CoreProductionContent.WoodenShieldProductId;
+                case "equipment.long_spear":
+                    return CoreProductionContent.LongSpearProductId;
+                case "equipment.horn_bow":
+                    return CoreProductionContent.HornBowProductId;
+                case "equipment.arrow_bundle":
+                    return CoreProductionContent.ArrowBundleProductId;
+                case "equipment.lamellar_armor":
+                    return CoreProductionContent.LamellarArmorProductId;
+                default:
+                    return "product.equipment." +
+                           equipmentId.Substring(equipmentId.IndexOf('.') + 1);
+            }
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

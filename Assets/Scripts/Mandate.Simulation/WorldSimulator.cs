@@ -19,6 +19,7 @@ namespace Mandate.Simulation
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
         private readonly ProcessingProductionSystem _processingSystem;
+        private readonly MilitaryProcurementSystem _militaryProcurementSystem;
         private readonly CountyGovernanceSystem _countyGovernanceSystem =
             new CountyGovernanceSystem();
 
@@ -40,6 +41,8 @@ namespace Mandate.Simulation
                 masterSeed, productionContent, personRepository);
             _researchSystem = new ResearchSystem(productionContent);
             _processingSystem = new ProcessingProductionSystem(productionContent);
+            _militaryProcurementSystem =
+                new MilitaryProcurementSystem(personRepository);
         }
 
         public void AdvanceDays(WorldState world, int days)
@@ -79,6 +82,7 @@ namespace Mandate.Simulation
                 world.Validate();
                 _travelSystem.AdvanceJourneysOneSegment(world);
                 _armySystem.AdvanceMarchesOneSegment(world);
+                _militaryProcurementSystem.ResolveArrivals(world);
                 var enteredNewDay = world.AdvanceOneSegment();
                 if (enteredNewDay)
                 {

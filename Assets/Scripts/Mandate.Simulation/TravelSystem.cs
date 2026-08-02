@@ -86,11 +86,34 @@ namespace Mandate.Simulation
                 }
 
                 var person = people.GetRequiredForUpdate(journey.PersonId);
+                for (var orderIndex = 0;
+                     orderIndex < world.MilitaryProcurementOrders.Count;
+                     orderIndex++)
+                {
+                    var order = world.MilitaryProcurementOrders[orderIndex];
+                    if (order.JourneyId == journey.Id &&
+                        order.Status ==
+                        MilitaryProcurementStatus.InTransit)
+                    {
+                        order.Status =
+                            MilitaryProcurementStatus.AwaitingArmy;
+                    }
+                }
                 world.Journeys.RemoveAt(i);
                 _populationLedgerSystem.MoveIndependentPerson(
                     world,
                     person,
                     journey.DestinationLocationId);
+                for (var containerIndex = 0;
+                     containerIndex < world.InventoryContainers.Count;
+                     containerIndex++)
+                {
+                    var container = world.InventoryContainers[containerIndex];
+                    if (container.CarrierPersonId == person.Id)
+                    {
+                        container.LocationId = journey.DestinationLocationId;
+                    }
+                }
             }
         }
 

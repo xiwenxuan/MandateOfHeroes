@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "3.0.0",
+  "Version": "4.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -89,6 +89,54 @@
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 250
+    },
+    {
+      "Id": "product.equipment.han_ring_sword",
+      "DisplayName": "环首刀",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.melee"],
+      "BaseWeight": 3,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.equipment.wooden_shield",
+      "DisplayName": "木盾",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.shield"],
+      "BaseWeight": 5,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.equipment.long_spear",
+      "DisplayName": "长矛",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.melee"],
+      "BaseWeight": 5,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.equipment.horn_bow",
+      "DisplayName": "角弓",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.ranged"],
+      "BaseWeight": 2,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.equipment.arrow_bundle",
+      "DisplayName": "箭束",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.ammunition"],
+      "BaseWeight": 2,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.equipment.lamellar_armor",
+      "DisplayName": "札甲",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.armor"],
+      "BaseWeight": 10,
+      "PerishabilityBasisPoints": 0
     }
   ],
   "Recipes": [

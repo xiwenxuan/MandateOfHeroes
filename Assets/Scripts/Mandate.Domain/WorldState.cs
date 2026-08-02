@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 13;
+        public const int CurrentSchemaVersion = 14;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -227,6 +227,8 @@ namespace Mandate.Domain
             new List<ProductionLedgerEntryState>();
         public List<ProductBatchState> ProductBatches =
             new List<ProductBatchState>();
+        public List<InventoryContainerState> InventoryContainers =
+            new List<InventoryContainerState>();
         public List<InventoryTransactionState> InventoryTransactions =
             new List<InventoryTransactionState>();
         public List<ProcessingWorkOrderState> ProcessingWorkOrders =
@@ -237,6 +239,11 @@ namespace Mandate.Domain
             new List<TechnologyApplicationState>();
         public List<ResearchLedgerEntryState> ResearchLedgerEntries =
             new List<ResearchLedgerEntryState>();
+        public List<MilitaryProcurementOrderState> MilitaryProcurementOrders =
+            new List<MilitaryProcurementOrderState>();
+        public List<MilitaryProcurementLedgerEntryState>
+            MilitaryProcurementLedgerEntries =
+                new List<MilitaryProcurementLedgerEntryState>();
         public ProductionContentManifestState ProductionContentManifest;
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
@@ -371,6 +378,8 @@ namespace Mandate.Domain
                 ProductionLedgerEntries, item => item.Id, "production ledger entry");
             ValidateUniqueIds(ProductBatches, item => item.Id, "product batch");
             ValidateUniqueIds(
+                InventoryContainers, item => item.Id, "inventory container");
+            ValidateUniqueIds(
                 InventoryTransactions, item => item.Id, "inventory transaction");
             ValidateUniqueIds(
                 ProcessingWorkOrders, item => item.Id, "processing work order");
@@ -380,6 +389,14 @@ namespace Mandate.Domain
                 TechnologyApplications, item => item.Id, "technology application");
             ValidateUniqueIds(
                 ResearchLedgerEntries, item => item.Id, "research ledger entry");
+            ValidateUniqueIds(
+                MilitaryProcurementOrders,
+                item => item.Id,
+                "military procurement order");
+            ValidateUniqueIds(
+                MilitaryProcurementLedgerEntries,
+                item => item.Id,
+                "military procurement ledger entry");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -1308,7 +1325,247 @@ namespace Mandate.Domain
             ValidateEducation(personIds, positionIds);
             ValidateMilitaryService(personIds, locationIds, armyIds);
             ValidateMilitaryEquipment(personIds, armyIds);
+            ValidateMilitaryProcurement(
+                personIds, locationIds, organizationIds, armyIds, routeIds);
             ValidateAttention(personIds);
+        }
+
+        private void ValidateMilitaryProcurement(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds,
+            HashSet<string> armyIds,
+            HashSet<string> routeIds)
+        {
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            var equipment = new Dictionary<string,
+                MilitaryEquipmentDefinitionState>(StringComparer.Ordinal);
+            var journeys = new Dictionary<string, JourneyState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            }
+
+            for (var i = 0; i < MilitaryEquipmentDefinitions.Count; i++)
+            {
+                equipment.Add(
+                    MilitaryEquipmentDefinitions[i].Id,
+                    MilitaryEquipmentDefinitions[i]);
+            }
+
+            for (var i = 0; i < Journeys.Count; i++)
+            {
+                journeys.Add(Journeys[i].Id, Journeys[i]);
+            }
+
+            var orders = new Dictionary<string, MilitaryProcurementOrderState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryProcurementOrders.Count; i++)
+            {
+                var order = MilitaryProcurementOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A military procurement order cannot be null.");
+                orders.Add(order.Id, order);
+                var hasJourney = journeys.TryGetValue(
+                    order.JourneyId, out var journey);
+                var validStatus =
+                    order.Status == MilitaryProcurementStatus.InTransit &&
+                    order.DeliveredDay == -1 && hasJourney &&
+                    journey.PersonId == order.CarrierPersonId &&
+                    journey.RouteId == order.RouteId &&
+                    journey.OriginLocationId == order.OriginLocationId &&
+                    journey.DestinationLocationId == order.DestinationLocationId ||
+                    order.Status == MilitaryProcurementStatus.AwaitingArmy &&
+                    order.DeliveredDay == -1 && !hasJourney ||
+                    order.Status == MilitaryProcurementStatus.Delivered &&
+                    order.DeliveredDay >= order.CreatedDay &&
+                    order.DeliveredDay <= AbsoluteDay && !hasJourney;
+                var hasEquipment = equipment.TryGetValue(
+                    order.EquipmentDefinitionId, out var definition);
+                var hasBatch = batches.TryGetValue(
+                    order.SourceBatchId, out var batch);
+                var hasContainer = containers.TryGetValue(
+                    order.InventoryContainerId, out var container);
+                if (!Enum.IsDefined(
+                        typeof(MilitaryProcurementStatus), order.Status) ||
+                    !personIds.Contains(order.IssuerPersonId) ||
+                    !personIds.Contains(order.CarrierPersonId) ||
+                    !organizationIds.Contains(order.BuyerOrganizationId) ||
+                    !organizationIds.Contains(order.SupplierOrganizationId) ||
+                    order.BuyerOrganizationId == order.SupplierOrganizationId ||
+                    !armyIds.Contains(order.TargetArmyId) ||
+                    FindArmy(Armies, order.TargetArmyId).OrganizationId !=
+                        order.BuyerOrganizationId ||
+                    !hasEquipment ||
+                    definition.ProductDefinitionId != order.ProductDefinitionId ||
+                    !hasBatch ||
+                    batch.ProductDefinitionId != order.ProductDefinitionId ||
+                    batch.OwnerOrganizationId != order.SupplierOrganizationId ||
+                    !hasContainer ||
+                    batch.InventoryContainerId != container.Id ||
+                    container.OwnerOrganizationId != order.SupplierOrganizationId ||
+                    container.CarrierPersonId != order.CarrierPersonId ||
+                    !routeIds.Contains(order.RouteId) ||
+                    !locationIds.Contains(order.OriginLocationId) ||
+                    !locationIds.Contains(order.DestinationLocationId) ||
+                    order.CreatedDay < 0 || order.CreatedDay > AbsoluteDay ||
+                    order.Quantity <= 0 || order.UnitPrice <= 0 ||
+                    order.TotalPaid != checked(order.UnitPrice * order.Quantity) ||
+                    !validStatus)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military procurement order {order.Id}: " +
+                        $"status={validStatus}, journey={hasJourney}, " +
+                        $"people={personIds.Contains(order.IssuerPersonId)}/" +
+                        $"{personIds.Contains(order.CarrierPersonId)}, " +
+                        $"organizations=" +
+                        $"{organizationIds.Contains(order.BuyerOrganizationId)}/" +
+                        $"{organizationIds.Contains(order.SupplierOrganizationId)}, " +
+                        $"army={armyIds.Contains(order.TargetArmyId)}, " +
+                        $"equipment={hasEquipment}, batch={hasBatch}, " +
+                        $"container={hasContainer}, " +
+                        $"route={routeIds.Contains(order.RouteId)}, " +
+                        $"quantity={order.Quantity}, price={order.UnitPrice}, " +
+                        $"paid={order.TotalPaid}.");
+                }
+            }
+
+            var dispatchCount = new Dictionary<string, int>(StringComparer.Ordinal);
+            var receiptCount = new Dictionary<string, int>(StringComparer.Ordinal);
+            var inventoryDispatchCount = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var equipmentReceiptCount = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                var transaction = InventoryTransactions[i];
+                if (string.IsNullOrEmpty(
+                        transaction.SourceMilitaryProcurementId))
+                {
+                    continue;
+                }
+
+                var order = orders[transaction.SourceMilitaryProcurementId];
+                if (transaction.Type !=
+                        InventoryTransactionType.MilitaryProcurementDispatched ||
+                    transaction.Day != order.CreatedDay ||
+                    transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != order.SourceBatchId ||
+                    transaction.Lines[0].ProductDefinitionId !=
+                        order.ProductDefinitionId ||
+                    transaction.Lines[0].QuantityDelta != -order.Quantity ||
+                    transaction.Lines[0].ReservedQuantityDelta != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid procurement inventory dispatch {transaction.Id}.");
+                }
+
+                AddEquipmentCount(
+                    inventoryDispatchCount, order.Id, 1);
+            }
+
+            for (var i = 0; i < MilitaryEquipmentTransactions.Count; i++)
+            {
+                var transaction = MilitaryEquipmentTransactions[i];
+                if (string.IsNullOrEmpty(
+                        transaction.SourceProcurementOrderId))
+                {
+                    continue;
+                }
+
+                var order = orders[transaction.SourceProcurementOrderId];
+                if (transaction.Type !=
+                        MilitaryEquipmentTransactionType.ProcurementReceipt ||
+                    transaction.Day != order.DeliveredDay ||
+                    transaction.EquipmentDefinitionId !=
+                        order.EquipmentDefinitionId ||
+                    transaction.ToArmyId != order.TargetArmyId ||
+                    transaction.Quantity != order.Quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid procurement armory receipt {transaction.Id}.");
+                }
+
+                AddEquipmentCount(
+                    equipmentReceiptCount, order.Id, 1);
+            }
+
+            for (var i = 0; i < MilitaryProcurementLedgerEntries.Count; i++)
+            {
+                var entry = MilitaryProcurementLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A military procurement ledger entry cannot be null.");
+                if (!orders.TryGetValue(
+                        entry.ProcurementOrderId, out var order) ||
+                    entry.Day < order.CreatedDay || entry.Day > AbsoluteDay ||
+                    entry.BuyerOrganizationId != order.BuyerOrganizationId ||
+                    entry.SupplierOrganizationId != order.SupplierOrganizationId ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryProcurementLedgerType), entry.Type) ||
+                    string.IsNullOrWhiteSpace(entry.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military procurement ledger entry {entry.Id}.");
+                }
+
+                if (entry.Type == MilitaryProcurementLedgerType.DispatchPayment)
+                {
+                    if (entry.Day != order.CreatedDay ||
+                        entry.BuyerMoneyDelta != -order.TotalPaid ||
+                        entry.SupplierMoneyDelta != order.TotalPaid ||
+                        entry.ArmoryQuantityDelta != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Unbalanced procurement payment {entry.Id}.");
+                    }
+
+                    AddEquipmentCount(dispatchCount, order.Id, 1);
+                }
+                else
+                {
+                    if (order.Status != MilitaryProcurementStatus.Delivered ||
+                        entry.Day != order.DeliveredDay ||
+                        entry.BuyerMoneyDelta != 0 ||
+                        entry.SupplierMoneyDelta != 0 ||
+                        entry.ArmoryQuantityDelta != order.Quantity)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid procurement receipt {entry.Id}.");
+                    }
+
+                    AddEquipmentCount(receiptCount, order.Id, 1);
+                }
+            }
+
+            foreach (var pair in orders)
+            {
+                dispatchCount.TryGetValue(pair.Key, out var dispatches);
+                receiptCount.TryGetValue(pair.Key, out var receipts);
+                inventoryDispatchCount.TryGetValue(
+                    pair.Key, out var inventoryDispatches);
+                equipmentReceiptCount.TryGetValue(
+                    pair.Key, out var equipmentReceipts);
+                var delivered = pair.Value.Status ==
+                    MilitaryProcurementStatus.Delivered;
+                if (dispatches != 1 || inventoryDispatches != 1 ||
+                    (pair.Value.Status == MilitaryProcurementStatus.Delivered
+                        ? receipts != 1
+                        : receipts != 0) ||
+                    (delivered ? equipmentReceipts != 1 : equipmentReceipts != 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Incomplete procurement ledger for {pair.Key}.");
+                }
+            }
         }
 
         private void ValidateAttention(HashSet<string> personIds)
@@ -1679,6 +1936,10 @@ namespace Mandate.Domain
                 var definition = MilitaryEquipmentDefinitions[i];
                 _ = new StableId(definition.CategoryId);
                 _ = new StableId(definition.SlotId);
+                ValidateContentReference(
+                    definition.ProductDefinitionId,
+                    "military equipment product",
+                    definition.Id);
                 if (string.IsNullOrWhiteSpace(definition.DisplayName) ||
                     definition.UnitWeight <= 0 ||
                     definition.MaximumConditionBasisPoints <= 0 ||
@@ -1801,6 +2062,11 @@ namespace Mandate.Domain
 
             var balances = new Dictionary<string, EquipmentLedgerBalance>(
                 StringComparer.Ordinal);
+            var procurementIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryProcurementOrders.Count; i++)
+            {
+                procurementIds.Add(MilitaryProcurementOrders[i].Id);
+            }
             long previousDay = -1;
             for (var i = 0; i < MilitaryEquipmentTransactions.Count; i++)
             {
@@ -1821,6 +2087,13 @@ namespace Mandate.Domain
                     !services.ContainsKey(transaction.MilitaryServiceId) ||
                     !string.IsNullOrEmpty(transaction.BattleId) &&
                     !ContainsId(Battles, item => item.Id, transaction.BattleId) ||
+                    !string.IsNullOrEmpty(transaction.SourceProcurementOrderId) &&
+                    !procurementIds.Contains(
+                        transaction.SourceProcurementOrderId) ||
+                    (transaction.Type ==
+                         MilitaryEquipmentTransactionType.ProcurementReceipt) !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceProcurementOrderId) ||
                     string.IsNullOrWhiteSpace(transaction.Summary))
                 {
                     throw new InvalidOperationException(
@@ -1948,6 +2221,13 @@ namespace Mandate.Domain
                         transaction.FromArmyId != transaction.ToArmyId &&
                         string.IsNullOrEmpty(transaction.MilitaryServiceId));
                     from.Available -= quantity;
+                    to.Available += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.ProcurementReceipt:
+                    RequireEquipmentTransaction(
+                        transaction, from == null && to != null &&
+                        string.IsNullOrEmpty(transaction.MilitaryServiceId) &&
+                        string.IsNullOrEmpty(transaction.BattleId));
                     to.Available += quantity;
                     break;
                 default:
@@ -3088,17 +3368,26 @@ namespace Mandate.Domain
             HashSet<string> locationIds)
         {
             var familyIds = new HashSet<string>(StringComparer.Ordinal);
+            var organizationIds = new HashSet<string>(StringComparer.Ordinal);
             var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
                 StringComparer.Ordinal);
             var batches = new Dictionary<string, ProductBatchState>(
                 StringComparer.Ordinal);
             var processingOrders = new Dictionary<string, ProcessingWorkOrderState>(
                 StringComparer.Ordinal);
             var processingOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var procurementOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var transactionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Families.Count; i++)
             {
                 familyIds.Add(Families[i].Id);
+            }
+
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizationIds.Add(Organizations[i].Id);
             }
 
             for (var i = 0; i < VillageFacilities.Count; i++)
@@ -3116,6 +3405,36 @@ namespace Mandate.Domain
                 transactionIds.Add(InventoryTransactions[i].Id);
             }
 
+            for (var i = 0; i < MilitaryProcurementOrders.Count; i++)
+            {
+                procurementOrderIds.Add(MilitaryProcurementOrders[i].Id);
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                var container = InventoryContainers[i] ??
+                    throw new InvalidOperationException(
+                        "An inventory container cannot be null.");
+                containers.Add(container.Id, container);
+                ValidateContentReference(
+                    container.KindId, "inventory container kind", container.Id);
+                var familyOwned = !string.IsNullOrEmpty(container.OwnerFamilyId);
+                var organizationOwned =
+                    !string.IsNullOrEmpty(container.OwnerOrganizationId);
+                if (familyOwned == organizationOwned ||
+                    familyOwned && !familyIds.Contains(container.OwnerFamilyId) ||
+                    organizationOwned &&
+                    !organizationIds.Contains(container.OwnerOrganizationId) ||
+                    !string.IsNullOrEmpty(container.CarrierPersonId) &&
+                    !personIds.Contains(container.CarrierPersonId) ||
+                    !locationIds.Contains(container.LocationId) ||
+                    container.CapacityWeight <= 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid inventory container {container.Id}.");
+                }
+            }
+
             for (var i = 0; i < ProductBatches.Count; i++)
             {
                 var batch = ProductBatches[i] ??
@@ -3130,9 +3449,26 @@ namespace Mandate.Domain
                         batch.CropVarietyDefinitionId, "batch variety", batch.Id);
                 }
 
-                if (!familyIds.Contains(batch.OwnerFamilyId) ||
-                    !facilities.TryGetValue(batch.StorageFacilityId, out var facility) ||
-                    facility.OwnerFamilyId != batch.OwnerFamilyId ||
+                var familyStored = !string.IsNullOrEmpty(batch.OwnerFamilyId) &&
+                    string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+                    !string.IsNullOrEmpty(batch.StorageFacilityId) &&
+                    string.IsNullOrEmpty(batch.InventoryContainerId);
+                var organizationStored =
+                    string.IsNullOrEmpty(batch.OwnerFamilyId) &&
+                    !string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+                    string.IsNullOrEmpty(batch.StorageFacilityId) &&
+                    !string.IsNullOrEmpty(batch.InventoryContainerId);
+                var validFamilyStorage = familyStored &&
+                    familyIds.Contains(batch.OwnerFamilyId) &&
+                    facilities.TryGetValue(
+                        batch.StorageFacilityId, out var facility) &&
+                    facility.OwnerFamilyId == batch.OwnerFamilyId;
+                var validOrganizationStorage = organizationStored &&
+                    organizationIds.Contains(batch.OwnerOrganizationId) &&
+                    containers.TryGetValue(
+                        batch.InventoryContainerId, out var container) &&
+                    container.OwnerOrganizationId == batch.OwnerOrganizationId;
+                if (!validFamilyStorage && !validOrganizationStorage ||
                     !locationIds.Contains(batch.OriginLocationId) ||
                     !transactionIds.Contains(batch.SourceTransactionId) ||
                     !string.IsNullOrEmpty(batch.SourceWorkOrderId) &&
@@ -3231,6 +3567,10 @@ namespace Mandate.Domain
                     !personIds.Contains(transaction.ActorPersonId) ||
                     !string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
                     !processingOrders.ContainsKey(transaction.SourceWorkOrderId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceMilitaryProcurementId) &&
+                    !procurementOrderIds.Contains(
+                        transaction.SourceMilitaryProcurementId) ||
                     transaction.Lines == null || transaction.Lines.Count == 0)
                 {
                     throw new InvalidOperationException(
@@ -3242,12 +3582,20 @@ namespace Mandate.Domain
                     transaction.Type == InventoryTransactionType.Reserved ||
                     transaction.Type == InventoryTransactionType.ReservationReleased ||
                     transaction.Type == InventoryTransactionType.RecipeSettled;
+                var requiresProcurement = transaction.Type ==
+                    InventoryTransactionType.MilitaryProcurementDispatched;
                 if (requiresOrder !=
                     !string.IsNullOrEmpty(transaction.SourceWorkOrderId) ||
+                    requiresProcurement !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceMilitaryProcurementId) ||
                     transaction.Type ==
                         InventoryTransactionType.LegacyBalanceConverted &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
-                    transaction.LegacyFamilySeedGrainDelta == 0)
+                    transaction.LegacyFamilySeedGrainDelta == 0 ||
+                    transaction.Type == InventoryTransactionType.OpeningBalance &&
+                    (transaction.LegacyFamilyGrainDelta != 0 ||
+                     transaction.LegacyFamilySeedGrainDelta != 0))
                 {
                     throw new InvalidOperationException(
                         $"Inventory transaction {transaction.Id} has invalid provenance.");
@@ -3261,7 +3609,9 @@ namespace Mandate.Domain
                     if (line == null || !batches.TryGetValue(line.BatchId, out var batch) ||
                         line.ProductDefinitionId != batch.ProductDefinitionId ||
                         line.OwnerFamilyId != batch.OwnerFamilyId ||
+                        line.OwnerOrganizationId != batch.OwnerOrganizationId ||
                         line.StorageFacilityId != batch.StorageFacilityId ||
+                        line.InventoryContainerId != batch.InventoryContainerId ||
                         line.UnitId != batch.UnitId ||
                         line.QuantityDelta == 0 && line.ReservedQuantityDelta == 0)
                     {
@@ -3315,6 +3665,30 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Tracked batches exceed granary stock for {facility.Id}.");
+                }
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                var container = InventoryContainers[i];
+                long trackedBatchWeight = 0;
+                for (var batchIndex = 0;
+                     batchIndex < ProductBatches.Count;
+                     batchIndex++)
+                {
+                    var batch = ProductBatches[batchIndex];
+                    if (batch.InventoryContainerId == container.Id)
+                    {
+                        trackedBatchWeight = checked(
+                            trackedBatchWeight +
+                            batch.Quantity * batch.UnitWeight);
+                    }
+                }
+
+                if (trackedBatchWeight > container.CapacityWeight)
+                {
+                    throw new InvalidOperationException(
+                        $"Tracked batches exceed container capacity for {container.Id}.");
                 }
             }
         }

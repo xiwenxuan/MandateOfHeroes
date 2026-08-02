@@ -33,11 +33,12 @@ namespace Mandate.Simulation
         public int CapturedOut;
         public int TransferredIn;
         public int TransferredOut;
+        public int ProcuredIn;
 
         public int CurrentTracked => Available + Damaged + Issued;
         public int ExpectedTracked =>
             Opening + CapturedIn - CapturedOut +
-            TransferredIn - TransferredOut - Lost;
+            TransferredIn - TransferredOut + ProcuredIn - Lost;
         public bool IsBalanced => CurrentTracked == ExpectedTracked;
     }
 
@@ -269,6 +270,12 @@ namespace Mandate.Simulation
                     {
                         audit.TransferredIn += transaction.Quantity;
                     }
+                }
+                else if (transaction.Type ==
+                         MilitaryEquipmentTransactionType.ProcurementReceipt &&
+                         transaction.ToArmyId == armyId)
+                {
+                    audit.ProcuredIn += transaction.Quantity;
                 }
             }
 
@@ -637,6 +644,7 @@ namespace Mandate.Simulation
                     DisplayName = displayName,
                     CategoryId = categoryId,
                     SlotId = slotId,
+                    ProductDefinitionId = ProductForEquipment(id),
                     UnitWeight = weight,
                     MaximumConditionBasisPoints = 10_000,
                     MeleePowerBasisPoints = melee,
@@ -646,6 +654,28 @@ namespace Mandate.Simulation
                     RequiredDexterityBasisPoints = dexterity,
                     CompatibleEquipmentId = compatibleEquipmentId
                 });
+        }
+
+        public static string ProductForEquipment(string equipmentId)
+        {
+            switch (equipmentId)
+            {
+                case RingSwordId:
+                    return CoreProductionContent.RingSwordProductId;
+                case WoodenShieldId:
+                    return CoreProductionContent.WoodenShieldProductId;
+                case LongSpearId:
+                    return CoreProductionContent.LongSpearProductId;
+                case HornBowId:
+                    return CoreProductionContent.HornBowProductId;
+                case ArrowBundleId:
+                    return CoreProductionContent.ArrowBundleProductId;
+                case LamellarArmorId:
+                    return CoreProductionContent.LamellarArmorProductId;
+                default:
+                    throw new InvalidOperationException(
+                        $"No product mapping for equipment {equipmentId}.");
+            }
         }
 
         private static void AddOpeningStocks(WorldState world, ArmyState army)

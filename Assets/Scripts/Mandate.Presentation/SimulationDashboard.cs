@@ -70,6 +70,8 @@ namespace Mandate.Presentation
             new MilitaryAuthoritySystem();
         private readonly MilitaryEquipmentSystem _militaryEquipmentSystem =
             new MilitaryEquipmentSystem();
+        private readonly MilitaryProcurementSystem _militaryProcurementSystem =
+            new MilitaryProcurementSystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2849,6 +2851,66 @@ namespace Mandate.Presentation
 
             GUI.enabled = true;
             GUILayout.EndHorizontal();
+
+            var equipmentBatch = _world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.LongSpearProductId);
+            var spearStock = _world.MilitaryArmoryStocks.Find(item =>
+                item.ArmyId == army.Id &&
+                item.EquipmentDefinitionId ==
+                MilitaryEquipmentSystem.LongSpearId);
+            GUILayout.Label(
+                $"军械采购原型：商号长矛{equipmentBatch?.Quantity ?? 0}件，" +
+                $"援军库内可用长矛{spearStock?.AvailableQuantity ?? 0}件",
+                _normalStyle);
+            GUILayout.BeginHorizontal();
+            GUI.enabled =
+                _world.MilitaryProcurementOrders.Count == 0 &&
+                FindJourney(merchant.Id) == null &&
+                FindArmyMarch(army.Id) == null &&
+                merchant.LocationId == "location.zhongshan" &&
+                army.LocationId == "location.zhongshan";
+            if (GUILayout.Button(
+                    "采购2件长矛并与援军同赴安平",
+                    GUILayout.Width(260)))
+            {
+                _armySystem.StartMarch(
+                    _world,
+                    new StableId("person.zou_jing"),
+                    new StableId(army.Id),
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping"));
+                var order = _militaryProcurementSystem.CreateOrderAndDispatch(
+                    _world,
+                    new StableId("person.zou_jing"),
+                    new StableId(merchant.Id),
+                    new StableId(army.Id),
+                    new StableId(MilitaryEquipmentSystem.LongSpearId),
+                    2,
+                    25,
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping"));
+                _message = $"采购单{order.Id}已发运。";
+            }
+
+            GUI.enabled = _world.MilitaryProcurementOrders.Exists(item =>
+                item.Status != MilitaryProcurementStatus.Delivered);
+            if (GUILayout.Button("推进军械运输18时段", GUILayout.Width(190)))
+            {
+                _simulator.AdvanceSegments(_world, 18);
+                _message = "已推进运输，采购单将按承运人与军队实际位置结算。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            for (var i = 0; i < _world.MilitaryProcurementOrders.Count; i++)
+            {
+                var order = _world.MilitaryProcurementOrders[i];
+                GUILayout.Label(
+                    $"{order.Id}：{order.Status}，{order.Quantity}件，" +
+                    $"付款{order.TotalPaid}钱，交付地{order.DestinationLocationId}",
+                    _normalStyle);
+            }
 
             var first = Math.Max(0, _world.MilitarySupplies.Count - 5);
             for (var i = _world.MilitarySupplies.Count - 1; i >= first; i--)

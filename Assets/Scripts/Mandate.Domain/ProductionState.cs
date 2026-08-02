@@ -1019,6 +1019,18 @@ namespace Mandate.Domain
         public const string WheatFlourProductId = "product.wheat_flour";
         public const string WheatBranProductId = "product.wheat_bran";
         public const string DryRationProductId = "product.dry_ration";
+        public const string RingSwordProductId =
+            "product.equipment.han_ring_sword";
+        public const string WoodenShieldProductId =
+            "product.equipment.wooden_shield";
+        public const string LongSpearProductId =
+            "product.equipment.long_spear";
+        public const string HornBowProductId =
+            "product.equipment.horn_bow";
+        public const string ArrowBundleProductId =
+            "product.equipment.arrow_bundle";
+        public const string LamellarArmorProductId =
+            "product.equipment.lamellar_armor";
         public const string GrowWheatRecipeId = "recipe.field.grow_wheat";
         public const string HandMillWheatRecipeId =
             "recipe.processing.hand_mill_wheat";
@@ -1032,13 +1044,14 @@ namespace Mandate.Domain
             "method.processing.dry_ration";
         public const string GrainUnitId = "unit.grain";
         public const string LaborDayUnitId = "unit.labor_day";
+        public const string ItemUnitId = "unit.item";
 
         public static ProductionContentPackageDefinition CreatePackage()
         {
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "3.0.0",
+                Version = "4.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1135,6 +1148,24 @@ namespace Mandate.Domain
                     "product.military_supply"
                 }
             });
+            AddMilitaryEquipmentProduct(
+                package, RingSwordProductId, "环首刀", 3,
+                "product.equipment.melee");
+            AddMilitaryEquipmentProduct(
+                package, WoodenShieldProductId, "木盾", 5,
+                "product.equipment.shield");
+            AddMilitaryEquipmentProduct(
+                package, LongSpearProductId, "长矛", 5,
+                "product.equipment.melee");
+            AddMilitaryEquipmentProduct(
+                package, HornBowProductId, "角弓", 2,
+                "product.equipment.ranged");
+            AddMilitaryEquipmentProduct(
+                package, ArrowBundleProductId, "箭束", 2,
+                "product.equipment.ammunition");
+            AddMilitaryEquipmentProduct(
+                package, LamellarArmorProductId, "札甲", 10,
+                "product.equipment.armor");
             package.Recipes.Add(new RecipeDefinition
             {
                 Id = GrowWheatRecipeId,
@@ -1299,6 +1330,30 @@ namespace Mandate.Domain
                 10_000,
                 9_000));
             return package;
+        }
+
+        private static void AddMilitaryEquipmentProduct(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            int weight,
+            string categoryTag)
+        {
+            package.Products.Add(new ProductDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                UnitId = ItemUnitId,
+                BaseWeight = weight,
+                PerishabilityBasisPoints = 0,
+                CategoryTags = new List<string>
+                {
+                    "product.equipment",
+                    "product.market",
+                    "product.military_supply",
+                    categoryTag
+                }
+            });
         }
 
         private static TechnologyDefinition CreateAgricultureTechnology(

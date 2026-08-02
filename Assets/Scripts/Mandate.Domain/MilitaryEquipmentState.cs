@@ -11,7 +11,8 @@ namespace Mandate.Domain
         Repair,
         Loss,
         Capture,
-        Transfer
+        Transfer,
+        ProcurementReceipt
     }
 
     [Serializable]
@@ -21,6 +22,7 @@ namespace Mandate.Domain
         public string DisplayName;
         public string CategoryId;
         public string SlotId;
+        public string ProductDefinitionId;
         public int UnitWeight = 1;
         public int MaximumConditionBasisPoints = 10_000;
         public int MeleePowerBasisPoints;
@@ -71,6 +73,7 @@ namespace Mandate.Domain
         public string ToArmyId;
         public string MilitaryServiceId;
         public string BattleId;
+        public string SourceProcurementOrderId;
         public string Summary;
     }
 }

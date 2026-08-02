@@ -8,7 +8,21 @@ namespace Mandate.Domain
         LegacyBalanceConverted,
         Reserved,
         ReservationReleased,
-        RecipeSettled
+        RecipeSettled,
+        OpeningBalance,
+        MilitaryProcurementDispatched
+    }
+
+    [Serializable]
+    public sealed class InventoryContainerState
+    {
+        public string Id;
+        public string KindId;
+        public string OwnerFamilyId;
+        public string OwnerOrganizationId;
+        public string CarrierPersonId;
+        public string LocationId;
+        public long CapacityWeight;
     }
 
     [Serializable]
@@ -17,7 +31,9 @@ namespace Mandate.Domain
         public string Id;
         public string ProductDefinitionId;
         public string OwnerFamilyId;
+        public string OwnerOrganizationId;
         public string StorageFacilityId;
+        public string InventoryContainerId;
         public string OriginLocationId;
         public string SourceWorkOrderId;
         public string SourceTransactionId;
@@ -39,7 +55,9 @@ namespace Mandate.Domain
         public string BatchId;
         public string ProductDefinitionId;
         public string OwnerFamilyId;
+        public string OwnerOrganizationId;
         public string StorageFacilityId;
+        public string InventoryContainerId;
         public string UnitId;
         public long QuantityDelta;
         public long ReservedQuantityDelta;
@@ -53,6 +71,7 @@ namespace Mandate.Domain
         public InventoryTransactionType Type;
         public string ActorPersonId;
         public string SourceWorkOrderId;
+        public string SourceMilitaryProcurementId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;
         public long FacilityInventoryDelta;

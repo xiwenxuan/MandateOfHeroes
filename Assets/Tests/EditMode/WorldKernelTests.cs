@@ -2838,7 +2838,8 @@ namespace Mandate.Tests
             var world = PrototypeWorldFactory.Create184World(184);
             var equipment = new MilitaryEquipmentSystem();
 
-            Assert.That(world.SchemaVersion, Is.EqualTo(13));
+            Assert.That(
+                world.SchemaVersion, Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(world.MilitaryEquipmentInitialized, Is.True);
             Assert.That(world.MilitaryEquipmentDefinitions.Count, Is.EqualTo(6));
             Assert.That(
@@ -3019,6 +3020,8 @@ namespace Mandate.Tests
                     DisplayName = "试制长杖",
                     CategoryId = "mod.example.equipment_category.staff",
                     SlotId = "equipment_slot.main_hand",
+                    ProductDefinitionId =
+                        "product.mod_example.equipment.test_staff",
                     UnitWeight = 4,
                     MaximumConditionBasisPoints = 10_000,
                     MeleePowerBasisPoints = 2_000
@@ -3068,7 +3071,7 @@ namespace Mandate.Tests
             var families = world.Families.Count;
             var services = world.MilitaryServices.Count;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 12");
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 12");
             var equipmentStart = json.IndexOf(
                 "  \"MilitaryEquipmentInitialized\":",
                 StringComparison.Ordinal);
@@ -3081,7 +3084,8 @@ namespace Mandate.Tests
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(13));
+            Assert.That(
+                loaded.SchemaVersion, Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.MilitaryEquipmentInitialized, Is.False);
             Assert.That(loaded.MilitaryEquipmentDefinitions, Is.Empty);
             Assert.That(loaded.MilitaryArmoryStocks, Is.Empty);
@@ -3828,7 +3832,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 13", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 14", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3851,7 +3855,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 13", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 14", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3889,7 +3893,7 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(5));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(11));
             Assert.That(fromResource.RecipeCount, Is.EqualTo(3));
             Assert.That(fromResource.MethodCount, Is.EqualTo(3));
             Assert.That(fromResource.SkillCount, Is.EqualTo(1));
@@ -4483,7 +4487,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 13", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 14", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4510,7 +4514,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4747,7 +4751,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4779,7 +4783,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -5058,7 +5062,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -5242,7 +5246,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -5854,6 +5858,262 @@ namespace Mandate.Tests
             {
                 DeletePopulationStoreTestRoot(root);
             }
+        }
+
+        [Test]
+        public void MilitaryProcurement_PrototypeCreatesMappedSupplierStock()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+
+            Assert.That(world.InventoryContainers.Count, Is.EqualTo(1));
+            Assert.That(
+                world.InventoryContainers[0].Id,
+                Is.EqualTo(MilitaryProcurementSystem.PrototypeContainerId));
+            Assert.That(
+                world.ProductBatches.FindAll(batch =>
+                    batch.InventoryContainerId ==
+                    MilitaryProcurementSystem.PrototypeContainerId).Count,
+                Is.EqualTo(6));
+            for (var i = 0;
+                 i < world.MilitaryEquipmentDefinitions.Count;
+                 i++)
+            {
+                Assert.That(
+                    world.MilitaryEquipmentDefinitions[i].ProductDefinitionId,
+                    Does.StartWith("product.equipment."));
+            }
+
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryProcurement_DispatchWaitsThenReceivesIntoArmory()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var armyId = new StableId("army.youzhou_reinforcement");
+            var routeId = new StableId("route.zhongshan_anping");
+            var destinationId = new StableId("location.anping");
+            new ArmySystem().StartMarch(
+                world,
+                new StableId("person.zou_jing"),
+                armyId,
+                routeId,
+                destinationId);
+            var buyer = world.Organizations.Find(item =>
+                item.Id == "organization.youzhou_field_force");
+            var supplier = world.Organizations.Find(item =>
+                item.Id == "organization.zhongshan_merchants");
+            var batch = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.LongSpearProductId);
+            var stock = world.MilitaryArmoryStocks.Find(item =>
+                item.ArmyId == armyId.Value &&
+                item.EquipmentDefinitionId ==
+                MilitaryEquipmentSystem.LongSpearId);
+            var buyerBefore = buyer.Treasury;
+            var supplierBefore = supplier.Treasury;
+            var batchBefore = batch.Quantity;
+            var stockBefore = stock.AvailableQuantity;
+            var procurement = new MilitaryProcurementSystem();
+
+            var order = procurement.CreateOrderAndDispatch(
+                world,
+                new StableId("person.zou_jing"),
+                new StableId("person.zhang_shiping"),
+                armyId,
+                new StableId(MilitaryEquipmentSystem.LongSpearId),
+                2,
+                25,
+                routeId,
+                destinationId);
+
+            Assert.That(batch.Quantity, Is.EqualTo(batchBefore - 2));
+            Assert.That(buyer.Treasury, Is.EqualTo(buyerBefore - 50));
+            Assert.That(supplier.Treasury, Is.EqualTo(supplierBefore + 50));
+            Assert.That(order.Status, Is.EqualTo(
+                MilitaryProcurementStatus.InTransit));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 15);
+            Assert.That(order.Status, Is.EqualTo(
+                MilitaryProcurementStatus.AwaitingArmy));
+            Assert.That(stock.AvailableQuantity, Is.EqualTo(stockBefore));
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 3);
+
+            Assert.That(order.Status, Is.EqualTo(
+                MilitaryProcurementStatus.Delivered));
+            Assert.That(stock.AvailableQuantity, Is.EqualTo(stockBefore + 2));
+            Assert.That(procurement.Audit(world, order.Id).IsBalanced, Is.True);
+            Assert.That(
+                new MilitaryEquipmentSystem().AuditArmy(world, armyId.Value)
+                    .IsBalanced,
+                Is.True);
+            Assert.That(
+                world.MilitaryEquipmentTransactions.Exists(item =>
+                    item.SourceProcurementOrderId == order.Id &&
+                    item.Type ==
+                    MilitaryEquipmentTransactionType.ProcurementReceipt),
+                Is.True);
+        }
+
+        [Test]
+        public void MilitaryProcurement_RejectsInsufficientFundsWithoutMutation()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var buyer = world.Organizations.Find(item =>
+                item.Id == "organization.youzhou_field_force");
+            buyer.Treasury = 0;
+            var batch = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.LongSpearProductId);
+            var quantityBefore = batch.Quantity;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryProcurementSystem().CreateOrderAndDispatch(
+                    world,
+                    new StableId("person.zou_jing"),
+                    new StableId("person.zhang_shiping"),
+                    new StableId("army.youzhou_reinforcement"),
+                    new StableId(MilitaryEquipmentSystem.LongSpearId),
+                    1,
+                    25,
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping")));
+
+            Assert.That(world.MilitaryProcurementOrders, Is.Empty);
+            Assert.That(world.Journeys, Is.Empty);
+            Assert.That(batch.Quantity, Is.EqualTo(quantityBefore));
+        }
+
+        [Test]
+        public void MilitaryProcurement_RejectsAuthorityRouteAndStockBeforeDispatch()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var system = new MilitaryProcurementSystem();
+            var batch = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.LongSpearProductId);
+            var quantityBefore = batch.Quantity;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                system.CreateOrderAndDispatch(
+                    world,
+                    new StableId("person.liu_bei"),
+                    new StableId("person.zhang_shiping"),
+                    new StableId("army.youzhou_reinforcement"),
+                    new StableId(MilitaryEquipmentSystem.LongSpearId),
+                    1,
+                    25,
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping")));
+            Assert.Throws<InvalidOperationException>(() =>
+                system.CreateOrderAndDispatch(
+                    world,
+                    new StableId("person.zou_jing"),
+                    new StableId("person.zhang_shiping"),
+                    new StableId("army.youzhou_reinforcement"),
+                    new StableId(MilitaryEquipmentSystem.LongSpearId),
+                    1,
+                    25,
+                    new StableId("route.anping_xiaquyang"),
+                    new StableId("location.anping")));
+            Assert.Throws<InvalidOperationException>(() =>
+                system.CreateOrderAndDispatch(
+                    world,
+                    new StableId("person.zou_jing"),
+                    new StableId("person.zhang_shiping"),
+                    new StableId("army.youzhou_reinforcement"),
+                    new StableId(MilitaryEquipmentSystem.LongSpearId),
+                    5,
+                    25,
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping")));
+
+            Assert.That(world.MilitaryProcurementOrders, Is.Empty);
+            Assert.That(world.Journeys, Is.Empty);
+            Assert.That(batch.Quantity, Is.EqualTo(quantityBefore));
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryProcurement_SameCommandsProduceSameSnapshot()
+        {
+            var first = PrototypeWorldFactory.Create184World(184);
+            var second = PrototypeWorldFactory.Create184World(184);
+            ExecutePrototypeProcurement(first);
+            ExecutePrototypeProcurement(second);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(first),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(second)));
+        }
+
+        [Test]
+        public void MilitaryProcurement_SnapshotRoundTripPreservesDelivery()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            ExecutePrototypeProcurement(world);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(loaded.MilitaryProcurementOrders.Count, Is.EqualTo(1));
+            Assert.That(
+                loaded.MilitaryProcurementOrders[0].Status,
+                Is.EqualTo(MilitaryProcurementStatus.Delivered));
+            Assert.That(
+                loaded.MilitaryProcurementLedgerEntries.Count,
+                Is.EqualTo(2));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThirteenWithoutProcurementFabrication()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 13");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.InventoryContainers, Is.Empty);
+            Assert.That(loaded.MilitaryProcurementOrders, Is.Empty);
+            Assert.That(loaded.MilitaryProcurementLedgerEntries, Is.Empty);
+            Assert.That(
+                loaded.ProductBatches.Exists(batch =>
+                    !string.IsNullOrEmpty(batch.OwnerOrganizationId)),
+                Is.False);
+            Assert.That(
+                loaded.MilitaryEquipmentDefinitions.TrueForAll(definition =>
+                    !string.IsNullOrEmpty(definition.ProductDefinitionId)),
+                Is.True);
+            loaded.Validate();
+        }
+
+        private static void ExecutePrototypeProcurement(WorldState world)
+        {
+            var armyId = new StableId("army.youzhou_reinforcement");
+            var routeId = new StableId("route.zhongshan_anping");
+            var destinationId = new StableId("location.anping");
+            new ArmySystem().StartMarch(
+                world,
+                new StableId("person.zou_jing"),
+                armyId,
+                routeId,
+                destinationId);
+            new MilitaryProcurementSystem().CreateOrderAndDispatch(
+                world,
+                new StableId("person.zou_jing"),
+                new StableId("person.zhang_shiping"),
+                armyId,
+                new StableId(MilitaryEquipmentSystem.LongSpearId),
+                2,
+                25,
+                routeId,
+                destinationId);
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 18);
         }
 
         private static List<string> AvailableAgricultureWorkers(
