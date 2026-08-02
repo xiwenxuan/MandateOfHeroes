@@ -12,6 +12,14 @@ namespace Mandate.Simulation
         public const int ExpertPracticeThresholdBasisPoints = 6_000;
         public const int PhaseSkillCapBasisPoints = 8_000;
         public const int MaximumStudentsPerTeacher = 3;
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
+
+        public EducationSystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
 
         public EducationPlanState StartPlan(
             WorldState world,
@@ -195,9 +203,10 @@ namespace Mandate.Simulation
                 student.ProfessionalSkills, discipline);
             PersonState best = null;
             var bestSkill = -1;
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world).GetKnownPeople();
+            for (var i = 0; i < people.Count; i++)
             {
-                var candidate = world.People[i];
+                var candidate = people[i];
                 if (candidate.Id == student.Id ||
                     !candidate.IsAlive ||
                     candidate.LocationId != student.LocationId ||
@@ -275,7 +284,7 @@ namespace Mandate.Simulation
                 monthlyStudyDays * (5L + teacherSkillBasisPoints / 1_000L));
         }
 
-        private static void ResolvePlan(
+        private void ResolvePlan(
             WorldState world,
             EducationPlanState plan)
         {
@@ -402,6 +411,12 @@ namespace Mandate.Simulation
                     LearningOutcomeKind.InsufficientFunds,
                     "本期学习资金不足，未支付费用也未获得成长。");
                 return;
+            }
+
+            student = PeopleFor(world).GetRequiredForUpdate(student.Id);
+            if (teacher != null && plan.MonthlyFee > 0)
+            {
+                teacher = PeopleFor(world).GetRequiredForUpdate(teacher.Id);
             }
 
             PayFee(world, plan, student, teacher);
@@ -863,19 +878,27 @@ namespace Mandate.Simulation
             throw new InvalidOperationException($"Missing education plan {planId}.");
         }
 
-        private static PersonState FindPerson(
+        private PersonState FindPerson(
             WorldState world,
             string personId)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            return PeopleFor(world).GetRequired(personId);
+        }
+
+        private IPersonRepository PeopleFor(WorldState world)
+        {
+            if (_people != null)
             {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {personId}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         private static FamilyState FindFamily(

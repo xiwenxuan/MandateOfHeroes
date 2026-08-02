@@ -15,7 +15,7 @@ namespace Mandate.Simulation
         private readonly LifeSimulationSystem _lifeSimulationSystem;
         private readonly MarketSimulationSystem _marketSimulationSystem;
         private readonly ArmySystem _armySystem = new ArmySystem();
-        private readonly EducationSystem _educationSystem = new EducationSystem();
+        private readonly EducationSystem _educationSystem;
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
         private readonly ProcessingProductionSystem _processingSystem;
@@ -31,6 +31,7 @@ namespace Mandate.Simulation
             _taskSystem = new TaskSystem(personRepository);
             _lifeSimulationSystem = new LifeSimulationSystem(
                 masterSeed, personRepository);
+            _educationSystem = new EducationSystem(personRepository);
             _marketSimulationSystem = new MarketSimulationSystem(masterSeed);
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent, personRepository);

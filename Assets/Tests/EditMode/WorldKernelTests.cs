@@ -2208,6 +2208,92 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void Education_InjectedRepositoryPreservesFactsAndTracksParticipants()
+        {
+            var inline = PrepareEducationWorld(1_000, 8_000);
+            var accessed = PrepareEducationWorld(1_000, 8_000);
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineSystem = new EducationSystem();
+            var accessedSystem = new EducationSystem(repository);
+
+            StartMilitaryStudy(inline, inlineSystem, "person.liu_bei");
+            StartMilitaryStudy(accessed, accessedSystem, "person.liu_bei");
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+
+            ResolveEducationAtDay(inline, 30, inlineSystem);
+            ResolveEducationAtDay(accessed, 30, accessedSystem);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[]
+                {
+                    "person.generated.farmer_001",
+                    "person.liu_bei"
+                }));
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+        }
+
+        [Test]
+        public void Education_ReadOnlyPlanningAndFailedSettlementStayClean()
+        {
+            var world = PrepareEducationWorld(1_000, 8_000);
+            var student = FindTestStudent(world);
+            student.Wealth = 0;
+            var repository = new WorldStatePersonRepository(world);
+            var system = new EducationSystem(repository);
+
+            var teacher = system.FindBestTeacher(
+                world,
+                student.Id,
+                ProfessionalDiscipline.Military);
+            Assert.That(teacher, Is.Not.Null);
+            system.StartPlan(
+                world,
+                new StableId(student.Id),
+                ProfessionalDiscipline.Military,
+                10,
+                teacher.Id);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+
+            ResolveEducationAtDay(world, 30, system);
+
+            Assert.That(
+                world.LearningRecords[0].Outcome,
+                Is.EqualTo(LearningOutcomeKind.InsufficientFunds));
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+        }
+
+        [Test]
+        public void Education_InjectedSimulatorMatchesInlineMonthlyLearning()
+        {
+            var inline = PrepareEducationWorld(1_000, 8_000);
+            var accessed = PrepareEducationWorld(1_000, 8_000);
+            StartMilitaryStudy(
+                inline, new EducationSystem(), "person.liu_bei");
+            StartMilitaryStudy(
+                accessed, new EducationSystem(), "person.liu_bei");
+            var repository = new WorldStatePersonRepository(accessed);
+
+            new WorldSimulator(inline.MasterSeed).AdvanceDays(inline, 30);
+            new WorldSimulator(
+                accessed.MasterSeed, null, repository).AdvanceDays(accessed, 30);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Does.Contain("person.generated.farmer_001"));
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Does.Contain("person.liu_bei"));
+        }
+
+        [Test]
         public void Education_HigherAptitudeProducesMoreGrowth()
         {
             var lowWorld = PrepareEducationWorld(1_000, 8_000);
