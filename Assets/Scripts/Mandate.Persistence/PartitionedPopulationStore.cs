@@ -179,6 +179,187 @@ namespace Mandate.Persistence
             }
         }
 
+        public PopulationPackageManifest CommitIncrementalCheckpoint(
+            PopulationIncrementalCheckpoint checkpoint)
+        {
+            ValidateIncrementalCheckpoint(checkpoint);
+            var previous = OpenCurrent();
+            if (checkpoint.StorageRevision <= previous.StorageRevision)
+            {
+                throw new InvalidOperationException(
+                    "Population storage revision must increase monotonically.");
+            }
+
+            var changedByPartition = new Dictionary<int, List<PersonState>>();
+            for (var i = 0; i < checkpoint.ChangedPeople.Count; i++)
+            {
+                var person = checkpoint.ChangedPeople[i];
+                var partitionIndex = PartitionFor(
+                    person.Id, previous.PartitionCount);
+                if (!changedByPartition.TryGetValue(
+                        partitionIndex, out var partitionChanges))
+                {
+                    partitionChanges = new List<PersonState>();
+                    changedByPartition.Add(partitionIndex, partitionChanges);
+                }
+
+                partitionChanges.Add(person);
+            }
+
+            var changedCores = new Dictionary<
+                int,
+                List<PermanentPersonCoreRecord>>();
+            var changedDetails = new Dictionary<
+                int,
+                List<PersonDetailExtensionRecord>>();
+            foreach (var pair in changedByPartition)
+            {
+                var cores = new List<PermanentPersonCoreRecord>(
+                    LoadCorePartition(pair.Key));
+                var details = new List<PersonDetailExtensionRecord>(
+                    LoadDetailPartition(pair.Key));
+                pair.Value.Sort((left, right) =>
+                    string.CompareOrdinal(left.Id, right.Id));
+                for (var changeIndex = 0;
+                     changeIndex < pair.Value.Count;
+                     changeIndex++)
+                {
+                    var changedPerson = pair.Value[changeIndex];
+                    var coreIndex = FindCoreIndex(cores, changedPerson.Id);
+                    var detailIndex = FindDetailIndex(details, changedPerson.Id);
+                    if (coreIndex < 0 || detailIndex < 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Incremental checkpoint references unknown person " +
+                            $"{changedPerson.Id}.");
+                    }
+
+                    cores[coreIndex] =
+                        PermanentPersonCoreRecord.FromPerson(changedPerson);
+                    details[detailIndex] = new PersonDetailExtensionRecord
+                    {
+                        StorageRevision = checkpoint.StorageRevision,
+                        Person = changedPerson
+                    };
+                }
+
+                cores.Sort(CoreComparer.Instance);
+                details.Sort(DetailComparer.Instance);
+                changedCores.Add(pair.Key, cores);
+                changedDetails.Add(pair.Key, details);
+            }
+
+            var generationName = "generation-" +
+                checkpoint.StorageRevision.ToString("D20");
+            var generationsRoot = Path.Combine(rootDirectory, "generations");
+            Directory.CreateDirectory(generationsRoot);
+            var finalGeneration = Path.Combine(generationsRoot, generationName);
+            if (Directory.Exists(finalGeneration))
+            {
+                throw new InvalidOperationException(
+                    $"Population generation already exists: {generationName}.");
+            }
+
+            var stagingGeneration = Path.Combine(
+                generationsRoot,
+                ".staging-" + generationName + "-" +
+                Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(stagingGeneration);
+            try
+            {
+                var manifest = new PopulationPackageManifest
+                {
+                    PackageId = previous.PackageId,
+                    PartitionCount = previous.PartitionCount,
+                    StorageRevision = checkpoint.StorageRevision
+                };
+                for (var partitionIndex = 0;
+                     partitionIndex < previous.PartitionCount;
+                     partitionIndex++)
+                {
+                    if (!changedCores.TryGetValue(
+                            partitionIndex, out var cores))
+                    {
+                        manifest.Partitions.Add(CloneEntry(
+                            previous.Partitions[partitionIndex]));
+                        continue;
+                    }
+
+                    var details = changedDetails[partitionIndex];
+                    var coreFilename = $"core-{partitionIndex:D5}.bin";
+                    var detailFilename = $"detail-{partitionIndex:D5}.bin";
+                    var stagedCorePath = Path.Combine(
+                        stagingGeneration, coreFilename);
+                    var stagedDetailPath = Path.Combine(
+                        stagingGeneration, detailFilename);
+                    WriteCorePartition(
+                        stagedCorePath, partitionIndex, cores);
+                    WriteDetailPartition(
+                        stagedDetailPath, partitionIndex, details);
+                    var livingCount = 0;
+                    for (var personIndex = 0;
+                         personIndex < cores.Count;
+                         personIndex++)
+                    {
+                        if (cores[personIndex].IsAlive)
+                        {
+                            livingCount++;
+                        }
+                    }
+
+                    manifest.Partitions.Add(new PopulationPartitionManifestEntry
+                    {
+                        PartitionIndex = partitionIndex,
+                        PersonCount = cores.Count,
+                        LivingPersonCount = livingCount,
+                        DetailExtensionCount = details.Count,
+                        CoreRelativePath = RelativeGenerationPath(
+                            generationName, coreFilename),
+                        CoreLength = new FileInfo(stagedCorePath).Length,
+                        CoreSha256 = ComputeSha256(stagedCorePath),
+                        DetailRelativePath = RelativeGenerationPath(
+                            generationName, detailFilename),
+                        DetailLength = new FileInfo(stagedDetailPath).Length,
+                        DetailSha256 = ComputeSha256(stagedDetailPath)
+                    });
+                }
+
+                for (var i = 0; i < manifest.Partitions.Count; i++)
+                {
+                    manifest.PermanentPersonCount +=
+                        manifest.Partitions[i].PersonCount;
+                    manifest.LivingPersonCount +=
+                        manifest.Partitions[i].LivingPersonCount;
+                    manifest.DetailExtensionCount +=
+                        manifest.Partitions[i].DetailExtensionCount;
+                }
+
+                var stagedManifestPath = Path.Combine(
+                    stagingGeneration, "manifest.json");
+                File.WriteAllText(
+                    stagedManifestPath,
+                    JsonConvert.SerializeObject(manifest, JsonSettings),
+                    new UTF8Encoding(false));
+                var manifestSha256 = ComputeSha256(stagedManifestPath);
+                Directory.Move(stagingGeneration, finalGeneration);
+                CommitPointer(
+                    RelativeGenerationPath(generationName, "manifest.json"),
+                    manifestSha256);
+                manifest.ManifestSha256 = manifestSha256;
+                currentManifest = manifest;
+                return manifest;
+            }
+            catch
+            {
+                if (Directory.Exists(stagingGeneration))
+                {
+                    Directory.Delete(stagingGeneration, true);
+                }
+
+                throw;
+            }
+        }
+
         public PopulationPackageManifest OpenCurrent()
         {
             if (currentManifest != null)
@@ -357,6 +538,80 @@ namespace Mandate.Persistence
                 {
                     throw new InvalidOperationException(
                         $"Population core partition {partitionIndex} has trailing data.");
+                }
+            }
+
+            return result;
+        }
+
+        public IReadOnlyList<PersonDetailExtensionRecord> LoadDetailPartition(
+            int partitionIndex)
+        {
+            var manifest = OpenCurrent();
+            if (partitionIndex < 0 || partitionIndex >= manifest.PartitionCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(partitionIndex));
+            }
+
+            var entry = manifest.Partitions[partitionIndex];
+            var result = new List<PersonDetailExtensionRecord>(
+                entry.DetailExtensionCount);
+            var path = ResolvePackagePath(entry.DetailRelativePath);
+            using (var stream = File.OpenRead(path))
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
+            {
+                ReadAndValidateHeader(
+                    reader,
+                    DetailMagic,
+                    DetailFormatVersion,
+                    partitionIndex,
+                    entry.DetailExtensionCount);
+                for (var i = 0; i < entry.DetailExtensionCount; i++)
+                {
+                    var id = reader.ReadString();
+                    var extensionVersion = reader.ReadInt32();
+                    var storageRevision = reader.ReadInt64();
+                    var payloadLength = reader.ReadInt32();
+                    if (extensionVersion !=
+                            PersonDetailExtensionRecord.CurrentExtensionVersion ||
+                        payloadLength < 0 ||
+                        payloadLength > stream.Length - stream.Position - 32)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid detail extension for {id}.");
+                    }
+
+                    var expectedPayloadHash = reader.ReadBytes(32);
+                    var payload = reader.ReadBytes(payloadLength);
+                    if (expectedPayloadHash.Length != 32 ||
+                        payload.Length != payloadLength ||
+                        !ByteArraysEqual(
+                            expectedPayloadHash, ComputeSha256(payload)))
+                    {
+                        throw new InvalidOperationException(
+                            $"Detail extension checksum failed for {id}.");
+                    }
+
+                    var person = DeserializePerson(payload);
+                    if (!string.Equals(person.Id, id, StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException(
+                            $"Detail extension identity mismatch for {id}.");
+                    }
+
+                    result.Add(new PersonDetailExtensionRecord
+                    {
+                        ExtensionVersion = extensionVersion,
+                        StorageRevision = storageRevision,
+                        Person = person
+                    });
+                }
+
+                if (stream.Position != stream.Length)
+                {
+                    throw new InvalidOperationException(
+                        $"Population detail partition {partitionIndex} " +
+                        "has trailing data.");
                 }
             }
 
@@ -583,6 +838,84 @@ namespace Mandate.Persistence
                         $"Detail extension core mismatch for {extension.Person.Id}.");
                 }
             }
+        }
+
+        private static void ValidateIncrementalCheckpoint(
+            PopulationIncrementalCheckpoint checkpoint)
+        {
+            if (checkpoint == null)
+            {
+                throw new ArgumentNullException(nameof(checkpoint));
+            }
+
+            if (checkpoint.StorageRevision < 0 ||
+                checkpoint.ChangedPeople == null ||
+                checkpoint.ChangedPeople.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Incremental population checkpoint metadata is invalid.");
+            }
+
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < checkpoint.ChangedPeople.Count; i++)
+            {
+                var person = checkpoint.ChangedPeople[i];
+                if (person == null || !ids.Add(person.Id))
+                {
+                    throw new InvalidOperationException(
+                        "Incremental checkpoint contains a null or duplicate person.");
+                }
+
+                ValidateCore(PermanentPersonCoreRecord.FromPerson(person));
+            }
+        }
+
+        private static int FindCoreIndex(
+            List<PermanentPersonCoreRecord> people,
+            string personId)
+        {
+            for (var i = 0; i < people.Count; i++)
+            {
+                if (people[i].PersonId == personId)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static int FindDetailIndex(
+            List<PersonDetailExtensionRecord> details,
+            string personId)
+        {
+            for (var i = 0; i < details.Count; i++)
+            {
+                if (details[i].Person.Id == personId)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static PopulationPartitionManifestEntry CloneEntry(
+            PopulationPartitionManifestEntry source)
+        {
+            return new PopulationPartitionManifestEntry
+            {
+                PartitionIndex = source.PartitionIndex,
+                PersonCount = source.PersonCount,
+                LivingPersonCount = source.LivingPersonCount,
+                DetailExtensionCount = source.DetailExtensionCount,
+                CoreRelativePath = source.CoreRelativePath,
+                CoreLength = source.CoreLength,
+                CoreSha256 = source.CoreSha256,
+                DetailRelativePath = source.DetailRelativePath,
+                DetailLength = source.DetailLength,
+                DetailSha256 = source.DetailSha256
+            };
         }
 
         private static void ValidateCore(PermanentPersonCoreRecord person)
@@ -1145,6 +1478,33 @@ namespace Mandate.Persistence
             }
 
             hotPeople.Remove(personId);
+        }
+
+        public void RefreshCommitted(IEnumerable<string> personIds)
+        {
+            if (personIds == null)
+            {
+                throw new ArgumentNullException(nameof(personIds));
+            }
+
+            foreach (var personId in personIds)
+            {
+                _ = new StableId(personId);
+                if (!hotPeople.ContainsKey(personId))
+                {
+                    continue;
+                }
+
+                if (!store.TryReadCore(personId, out var core) ||
+                    !store.TryReadDetail(personId, out var detail) ||
+                    !core.Matches(detail))
+                {
+                    throw new InvalidOperationException(
+                        $"Committed person {personId} cannot be refreshed.");
+                }
+
+                hotPeople[personId] = detail;
+            }
         }
 
         public PopulationResidencyReconciliationResult ReconcileAttention(

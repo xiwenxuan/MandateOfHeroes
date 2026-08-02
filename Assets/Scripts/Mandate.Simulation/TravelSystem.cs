@@ -7,6 +7,12 @@ namespace Mandate.Simulation
     {
         private readonly PopulationLedgerSystem _populationLedgerSystem =
             new PopulationLedgerSystem();
+        private readonly IPersonRepository _people;
+
+        public TravelSystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
 
         public JourneyState StartJourney(
             WorldState world,
@@ -21,7 +27,8 @@ namespace Mandate.Simulation
             }
 
             world.Validate();
-            var person = FindPerson(world, personId.Value);
+            var people = PeopleFor(world);
+            var person = people.GetRequired(personId.Value);
             if (!person.IsAlive)
             {
                 throw new InvalidOperationException("A deceased person cannot travel.");
@@ -68,6 +75,7 @@ namespace Mandate.Simulation
                 throw new ArgumentNullException(nameof(world));
             }
 
+            var people = PeopleFor(world);
             for (var i = world.Journeys.Count - 1; i >= 0; i--)
             {
                 var journey = world.Journeys[i];
@@ -77,7 +85,7 @@ namespace Mandate.Simulation
                     continue;
                 }
 
-                var person = FindPerson(world, journey.PersonId);
+                var person = people.GetRequiredForUpdate(journey.PersonId);
                 world.Journeys.RemoveAt(i);
                 _populationLedgerSystem.MoveIndependentPerson(
                     world,
@@ -88,9 +96,11 @@ namespace Mandate.Simulation
 
         public void ConsumeDailyTravelProvisions(WorldState world)
         {
+            var people = PeopleFor(world);
             for (var i = 0; i < world.Journeys.Count; i++)
             {
-                var person = FindPerson(world, world.Journeys[i].PersonId);
+                var person = people.GetRequiredForUpdate(
+                    world.Journeys[i].PersonId);
                 if (person.Provisions > 0)
                 {
                     person.Provisions--;
@@ -124,18 +134,8 @@ namespace Mandate.Simulation
             }
         }
 
-        private static PersonState FindPerson(WorldState world, string personId)
-        {
-            for (var i = 0; i < world.People.Count; i++)
-            {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
-            }
-
-            throw new InvalidOperationException($"Missing person {personId}.");
-        }
+        private IPersonRepository PeopleFor(WorldState world) =>
+            _people ?? new WorldStatePersonRepository(world);
 
         private static RouteState FindRoute(WorldState world, string routeId)
         {

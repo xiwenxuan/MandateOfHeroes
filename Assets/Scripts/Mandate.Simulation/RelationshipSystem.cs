@@ -6,10 +6,14 @@ namespace Mandate.Simulation
     public sealed class RelationshipSystem
     {
         private readonly NamedRandom _random;
+        private readonly IPersonRepository _people;
 
-        public RelationshipSystem(ulong masterSeed)
+        public RelationshipSystem(
+            ulong masterSeed,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
+            _people = people;
         }
 
         public int ResolveVisit(
@@ -18,8 +22,9 @@ namespace Mandate.Simulation
             StableId targetId,
             long monthIndex)
         {
-            var actor = FindPerson(world, actorId.Value);
-            var target = FindPerson(world, targetId.Value);
+            var people = _people ?? new WorldStatePersonRepository(world);
+            var actor = people.GetRequired(actorId.Value);
+            var target = people.GetRequired(targetId.Value);
             if (!actor.IsAlive || !target.IsAlive)
             {
                 throw new InvalidOperationException("A visit requires two living people.");
@@ -56,6 +61,7 @@ namespace Mandate.Simulation
             response.Trust = ClampRelationship(response.Trust + responseGain / 3);
             response.LastInteractionDay = world.AbsoluteDay;
 
+            actor = people.GetRequiredForUpdate(actor.Id);
             actor.Needs.Relationships = Math.Max(
                 0,
                 actor.Needs.Relationships - 1_000);
@@ -85,19 +91,6 @@ namespace Mandate.Simulation
             };
             world.Relationships.Add(created);
             return created;
-        }
-
-        private static PersonState FindPerson(WorldState world, string personId)
-        {
-            for (var i = 0; i < world.People.Count; i++)
-            {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
-            }
-
-            throw new InvalidOperationException($"Missing person {personId}.");
         }
 
         private static int ClampRelationship(int value)

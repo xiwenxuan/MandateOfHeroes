@@ -7,8 +7,8 @@ namespace Mandate.Simulation
     public sealed class WorldSimulator
     {
         private readonly NamedRandom _random;
-        private readonly TravelSystem _travelSystem = new TravelSystem();
-        private readonly TaskSystem _taskSystem = new TaskSystem();
+        private readonly TravelSystem _travelSystem;
+        private readonly TaskSystem _taskSystem;
         private readonly HistoricalEventSystem _historicalEventSystem =
             new HistoricalEventSystem();
         private readonly LifeSimulationSystem _lifeSimulationSystem;
@@ -21,9 +21,12 @@ namespace Mandate.Simulation
 
         public WorldSimulator(
             ulong masterSeed,
-            ProductionContentRegistry productionContent = null)
+            ProductionContentRegistry productionContent = null,
+            IPersonRepository personRepository = null)
         {
             _random = new NamedRandom(masterSeed);
+            _travelSystem = new TravelSystem(personRepository);
+            _taskSystem = new TaskSystem(personRepository);
             _lifeSimulationSystem = new LifeSimulationSystem(masterSeed);
             _marketSimulationSystem = new MarketSimulationSystem(masterSeed);
             _villageLifeSystem = new VillageLifeSystem(

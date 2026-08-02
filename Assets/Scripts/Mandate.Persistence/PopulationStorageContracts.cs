@@ -147,6 +147,13 @@ namespace Mandate.Persistence
     }
 
     [Serializable]
+    public sealed class PopulationIncrementalCheckpoint
+    {
+        public long StorageRevision;
+        public List<PersonState> ChangedPeople = new List<PersonState>();
+    }
+
+    [Serializable]
     public sealed class PopulationPartitionManifestEntry
     {
         public int PartitionIndex;
@@ -197,6 +204,9 @@ namespace Mandate.Persistence
     {
         PopulationPackageManifest CommitCheckpoint(PopulationCheckpoint checkpoint);
 
+        PopulationPackageManifest CommitIncrementalCheckpoint(
+            PopulationIncrementalCheckpoint checkpoint);
+
         PopulationPackageManifest OpenCurrent();
 
         bool TryReadCore(string personId, out PermanentPersonCoreRecord person);
@@ -204,6 +214,9 @@ namespace Mandate.Persistence
         bool TryReadDetail(string personId, out PersonState person);
 
         IReadOnlyList<PermanentPersonCoreRecord> LoadCorePartition(
+            int partitionIndex);
+
+        IReadOnlyList<PersonDetailExtensionRecord> LoadDetailPartition(
             int partitionIndex);
     }
 }

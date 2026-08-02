@@ -41,15 +41,18 @@ namespace Mandate.Simulation
     {
         private readonly NamedRandom _random;
         private readonly NpcActionValidator _validator = new NpcActionValidator();
-        private readonly TravelSystem _travelSystem = new TravelSystem();
+        private readonly TravelSystem _travelSystem;
         private readonly RelationshipSystem _relationshipSystem;
         private readonly OrganizationSystem _organizationSystem =
             new OrganizationSystem();
 
-        public NpcActionResolver(ulong masterSeed)
+        public NpcActionResolver(
+            ulong masterSeed,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
-            _relationshipSystem = new RelationshipSystem(masterSeed);
+            _travelSystem = new TravelSystem(people);
+            _relationshipSystem = new RelationshipSystem(masterSeed, people);
         }
 
         public NpcActionOutcome Resolve(

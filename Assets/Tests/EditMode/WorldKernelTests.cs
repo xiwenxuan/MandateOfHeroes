@@ -4312,6 +4312,266 @@ namespace Mandate.Tests
             }
         }
 
+        [Test]
+        public void PersonRepository_ReadsStayCleanAndFirstSystemsTrackUpdates()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var person = world.People[0];
+            var repository = new WorldStatePersonRepository(world);
+
+            Assert.That(repository.GetRequired(person.Id), Is.SameAs(person));
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            repository.GetRequiredForUpdate(person.Id);
+            repository.GetRequiredForUpdate("person.guan_yu");
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { "person.guan_yu", person.Id }));
+            repository.AcceptChanges(
+                new[] { person.Id, "person.guan_yu" });
+
+            var travel = new TravelSystem(repository);
+            travel.StartJourney(
+                world,
+                new StableId(person.Id),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhongshan"),
+                TravelMode.Foot);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            travel.ConsumeDailyTravelProvisions(world);
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+            repository.AcceptChanges(new[] { person.Id });
+
+            var relationship = new RelationshipSystem(
+                world.MasterSeed, repository);
+            relationship.ResolveVisit(
+                world,
+                new StableId(person.Id),
+                new StableId("person.guan_yu"),
+                1);
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+            repository.AcceptChanges(new[] { person.Id });
+
+            world.Journeys.Clear();
+            var join = new OrganizationSystem().TryJoinAtCurrentLocation(
+                world,
+                new StableId(person.Id),
+                OrganizationType.Government);
+            Assert.That(join.Success, Is.True, join.Message);
+            var tasks = new TaskSystem(repository);
+            var accepted = tasks.TryAccept(
+                world,
+                new StableId(person.Id),
+                new StableId("task_definition.verify_households"));
+            Assert.That(accepted.Success, Is.True, accepted.Message);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            tasks.ResolveDailyProgress(world);
+            tasks.ResolveDailyProgress(world);
+            tasks.ResolveDailyProgress(world);
+            Assert.That(accepted.Task.Status, Is.EqualTo(TaskStatus.Completed));
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+        }
+
+        [Test]
+        public void PersonRepository_InjectedSimulatorMatchesInlineSimulation()
+        {
+            var inline = PrototypeWorldFactory.Create184World(184);
+            var accessed = PrototypeWorldFactory.Create184World(184);
+            new TravelSystem().StartJourney(
+                inline,
+                new StableId("person.liu_bei"),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhongshan"),
+                TravelMode.Foot);
+            var repository = new WorldStatePersonRepository(accessed);
+            new TravelSystem(repository).StartJourney(
+                accessed,
+                new StableId("person.liu_bei"),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhongshan"),
+                TravelMode.Foot);
+
+            new WorldSimulator(184).AdvanceDays(inline, 5);
+            new WorldSimulator(184, null, repository).AdvanceDays(accessed, 5);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Does.Contain("person.liu_bei"));
+        }
+
+        [Test]
+        public void PopulationStore_IncrementalCheckpointRewritesOnlyDirtyPartition()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = VillagePrototypeFactory.Create(200, 21_001);
+                var store = new PartitionedPopulationStore(root);
+                var first = PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental",
+                    8,
+                    1);
+                var person = world.People[17];
+                var session = new PopulationResidencySession(store);
+                _ = session.Promote(person.Id);
+                var repository = new WorldStatePersonRepository(world);
+                repository.GetRequiredForUpdate(person.Id).Wealth += 777;
+                var result = new PopulationPersonCheckpointCoordinator(
+                    store, session).CommitChangedPeople(
+                        world, repository, 2);
+
+                Assert.That(result.Manifest.StorageRevision, Is.EqualTo(2));
+                Assert.That(result.RewrittenPartitionCount, Is.EqualTo(1));
+                Assert.That(result.CommittedPersonIds, Is.EqualTo(new[] { person.Id }));
+                Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+                Assert.That(world.PopulationStorage.StorageRevision, Is.EqualTo(2));
+                Assert.That(
+                    result.Manifest.PermanentPersonCount,
+                    Is.EqualTo(first.PermanentPersonCount));
+                Assert.That(
+                    result.Manifest.LivingPersonCount,
+                    Is.EqualTo(first.LivingPersonCount));
+                var changedPartitions = 0;
+                for (var i = 0; i < first.Partitions.Count; i++)
+                {
+                    var changed = first.Partitions[i].CoreRelativePath !=
+                                      result.Manifest.Partitions[i].CoreRelativePath ||
+                                  first.Partitions[i].DetailRelativePath !=
+                                      result.Manifest.Partitions[i].DetailRelativePath;
+                    if (changed)
+                    {
+                        changedPartitions++;
+                    }
+                    else
+                    {
+                        Assert.That(
+                            result.Manifest.Partitions[i].CoreSha256,
+                            Is.EqualTo(first.Partitions[i].CoreSha256));
+                        Assert.That(
+                            result.Manifest.Partitions[i].DetailSha256,
+                            Is.EqualTo(first.Partitions[i].DetailSha256));
+                    }
+                }
+
+                Assert.That(changedPartitions, Is.EqualTo(1));
+                Assert.That(
+                    Directory.GetFiles(
+                        Path.Combine(
+                            root,
+                            "generations",
+                            "generation-00000000000000000002"),
+                        "*.bin").Length,
+                    Is.EqualTo(2));
+                Assert.That(store.TryReadCore(person.Id, out var core), Is.True);
+                Assert.That(store.TryReadDetail(person.Id, out var detail), Is.True);
+                Assert.That(core.Matches(detail), Is.True);
+                Assert.That(detail.Wealth, Is.EqualTo(person.Wealth));
+                PopulationStorageWorldAdapter.ValidateAttachedPackage(
+                    world, store);
+                session.DemoteUnchanged(person.Id);
+                Assert.That(session.HotCount, Is.EqualTo(0));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_FailedIncrementalCheckpointKeepsPointerAndDirtySet()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental_failure",
+                    2,
+                    1);
+                var repository = new WorldStatePersonRepository(world);
+                repository.GetRequiredForUpdate("person.liu_bei").Wealth++;
+                var originalWorldRevision =
+                    world.PopulationStorage.StorageRevision;
+                var coordinator = new PopulationPersonCheckpointCoordinator(store);
+
+                Assert.Throws<InvalidOperationException>(
+                    () => coordinator.CommitChangedPeople(
+                        world, repository, 1));
+
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+                Assert.That(
+                    world.PopulationStorage.StorageRevision,
+                    Is.EqualTo(originalWorldRevision));
+                Assert.That(
+                    repository.GetChangedPersonIds(),
+                    Is.EqualTo(new[] { "person.liu_bei" }));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_IncrementalCheckpointRejectsUnknownAndDuplicatePeople()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental_validation",
+                    2,
+                    1);
+                var unknown = new PopulationIncrementalCheckpoint
+                {
+                    StorageRevision = 2,
+                    ChangedPeople =
+                    {
+                        new PersonState
+                        {
+                            Id = "person.unknown_incremental",
+                            DisplayName = "Unknown",
+                            LocationId = "location.zhuo"
+                        }
+                    }
+                };
+                Assert.Throws<InvalidOperationException>(
+                    () => store.CommitIncrementalCheckpoint(unknown));
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+
+                var duplicate = new PopulationIncrementalCheckpoint
+                {
+                    StorageRevision = 2
+                };
+                duplicate.ChangedPeople.Add(world.People[0]);
+                duplicate.ChangedPeople.Add(world.People[0]);
+                Assert.Throws<InvalidOperationException>(
+                    () => store.CommitIncrementalCheckpoint(duplicate));
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
         private static List<string> AvailableAgricultureWorkers(
             WorldState world,
             FamilyState family)

@@ -21,6 +21,12 @@ namespace Mandate.Simulation
     {
         private readonly MilitarySupplySystem _militarySupplySystem =
             new MilitarySupplySystem();
+        private readonly IPersonRepository _people;
+
+        public TaskSystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
 
         public TaskAcceptResult TryAccept(
             WorldState world,
@@ -28,7 +34,8 @@ namespace Mandate.Simulation
             StableId definitionId)
         {
             world.Validate();
-            var person = FindPerson(world, personId.Value);
+            var people = PeopleFor(world);
+            var person = people.GetRequired(personId.Value);
             var definition = FindDefinition(world, definitionId.Value);
             if (!person.IsAlive)
             {
@@ -73,6 +80,7 @@ namespace Mandate.Simulation
 
         public void ResolveDailyProgress(WorldState world)
         {
+            var people = PeopleFor(world);
             for (var i = 0; i < world.Tasks.Count; i++)
             {
                 var task = world.Tasks[i];
@@ -82,7 +90,7 @@ namespace Mandate.Simulation
                 }
 
                 var definition = FindDefinition(world, task.DefinitionId);
-                var person = FindPerson(world, task.AssigneePersonId);
+                var person = people.GetRequired(task.AssigneePersonId);
                 if (!person.IsAlive || world.AbsoluteDay > task.DeadlineDay)
                 {
                     task.Status = TaskStatus.Failed;
@@ -104,8 +112,9 @@ namespace Mandate.Simulation
 
                 if (task.Progress >= definition.RequiredProgress)
                 {
+                    var personForUpdate = people.GetRequiredForUpdate(person.Id);
                     task.Status = TaskStatus.Completed;
-                    GrantReward(world, person, task, definition);
+                    GrantReward(world, personForUpdate, task, definition);
                 }
             }
         }
@@ -174,18 +183,8 @@ namespace Mandate.Simulation
             return null;
         }
 
-        private static PersonState FindPerson(WorldState world, string personId)
-        {
-            for (var i = 0; i < world.People.Count; i++)
-            {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
-            }
-
-            throw new InvalidOperationException($"Missing person {personId}.");
-        }
+        private IPersonRepository PeopleFor(WorldState world) =>
+            _people ?? new WorldStatePersonRepository(world);
 
         private static TaskDefinitionState FindDefinition(
             WorldState world,
