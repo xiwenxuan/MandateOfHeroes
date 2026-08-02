@@ -17,6 +17,7 @@ namespace Mandate.Simulation
         private readonly EducationSystem _educationSystem = new EducationSystem();
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
+        private readonly ProcessingProductionSystem _processingSystem;
 
         public WorldSimulator(
             ulong masterSeed,
@@ -28,6 +29,7 @@ namespace Mandate.Simulation
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent);
             _researchSystem = new ResearchSystem(productionContent);
+            _processingSystem = new ProcessingProductionSystem(productionContent);
         }
 
         public void AdvanceDays(WorldState world, int days)
@@ -82,6 +84,7 @@ namespace Mandate.Simulation
             _historicalEventSystem.ResolveEligibleEvents(world);
             _taskSystem.ResolveDailyProgress(world);
             _researchSystem.ResolveDailyProjects(world);
+            _processingSystem.ResolveDueOrders(world);
             _villageLifeSystem.ResolveMonthly(world);
             _lifeSimulationSystem.ResolveMonthly(world);
             VillageLifeSystem.RefreshAllCaches(world);

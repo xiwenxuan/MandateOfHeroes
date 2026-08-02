@@ -486,6 +486,57 @@ namespace Mandate.Domain
                     GetTechnology(entry.TechnologyDefinitionId);
                 }
             }
+
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                var product = GetProduct(batch.ProductDefinitionId);
+                if (product.UnitId != batch.UnitId ||
+                    product.BaseWeight != batch.UnitWeight)
+                {
+                    throw new ProductionContentException(
+                        $"Product batch {batch.Id} has an invalid unit.");
+                }
+
+                if (!string.IsNullOrEmpty(batch.CropVarietyDefinitionId))
+                {
+                    GetCropVariety(batch.CropVarietyDefinitionId);
+                    if (!product.CategoryTags.Contains("product.seed"))
+                    {
+                        throw new ProductionContentException(
+                            $"Non-seed batch {batch.Id} declares a crop variety.");
+                    }
+                }
+            }
+
+            for (var i = 0; i < world.ProcessingWorkOrders.Count; i++)
+            {
+                var order = world.ProcessingWorkOrders[i];
+                var recipe = GetRecipe(order.RecipeDefinitionId);
+                var method = GetMethod(order.MethodDefinitionId);
+                if (!string.IsNullOrEmpty(recipe.CropDefinitionId) ||
+                    !method.RecipeDefinitionIds.Contains(recipe.Id))
+                {
+                    throw new ProductionContentException(
+                        $"Processing work order {order.Id} has incompatible content.");
+                }
+            }
+
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                var transaction = world.InventoryTransactions[i];
+                for (var lineIndex = 0;
+                     lineIndex < transaction.Lines.Count;
+                     lineIndex++)
+                {
+                    var line = transaction.Lines[lineIndex];
+                    if (GetProduct(line.ProductDefinitionId).UnitId != line.UnitId)
+                    {
+                        throw new ProductionContentException(
+                            $"Inventory transaction {transaction.Id} has an invalid unit.");
+                    }
+                }
+            }
         }
 
         private static string BuildManifestMismatchMessage(
@@ -578,6 +629,7 @@ namespace Mandate.Domain
                 ValidateQuantities(recipe.Id, recipe.Inputs, products, "input");
                 ValidateQuantities(recipe.Id, recipe.Outputs, products, "output");
                 RejectDirectFreeGrowth(recipe, products);
+                ValidateProcessingMass(recipe, products);
             }
 
             foreach (var pair in methods)
@@ -729,6 +781,40 @@ namespace Mandate.Domain
                         $"Recipe {recipe.Id} creates a direct free quantity cycle for " +
                         $"{products[output.ProductDefinitionId].Id}.");
                 }
+            }
+        }
+
+        private static void ValidateProcessingMass(
+            RecipeDefinition recipe,
+            Dictionary<string, ProductDefinition> products)
+        {
+            if (!string.IsNullOrEmpty(recipe.CropDefinitionId))
+            {
+                return;
+            }
+
+            long inputWeight = 0;
+            long outputWeight = 0;
+            for (var i = 0; i < recipe.Inputs.Count; i++)
+            {
+                var quantity = recipe.Inputs[i];
+                inputWeight = checked(inputWeight +
+                    quantity.QuantityPerLandUnit *
+                    products[quantity.ProductDefinitionId].BaseWeight);
+            }
+
+            for (var i = 0; i < recipe.Outputs.Count; i++)
+            {
+                var quantity = recipe.Outputs[i];
+                outputWeight = checked(outputWeight +
+                    quantity.QuantityPerLandUnit *
+                    products[quantity.ProductDefinitionId].BaseWeight);
+            }
+
+            if (inputWeight != outputWeight)
+            {
+                throw new ProductionContentException(
+                    $"Processing recipe {recipe.Id} does not conserve product weight.");
             }
         }
 
@@ -930,9 +1016,20 @@ namespace Mandate.Domain
             "crop_variety.wheat.prototype_northern";
         public const string WheatSeedProductId = "product.wheat_seed";
         public const string WheatGrainProductId = "product.wheat_grain";
+        public const string WheatFlourProductId = "product.wheat_flour";
+        public const string WheatBranProductId = "product.wheat_bran";
+        public const string DryRationProductId = "product.dry_ration";
         public const string GrowWheatRecipeId = "recipe.field.grow_wheat";
+        public const string HandMillWheatRecipeId =
+            "recipe.processing.hand_mill_wheat";
+        public const string MakeDryRationRecipeId =
+            "recipe.processing.make_dry_ration";
         public const string PrototypeDrylandMethodId =
             "method.farming.prototype_dryland";
+        public const string HandMillingMethodId =
+            "method.processing.hand_milling";
+        public const string DryRationMethodId =
+            "method.processing.dry_ration";
         public const string GrainUnitId = "unit.grain";
         public const string LaborDayUnitId = "unit.labor_day";
 
@@ -941,7 +1038,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "2.0.0",
+                Version = "3.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -995,6 +1092,49 @@ namespace Mandate.Domain
                     "product.military_supply"
                 }
             });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = WheatFlourProductId,
+                DisplayName = "小麦面粉",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 800,
+                CategoryTags = new List<string>
+                {
+                    "product.food",
+                    "product.processed",
+                    "product.market"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = WheatBranProductId,
+                DisplayName = "麦麸",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 700,
+                CategoryTags = new List<string>
+                {
+                    "product.byproduct",
+                    "product.fodder",
+                    "product.market"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = DryRationProductId,
+                DisplayName = "干粮",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 250,
+                CategoryTags = new List<string>
+                {
+                    "product.food",
+                    "product.processed",
+                    "product.market",
+                    "product.military_supply"
+                }
+            });
             package.Recipes.Add(new RecipeDefinition
             {
                 Id = GrowWheatRecipeId,
@@ -1019,6 +1159,63 @@ namespace Mandate.Domain
                     }
                 }
             });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = HandMillWheatRecipeId,
+                DisplayName = "手工磨麦",
+                DurationDays = 2,
+                FacilityTags = new List<string>
+                {
+                    VillageFacilityTags.HouseholdGranary
+                },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = WheatGrainProductId,
+                        QuantityPerLandUnit = 10
+                    }
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = WheatFlourProductId,
+                        QuantityPerLandUnit = 8
+                    },
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = WheatBranProductId,
+                        QuantityPerLandUnit = 2
+                    }
+                }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = MakeDryRationRecipeId,
+                DisplayName = "制作干粮",
+                DurationDays = 1,
+                FacilityTags = new List<string>
+                {
+                    VillageFacilityTags.HouseholdGranary
+                },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = WheatFlourProductId,
+                        QuantityPerLandUnit = 8
+                    }
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = DryRationProductId,
+                        QuantityPerLandUnit = 8
+                    }
+                }
+            });
             package.Methods.Add(new ProductionMethodDefinition
             {
                 Id = PrototypeDrylandMethodId,
@@ -1027,6 +1224,30 @@ namespace Mandate.Domain
                 YieldBasisPoints = 10_000,
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "gameplay_completion"
+            });
+            package.Methods.Add(new ProductionMethodDefinition
+            {
+                Id = HandMillingMethodId,
+                DisplayName = "手工磨制",
+                RecipeDefinitionIds = new List<string>
+                {
+                    HandMillWheatRecipeId
+                },
+                YieldBasisPoints = 10_000,
+                LaborBasisPoints = 10_000,
+                HistoricalStatus = "historical_inference"
+            });
+            package.Methods.Add(new ProductionMethodDefinition
+            {
+                Id = DryRationMethodId,
+                DisplayName = "干粮制作",
+                RecipeDefinitionIds = new List<string>
+                {
+                    MakeDryRationRecipeId
+                },
+                YieldBasisPoints = 10_000,
+                LaborBasisPoints = 10_000,
+                HistoricalStatus = "historical_inference"
             });
             package.Skills.Add(new SkillDefinition
             {

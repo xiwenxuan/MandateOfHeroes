@@ -5,7 +5,9 @@ namespace Mandate.Persistence
 {
     public static class WorldSnapshotMigrator
     {
-        public static WorldState MigrateToCurrent(WorldState world)
+        public static WorldState MigrateToCurrent(
+            WorldState world,
+            ProductionContentRegistry productionContent = null)
         {
             if (world == null)
             {
@@ -18,6 +20,9 @@ namespace Mandate.Persistence
                 throw new InvalidOperationException(
                     $"Unsupported world schema {world.SchemaVersion}.");
             }
+
+            var content = productionContent ??
+                          ProductionContentRegistry.CreateCore();
 
             while (world.SchemaVersion < WorldState.CurrentSchemaVersion)
             {
@@ -46,6 +51,9 @@ namespace Mandate.Persistence
                         break;
                     case 8:
                         MigrateVersionEightToNine(world);
+                        break;
+                    case 9:
+                        MigrateVersionNineToTen(world, content);
                         break;
                     default:
                         throw new InvalidOperationException(
@@ -179,6 +187,21 @@ namespace Mandate.Persistence
             world.ProductionContentManifest =
                 ProductionContentRegistry.CreateCore().CreateManifest();
             world.SchemaVersion = 9;
+        }
+
+        private static void MigrateVersionNineToTen(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.ProductBatches ??=
+                new System.Collections.Generic.List<ProductBatchState>();
+            world.InventoryTransactions ??=
+                new System.Collections.Generic.List<InventoryTransactionState>();
+            world.ProcessingWorkOrders ??=
+                new System.Collections.Generic.List<ProcessingWorkOrderState>();
+            world.ProductionContentManifest =
+                productionContent.CreateManifest();
+            world.SchemaVersion = 10;
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

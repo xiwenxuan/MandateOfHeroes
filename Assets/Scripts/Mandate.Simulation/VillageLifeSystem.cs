@@ -140,8 +140,9 @@ namespace Mandate.Simulation
                     world, village.Id, family.Id);
                 if (householdGranary != null)
                 {
-                    householdGranary.InventoryUnits =
-                        family.Grain + family.SeedGrain;
+                    householdGranary.InventoryUnits = ProductInventorySystem
+                        .CalculatePhysicalInventoryUnits(
+                            world, householdGranary.Id, family.Id);
                 }
             }
         }

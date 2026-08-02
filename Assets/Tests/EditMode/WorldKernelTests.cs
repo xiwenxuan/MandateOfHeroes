@@ -3025,7 +3025,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 9", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 10", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3048,7 +3048,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 9", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 10", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3086,9 +3086,9 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(2));
-            Assert.That(fromResource.RecipeCount, Is.EqualTo(1));
-            Assert.That(fromResource.MethodCount, Is.EqualTo(1));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(5));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(3));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(3));
             Assert.That(fromResource.SkillCount, Is.EqualTo(1));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
@@ -3571,7 +3571,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 9", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 10", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3598,7 +3598,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 9", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -3632,6 +3632,255 @@ namespace Mandate.Tests
                 loaded.ProductionContentManifest.ContentSchemaVersion,
                 Is.EqualTo(2));
             loaded.Validate();
+        }
+
+        [Test]
+        public void ProductInventory_LegacyConversionPreservesPhysicalStock()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_001);
+            var family = world.Families[0];
+            var storage = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.HouseholdGranary &&
+                        item.OwnerFamilyId == family.Id);
+            var originalGrain = family.Grain;
+            var originalSeed = family.SeedGrain;
+            var originalPhysical = storage.InventoryUnits;
+            var system = new ProductInventorySystem();
+
+            var grain = system.ConvertLegacyBalanceToBatch(
+                world,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatGrainProductId,
+                10);
+            var seed = system.ConvertLegacyBalanceToBatch(
+                world,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatSeedProductId,
+                2,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId);
+
+            Assert.That(family.Grain, Is.EqualTo(originalGrain - 10));
+            Assert.That(family.SeedGrain, Is.EqualTo(originalSeed - 2));
+            Assert.That(grain.Quantity, Is.EqualTo(10));
+            Assert.That(seed.Quantity, Is.EqualTo(2));
+            Assert.That(seed.SeedVigorBasisPoints, Is.GreaterThan(0));
+            Assert.That(storage.InventoryUnits, Is.EqualTo(originalPhysical));
+            Assert.That(world.InventoryTransactions.Count, Is.EqualTo(2));
+            world.Validate();
+        }
+
+        [Test]
+        public void Processing_WheatToDryRationIsBalancedAndRoundTrips()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_002);
+            var family = world.Families[0];
+            var storage = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.HouseholdGranary &&
+                        item.OwnerFamilyId == family.Id);
+            var inventory = new ProductInventorySystem();
+            inventory.ConvertLegacyBalanceToBatch(
+                world,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatGrainProductId,
+                10);
+            var processing = new ProcessingProductionSystem();
+            var milling = processing.CreateOrder(
+                world,
+                CoreProductionContent.HandMillWheatRecipeId,
+                CoreProductionContent.HandMillingMethodId,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                ProductionControlMode.WorkOrder,
+                1);
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 2);
+
+            Assert.That(milling.Status, Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(
+                world.ProductBatches.Find(
+                    item => item.ProductDefinitionId ==
+                            CoreProductionContent.WheatFlourProductId).Quantity,
+                Is.EqualTo(8));
+            Assert.That(
+                world.ProductBatches.Find(
+                    item => item.ProductDefinitionId ==
+                            CoreProductionContent.WheatBranProductId).Quantity,
+                Is.EqualTo(2));
+            var rationOrder = processing.CreateOrder(
+                world,
+                CoreProductionContent.MakeDryRationRecipeId,
+                CoreProductionContent.DryRationMethodId,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                ProductionControlMode.DelegatedPolicy,
+                1);
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+
+            Assert.That(
+                rationOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(
+                inventory.MarketableQuantity(
+                    world,
+                    family.LocationId,
+                    CoreProductionContent.DryRationProductId),
+                Is.EqualTo(8));
+            Assert.That(
+                ProductInventorySystem.CalculatePhysicalInventoryUnits(
+                    world, storage.Id, family.Id),
+                Is.EqualTo(storage.InventoryUnits));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.ProcessingWorkOrders.Count, Is.EqualTo(2));
+            Assert.That(loaded.InventoryTransactions.Count, Is.EqualTo(5));
+            Assert.That(
+                loaded.ProductBatches.Find(
+                    item => item.ProductDefinitionId ==
+                            CoreProductionContent.DryRationProductId).Quantity,
+                Is.EqualTo(8));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Processing_InsufficientInputHasNoSideEffects()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_003);
+            var family = world.Families[0];
+            var storage = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.HouseholdGranary &&
+                        item.OwnerFamilyId == family.Id);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new ProcessingProductionSystem().CreateOrder(
+                    world,
+                    CoreProductionContent.HandMillWheatRecipeId,
+                    CoreProductionContent.HandMillingMethodId,
+                    family.Id,
+                    storage.Id,
+                    family.HeadPersonId,
+                    ProductionControlMode.DirectAssignment,
+                    1));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world), Is.EqualTo(before));
+        }
+
+        [Test]
+        public void Processing_ControlModesProduceTheSameInventoryFacts()
+        {
+            List<string> expected = null;
+            foreach (var mode in new[]
+                     {
+                         ProductionControlMode.PersonalLabor,
+                         ProductionControlMode.DelegatedPolicy
+                     })
+            {
+                var world = VillagePrototypeFactory.Create(200, 22_004);
+                var family = world.Families[0];
+                var storage = world.VillageFacilities.Find(
+                    item => item.Kind == VillageFacilityKind.HouseholdGranary &&
+                            item.OwnerFamilyId == family.Id);
+                new ProductInventorySystem().ConvertLegacyBalanceToBatch(
+                    world,
+                    family.Id,
+                    storage.Id,
+                    family.HeadPersonId,
+                    CoreProductionContent.WheatGrainProductId,
+                    10);
+                new ProcessingProductionSystem().CreateOrder(
+                    world,
+                    CoreProductionContent.HandMillWheatRecipeId,
+                    CoreProductionContent.HandMillingMethodId,
+                    family.Id,
+                    storage.Id,
+                    family.HeadPersonId,
+                    mode,
+                    1);
+                new WorldSimulator(world.MasterSeed).AdvanceDays(world, 2);
+                var facts = new List<string>();
+                for (var i = 0; i < world.ProductBatches.Count; i++)
+                {
+                    facts.Add(
+                        world.ProductBatches[i].ProductDefinitionId + "|" +
+                        world.ProductBatches[i].Quantity + "|" +
+                        world.ProductBatches[i].ReservedQuantity);
+                }
+
+                facts.Sort(StringComparer.Ordinal);
+                if (expected == null)
+                {
+                    expected = facts;
+                }
+                else
+                {
+                    Assert.That(facts, Is.EqualTo(expected));
+                }
+            }
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionNineToInventoryCollections()
+        {
+            var world = BuildMinimalWorld();
+            var originalPeople = world.People.Count;
+            var originalFamilies = world.Families.Count;
+            var originalStorageMode = world.PopulationStorage.Mode;
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 9")
+                .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
+                .Replace(
+                    "\"InventoryTransactions\": []",
+                    "\"InventoryTransactions\": null")
+                .Replace(
+                    "\"ProcessingWorkOrders\": []",
+                    "\"ProcessingWorkOrders\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(10));
+            Assert.That(loaded.ProductBatches, Is.Not.Null);
+            Assert.That(loaded.InventoryTransactions, Is.Not.Null);
+            Assert.That(loaded.ProcessingWorkOrders, Is.Not.Null);
+            Assert.That(loaded.People.Count, Is.EqualTo(originalPeople));
+            Assert.That(loaded.Families.Count, Is.EqualTo(originalFamilies));
+            Assert.That(loaded.PopulationStorage.Mode, Is.EqualTo(originalStorageMode));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_VersionNineMigrationPreservesLoadedModManifest()
+        {
+            var registry = ProductionContentRegistry.CreateCore();
+            registry.Register(ProductionContentJson.DeserializePackage(
+                TestProductionModJson()));
+            var world = BuildMinimalWorld();
+            world.ProductionContentManifest = registry.CreateManifest();
+            var json = WorldSnapshotSerializer.Serialize(world, registry)
+                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 9")
+                .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
+                .Replace(
+                    "\"InventoryTransactions\": []",
+                    "\"InventoryTransactions\": null")
+                .Replace(
+                    "\"ProcessingWorkOrders\": []",
+                    "\"ProcessingWorkOrders\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json, registry);
+
+            Assert.That(loaded.ProductionContentManifest.Packages.Count,
+                Is.EqualTo(2));
+            Assert.That(
+                loaded.ProductionContentManifest.ResolvedHash,
+                Is.EqualTo(registry.ResolvedHash));
         }
 
         [Test]

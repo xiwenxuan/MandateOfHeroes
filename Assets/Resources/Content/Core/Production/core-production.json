@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "2.0.0",
+  "Version": "3.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -52,6 +52,43 @@
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 600
+    },
+    {
+      "Id": "product.wheat_flour",
+      "DisplayName": "小麦面粉",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.processed",
+        "product.market"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 800
+    },
+    {
+      "Id": "product.wheat_bran",
+      "DisplayName": "麦麸",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.byproduct",
+        "product.fodder",
+        "product.market"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 700
+    },
+    {
+      "Id": "product.dry_ration",
+      "DisplayName": "干粮",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.processed",
+        "product.market",
+        "product.military_supply"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 250
     }
   ],
   "Recipes": [
@@ -75,6 +112,52 @@
           "QuantityPerLandUnit": 15
         }
       ]
+    },
+    {
+      "Id": "recipe.processing.hand_mill_wheat",
+      "DisplayName": "手工磨麦",
+      "CropDefinitionId": null,
+      "DurationDays": 2,
+      "FacilityTags": [
+        "facility.household_granary"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.wheat_grain",
+          "QuantityPerLandUnit": 10
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.wheat_flour",
+          "QuantityPerLandUnit": 8
+        },
+        {
+          "ProductDefinitionId": "product.wheat_bran",
+          "QuantityPerLandUnit": 2
+        }
+      ]
+    },
+    {
+      "Id": "recipe.processing.make_dry_ration",
+      "DisplayName": "制作干粮",
+      "CropDefinitionId": null,
+      "DurationDays": 1,
+      "FacilityTags": [
+        "facility.household_granary"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.wheat_flour",
+          "QuantityPerLandUnit": 8
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.dry_ration",
+          "QuantityPerLandUnit": 8
+        }
+      ]
     }
   ],
   "Methods": [
@@ -87,6 +170,26 @@
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "gameplay_completion"
+    },
+    {
+      "Id": "method.processing.hand_milling",
+      "DisplayName": "手工磨制",
+      "RecipeDefinitionIds": [
+        "recipe.processing.hand_mill_wheat"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.processing.dry_ration",
+      "DisplayName": "干粮制作",
+      "RecipeDefinitionIds": [
+        "recipe.processing.make_dry_ration"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
     }
   ],
   "Skills": [

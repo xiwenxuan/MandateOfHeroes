@@ -164,7 +164,9 @@ namespace Mandate.Simulation
                         worker.LaborCapacityBasisPoints * LaborWindowDays / 10_000));
             }
 
-            storage.InventoryUnits = family.Grain + family.SeedGrain;
+            storage.InventoryUnits = ProductInventorySystem
+                .CalculatePhysicalInventoryUnits(
+                    world, storage.Id, family.Id, _content);
             var technologyFactors = _research.ResolveProductionFactors(
                 world,
                 field.Id,
@@ -434,7 +436,9 @@ namespace Mandate.Simulation
                 world, village.LocationId).PublicOrderBasisPoints);
             harvest = ApplyFactor(harvest, weatherFactor);
 
-            storage.InventoryUnits = family.Grain + family.SeedGrain;
+            storage.InventoryUnits = ProductInventorySystem
+                .CalculatePhysicalInventoryUnits(
+                    world, storage.Id, family.Id, _content);
             var availableCapacity = Math.Max(
                 0L, storage.Capacity - storage.InventoryUnits);
             var stored = Math.Min(harvest, availableCapacity);

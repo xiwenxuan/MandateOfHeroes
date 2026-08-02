@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 9;
+        public const int CurrentSchemaVersion = 10;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -204,6 +204,12 @@ namespace Mandate.Domain
             new List<AgricultureWorkOrderState>();
         public List<ProductionLedgerEntryState> ProductionLedgerEntries =
             new List<ProductionLedgerEntryState>();
+        public List<ProductBatchState> ProductBatches =
+            new List<ProductBatchState>();
+        public List<InventoryTransactionState> InventoryTransactions =
+            new List<InventoryTransactionState>();
+        public List<ProcessingWorkOrderState> ProcessingWorkOrders =
+            new List<ProcessingWorkOrderState>();
         public List<ResearchProjectState> ResearchProjects =
             new List<ResearchProjectState>();
         public List<TechnologyApplicationState> TechnologyApplications =
@@ -310,6 +316,11 @@ namespace Mandate.Domain
                 AgricultureWorkOrders, item => item.Id, "agriculture work order");
             ValidateUniqueIds(
                 ProductionLedgerEntries, item => item.Id, "production ledger entry");
+            ValidateUniqueIds(ProductBatches, item => item.Id, "product batch");
+            ValidateUniqueIds(
+                InventoryTransactions, item => item.Id, "inventory transaction");
+            ValidateUniqueIds(
+                ProcessingWorkOrders, item => item.Id, "processing work order");
             ValidateUniqueIds(
                 ResearchProjects, item => item.Id, "research project");
             ValidateUniqueIds(
@@ -648,6 +659,7 @@ namespace Mandate.Domain
             }
 
             ValidateVillages(personIds, locationIds);
+            ValidateInventoryProduction(personIds, locationIds);
             ValidateProduction(personIds);
             ValidateResearch(personIds);
 
@@ -2299,6 +2311,251 @@ namespace Mandate.Domain
                         entry.TechnologyDefinitionId, "technology", entry.Id);
                 }
             }
+        }
+
+        private void ValidateInventoryProduction(
+            HashSet<string> personIds,
+            HashSet<string> locationIds)
+        {
+            var familyIds = new HashSet<string>(StringComparer.Ordinal);
+            var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            var processingOrders = new Dictionary<string, ProcessingWorkOrderState>(
+                StringComparer.Ordinal);
+            var processingOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var transactionIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < Families.Count; i++)
+            {
+                familyIds.Add(Families[i].Id);
+            }
+
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+            }
+
+            for (var i = 0; i < ProcessingWorkOrders.Count; i++)
+            {
+                processingOrderIds.Add(ProcessingWorkOrders[i].Id);
+            }
+
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                transactionIds.Add(InventoryTransactions[i].Id);
+            }
+
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                var batch = ProductBatches[i] ??
+                    throw new InvalidOperationException("A product batch cannot be null.");
+                batches.Add(batch.Id, batch);
+                ValidateContentReference(
+                    batch.ProductDefinitionId, "batch product", batch.Id);
+                ValidateContentReference(batch.UnitId, "batch unit", batch.Id);
+                if (!string.IsNullOrEmpty(batch.CropVarietyDefinitionId))
+                {
+                    ValidateContentReference(
+                        batch.CropVarietyDefinitionId, "batch variety", batch.Id);
+                }
+
+                if (!familyIds.Contains(batch.OwnerFamilyId) ||
+                    !facilities.TryGetValue(batch.StorageFacilityId, out var facility) ||
+                    facility.OwnerFamilyId != batch.OwnerFamilyId ||
+                    !locationIds.Contains(batch.OriginLocationId) ||
+                    !transactionIds.Contains(batch.SourceTransactionId) ||
+                    !string.IsNullOrEmpty(batch.SourceWorkOrderId) &&
+                    !processingOrderIds.Contains(batch.SourceWorkOrderId) ||
+                    batch.ProducedDay < 0 || batch.ProducedDay > AbsoluteDay ||
+                    batch.UnitWeight <= 0 ||
+                    batch.Quantity < 0 || batch.ReservedQuantity < 0 ||
+                    batch.ReservedQuantity > batch.Quantity ||
+                    batch.QualityBasisPoints < 0 ||
+                    batch.QualityBasisPoints > 10_000 ||
+                    batch.FreshnessBasisPoints < 0 ||
+                    batch.FreshnessBasisPoints > 10_000 ||
+                    batch.SeedVigorBasisPoints < 0 ||
+                    batch.SeedVigorBasisPoints > 10_000 ||
+                    batch.SeedPurityBasisPoints < 0 ||
+                    batch.SeedPurityBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid product batch {batch.Id}.");
+                }
+            }
+
+            for (var i = 0; i < ProcessingWorkOrders.Count; i++)
+            {
+                var order = ProcessingWorkOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A processing work order cannot be null.");
+                processingOrders.Add(order.Id, order);
+                ValidateContentReference(
+                    order.RecipeDefinitionId, "processing recipe", order.Id);
+                ValidateContentReference(
+                    order.MethodDefinitionId, "processing method", order.Id);
+                if (!familyIds.Contains(order.OwnerFamilyId) ||
+                    !facilities.TryGetValue(order.StorageFacilityId, out var facility) ||
+                    facility.OwnerFamilyId != order.OwnerFamilyId ||
+                    !personIds.Contains(order.ManagerPersonId) ||
+                    !Enum.IsDefined(typeof(ProductionControlMode), order.ControlMode) ||
+                    !Enum.IsDefined(typeof(ProductionOrderStatus), order.Status) ||
+                    order.CreatedDay < 0 || order.FinishDay <= order.CreatedDay ||
+                    order.SettledDay < -1 || order.SettledDay > AbsoluteDay ||
+                    order.RunCount <= 0 || order.InputReservations == null ||
+                    order.InputReservations.Count == 0 ||
+                    order.OutputBatchIds == null ||
+                    order.Status == ProductionOrderStatus.Active &&
+                    (order.SettledDay != -1 || order.OutputBatchIds.Count != 0) ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                    (order.SettledDay < order.FinishDay ||
+                     order.OutputBatchIds.Count == 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid processing work order {order.Id}.");
+                }
+
+                var reservationKeys = new HashSet<string>(StringComparer.Ordinal);
+                for (var reservationIndex = 0;
+                     reservationIndex < order.InputReservations.Count;
+                     reservationIndex++)
+                {
+                    var reservation = order.InputReservations[reservationIndex];
+                    if (reservation == null || reservation.Quantity <= 0 ||
+                        !batches.ContainsKey(reservation.BatchId) ||
+                        !reservationKeys.Add(reservation.BatchId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid reservation on {order.Id}.");
+                    }
+                }
+
+                var outputIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var outputIndex = 0;
+                     outputIndex < order.OutputBatchIds.Count;
+                     outputIndex++)
+                {
+                    if (!batches.TryGetValue(
+                            order.OutputBatchIds[outputIndex], out var output) ||
+                        output.SourceWorkOrderId != order.Id ||
+                        !outputIds.Add(output.Id))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid output batch on {order.Id}.");
+                    }
+                }
+            }
+
+            var quantityDeltas = new Dictionary<string, long>(StringComparer.Ordinal);
+            var reservationDeltas = new Dictionary<string, long>(StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                var transaction = InventoryTransactions[i] ??
+                    throw new InvalidOperationException(
+                        "An inventory transaction cannot be null.");
+                if (transaction.Day < 0 || transaction.Day > AbsoluteDay ||
+                    !Enum.IsDefined(
+                        typeof(InventoryTransactionType), transaction.Type) ||
+                    !string.IsNullOrEmpty(transaction.ActorPersonId) &&
+                    !personIds.Contains(transaction.ActorPersonId) ||
+                    !string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    !processingOrders.ContainsKey(transaction.SourceWorkOrderId) ||
+                    transaction.Lines == null || transaction.Lines.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid inventory transaction {transaction.Id}.");
+                }
+
+
+                var requiresOrder =
+                    transaction.Type == InventoryTransactionType.Reserved ||
+                    transaction.Type == InventoryTransactionType.ReservationReleased ||
+                    transaction.Type == InventoryTransactionType.RecipeSettled;
+                if (requiresOrder !=
+                    !string.IsNullOrEmpty(transaction.SourceWorkOrderId) ||
+                    transaction.Type ==
+                        InventoryTransactionType.LegacyBalanceConverted &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyFamilySeedGrainDelta == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has invalid provenance.");
+                }
+
+                for (var lineIndex = 0;
+                     lineIndex < transaction.Lines.Count;
+                     lineIndex++)
+                {
+                    var line = transaction.Lines[lineIndex];
+                    if (line == null || !batches.TryGetValue(line.BatchId, out var batch) ||
+                        line.ProductDefinitionId != batch.ProductDefinitionId ||
+                        line.OwnerFamilyId != batch.OwnerFamilyId ||
+                        line.StorageFacilityId != batch.StorageFacilityId ||
+                        line.UnitId != batch.UnitId ||
+                        line.QuantityDelta == 0 && line.ReservedQuantityDelta == 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid line on inventory transaction {transaction.Id}.");
+                    }
+
+                    AddDelta(quantityDeltas, line.BatchId, line.QuantityDelta);
+                    AddDelta(
+                        reservationDeltas,
+                        line.BatchId,
+                        line.ReservedQuantityDelta);
+                }
+            }
+
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                var batch = ProductBatches[i];
+                quantityDeltas.TryGetValue(batch.Id, out var quantity);
+                reservationDeltas.TryGetValue(batch.Id, out var reserved);
+                if (quantity != batch.Quantity || reserved != batch.ReservedQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Product batch ledger mismatch for {batch.Id}.");
+                }
+            }
+
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                var facility = VillageFacilities[i];
+                if (facility.Kind != VillageFacilityKind.HouseholdGranary)
+                {
+                    continue;
+                }
+
+                long trackedBatchWeight = 0;
+                for (var batchIndex = 0;
+                     batchIndex < ProductBatches.Count;
+                     batchIndex++)
+                {
+                    var batch = ProductBatches[batchIndex];
+                    if (batch.StorageFacilityId == facility.Id)
+                    {
+                        trackedBatchWeight = checked(
+                            trackedBatchWeight +
+                            batch.Quantity * batch.UnitWeight);
+                    }
+                }
+
+                if (trackedBatchWeight > facility.InventoryUnits)
+                {
+                    throw new InvalidOperationException(
+                        $"Tracked batches exceed granary stock for {facility.Id}.");
+                }
+            }
+        }
+
+        private static void AddDelta(
+            IDictionary<string, long> totals,
+            string id,
+            long delta)
+        {
+            totals.TryGetValue(id, out var current);
+            totals[id] = checked(current + delta);
         }
 
         private void ValidateProduction(HashSet<string> personIds)
