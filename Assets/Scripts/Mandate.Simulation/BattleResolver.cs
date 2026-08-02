@@ -17,10 +17,14 @@ namespace Mandate.Simulation
     public sealed class BattleResolver
     {
         private readonly NamedRandom _random;
+        private readonly IPersonRepository _people;
 
-        public BattleResolver(ulong masterSeed)
+        public BattleResolver(
+            ulong masterSeed,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
+            _people = people;
         }
 
         public BattleOutcome Resolve(
@@ -97,7 +101,7 @@ namespace Mandate.Simulation
                 attacker, attackerCasualties, sequence);
             var defenderWounded = CalculateWounded(
                 defender, defenderCasualties, sequence);
-            var militaryService = new MilitaryServiceSystem();
+            var militaryService = new MilitaryServiceSystem(_people);
             militaryService.ApplyCasualties(
                 world,
                 attackerArmyId,

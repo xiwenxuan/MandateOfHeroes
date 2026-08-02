@@ -1,3 +1,4 @@
+using System;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -5,6 +6,13 @@ namespace Mandate.Simulation
     public static class PrototypeWorldFactory
     {
         public static WorldState Create184World(ulong masterSeed = 184_001UL)
+        {
+            return Create184World(masterSeed, null);
+        }
+
+        public static WorldState Create184World(
+            ulong masterSeed,
+            Func<WorldState, IPersonRepository> personRepositoryFactory)
         {
             var world = WorldState.Create(masterSeed);
 
@@ -585,7 +593,16 @@ namespace Mandate.Simulation
 
             CharacterAbilityBootstrap.InitializeWorld(world);
             new PopulationLedgerSystem().InitializeFromLocationSummaries(world);
-            new MilitaryServiceSystem().InitializePrototype(world);
+            var people = personRepositoryFactory == null
+                ? null
+                : personRepositoryFactory(world);
+            if (personRepositoryFactory != null && people == null)
+            {
+                throw new InvalidOperationException(
+                    "Person repository factory returned null.");
+            }
+
+            new MilitaryServiceSystem(people).InitializePrototype(world);
             world.Validate();
             return world;
         }

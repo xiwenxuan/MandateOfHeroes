@@ -14,7 +14,7 @@ namespace Mandate.Simulation
             new HistoricalEventSystem();
         private readonly LifeSimulationSystem _lifeSimulationSystem;
         private readonly MarketSimulationSystem _marketSimulationSystem;
-        private readonly ArmySystem _armySystem = new ArmySystem();
+        private readonly ArmySystem _armySystem;
         private readonly EducationSystem _educationSystem;
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
@@ -27,6 +27,7 @@ namespace Mandate.Simulation
         {
             _random = new NamedRandom(masterSeed);
             _personRepository = personRepository;
+            _armySystem = new ArmySystem(personRepository);
             _travelSystem = new TravelSystem(personRepository);
             _taskSystem = new TaskSystem(personRepository);
             _lifeSimulationSystem = new LifeSimulationSystem(

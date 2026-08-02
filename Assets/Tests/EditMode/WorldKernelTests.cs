@@ -2785,6 +2785,40 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void MilitaryService_InjectedRepositoryTracksPrototypeRecruits()
+        {
+            var inline = PrototypeWorldFactory.Create184World(184);
+            WorldStatePersonRepository repository = null;
+            var accessed = PrototypeWorldFactory.Create184World(
+                184,
+                world =>
+                {
+                    repository = new WorldStatePersonRepository(world);
+                    return repository;
+                });
+
+            Assert.That(repository, Is.Not.Null);
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            var addedPeople = repository.GetAddedPersonIds();
+            Assert.That(addedPeople.Count, Is.EqualTo(237));
+            for (var i = 0; i < addedPeople.Count; i++)
+            {
+                Assert.That(
+                    addedPeople[i],
+                    Does.StartWith("person.military."));
+            }
+
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { "person.zou_jing" }));
+            Assert.That(
+                repository.GetRequired("person.zou_jing").LocationId,
+                Is.EqualTo("location.zhongshan"));
+        }
+
+        [Test]
         public void MilitaryAuthority_RecordsAuthorizedAndRejectedOrders()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -2912,6 +2946,108 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void Battle_InjectedRepositoryTracksEveryConcreteCasualty()
+        {
+            var inline = BuildGuangzongBattleWorld();
+            var accessed = BuildGuangzongBattleWorld();
+            var repository = new WorldStatePersonRepository(accessed);
+
+            var inlineOutcome = new BattleResolver(inline.MasterSeed).Resolve(
+                inline,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            var accessedOutcome = new BattleResolver(
+                accessed.MasterSeed, repository).Resolve(
+                accessed,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(
+                accessedOutcome.Record.AttackerCasualties,
+                Is.EqualTo(inlineOutcome.Record.AttackerCasualties));
+            Assert.That(
+                accessedOutcome.Record.DefenderCasualties,
+                Is.EqualTo(inlineOutcome.Record.DefenderCasualties));
+            var expectedCasualties =
+                accessedOutcome.Record.AttackerCasualties +
+                accessedOutcome.Record.DefenderCasualties;
+            var changedPeople = repository.GetChangedPersonIds();
+            Assert.That(changedPeople.Count, Is.EqualTo(expectedCasualties));
+            for (var i = 0; i < changedPeople.Count; i++)
+            {
+                var service = accessed.MilitaryServices.Find(
+                    item => item.PersonId == changedPeople[i]);
+                Assert.That(service, Is.Not.Null);
+                Assert.That(
+                    service.Status == MilitaryServiceStatus.Wounded ||
+                    service.Status == MilitaryServiceStatus.Dead,
+                    Is.True);
+                var person = repository.GetRequired(changedPeople[i]);
+                if (service.Status == MilitaryServiceStatus.Wounded)
+                {
+                    Assert.That(
+                        person.HealthBasisPoints,
+                        Is.LessThanOrEqualTo(4_000));
+                }
+                else
+                {
+                    Assert.That(person.IsAlive, Is.False);
+                }
+            }
+
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+        }
+
+        [Test]
+        public void ArmyMarch_InjectedRepositoryTracksArrivingPersonnel()
+        {
+            var inline = PrototypeWorldFactory.Create184World(184);
+            var accessed = PrototypeWorldFactory.Create184World(184);
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineArmy = inline.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var accessedArmy = accessed.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            new ArmySystem().StartMarch(
+                inline,
+                new StableId(inlineArmy.CommanderPersonId),
+                new StableId(inlineArmy.Id),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+            new ArmySystem(repository).StartMarch(
+                accessed,
+                new StableId(accessedArmy.CommanderPersonId),
+                new StableId(accessedArmy.Id),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+
+            new WorldSimulator(inline.MasterSeed).AdvanceDays(inline, 8);
+            new WorldSimulator(
+                accessed.MasterSeed,
+                personRepository: repository).AdvanceDays(accessed, 8);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(accessed.ArmyMarches, Is.Empty);
+            var changedPeople = repository.GetChangedPersonIds();
+            Assert.That(changedPeople.Count, Is.EqualTo(accessedArmy.Troops));
+            for (var i = 0; i < changedPeople.Count; i++)
+            {
+                Assert.That(
+                    repository.GetRequired(changedPeople[i]).LocationId,
+                    Is.EqualTo("location.guangzong"));
+            }
+
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+        }
+
+        [Test]
         public void Starvation_DesertionChangesSpecificServiceMembers()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -2938,6 +3074,43 @@ namespace Mandate.Tests
                         item.ArmyId == army.Id &&
                         item.Status == MilitaryServiceStatus.Deserter),
                 Is.True);
+        }
+
+        [Test]
+        public void Starvation_DesertionDoesNotDirtyUnchangedPeople()
+        {
+            var inline = PrototypeWorldFactory.Create184World(184);
+            var accessed = PrototypeWorldFactory.Create184World(184);
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineArmy = inline.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var accessedArmy = accessed.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var inlineSystem = new ArmySystem();
+            var accessedSystem = new ArmySystem(repository);
+            inlineSystem.StartMarch(
+                inline,
+                new StableId(inlineArmy.CommanderPersonId),
+                new StableId(inlineArmy.Id),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+            accessedSystem.StartMarch(
+                accessed,
+                new StableId(accessedArmy.CommanderPersonId),
+                new StableId(accessedArmy.Id),
+                new StableId("route.xiaquyang_guangzong"),
+                new StableId("location.guangzong"));
+            inlineArmy.Provisions = 0;
+            accessedArmy.Provisions = 0;
+
+            inlineSystem.ConsumeDailyMarchSupplies(inline);
+            accessedSystem.ConsumeDailyMarchSupplies(accessed);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
         }
 
         [Test]

@@ -24,6 +24,14 @@ namespace Mandate.Simulation
     public sealed class MilitaryServiceSystem
     {
         public const int PrototypeStrengthPerArmy = 80;
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
+
+        public MilitaryServiceSystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
 
         public void InitializePrototype(
             WorldState world,
@@ -54,12 +62,13 @@ namespace Mandate.Simulation
             var armies = new List<ArmyState>(world.Armies);
             armies.Sort((left, right) =>
                 string.CompareOrdinal(left.Id, right.Id));
-            var population = new PopulationLedgerSystem();
+            var people = PeopleFor(world);
+            var population = new PopulationLedgerSystem(people);
             var recruitsByArmy = new List<List<PersonState>>();
             for (var armyIndex = 0; armyIndex < armies.Count; armyIndex++)
             {
                 var army = armies[armyIndex];
-                var commander = FindPerson(world, army.CommanderPersonId);
+                var commander = people.GetRequired(army.CommanderPersonId);
                 if (commander.LocationId != army.LocationId)
                 {
                     population.MoveIndependentPerson(
@@ -204,6 +213,7 @@ namespace Mandate.Simulation
                     $"Army {armyId.Value} lacks service members for casualties.");
             }
 
+            var people = PeopleFor(world);
             for (var i = 0; i < available.Count; i++)
             {
                 var service = available[i];
@@ -211,20 +221,25 @@ namespace Mandate.Simulation
                     ? MilitaryServiceStatus.Wounded
                     : MilitaryServiceStatus.Dead;
                 service.LastStatusChangeDay = world.AbsoluteDay;
-                var person = FindPerson(world, service.PersonId);
+                var person = people.GetRequired(service.PersonId);
                 if (service.Status == MilitaryServiceStatus.Wounded)
                 {
-                    person.HealthBasisPoints = Math.Min(
+                    var woundedHealth = Math.Min(
                         person.HealthBasisPoints, 4_000);
+                    if (woundedHealth != person.HealthBasisPoints)
+                    {
+                        people.GetRequiredForUpdate(service.PersonId)
+                            .HealthBasisPoints = woundedHealth;
+                    }
                 }
             }
 
             SynchronizeArmyCaches(world, armyId.Value);
-            var ledger = new PopulationLedgerSystem();
+            var ledger = new PopulationLedgerSystem(people);
             var deceased = new List<PersonState>();
             for (var i = wounded; i < available.Count; i++)
             {
-                deceased.Add(FindPerson(world, available[i].PersonId));
+                deceased.Add(people.GetRequired(available[i].PersonId));
             }
 
             if (deceased.Count > 0)
@@ -287,7 +302,7 @@ namespace Mandate.Simulation
             var selected = SelectServices(
                 world, armyId.Value, MilitaryServiceStatus.Wounded,
                 requested, sequence, "recovery");
-            people = people ?? new WorldStatePersonRepository(world);
+            people = people ?? PeopleFor(world);
             for (var i = 0; i < selected.Count; i++)
             {
                 var service = selected[i];
@@ -510,19 +525,20 @@ namespace Mandate.Simulation
             return selected;
         }
 
-        private static PersonState FindPerson(
-            WorldState world,
-            string personId)
+        private IPersonRepository PeopleFor(WorldState world)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            if (_people != null)
             {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {personId}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         private static ArmyState FindArmy(

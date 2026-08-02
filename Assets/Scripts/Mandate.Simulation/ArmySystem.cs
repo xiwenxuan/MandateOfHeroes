@@ -7,6 +7,14 @@ namespace Mandate.Simulation
     public sealed class ArmySystem
     {
         private const int KilometersPerSegment = 5;
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
+
+        public ArmySystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
 
         public ArmyMarchState StartMarch(
             WorldState world,
@@ -90,6 +98,7 @@ namespace Mandate.Simulation
                 army.LocationId = march.DestinationLocationId;
                 if (world.MilitaryServiceInitialized)
                 {
+                    var people = PeopleFor(world);
                     var personnel = new List<PersonState>();
                     for (var serviceIndex = 0;
                          serviceIndex < world.MilitaryServices.Count;
@@ -101,11 +110,11 @@ namespace Mandate.Simulation
                              service.Status == MilitaryServiceStatus.Active ||
                              service.Status == MilitaryServiceStatus.Wounded))
                         {
-                            personnel.Add(FindPerson(world, service.PersonId));
+                            personnel.Add(people.GetRequired(service.PersonId));
                         }
                     }
 
-                    new PopulationLedgerSystem().MovePeople(
+                    new PopulationLedgerSystem(people).MovePeople(
                         world,
                         personnel,
                         march.DestinationLocationId,
@@ -130,7 +139,7 @@ namespace Mandate.Simulation
                 army.MoraleBasisPoints = Math.Max(
                     0, army.MoraleBasisPoints - 150);
                 var deserters = Math.Max(1, army.Troops / 500);
-                new MilitaryServiceSystem().ApplyDesertion(
+                new MilitaryServiceSystem(PeopleFor(world)).ApplyDesertion(
                     world,
                     new StableId(army.Id),
                     deserters,
@@ -169,19 +178,20 @@ namespace Mandate.Simulation
             return null;
         }
 
-        private static PersonState FindPerson(
-            WorldState world,
-            string personId)
+        private IPersonRepository PeopleFor(WorldState world)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            if (_people != null)
             {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {personId}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         private static RouteState FindRoute(WorldState world, string routeId)
