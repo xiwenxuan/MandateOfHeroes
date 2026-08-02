@@ -607,6 +607,7 @@ namespace Mandate.Simulation
             new MilitaryProcurementSystem(people).InitializePrototypeSupply(world);
             MilitaryEquipmentRepairSystem.InitializePrototypeWorkshop(world);
             UpstreamResourceProductionSystem.InitializePrototype(world);
+            LivestockProductionSystem.InitializePrototype(world);
             world.Validate();
             return world;
         }

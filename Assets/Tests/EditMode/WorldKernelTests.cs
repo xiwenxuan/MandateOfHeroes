@@ -3071,7 +3071,7 @@ namespace Mandate.Tests
             var families = world.Families.Count;
             var services = world.MilitaryServices.Count;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 12");
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 12");
             var equipmentStart = json.IndexOf(
                 "  \"MilitaryEquipmentInitialized\":",
                 StringComparison.Ordinal);
@@ -3832,7 +3832,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 16", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 17", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3855,7 +3855,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 16", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 17", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3893,9 +3893,9 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(19));
-            Assert.That(fromResource.RecipeCount, Is.EqualTo(11));
-            Assert.That(fromResource.MethodCount, Is.EqualTo(9));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(29));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(15));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(13));
             Assert.That(fromResource.SkillCount, Is.EqualTo(1));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
@@ -4487,7 +4487,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 16", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 17", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4514,7 +4514,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4751,7 +4751,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4783,7 +4783,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -5062,7 +5062,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -5246,7 +5246,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -6058,7 +6058,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 14");
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 14");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6202,7 +6202,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 15");
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 15");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6211,6 +6211,142 @@ namespace Mandate.Tests
             Assert.That(loaded.ResourceBodies, Is.Empty);
             Assert.That(loaded.ResourceExtractionOrders, Is.Empty);
             Assert.That(loaded.ResourceExtractionLedgerEntries, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void LivestockProduction_PrototypeHasTraceableFlockAndFacilities()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var flock = world.ProductBatches.Find(item =>
+                item.Id == LivestockProductionSystem.PrototypeOpeningFlockBatchId);
+
+            Assert.That(flock, Is.Not.Null);
+            Assert.That(flock.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.LiveSheepProductId));
+            Assert.That(flock.Quantity, Is.EqualTo(30));
+            Assert.That(flock.UnitWeight, Is.EqualTo(10));
+            Assert.That(world.ResourceBodies.Exists(item =>
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypePastureForageBodyId),
+                Is.True);
+            Assert.That(world.ResourceBodies.Exists(item =>
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypeTanningBarkBodyId),
+                Is.True);
+            Assert.That(world.ProductionSites.Exists(item =>
+                item.Id == LivestockProductionSystem.PrototypePastureSiteId),
+                Is.True);
+            Assert.That(world.InventoryTransactions.Exists(item =>
+                item.Id == flock.SourceTransactionId &&
+                item.Type == InventoryTransactionType.OpeningBalance), Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void LivestockProduction_BreedsSlaughtersProcessesAndMakesEquipment()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+
+            ExecutePrototypeLivestockChain(world);
+
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.BreedSheepRecipeId,
+                    CoreProductionContent.LiveSheepProductId),
+                Is.EqualTo(2));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.SlaughterSheepRecipeId,
+                    CoreProductionContent.FreshMuttonProductId),
+                Is.EqualTo(10));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.SlaughterSheepRecipeId,
+                    CoreProductionContent.RawHideProductId),
+                Is.EqualTo(4));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.SlaughterSheepRecipeId,
+                    CoreProductionContent.RawHornProductId),
+                Is.EqualTo(2));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.VegetableTanHideRecipeId,
+                    CoreProductionContent.LeatherMaterialProductId),
+                Is.EqualTo(4));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.FinishHornRecipeId,
+                    CoreProductionContent.HornMaterialProductId),
+                Is.EqualTo(1));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.MakeWoodenShieldRecipeId,
+                    CoreProductionContent.WoodenShieldProductId),
+                Is.EqualTo(1));
+            Assert.That(QuantityFromRecipe(
+                    world,
+                    CoreProductionContent.MakeHornBowRecipeId,
+                    CoreProductionContent.HornBowProductId),
+                Is.EqualTo(1));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void LivestockProduction_InvalidManagerDoesNotMutateWorld()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new LivestockProductionSystem().CreateSlaughterOrder(
+                    world,
+                    "person.zhang_shiping",
+                    ProductionControlMode.DirectAssignment,
+                    1));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void LivestockProduction_SameCommandsProduceSameSnapshot()
+        {
+            var first = PrototypeWorldFactory.Create184World(184);
+            var second = PrototypeWorldFactory.Create184World(184);
+
+            ExecutePrototypeLivestockChain(first);
+            ExecutePrototypeLivestockChain(second);
+
+            Assert.That(WorldSnapshotSerializer.Serialize(first),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(second)));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixteenWithoutFabricatingLivestock()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            RemoveM23P3Prototype(world);
+            world.Validate();
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 16");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ProductBatches.Exists(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.LiveSheepProductId), Is.False);
+            Assert.That(loaded.ResourceBodies.Exists(item =>
+                item.OutputProductDefinitionId ==
+                    CoreProductionContent.PastureFodderProductId), Is.False);
+            Assert.That(loaded.ProductionSites.Exists(item =>
+                item.Id == LivestockProductionSystem.PrototypePastureSiteId),
+                Is.False);
             loaded.Validate();
         }
 
@@ -6426,7 +6562,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 13");
+                .Replace("\"SchemaVersion\": 17", "\"SchemaVersion\": 13");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6536,6 +6672,144 @@ namespace Mandate.Tests
                 2);
             world.AbsoluteDay = spears.FinishDay;
             processing.ResolveDueOrders(world);
+        }
+
+        private static void ExecutePrototypeLivestockChain(WorldState world)
+        {
+            RemoveOpeningProduct(
+                world, CoreProductionContent.LeatherMaterialProductId);
+            RemoveOpeningProduct(
+                world, CoreProductionContent.HornMaterialProductId);
+            world.Validate();
+            var extraction = new UpstreamResourceProductionSystem();
+            var fodder = extraction.CreateOrder(
+                world,
+                UpstreamResourceProductionSystem.PrototypePastureForageBodyId,
+                UpstreamResourceProductionSystem.PrototypePastureForageSiteId,
+                "person.zhang_shiping",
+                new[] { "person.zhang_shiping" },
+                ProductionControlMode.WorkOrder,
+                20);
+            var bark = extraction.CreateOrder(
+                world,
+                UpstreamResourceProductionSystem.PrototypeTanningBarkBodyId,
+                UpstreamResourceProductionSystem.PrototypeBarkHarvestingSiteId,
+                "person.su_shuang",
+                new[] { "person.su_shuang" },
+                ProductionControlMode.WorkOrder,
+                2);
+            world.AbsoluteDay = Math.Max(fodder.FinishDay, bark.FinishDay);
+            extraction.ResolveDueOrders(world);
+
+            var livestock = new LivestockProductionSystem();
+            var processing = new ProcessingProductionSystem();
+            var husbandry = livestock.CreateHusbandryOrder(
+                world,
+                "person.zhang_shiping",
+                ProductionControlMode.TargetInstruction,
+                1);
+            world.AbsoluteDay = husbandry.FinishDay - 1;
+            processing.ResolveDueOrders(world);
+            Assert.That(husbandry.Status,
+                Is.EqualTo(ProductionOrderStatus.Active));
+            world.AbsoluteDay = husbandry.FinishDay;
+            processing.ResolveDueOrders(world);
+
+            var slaughter = livestock.CreateSlaughterOrder(
+                world,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                2);
+            world.AbsoluteDay = slaughter.FinishDay;
+            processing.ResolveDueOrders(world);
+            var tanning = livestock.CreateTanningOrder(
+                world,
+                "person.zhang_shiping",
+                ProductionControlMode.WorkOrder,
+                2);
+            var horn = livestock.CreateHornFinishingOrder(
+                world,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                1);
+            world.AbsoluteDay = Math.Max(tanning.FinishDay, horn.FinishDay);
+            processing.ResolveDueOrders(world);
+
+            var shield = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.MakeWoodenShieldRecipeId,
+                CoreProductionContent.WoodworkingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                1);
+            var bow = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.MakeHornBowRecipeId,
+                CoreProductionContent.BowmakingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                1);
+            world.AbsoluteDay = Math.Max(shield.FinishDay, bow.FinishDay);
+            processing.ResolveDueOrders(world);
+            world.Validate();
+        }
+
+        private static long QuantityFromRecipe(
+            WorldState world,
+            string recipeId,
+            string productDefinitionId)
+        {
+            var order = world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId == recipeId);
+            Assert.That(order, Is.Not.Null);
+            long quantity = 0;
+            var transaction = world.InventoryTransactions.Find(item =>
+                item.SourceWorkOrderId == order.Id &&
+                item.Type == InventoryTransactionType.RecipeSettled);
+            Assert.That(transaction, Is.Not.Null);
+            for (var i = 0; i < transaction.Lines.Count; i++)
+            {
+                var line = transaction.Lines[i];
+                if (line.ProductDefinitionId == productDefinitionId &&
+                    line.QuantityDelta > 0)
+                {
+                    quantity += line.QuantityDelta;
+                }
+            }
+
+            return quantity;
+        }
+
+        private static void RemoveM23P3Prototype(WorldState world)
+        {
+            world.ResourceBodies.RemoveAll(item =>
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypePastureForageBodyId ||
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypeTanningBarkBodyId);
+            world.ProductionSites.RemoveAll(item =>
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypePastureForageSiteId ||
+                item.Id ==
+                    UpstreamResourceProductionSystem.PrototypeBarkHarvestingSiteId ||
+                item.Id == LivestockProductionSystem.PrototypePastureSiteId ||
+                item.Id == LivestockProductionSystem.PrototypeSlaughterYardSiteId ||
+                item.Id == LivestockProductionSystem.PrototypeTannerySiteId ||
+                item.Id == LivestockProductionSystem.PrototypeHornWorkshopSiteId);
+            var flock = world.ProductBatches.Find(item =>
+                item.Id == LivestockProductionSystem.PrototypeOpeningFlockBatchId);
+            if (flock != null)
+            {
+                world.ProductBatches.Remove(flock);
+                world.InventoryTransactions.RemoveAll(item =>
+                    item.Id == flock.SourceTransactionId);
+            }
         }
 
         private static void RemoveOpeningProduct(

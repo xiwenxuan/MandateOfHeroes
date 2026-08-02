@@ -1032,6 +1032,19 @@ namespace Mandate.Domain
         public const string CharcoalProductId = "product.material.charcoal";
         public const string WoodAshProductId = "product.byproduct.wood_ash";
         public const string SlagProductId = "product.byproduct.smelting_slag";
+        public const string PastureFodderProductId =
+            "product.fodder.pasture_grass";
+        public const string LiveSheepProductId = "product.livestock.sheep";
+        public const string FreshMuttonProductId = "product.food.fresh_mutton";
+        public const string RawHideProductId = "product.raw.sheep_hide";
+        public const string RawHornProductId = "product.raw.sheep_horn";
+        public const string AnimalBoneProductId = "product.byproduct.animal_bone";
+        public const string OffalProductId = "product.food.offal";
+        public const string TanningBarkProductId = "product.raw.tanning_bark";
+        public const string TanningWasteProductId =
+            "product.byproduct.tanning_waste";
+        public const string HornScrapProductId =
+            "product.byproduct.horn_scrap";
         public const string RingSwordProductId =
             "product.equipment.han_ring_sword";
         public const string WoodenShieldProductId =
@@ -1065,6 +1078,14 @@ namespace Mandate.Domain
             "recipe.primary_processing.burn_charcoal";
         public const string SmeltBloomeryIronRecipeId =
             "recipe.primary_processing.smelt_bloomery_iron";
+        public const string BreedSheepRecipeId =
+            "recipe.livestock.breed_sheep";
+        public const string SlaughterSheepRecipeId =
+            "recipe.livestock.slaughter_sheep";
+        public const string VegetableTanHideRecipeId =
+            "recipe.primary_processing.vegetable_tan_hide";
+        public const string FinishHornRecipeId =
+            "recipe.primary_processing.finish_horn";
         public const string PrototypeDrylandMethodId =
             "method.farming.prototype_dryland";
         public const string HandMillingMethodId =
@@ -1083,6 +1104,14 @@ namespace Mandate.Domain
             "method.primary_processing.earth_kiln_charcoal";
         public const string BloomerySmeltingMethodId =
             "method.primary_processing.bloomery_smelting";
+        public const string PastureBreedingMethodId =
+            "method.livestock.pasture_breeding";
+        public const string ManualSlaughterMethodId =
+            "method.livestock.manual_slaughter";
+        public const string VegetableTanningMethodId =
+            "method.primary_processing.vegetable_tanning";
+        public const string HornFinishingMethodId =
+            "method.primary_processing.horn_finishing";
         public const string BlacksmithFacilityTag =
             "facility.blacksmith_workshop";
         public const string WoodworkingFacilityTag =
@@ -1099,6 +1128,17 @@ namespace Mandate.Domain
             "facility.primary_processing.charcoal_kiln";
         public const string BloomeryFacilityTag =
             "facility.primary_processing.bloomery";
+        public const string PastureForageFacilityTag =
+            "facility.resource_extraction.pasture_forage";
+        public const string BarkHarvestingFacilityTag =
+            "facility.resource_extraction.bark_harvesting";
+        public const string PastureFacilityTag = "facility.livestock.pasture";
+        public const string SlaughterYardFacilityTag =
+            "facility.livestock.slaughter_yard";
+        public const string TanneryFacilityTag =
+            "facility.primary_processing.tannery";
+        public const string HornWorkshopFacilityTag =
+            "facility.primary_processing.horn_workshop";
         public const string GrainUnitId = "unit.grain";
         public const string LaborDayUnitId = "unit.labor_day";
         public const string ItemUnitId = "unit.item";
@@ -1108,7 +1148,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "6.0.0",
+                Version = "7.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1213,6 +1253,36 @@ namespace Mandate.Domain
             AddMaterialProduct(package, CharcoalProductId, "木炭");
             AddByproduct(package, WoodAshProductId, "草木灰");
             AddByproduct(package, SlagProductId, "炉渣");
+            AddOpenProduct(
+                package, PastureFodderProductId, "牧草", 1, 900,
+                "product.fodder", "product.market", "product.livestock_input");
+            AddOpenProduct(
+                package, LiveSheepProductId, "活羊", 10, 0,
+                "product.livestock", "product.market", "product.living_asset");
+            AddOpenProduct(
+                package, FreshMuttonProductId, "鲜羊肉", 1, 2_500,
+                "product.food", "product.market", "product.perishable");
+            AddOpenProduct(
+                package, RawHideProductId, "生羊皮", 1, 1_500,
+                "product.raw", "product.market", "product.tanning_input");
+            AddOpenProduct(
+                package, RawHornProductId, "生羊角", 1, 0,
+                "product.raw", "product.market", "product.horn_input");
+            AddOpenProduct(
+                package, AnimalBoneProductId, "兽骨", 1, 0,
+                "product.byproduct", "product.material", "product.market");
+            AddOpenProduct(
+                package, OffalProductId, "下水", 1, 3_000,
+                "product.food", "product.byproduct", "product.perishable");
+            AddOpenProduct(
+                package, TanningBarkProductId, "鞣料树皮", 1, 0,
+                "product.raw", "product.market", "product.tanning_input");
+            AddOpenProduct(
+                package, TanningWasteProductId, "鞣制废料", 1, 0,
+                "product.byproduct", "product.waste");
+            AddOpenProduct(
+                package, HornScrapProductId, "角边料", 1, 0,
+                "product.byproduct", "product.material", "product.market");
             AddMilitaryEquipmentProduct(
                 package, RingSwordProductId, "环首刀", 3,
                 "product.equipment.melee");
@@ -1374,6 +1444,74 @@ namespace Mandate.Domain
                 2,
                 CharcoalProductId,
                 1);
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = BreedSheepRecipeId,
+                DisplayName = "牧场繁育羊群",
+                DurationDays = 30,
+                FacilityTags = new List<string> { PastureFacilityTag },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(LiveSheepProductId, 1),
+                    Quantity(PastureFodderProductId, 10)
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(LiveSheepProductId, 2)
+                }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = SlaughterSheepRecipeId,
+                DisplayName = "屠宰羊只",
+                DurationDays = 1,
+                FacilityTags = new List<string> { SlaughterYardFacilityTag },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(LiveSheepProductId, 1)
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(FreshMuttonProductId, 5),
+                    Quantity(RawHideProductId, 2),
+                    Quantity(RawHornProductId, 1),
+                    Quantity(AnimalBoneProductId, 1),
+                    Quantity(OffalProductId, 1)
+                }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = VegetableTanHideRecipeId,
+                DisplayName = "植物鞣制羊皮",
+                DurationDays = 7,
+                FacilityTags = new List<string> { TanneryFacilityTag },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(RawHideProductId, 2),
+                    Quantity(TanningBarkProductId, 1)
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(LeatherMaterialProductId, 2),
+                    Quantity(TanningWasteProductId, 1)
+                }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = FinishHornRecipeId,
+                DisplayName = "整理角料",
+                DurationDays = 3,
+                FacilityTags = new List<string> { HornWorkshopFacilityTag },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(RawHornProductId, 2)
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(HornMaterialProductId, 1),
+                    Quantity(HornScrapProductId, 1)
+                }
+            });
             package.Methods.Add(new ProductionMethodDefinition
             {
                 Id = PrototypeDrylandMethodId,
@@ -1425,6 +1563,18 @@ namespace Mandate.Domain
             AddManufacturingMethod(
                 package, BloomerySmeltingMethodId, "块炼炉冶炼",
                 SmeltBloomeryIronRecipeId);
+            AddManufacturingMethod(
+                package, PastureBreedingMethodId, "牧场繁育",
+                BreedSheepRecipeId);
+            AddManufacturingMethod(
+                package, ManualSlaughterMethodId, "手工屠宰",
+                SlaughterSheepRecipeId);
+            AddManufacturingMethod(
+                package, VegetableTanningMethodId, "植物鞣革",
+                VegetableTanHideRecipeId);
+            AddManufacturingMethod(
+                package, HornFinishingMethodId, "角料整理",
+                FinishHornRecipeId);
             package.Skills.Add(new SkillDefinition
             {
                 Id = CoreSkillIds.Agriculture,
@@ -1541,6 +1691,36 @@ namespace Mandate.Domain
                     "product.market"
                 }
             });
+        }
+
+        private static void AddOpenProduct(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            int baseWeight,
+            int perishabilityBasisPoints,
+            params string[] categoryTags)
+        {
+            package.Products.Add(new ProductDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                UnitId = ItemUnitId,
+                BaseWeight = baseWeight,
+                PerishabilityBasisPoints = perishabilityBasisPoints,
+                CategoryTags = new List<string>(categoryTags)
+            });
+        }
+
+        private static ProductionQuantityDefinition Quantity(
+            string productDefinitionId,
+            long quantity)
+        {
+            return new ProductionQuantityDefinition
+            {
+                ProductDefinitionId = productDefinitionId,
+                QuantityPerLandUnit = quantity
+            };
         }
 
         private static void AddPrimaryProcessingRecipe(

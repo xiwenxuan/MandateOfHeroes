@@ -10,6 +10,10 @@ namespace Mandate.Simulation
             "resource_body.zhongshan.iron_vein.001";
         public const string PrototypeForestBodyId =
             "resource_body.zhongshan.forest_stand.001";
+        public const string PrototypePastureForageBodyId =
+            "resource_body.zhongshan.pasture_forage.001";
+        public const string PrototypeTanningBarkBodyId =
+            "resource_body.zhongshan.tanning_bark.001";
         public const string PrototypeIronMineSiteId =
             "production_site.zhongshan_merchants.iron_mine";
         public const string PrototypeLoggingSiteId =
@@ -18,6 +22,10 @@ namespace Mandate.Simulation
             "production_site.zhongshan_merchants.charcoal_kiln";
         public const string PrototypeBloomerySiteId =
             "production_site.zhongshan_merchants.bloomery";
+        public const string PrototypePastureForageSiteId =
+            "production_site.zhongshan_merchants.pasture_forage";
+        public const string PrototypeBarkHarvestingSiteId =
+            "production_site.zhongshan_merchants.bark_harvesting";
 
         private const string MerchantOrganizationId =
             "organization.zhongshan_merchants";
@@ -77,6 +85,38 @@ namespace Mandate.Simulation
                 QualityBasisPoints = 8_000,
                 ExtractionDifficultyBasisPoints = 9_000
             });
+            world.ResourceBodies.Add(new ResourceBodyState
+            {
+                Id = PrototypePastureForageBodyId,
+                ResourceKindId = "resource_kind.northern_pasture_forage",
+                OutputProductDefinitionId =
+                    CoreProductionContent.PastureFodderProductId,
+                LocationId = ZhongshanLocationId,
+                Provenance = "historical_inference",
+                GenerationRuleVersion = "resource_rules.prototype.1",
+                RequiredFacilityTag =
+                    CoreProductionContent.PastureForageFacilityTag,
+                InitialQuantity = 40_000,
+                RemainingQuantity = 40_000,
+                QualityBasisPoints = 7_800,
+                ExtractionDifficultyBasisPoints = 7_000
+            });
+            world.ResourceBodies.Add(new ResourceBodyState
+            {
+                Id = PrototypeTanningBarkBodyId,
+                ResourceKindId = "resource_kind.tannin_bark_stand",
+                OutputProductDefinitionId =
+                    CoreProductionContent.TanningBarkProductId,
+                LocationId = ZhongshanLocationId,
+                Provenance = "historical_inference",
+                GenerationRuleVersion = "resource_rules.prototype.1",
+                RequiredFacilityTag =
+                    CoreProductionContent.BarkHarvestingFacilityTag,
+                InitialQuantity = 8_000,
+                RemainingQuantity = 8_000,
+                QualityBasisPoints = 7_600,
+                ExtractionDifficultyBasisPoints = 8_000
+            });
             AddSite(
                 world,
                 PrototypeIronMineSiteId,
@@ -101,6 +141,18 @@ namespace Mandate.Simulation
                 "production_site_kind.bloomery",
                 "person.su_shuang",
                 CoreProductionContent.BloomeryFacilityTag);
+            AddSite(
+                world,
+                PrototypePastureForageSiteId,
+                "production_site_kind.pasture_forage",
+                "person.zhang_shiping",
+                CoreProductionContent.PastureForageFacilityTag);
+            AddSite(
+                world,
+                PrototypeBarkHarvestingSiteId,
+                "production_site_kind.bark_harvesting",
+                "person.su_shuang",
+                CoreProductionContent.BarkHarvestingFacilityTag);
         }
 
         public ResourceExtractionOrderState CreateOrder(

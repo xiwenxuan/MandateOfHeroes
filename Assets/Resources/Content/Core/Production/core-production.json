@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "6.0.0",
+  "Version": "7.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -94,7 +94,11 @@
       "Id": "product.material.iron",
       "DisplayName": "铁料",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -102,7 +106,11 @@
       "Id": "product.material.timber",
       "DisplayName": "木料",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -110,7 +118,11 @@
       "Id": "product.material.leather",
       "DisplayName": "皮革",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -118,7 +130,11 @@
       "Id": "product.material.horn",
       "DisplayName": "角料",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -126,7 +142,11 @@
       "Id": "product.raw.iron_ore",
       "DisplayName": "铁矿石",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -134,7 +154,11 @@
       "Id": "product.material.charcoal",
       "DisplayName": "木炭",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "CategoryTags": [
+        "product.material",
+        "product.market",
+        "product.manufacturing_input"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -142,7 +166,11 @@
       "Id": "product.byproduct.wood_ash",
       "DisplayName": "草木灰",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.byproduct", "product.material", "product.market"],
+      "CategoryTags": [
+        "product.byproduct",
+        "product.material",
+        "product.market"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -150,7 +178,130 @@
       "Id": "product.byproduct.smelting_slag",
       "DisplayName": "炉渣",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.byproduct", "product.material", "product.market"],
+      "CategoryTags": [
+        "product.byproduct",
+        "product.material",
+        "product.market"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.fodder.pasture_grass",
+      "DisplayName": "牧草",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.fodder",
+        "product.market",
+        "product.livestock_input"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 900
+    },
+    {
+      "Id": "product.livestock.sheep",
+      "DisplayName": "活羊",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.livestock",
+        "product.market",
+        "product.living_asset"
+      ],
+      "BaseWeight": 10,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.food.fresh_mutton",
+      "DisplayName": "鲜羊肉",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.food",
+        "product.market",
+        "product.perishable"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 2500
+    },
+    {
+      "Id": "product.raw.sheep_hide",
+      "DisplayName": "生羊皮",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.raw",
+        "product.market",
+        "product.tanning_input"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 1500
+    },
+    {
+      "Id": "product.raw.sheep_horn",
+      "DisplayName": "生羊角",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.raw",
+        "product.market",
+        "product.horn_input"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.byproduct.animal_bone",
+      "DisplayName": "兽骨",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.byproduct",
+        "product.material",
+        "product.market"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.food.offal",
+      "DisplayName": "下水",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.food",
+        "product.byproduct",
+        "product.perishable"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 3000
+    },
+    {
+      "Id": "product.raw.tanning_bark",
+      "DisplayName": "鞣料树皮",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.raw",
+        "product.market",
+        "product.tanning_input"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.byproduct.tanning_waste",
+      "DisplayName": "鞣制废料",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.byproduct",
+        "product.waste"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.byproduct.horn_scrap",
+      "DisplayName": "角边料",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.byproduct",
+        "product.material",
+        "product.market"
+      ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -158,7 +309,12 @@
       "Id": "product.equipment.han_ring_sword",
       "DisplayName": "环首刀",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.melee"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.melee"
+      ],
       "BaseWeight": 3,
       "PerishabilityBasisPoints": 0
     },
@@ -166,7 +322,12 @@
       "Id": "product.equipment.wooden_shield",
       "DisplayName": "木盾",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.shield"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.shield"
+      ],
       "BaseWeight": 5,
       "PerishabilityBasisPoints": 0
     },
@@ -174,7 +335,12 @@
       "Id": "product.equipment.long_spear",
       "DisplayName": "长矛",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.melee"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.melee"
+      ],
       "BaseWeight": 5,
       "PerishabilityBasisPoints": 0
     },
@@ -182,7 +348,12 @@
       "Id": "product.equipment.horn_bow",
       "DisplayName": "角弓",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.ranged"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.ranged"
+      ],
       "BaseWeight": 2,
       "PerishabilityBasisPoints": 0
     },
@@ -190,7 +361,12 @@
       "Id": "product.equipment.arrow_bundle",
       "DisplayName": "箭束",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.ammunition"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.ammunition"
+      ],
       "BaseWeight": 2,
       "PerishabilityBasisPoints": 0
     },
@@ -198,7 +374,12 @@
       "Id": "product.equipment.lamellar_armor",
       "DisplayName": "札甲",
       "UnitId": "unit.item",
-      "CategoryTags": ["product.equipment", "product.market", "product.military_supply", "product.equipment.armor"],
+      "CategoryTags": [
+        "product.equipment",
+        "product.market",
+        "product.military_supply",
+        "product.equipment.armor"
+      ],
       "BaseWeight": 10,
       "PerishabilityBasisPoints": 0
     }
@@ -276,13 +457,24 @@
       "DisplayName": "锻造环首刀",
       "CropDefinitionId": null,
       "DurationDays": 6,
-      "FacilityTags": ["facility.blacksmith_workshop"],
+      "FacilityTags": [
+        "facility.blacksmith_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.material.iron",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 1
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.han_ring_sword", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.han_ring_sword",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -290,13 +482,24 @@
       "DisplayName": "制作木盾",
       "CropDefinitionId": null,
       "DurationDays": 4,
-      "FacilityTags": ["facility.woodworking_workshop"],
+      "FacilityTags": [
+        "facility.woodworking_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 4},
-        {"ProductDefinitionId": "product.material.leather", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 4
+        },
+        {
+          "ProductDefinitionId": "product.material.leather",
+          "QuantityPerLandUnit": 1
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.wooden_shield", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.wooden_shield",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -304,13 +507,24 @@
       "DisplayName": "锻造长矛",
       "CropDefinitionId": null,
       "DurationDays": 5,
-      "FacilityTags": ["facility.blacksmith_workshop"],
+      "FacilityTags": [
+        "facility.blacksmith_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 3}
+        {
+          "ProductDefinitionId": "product.material.iron",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 3
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.long_spear", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.long_spear",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -318,13 +532,24 @@
       "DisplayName": "制作角弓",
       "CropDefinitionId": null,
       "DurationDays": 7,
-      "FacilityTags": ["facility.bowmaking_workshop"],
+      "FacilityTags": [
+        "facility.bowmaking_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1},
-        {"ProductDefinitionId": "product.material.horn", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.material.horn",
+          "QuantityPerLandUnit": 1
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.horn_bow", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.horn_bow",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -332,13 +557,24 @@
       "DisplayName": "制作箭束",
       "CropDefinitionId": null,
       "DurationDays": 2,
-      "FacilityTags": ["facility.woodworking_workshop"],
+      "FacilityTags": [
+        "facility.woodworking_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1},
-        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.material.iron",
+          "QuantityPerLandUnit": 1
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.arrow_bundle", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.arrow_bundle",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -346,13 +582,24 @@
       "DisplayName": "制作札甲",
       "CropDefinitionId": null,
       "DurationDays": 12,
-      "FacilityTags": ["facility.armoring_workshop"],
+      "FacilityTags": [
+        "facility.armoring_workshop"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 8},
-        {"ProductDefinitionId": "product.material.leather", "QuantityPerLandUnit": 2}
+        {
+          "ProductDefinitionId": "product.material.iron",
+          "QuantityPerLandUnit": 8
+        },
+        {
+          "ProductDefinitionId": "product.material.leather",
+          "QuantityPerLandUnit": 2
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.equipment.lamellar_armor", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.equipment.lamellar_armor",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -360,13 +607,24 @@
       "DisplayName": "烧制木炭",
       "CropDefinitionId": null,
       "DurationDays": 3,
-      "FacilityTags": ["facility.primary_processing.charcoal_kiln"],
+      "FacilityTags": [
+        "facility.primary_processing.charcoal_kiln"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 2}
+        {
+          "ProductDefinitionId": "product.material.timber",
+          "QuantityPerLandUnit": 2
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.material.charcoal", "QuantityPerLandUnit": 1},
-        {"ProductDefinitionId": "product.byproduct.wood_ash", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.material.charcoal",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.byproduct.wood_ash",
+          "QuantityPerLandUnit": 1
+        }
       ]
     },
     {
@@ -374,14 +632,144 @@
       "DisplayName": "块炼铁冶炼",
       "CropDefinitionId": null,
       "DurationDays": 5,
-      "FacilityTags": ["facility.primary_processing.bloomery"],
+      "FacilityTags": [
+        "facility.primary_processing.bloomery"
+      ],
       "Inputs": [
-        {"ProductDefinitionId": "product.raw.iron_ore", "QuantityPerLandUnit": 3},
-        {"ProductDefinitionId": "product.material.charcoal", "QuantityPerLandUnit": 1}
+        {
+          "ProductDefinitionId": "product.raw.iron_ore",
+          "QuantityPerLandUnit": 3
+        },
+        {
+          "ProductDefinitionId": "product.material.charcoal",
+          "QuantityPerLandUnit": 1
+        }
       ],
       "Outputs": [
-        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
-        {"ProductDefinitionId": "product.byproduct.smelting_slag", "QuantityPerLandUnit": 2}
+        {
+          "ProductDefinitionId": "product.material.iron",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.byproduct.smelting_slag",
+          "QuantityPerLandUnit": 2
+        }
+      ]
+    },
+    {
+      "Id": "recipe.livestock.breed_sheep",
+      "DisplayName": "牧场繁育羊群",
+      "CropDefinitionId": null,
+      "DurationDays": 30,
+      "FacilityTags": [
+        "facility.livestock.pasture"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.livestock.sheep",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.fodder.pasture_grass",
+          "QuantityPerLandUnit": 10
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.livestock.sheep",
+          "QuantityPerLandUnit": 2
+        }
+      ]
+    },
+    {
+      "Id": "recipe.livestock.slaughter_sheep",
+      "DisplayName": "屠宰羊只",
+      "CropDefinitionId": null,
+      "DurationDays": 1,
+      "FacilityTags": [
+        "facility.livestock.slaughter_yard"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.livestock.sheep",
+          "QuantityPerLandUnit": 1
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.food.fresh_mutton",
+          "QuantityPerLandUnit": 5
+        },
+        {
+          "ProductDefinitionId": "product.raw.sheep_hide",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.raw.sheep_horn",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.byproduct.animal_bone",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.food.offal",
+          "QuantityPerLandUnit": 1
+        }
+      ]
+    },
+    {
+      "Id": "recipe.primary_processing.vegetable_tan_hide",
+      "DisplayName": "植物鞣制羊皮",
+      "CropDefinitionId": null,
+      "DurationDays": 7,
+      "FacilityTags": [
+        "facility.primary_processing.tannery"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.raw.sheep_hide",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.raw.tanning_bark",
+          "QuantityPerLandUnit": 1
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.material.leather",
+          "QuantityPerLandUnit": 2
+        },
+        {
+          "ProductDefinitionId": "product.byproduct.tanning_waste",
+          "QuantityPerLandUnit": 1
+        }
+      ]
+    },
+    {
+      "Id": "recipe.primary_processing.finish_horn",
+      "DisplayName": "整理角料",
+      "CropDefinitionId": null,
+      "DurationDays": 3,
+      "FacilityTags": [
+        "facility.primary_processing.horn_workshop"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.raw.sheep_horn",
+          "QuantityPerLandUnit": 2
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.material.horn",
+          "QuantityPerLandUnit": 1
+        },
+        {
+          "ProductDefinitionId": "product.byproduct.horn_scrap",
+          "QuantityPerLandUnit": 1
+        }
       ]
     }
   ],
@@ -419,7 +807,10 @@
     {
       "Id": "method.manufacturing.blacksmithing",
       "DisplayName": "锻打",
-      "RecipeDefinitionIds": ["recipe.manufacturing.forge_ring_sword", "recipe.manufacturing.forge_long_spear"],
+      "RecipeDefinitionIds": [
+        "recipe.manufacturing.forge_ring_sword",
+        "recipe.manufacturing.forge_long_spear"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -427,7 +818,10 @@
     {
       "Id": "method.manufacturing.woodworking",
       "DisplayName": "木作",
-      "RecipeDefinitionIds": ["recipe.manufacturing.make_wooden_shield", "recipe.manufacturing.make_arrow_bundle"],
+      "RecipeDefinitionIds": [
+        "recipe.manufacturing.make_wooden_shield",
+        "recipe.manufacturing.make_arrow_bundle"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -435,7 +829,9 @@
     {
       "Id": "method.manufacturing.bowmaking",
       "DisplayName": "制弓",
-      "RecipeDefinitionIds": ["recipe.manufacturing.make_horn_bow"],
+      "RecipeDefinitionIds": [
+        "recipe.manufacturing.make_horn_bow"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -443,7 +839,9 @@
     {
       "Id": "method.manufacturing.armoring",
       "DisplayName": "制甲",
-      "RecipeDefinitionIds": ["recipe.manufacturing.make_lamellar_armor"],
+      "RecipeDefinitionIds": [
+        "recipe.manufacturing.make_lamellar_armor"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -451,7 +849,9 @@
     {
       "Id": "method.primary_processing.earth_kiln_charcoal",
       "DisplayName": "土窑烧炭",
-      "RecipeDefinitionIds": ["recipe.primary_processing.burn_charcoal"],
+      "RecipeDefinitionIds": [
+        "recipe.primary_processing.burn_charcoal"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"
@@ -459,7 +859,49 @@
     {
       "Id": "method.primary_processing.bloomery_smelting",
       "DisplayName": "块炼炉冶炼",
-      "RecipeDefinitionIds": ["recipe.primary_processing.smelt_bloomery_iron"],
+      "RecipeDefinitionIds": [
+        "recipe.primary_processing.smelt_bloomery_iron"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.livestock.pasture_breeding",
+      "DisplayName": "牧场繁育",
+      "RecipeDefinitionIds": [
+        "recipe.livestock.breed_sheep"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.livestock.manual_slaughter",
+      "DisplayName": "手工屠宰",
+      "RecipeDefinitionIds": [
+        "recipe.livestock.slaughter_sheep"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.primary_processing.vegetable_tanning",
+      "DisplayName": "植物鞣革",
+      "RecipeDefinitionIds": [
+        "recipe.primary_processing.vegetable_tan_hide"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.primary_processing.horn_finishing",
+      "DisplayName": "角料整理",
+      "RecipeDefinitionIds": [
+        "recipe.primary_processing.finish_horn"
+      ],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"

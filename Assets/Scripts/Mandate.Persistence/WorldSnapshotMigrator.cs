@@ -73,6 +73,9 @@ namespace Mandate.Persistence
                     case 15:
                         MigrateVersionFifteenToSixteen(world, content);
                         break;
+                    case 16:
+                        MigrateVersionSixteenToSeventeen(world, content);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -415,6 +418,14 @@ namespace Mandate.Persistence
                     ResourceExtractionLedgerEntryState>();
             world.ProductionContentManifest = productionContent.CreateManifest();
             world.SchemaVersion = 16;
+        }
+
+        private static void MigrateVersionSixteenToSeventeen(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.ProductionContentManifest = productionContent.CreateManifest();
+            world.SchemaVersion = 17;
         }
 
         private static void SetRepair(

@@ -33,7 +33,7 @@ namespace Mandate.Simulation
                 KindId = WorkshopContainerKindId,
                 OwnerOrganizationId = "organization.zhongshan_merchants",
                 LocationId = "location.zhongshan",
-                CapacityWeight = 1_000
+                CapacityWeight = 10_000
             });
             world.ProductionSites.Add(new ProductionSiteState
             {

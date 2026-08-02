@@ -77,6 +77,8 @@ namespace Mandate.Presentation
         private readonly UpstreamResourceProductionSystem
             _upstreamResourceProductionSystem =
                 new UpstreamResourceProductionSystem();
+        private readonly LivestockProductionSystem _livestockProductionSystem =
+            new LivestockProductionSystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2958,6 +2960,147 @@ namespace Mandate.Presentation
                     _world,
                     Math.Max(1, (int)(finishDay - _world.AbsoluteDay)));
                 _message = "已按世界时间推进并结算资源采集。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            var fodderExtraction = _world.ResourceExtractionOrders.Find(item =>
+                item.ResourceBodyId == UpstreamResourceProductionSystem
+                    .PrototypePastureForageBodyId &&
+                item.Status == ProductionOrderStatus.Active);
+            var barkExtraction = _world.ResourceExtractionOrders.Find(item =>
+                item.ResourceBodyId == UpstreamResourceProductionSystem
+                    .PrototypeTanningBarkBodyId &&
+                item.Status == ProductionOrderStatus.Active);
+            var husbandryOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.BreedSheepRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            var slaughterOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.SlaughterSheepRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            var tanningOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.VegetableTanHideRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            var hornOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.FinishHornRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            GUILayout.Label(
+                $"畜牧链：活羊{AvailableProductQuantity(CoreProductionContent.LiveSheepProductId)}，" +
+                $"牧草{AvailableProductQuantity(CoreProductionContent.PastureFodderProductId)}，" +
+                $"生皮{AvailableProductQuantity(CoreProductionContent.RawHideProductId)}，" +
+                $"生角{AvailableProductQuantity(CoreProductionContent.RawHornProductId)}，" +
+                $"皮革{AvailableProductQuantity(CoreProductionContent.LeatherMaterialProductId)}，" +
+                $"角料{AvailableProductQuantity(CoreProductionContent.HornMaterialProductId)}",
+                _normalStyle);
+            GUILayout.BeginHorizontal();
+            GUI.enabled = fodderExtraction == null && barkExtraction == null;
+            if (GUILayout.Button("采集牧草与鞣料", GUILayout.Width(170)))
+            {
+                fodderExtraction = _upstreamResourceProductionSystem.CreateOrder(
+                    _world,
+                    UpstreamResourceProductionSystem.PrototypePastureForageBodyId,
+                    UpstreamResourceProductionSystem.PrototypePastureForageSiteId,
+                    "person.zhang_shiping",
+                    new[] { "person.zhang_shiping" },
+                    ProductionControlMode.WorkOrder,
+                    20);
+                barkExtraction = _upstreamResourceProductionSystem.CreateOrder(
+                    _world,
+                    UpstreamResourceProductionSystem.PrototypeTanningBarkBodyId,
+                    UpstreamResourceProductionSystem.PrototypeBarkHarvestingSiteId,
+                    "person.su_shuang",
+                    new[] { "person.su_shuang" },
+                    ProductionControlMode.WorkOrder,
+                    2);
+                _message = "已预留草料和鞣料资源，等待采集完成。";
+            }
+
+            GUI.enabled = husbandryOrder == null &&
+                AvailableProductQuantity(
+                    CoreProductionContent.LiveSheepProductId) >= 1 &&
+                AvailableProductQuantity(
+                    CoreProductionContent.PastureFodderProductId) >= 10;
+            if (GUILayout.Button("繁育1批羊", GUILayout.Width(140)))
+            {
+                husbandryOrder =
+                    _livestockProductionSystem.CreateHusbandryOrder(
+                        _world,
+                        "person.zhang_shiping",
+                        ProductionControlMode.TargetInstruction,
+                        1);
+                _message = $"繁育订单{husbandryOrder.Id}已预留种羊和牧草。";
+            }
+
+            GUI.enabled = slaughterOrder == null &&
+                AvailableProductQuantity(
+                    CoreProductionContent.LiveSheepProductId) >= 2;
+            if (GUILayout.Button("屠宰2只羊", GUILayout.Width(140)))
+            {
+                slaughterOrder =
+                    _livestockProductionSystem.CreateSlaughterOrder(
+                        _world,
+                        "person.su_shuang",
+                        ProductionControlMode.WorkOrder,
+                        2);
+                _message = $"屠宰订单{slaughterOrder.Id}已预留两只羊。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUI.enabled = tanningOrder == null &&
+                AvailableProductQuantity(CoreProductionContent.RawHideProductId) >=
+                    4 &&
+                AvailableProductQuantity(
+                    CoreProductionContent.TanningBarkProductId) >= 2;
+            if (GUILayout.Button("鞣制2批皮革", GUILayout.Width(160)))
+            {
+                tanningOrder = _livestockProductionSystem.CreateTanningOrder(
+                    _world,
+                    "person.zhang_shiping",
+                    ProductionControlMode.WorkOrder,
+                    2);
+                _message = $"制革订单{tanningOrder.Id}已预留生皮与鞣料。";
+            }
+
+            GUI.enabled = hornOrder == null &&
+                AvailableProductQuantity(CoreProductionContent.RawHornProductId) >=
+                    2;
+            if (GUILayout.Button("整理1批角料", GUILayout.Width(160)))
+            {
+                hornOrder =
+                    _livestockProductionSystem.CreateHornFinishingOrder(
+                        _world,
+                        "person.su_shuang",
+                        ProductionControlMode.WorkOrder,
+                        1);
+                _message = $"角料订单{hornOrder.Id}已预留生角。";
+            }
+
+            var livestockFinishDay = Math.Max(
+                Math.Max(
+                    fodderExtraction?.FinishDay ?? _world.AbsoluteDay,
+                    barkExtraction?.FinishDay ?? _world.AbsoluteDay),
+                Math.Max(
+                    Math.Max(
+                        husbandryOrder?.FinishDay ?? _world.AbsoluteDay,
+                        slaughterOrder?.FinishDay ?? _world.AbsoluteDay),
+                    Math.Max(
+                        tanningOrder?.FinishDay ?? _world.AbsoluteDay,
+                        hornOrder?.FinishDay ?? _world.AbsoluteDay)));
+            GUI.enabled = livestockFinishDay > _world.AbsoluteDay;
+            if (GUILayout.Button("推进畜牧工单完成", GUILayout.Width(180)))
+            {
+                _simulator.AdvanceDays(
+                    _world,
+                    Math.Max(
+                        1,
+                        (int)(livestockFinishDay - _world.AbsoluteDay)));
+                _message = "已按世界时间推进并结算当前畜牧链工单。";
             }
 
             GUI.enabled = true;
