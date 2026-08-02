@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 11;
+        public const int CurrentSchemaVersion = 12;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -160,6 +160,14 @@ namespace Mandate.Domain
         public List<OrganizationState> Organizations = new List<OrganizationState>();
         public List<PositionState> Positions = new List<PositionState>();
         public List<MembershipState> Memberships = new List<MembershipState>();
+        public List<CountyGovernanceState> CountyGovernances =
+            new List<CountyGovernanceState>();
+        public List<CountyGentryHouseState> CountyGentryHouses =
+            new List<CountyGentryHouseState>();
+        public List<CountyHouseholdTaxState> CountyHouseholdTaxes =
+            new List<CountyHouseholdTaxState>();
+        public List<CountyFiscalLedgerEntryState> CountyFiscalLedgerEntries =
+            new List<CountyFiscalLedgerEntryState>();
         public List<TaskDefinitionState> TaskDefinitions = new List<TaskDefinitionState>();
         public List<TaskInstanceState> Tasks = new List<TaskInstanceState>();
         public List<HistoricalEventDefinitionState> HistoricalEventDefinitions =
@@ -285,6 +293,16 @@ namespace Mandate.Domain
             ValidateUniqueIds(Organizations, organization => organization.Id, "organization");
             ValidateUniqueIds(Positions, position => position.Id, "position");
             ValidateUniqueIds(Memberships, membership => membership.Id, "membership");
+            ValidateUniqueIds(
+                CountyGovernances, item => item.Id, "county governance");
+            ValidateUniqueIds(
+                CountyGentryHouses, item => item.Id, "county gentry house");
+            ValidateUniqueIds(
+                CountyHouseholdTaxes, item => item.Id, "county household tax");
+            ValidateUniqueIds(
+                CountyFiscalLedgerEntries,
+                item => item.Id,
+                "county fiscal ledger entry");
             ValidateUniqueIds(TaskDefinitions, task => task.Id, "task definition");
             ValidateUniqueIds(Tasks, task => task.Id, "task");
             ValidateUniqueIds(
@@ -762,7 +780,8 @@ namespace Mandate.Domain
                 var organization = Organizations[i];
                 _ = new StableId(organization.Id);
                 organizationIds.Add(organization.Id);
-                if (!locationIds.Contains(organization.HeadquartersLocationId))
+                if (!locationIds.Contains(organization.HeadquartersLocationId) ||
+                    organization.Treasury < 0)
                 {
                     throw new InvalidOperationException(
                         $"Organization {organization.Id} has no valid headquarters.");
@@ -780,6 +799,8 @@ namespace Mandate.Domain
                     organization.Id,
                     "organization reputation");
             }
+
+            ValidateCountyGovernance(locationIds, organizationIds);
 
             var positionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Positions.Count; i++)
@@ -2233,6 +2254,238 @@ namespace Mandate.Domain
                 }
 
             }
+        }
+
+        private void ValidateCountyGovernance(
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds)
+        {
+            var governanceIds = new HashSet<string>(StringComparer.Ordinal);
+            var governedLocations = new HashSet<string>(StringComparer.Ordinal);
+            var governmentOrganizations = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < CountyGovernances.Count; i++)
+            {
+                var governance = CountyGovernances[i] ??
+                    throw new InvalidOperationException(
+                        "A county governance cannot be null.");
+                _ = new StableId(governance.Id);
+                governanceIds.Add(governance.Id);
+                if (!locationIds.Contains(governance.CountyLocationId) ||
+                    !LocationHasKind(
+                        governance.CountyLocationId,
+                        LocationKind.CountySeat) ||
+                    !organizationIds.Contains(
+                        governance.GovernmentOrganizationId) ||
+                    !FamilyExists(Families, governance.AdministratorFamilyId) ||
+                    !FamilyBelongsToCounty(
+                        governance.AdministratorFamilyId,
+                        governance.CountyLocationId) ||
+                    !governedLocations.Add(governance.CountyLocationId) ||
+                    !governmentOrganizations.Add(
+                        governance.GovernmentOrganizationId) ||
+                    governance.AnnualCashTaxRateBasisPoints < 0 ||
+                    governance.AnnualCashTaxRateBasisPoints > 10_000 ||
+                    governance.LocalGrainRetentionBasisPoints < 0 ||
+                    governance.LocalGrainRetentionBasisPoints > 10_000 ||
+                    governance.RegistrationCoverageBasisPoints < 0 ||
+                    governance.RegistrationCoverageBasisPoints > 10_000 ||
+                    governance.AdministrativeEfficiencyBasisPoints < 0 ||
+                    governance.AdministrativeEfficiencyBasisPoints > 10_000 ||
+                    governance.GentryInfluenceBasisPoints < 0 ||
+                    governance.GentryInfluenceBasisPoints > 10_000 ||
+                    governance.LastMarketPressureBasisPoints < 0 ||
+                    governance.LastMarketPressureBasisPoints > 20_000 ||
+                    governance.CountyGranaryGrain < 0 ||
+                    governance.TotalMoneyTaxCollected < 0 ||
+                    governance.TotalGrainTaxReceived < 0 ||
+                    governance.TotalAdministrationPaid < 0 ||
+                    governance.TotalReliefGrain < 0 ||
+                    governance.LastPublicOrderChange < -10_000 ||
+                    governance.LastPublicOrderChange > 10_000 ||
+                    governance.LastSettlementDay < -1 ||
+                    governance.NextSettlementDay < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid county governance {governance.Id}.");
+                }
+
+                OrganizationState organization = null;
+                for (var organizationIndex = 0;
+                     organizationIndex < Organizations.Count;
+                     organizationIndex++)
+                {
+                    if (Organizations[organizationIndex].Id ==
+                        governance.GovernmentOrganizationId)
+                    {
+                        organization = Organizations[organizationIndex];
+                        break;
+                    }
+                }
+
+                if (organization == null ||
+                    organization.Type != OrganizationType.Government ||
+                    organization.HeadquartersLocationId !=
+                    governance.CountyLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"County governance {governance.Id} lacks government.");
+                }
+            }
+
+            var gentryKeys = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < CountyGentryHouses.Count; i++)
+            {
+                var gentry = CountyGentryHouses[i] ??
+                    throw new InvalidOperationException(
+                        "A county gentry house cannot be null.");
+                _ = new StableId(gentry.Id);
+                if (!governanceIds.Contains(gentry.CountyGovernanceId) ||
+                    !FamilyExists(Families, gentry.FamilyId) ||
+                    !FamilyBelongsToGovernance(
+                        governanceIds,
+                        gentry.CountyGovernanceId,
+                        gentry.FamilyId) ||
+                    !gentryKeys.Add(
+                        gentry.CountyGovernanceId + "|" + gentry.FamilyId) ||
+                    gentry.InfluenceBasisPoints < 0 ||
+                    gentry.InfluenceBasisPoints > 10_000 ||
+                    gentry.TaxComplianceBasisPoints < 0 ||
+                    gentry.TaxComplianceBasisPoints > 10_000 ||
+                    gentry.TotalAssessmentReductionMoney < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid county gentry house {gentry.Id}.");
+                }
+            }
+
+            var taxKeys = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < CountyHouseholdTaxes.Count; i++)
+            {
+                var tax = CountyHouseholdTaxes[i] ??
+                    throw new InvalidOperationException(
+                        "A county household tax cannot be null.");
+                _ = new StableId(tax.Id);
+                if (!governanceIds.Contains(tax.CountyGovernanceId) ||
+                    !FamilyExists(Families, tax.FamilyId) ||
+                    !FamilyBelongsToGovernance(
+                        governanceIds,
+                        tax.CountyGovernanceId,
+                        tax.FamilyId) ||
+                    !taxKeys.Add(
+                        tax.CountyGovernanceId + "|" + tax.FamilyId) ||
+                    tax.AssessedMoney < 0 ||
+                    tax.PaidMoney < 0 ||
+                    tax.ArrearsMoney < 0 ||
+                    tax.LastAssessmentDay < -1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid county household tax {tax.Id}.");
+                }
+            }
+
+            for (var i = 0; i < CountyFiscalLedgerEntries.Count; i++)
+            {
+                var entry = CountyFiscalLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A county fiscal ledger entry cannot be null.");
+                _ = new StableId(entry.Id);
+                if (!governanceIds.Contains(entry.CountyGovernanceId) ||
+                    !string.IsNullOrEmpty(entry.FamilyId) &&
+                    !FamilyExists(Families, entry.FamilyId) ||
+                    !string.IsNullOrEmpty(entry.VillageId) &&
+                    !VillageExists(entry.VillageId) ||
+                    !Enum.IsDefined(typeof(CountyFiscalEntryType), entry.Type) ||
+                    entry.Amount < 0 ||
+                    entry.FamilyMoneyDelta + entry.GovernmentMoneyDelta != 0 ||
+                    entry.VillageGrainDelta + entry.CountyGrainDelta != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid county fiscal ledger entry {entry.Id}.");
+                }
+            }
+        }
+
+        private bool VillageExists(string villageId)
+        {
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                if (Villages[i].Id == villageId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool LocationHasKind(string locationId, LocationKind kind)
+        {
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                if (Locations[i].Id == locationId)
+                {
+                    return Locations[i].Kind == kind;
+                }
+            }
+
+            return false;
+        }
+
+        private bool FamilyBelongsToGovernance(
+            HashSet<string> governanceIds,
+            string governanceId,
+            string familyId)
+        {
+            if (!governanceIds.Contains(governanceId))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < CountyGovernances.Count; i++)
+            {
+                if (CountyGovernances[i].Id == governanceId)
+                {
+                    return FamilyBelongsToCounty(
+                        familyId, CountyGovernances[i].CountyLocationId);
+                }
+            }
+
+            return false;
+        }
+
+        private bool FamilyBelongsToCounty(
+            string familyId,
+            string countyLocationId)
+        {
+            FamilyState family = null;
+            for (var i = 0; i < Families.Count; i++)
+            {
+                if (Families[i].Id == familyId)
+                {
+                    family = Families[i];
+                    break;
+                }
+            }
+
+            if (family == null)
+            {
+                return false;
+            }
+
+            if (family.LocationId == countyLocationId)
+            {
+                return true;
+            }
+
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                if (Villages[i].Id == family.VillageId)
+                {
+                    return Villages[i].ParentLocationId == countyLocationId;
+                }
+            }
+
+            return false;
         }
 
         private void ValidatePersonProgression(PersonState person)

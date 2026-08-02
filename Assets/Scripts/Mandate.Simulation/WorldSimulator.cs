@@ -19,6 +19,8 @@ namespace Mandate.Simulation
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
         private readonly ProcessingProductionSystem _processingSystem;
+        private readonly CountyGovernanceSystem _countyGovernanceSystem =
+            new CountyGovernanceSystem();
 
         public WorldSimulator(
             ulong masterSeed,
@@ -96,6 +98,7 @@ namespace Mandate.Simulation
             _villageLifeSystem.ResolveMonthly(world);
             _lifeSimulationSystem.ResolveMonthly(world);
             VillageLifeSystem.RefreshAllCaches(world, _personRepository);
+            _countyGovernanceSystem.ResolveMonthly(world);
             _educationSystem.ResolveDuePlans(world);
             _marketSimulationSystem.ResolveDailyPrices(world);
             var locations = new List<LocationState>(world.Locations);

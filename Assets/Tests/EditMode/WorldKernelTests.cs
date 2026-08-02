@@ -3505,7 +3505,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 11", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 12", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3528,7 +3528,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 11", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 12", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4160,7 +4160,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 11", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 12", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4187,7 +4187,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4424,7 +4424,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4456,7 +4456,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4735,7 +4735,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -4762,6 +4762,200 @@ namespace Mandate.Tests
                 Is.EqualTo(originalRelationships));
             Assert.That(loaded.PopulationStorage.Mode, Is.EqualTo(storageMode));
             loaded.Validate();
+        }
+
+        [Test]
+        public void CountyGovernance_AnnualSettlementMovesRealMoneyAndGrain()
+        {
+            var world = VillagePrototypeFactory.Create(300, 22_100);
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                world.Families[i].LastHarvestGrain = 100;
+            }
+            world.AbsoluteDay = 300;
+            new VillageLifeSystem(world.MasterSeed).ResolveMonthly(world);
+            VillageLifeSystem.RefreshAllCaches(world);
+            var governance = world.CountyGovernances[0];
+            var organization = world.Organizations.Find(
+                item => item.Id == governance.GovernmentOrganizationId);
+            var moneyBefore = organization.Treasury;
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                moneyBefore += world.Families[i].Wealth;
+            }
+
+            var grainBefore = governance.CountyGranaryGrain;
+            for (var i = 0; i < world.Villages.Count; i++)
+            {
+                grainBefore += world.Villages[i].PublicGranaryGrain;
+            }
+
+            new CountyGovernanceSystem().ResolveMonthly(world);
+
+            var moneyAfter = organization.Treasury;
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                moneyAfter += world.Families[i].Wealth;
+            }
+
+            var grainAfter = governance.CountyGranaryGrain;
+            for (var i = 0; i < world.Villages.Count; i++)
+            {
+                grainAfter += world.Villages[i].PublicGranaryGrain;
+            }
+
+            Assert.That(governance.TotalMoneyTaxCollected, Is.GreaterThan(0));
+            Assert.That(governance.TotalGrainTaxReceived, Is.GreaterThan(0));
+            Assert.That(world.CountyHouseholdTaxes.Count,
+                Is.EqualTo(world.Families.Count));
+            Assert.That(moneyAfter, Is.EqualTo(moneyBefore));
+            Assert.That(grainAfter, Is.EqualTo(grainBefore));
+            world.Validate();
+        }
+
+        [Test]
+        public void CountyGovernance_SameDaySettlementIsIdempotent()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_101);
+            world.AbsoluteDay = 30;
+            var system = new CountyGovernanceSystem();
+
+            system.ResolveMonthly(world);
+            var snapshot = WorldSnapshotSerializer.Serialize(world);
+            var ledgerCount = world.CountyFiscalLedgerEntries.Count;
+            system.ResolveMonthly(world);
+
+            Assert.That(world.CountyFiscalLedgerEntries.Count,
+                Is.EqualTo(ledgerCount));
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(snapshot));
+        }
+
+        [Test]
+        public void CountyGovernance_LowFoodMovesCountyReliefIntoVillage()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_102);
+            var governance = world.CountyGovernances[0];
+            var village = world.Villages[0];
+            village.FoodSecurityBasisPoints = 2_000;
+            governance.CountyGranaryGrain = 100;
+            var countyBefore = governance.CountyGranaryGrain;
+            var villageBefore = village.PublicGranaryGrain;
+            world.AbsoluteDay = 30;
+
+            new CountyGovernanceSystem().ResolveMonthly(world);
+
+            Assert.That(governance.TotalReliefGrain, Is.GreaterThan(0));
+            Assert.That(governance.CountyGranaryGrain,
+                Is.LessThan(countyBefore));
+            Assert.That(village.PublicGranaryGrain,
+                Is.GreaterThan(villageBefore));
+            Assert.That(
+                governance.CountyGranaryGrain + village.PublicGranaryGrain,
+                Is.EqualTo(countyBefore + villageBefore));
+            world.Validate();
+        }
+
+        [Test]
+        public void CountyGovernance_GentryComplianceChangesActualRevenue()
+        {
+            var lowCompliance = VillagePrototypeFactory.Create(200, 22_103);
+            var highCompliance = VillagePrototypeFactory.Create(200, 22_103);
+            for (var i = 0; i < lowCompliance.CountyGentryHouses.Count; i++)
+            {
+                lowCompliance.CountyGentryHouses[i].TaxComplianceBasisPoints = 0;
+                highCompliance.CountyGentryHouses[i].TaxComplianceBasisPoints =
+                    10_000;
+            }
+
+            lowCompliance.AbsoluteDay = 300;
+            highCompliance.AbsoluteDay = 300;
+            var system = new CountyGovernanceSystem();
+            system.ResolveMonthly(lowCompliance);
+            system.ResolveMonthly(highCompliance);
+
+            Assert.That(
+                highCompliance.CountyGovernances[0].TotalMoneyTaxCollected,
+                Is.GreaterThan(
+                    lowCompliance.CountyGovernances[0].TotalMoneyTaxCollected));
+            lowCompliance.Validate();
+            highCompliance.Validate();
+        }
+
+        [Test]
+        public void CountyGovernance_SnapshotRoundTripPreservesFiscalFacts()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_104);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 300);
+
+            var json = WorldSnapshotSerializer.Serialize(world);
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(loaded),
+                Is.EqualTo(json));
+            Assert.That(loaded.CountyGovernances[0].TotalMoneyTaxCollected,
+                Is.GreaterThan(0));
+            Assert.That(loaded.CountyFiscalLedgerEntries, Is.Not.Empty);
+        }
+
+        [Test]
+        public void CountyGovernance_SameSeedAndDurationProduceSameSnapshot()
+        {
+            var first = VillagePrototypeFactory.Create(200, 22_106);
+            var second = VillagePrototypeFactory.Create(200, 22_106);
+
+            new WorldSimulator(first.MasterSeed).AdvanceDays(first, 300);
+            new WorldSimulator(second.MasterSeed).AdvanceDays(second, 300);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(second),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(first)));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionElevenToEmptyCountyCollections()
+        {
+            var world = BuildMinimalWorld();
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 11")
+                .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
+                .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
+                .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
+                .Replace(
+                    "\"CountyFiscalLedgerEntries\": []",
+                    "\"CountyFiscalLedgerEntries\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.CountyGovernances, Is.Empty);
+            Assert.That(loaded.CountyGentryHouses, Is.Empty);
+            Assert.That(loaded.CountyHouseholdTaxes, Is.Empty);
+            Assert.That(loaded.CountyFiscalLedgerEntries, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void CountyGovernance_UnbalancedFiscalEntryIsRejected()
+        {
+            var world = VillagePrototypeFactory.Create(200, 22_105);
+            world.CountyFiscalLedgerEntries.Add(
+                new CountyFiscalLedgerEntryState
+                {
+                    Id = "county_fiscal.invalid",
+                    Day = 0,
+                    Type = CountyFiscalEntryType.HouseholdPayment,
+                    CountyGovernanceId = world.CountyGovernances[0].Id,
+                    FamilyId = world.Families[0].Id,
+                    FamilyMoneyDelta = -10,
+                    GovernmentMoneyDelta = 9,
+                    Amount = 10
+                });
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
         }
 
         [Test]

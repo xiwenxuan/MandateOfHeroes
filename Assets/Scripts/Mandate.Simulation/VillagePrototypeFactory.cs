@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -100,6 +101,7 @@ namespace Mandate.Simulation
             CharacterAbilityBootstrap.InitializeWorld(world);
             ApplyOccupationalSkills(world);
             AddFacilities(world, village);
+            AddCountyGovernance(world, village);
             VillageLifeSystem.RefreshCaches(world, village);
             for (var i = 0; i < village.HouseholdIds.Count; i++)
             {
@@ -367,6 +369,80 @@ namespace Mandate.Simulation
                     InventoryUnits = family.Grain + family.SeedGrain
                 });
             }
+        }
+
+        private static void AddCountyGovernance(
+            WorldState world,
+            VillageState village)
+        {
+            var administrator = FindFamily(world, village.HouseholdIds[0]);
+            var organization = new OrganizationState
+            {
+                Id = "organization.village_demo_county_government",
+                DisplayName = "安民县官府",
+                Type = OrganizationType.Government,
+                HeadquartersLocationId = village.ParentLocationId,
+                LeaderPersonId = administrator.HeadPersonId,
+                Treasury = 1_200,
+                ReputationBasisPoints = 6_000
+            };
+            world.Organizations.Add(organization);
+
+            var governance = new CountyGovernanceState
+            {
+                Id = "county_governance.village_demo",
+                CountyLocationId = village.ParentLocationId,
+                GovernmentOrganizationId = organization.Id,
+                AdministratorFamilyId = administrator.Id,
+                AnnualCashTaxRateBasisPoints = 300,
+                LocalGrainRetentionBasisPoints = 4_000,
+                RegistrationCoverageBasisPoints = 9_000,
+                AdministrativeEfficiencyBasisPoints = 8_000,
+                GentryInfluenceBasisPoints = 1_800,
+                CountyGranaryGrain = 120,
+                NextSettlementDay = 30
+            };
+            world.CountyGovernances.Add(governance);
+
+            var wealthyFamilies = new List<FamilyState>(world.Families);
+            wealthyFamilies.Sort((left, right) =>
+            {
+                var wealth = right.Wealth.CompareTo(left.Wealth);
+                return wealth != 0
+                    ? wealth
+                    : string.CompareOrdinal(left.Id, right.Id);
+            });
+            var influences = new[] { 800, 600, 400 };
+            var compliances = new[] { 7_000, 8_000, 9_000 };
+            for (var i = 0; i < Math.Min(3, wealthyFamilies.Count); i++)
+            {
+                world.CountyGentryHouses.Add(new CountyGentryHouseState
+                {
+                    Id = $"county_gentry.{governance.Id}.{wealthyFamilies[i].Id}",
+                    CountyGovernanceId = governance.Id,
+                    FamilyId = wealthyFamilies[i].Id,
+                    InfluenceBasisPoints = influences[i],
+                    TaxComplianceBasisPoints = compliances[i]
+                });
+            }
+
+            world.Commodities.Add(new CommodityState
+            {
+                Id = "commodity.grain",
+                DisplayName = "粮食",
+                BasePrice = 100,
+                UnitWeight = 1
+            });
+            world.MarketListings.Add(new MarketListingState
+            {
+                Id = "market.village_demo_county.grain",
+                LocationId = village.ParentLocationId,
+                CommodityId = "commodity.grain",
+                Price = 100,
+                EquilibriumPrice = 100,
+                Stock = 300,
+                TargetStock = 400
+            });
         }
 
         private static void AddFacility(
