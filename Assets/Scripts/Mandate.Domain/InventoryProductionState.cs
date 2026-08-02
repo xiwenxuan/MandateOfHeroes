@@ -10,7 +10,9 @@ namespace Mandate.Domain
         ReservationReleased,
         RecipeSettled,
         OpeningBalance,
-        MilitaryProcurementDispatched
+        MilitaryProcurementDispatched,
+        EquipmentRepairReserved,
+        EquipmentRepairSettled
     }
 
     [Serializable]
@@ -23,6 +25,20 @@ namespace Mandate.Domain
         public string CarrierPersonId;
         public string LocationId;
         public long CapacityWeight;
+    }
+
+    [Serializable]
+    public sealed class ProductionSiteState
+    {
+        public string Id;
+        public string KindId;
+        public string OwnerOrganizationId;
+        public string LocationId;
+        public string ManagerPersonId;
+        public string InventoryContainerId;
+        public int ConcurrentOrderCapacity = 1;
+        public int ConditionBasisPoints = 10_000;
+        public List<string> FacilityTags = new List<string>();
     }
 
     [Serializable]
@@ -72,6 +88,7 @@ namespace Mandate.Domain
         public string ActorPersonId;
         public string SourceWorkOrderId;
         public string SourceMilitaryProcurementId;
+        public string SourceEquipmentRepairOrderId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;
         public long FacilityInventoryDelta;
@@ -95,6 +112,9 @@ namespace Mandate.Domain
         public string MethodDefinitionId;
         public string OwnerFamilyId;
         public string StorageFacilityId;
+        public string OwnerOrganizationId;
+        public string ProductionSiteId;
+        public string InventoryContainerId;
         public string ManagerPersonId;
         public ProductionControlMode ControlMode;
         public ProductionOrderStatus Status;

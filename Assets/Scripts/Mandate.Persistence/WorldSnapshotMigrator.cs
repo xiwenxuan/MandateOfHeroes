@@ -67,6 +67,9 @@ namespace Mandate.Persistence
                     case 13:
                         MigrateVersionThirteenToFourteen(world, content);
                         break;
+                    case 14:
+                        MigrateVersionFourteenToFifteen(world, content);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -310,6 +313,102 @@ namespace Mandate.Persistence
                     return "product.equipment." +
                            equipmentId.Substring(equipmentId.IndexOf('.') + 1);
             }
+        }
+
+        private static void MigrateVersionFourteenToFifteen(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.ProductionSites =
+                new System.Collections.Generic.List<ProductionSiteState>();
+            world.MilitaryEquipmentRepairOrders =
+                new System.Collections.Generic.List<
+                    MilitaryEquipmentRepairOrderState>();
+            for (var i = 0;
+                 i < world.MilitaryEquipmentDefinitions.Count;
+                 i++)
+            {
+                ConfigureRepair(world.MilitaryEquipmentDefinitions[i]);
+            }
+
+            for (var i = 0; i < world.MilitaryArmoryStocks.Count; i++)
+            {
+                world.MilitaryArmoryStocks[i].ReservedDamagedQuantity = 0;
+            }
+
+            world.ProductionContentManifest = productionContent.CreateManifest();
+            world.SchemaVersion = 15;
+        }
+
+        private static void ConfigureRepair(
+            MilitaryEquipmentDefinitionState definition)
+        {
+            switch (definition.Id)
+            {
+                case "equipment.han_ring_sword":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        1,
+                        3,
+                        CoreProductionContent.BlacksmithFacilityTag);
+                    break;
+                case "equipment.wooden_shield":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.TimberMaterialProductId,
+                        2,
+                        2,
+                        CoreProductionContent.WoodworkingFacilityTag);
+                    break;
+                case "equipment.long_spear":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        1,
+                        2,
+                        CoreProductionContent.BlacksmithFacilityTag);
+                    break;
+                case "equipment.horn_bow":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.HornMaterialProductId,
+                        1,
+                        3,
+                        CoreProductionContent.BowmakingFacilityTag);
+                    break;
+                case "equipment.arrow_bundle":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.TimberMaterialProductId,
+                        1,
+                        1,
+                        CoreProductionContent.WoodworkingFacilityTag);
+                    break;
+                case "equipment.lamellar_armor":
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        2,
+                        5,
+                        CoreProductionContent.ArmoringFacilityTag);
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        private static void SetRepair(
+            MilitaryEquipmentDefinitionState definition,
+            string productId,
+            int quantity,
+            int durationDays,
+            string facilityTag)
+        {
+            definition.RepairMaterialProductDefinitionId = productId;
+            definition.RepairMaterialQuantityPerUnit = quantity;
+            definition.RepairDurationDays = durationDays;
+            definition.RepairFacilityTag = facilityTag;
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

@@ -637,23 +637,96 @@ namespace Mandate.Simulation
             int dexterity,
             string compatibleEquipmentId = "")
         {
-            world.MilitaryEquipmentDefinitions.Add(
-                new MilitaryEquipmentDefinitionState
-                {
-                    Id = id,
-                    DisplayName = displayName,
-                    CategoryId = categoryId,
-                    SlotId = slotId,
-                    ProductDefinitionId = ProductForEquipment(id),
-                    UnitWeight = weight,
-                    MaximumConditionBasisPoints = 10_000,
-                    MeleePowerBasisPoints = melee,
-                    RangedPowerBasisPoints = ranged,
-                    ProtectionBasisPoints = protection,
-                    RequiredStrengthBasisPoints = strength,
-                    RequiredDexterityBasisPoints = dexterity,
-                    CompatibleEquipmentId = compatibleEquipmentId
-                });
+            var definition = new MilitaryEquipmentDefinitionState
+            {
+                Id = id,
+                DisplayName = displayName,
+                CategoryId = categoryId,
+                SlotId = slotId,
+                ProductDefinitionId = ProductForEquipment(id),
+                UnitWeight = weight,
+                MaximumConditionBasisPoints = 10_000,
+                MeleePowerBasisPoints = melee,
+                RangedPowerBasisPoints = ranged,
+                ProtectionBasisPoints = protection,
+                RequiredStrengthBasisPoints = strength,
+                RequiredDexterityBasisPoints = dexterity,
+                CompatibleEquipmentId = compatibleEquipmentId
+            };
+            ConfigureRepair(definition);
+            world.MilitaryEquipmentDefinitions.Add(definition);
+        }
+
+        public static void ConfigureRepair(
+            MilitaryEquipmentDefinitionState definition)
+        {
+            switch (definition.Id)
+            {
+                case RingSwordId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        1,
+                        3,
+                        CoreProductionContent.BlacksmithFacilityTag);
+                    break;
+                case WoodenShieldId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.TimberMaterialProductId,
+                        2,
+                        2,
+                        CoreProductionContent.WoodworkingFacilityTag);
+                    break;
+                case LongSpearId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        1,
+                        2,
+                        CoreProductionContent.BlacksmithFacilityTag);
+                    break;
+                case HornBowId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.HornMaterialProductId,
+                        1,
+                        3,
+                        CoreProductionContent.BowmakingFacilityTag);
+                    break;
+                case ArrowBundleId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.TimberMaterialProductId,
+                        1,
+                        1,
+                        CoreProductionContent.WoodworkingFacilityTag);
+                    break;
+                case LamellarArmorId:
+                    SetRepair(
+                        definition,
+                        CoreProductionContent.IronMaterialProductId,
+                        2,
+                        5,
+                        CoreProductionContent.ArmoringFacilityTag);
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        $"No repair mapping for equipment {definition.Id}.");
+            }
+        }
+
+        private static void SetRepair(
+            MilitaryEquipmentDefinitionState definition,
+            string materialProductId,
+            int quantity,
+            int durationDays,
+            string facilityTag)
+        {
+            definition.RepairMaterialProductDefinitionId = materialProductId;
+            definition.RepairMaterialQuantityPerUnit = quantity;
+            definition.RepairDurationDays = durationDays;
+            definition.RepairFacilityTag = facilityTag;
         }
 
         public static string ProductForEquipment(string equipmentId)

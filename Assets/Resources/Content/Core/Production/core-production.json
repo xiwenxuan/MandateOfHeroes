@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "4.0.0",
+  "Version": "5.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -89,6 +89,38 @@
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 250
+    },
+    {
+      "Id": "product.material.iron",
+      "DisplayName": "铁料",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.material.timber",
+      "DisplayName": "木料",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.material.leather",
+      "DisplayName": "皮革",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.material.horn",
+      "DisplayName": "角料",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
     },
     {
       "Id": "product.equipment.han_ring_sword",
@@ -206,6 +238,90 @@
           "QuantityPerLandUnit": 8
         }
       ]
+    },
+    {
+      "Id": "recipe.manufacturing.forge_ring_sword",
+      "DisplayName": "锻造环首刀",
+      "CropDefinitionId": null,
+      "DurationDays": 6,
+      "FacilityTags": ["facility.blacksmith_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.han_ring_sword", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.manufacturing.make_wooden_shield",
+      "DisplayName": "制作木盾",
+      "CropDefinitionId": null,
+      "DurationDays": 4,
+      "FacilityTags": ["facility.woodworking_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 4},
+        {"ProductDefinitionId": "product.material.leather", "QuantityPerLandUnit": 1}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.wooden_shield", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.manufacturing.forge_long_spear",
+      "DisplayName": "锻造长矛",
+      "CropDefinitionId": null,
+      "DurationDays": 5,
+      "FacilityTags": ["facility.blacksmith_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 3}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.long_spear", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.manufacturing.make_horn_bow",
+      "DisplayName": "制作角弓",
+      "CropDefinitionId": null,
+      "DurationDays": 7,
+      "FacilityTags": ["facility.bowmaking_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1},
+        {"ProductDefinitionId": "product.material.horn", "QuantityPerLandUnit": 1}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.horn_bow", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.manufacturing.make_arrow_bundle",
+      "DisplayName": "制作箭束",
+      "CropDefinitionId": null,
+      "DurationDays": 2,
+      "FacilityTags": ["facility.woodworking_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 1},
+        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 1}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.arrow_bundle", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.manufacturing.make_lamellar_armor",
+      "DisplayName": "制作札甲",
+      "CropDefinitionId": null,
+      "DurationDays": 12,
+      "FacilityTags": ["facility.armoring_workshop"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 8},
+        {"ProductDefinitionId": "product.material.leather", "QuantityPerLandUnit": 2}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.equipment.lamellar_armor", "QuantityPerLandUnit": 1}
+      ]
     }
   ],
   "Methods": [
@@ -235,6 +351,38 @@
       "RecipeDefinitionIds": [
         "recipe.processing.make_dry_ration"
       ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.manufacturing.blacksmithing",
+      "DisplayName": "锻打",
+      "RecipeDefinitionIds": ["recipe.manufacturing.forge_ring_sword", "recipe.manufacturing.forge_long_spear"],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.manufacturing.woodworking",
+      "DisplayName": "木作",
+      "RecipeDefinitionIds": ["recipe.manufacturing.make_wooden_shield", "recipe.manufacturing.make_arrow_bundle"],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.manufacturing.bowmaking",
+      "DisplayName": "制弓",
+      "RecipeDefinitionIds": ["recipe.manufacturing.make_horn_bow"],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.manufacturing.armoring",
+      "DisplayName": "制甲",
+      "RecipeDefinitionIds": ["recipe.manufacturing.make_lamellar_armor"],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"

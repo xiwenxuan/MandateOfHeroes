@@ -3071,7 +3071,7 @@ namespace Mandate.Tests
             var families = world.Families.Count;
             var services = world.MilitaryServices.Count;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 12");
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 12");
             var equipmentStart = json.IndexOf(
                 "  \"MilitaryEquipmentInitialized\":",
                 StringComparison.Ordinal);
@@ -3832,7 +3832,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 14", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 15", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3855,7 +3855,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 14", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 15", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3893,9 +3893,9 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(11));
-            Assert.That(fromResource.RecipeCount, Is.EqualTo(3));
-            Assert.That(fromResource.MethodCount, Is.EqualTo(3));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(15));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(9));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(7));
             Assert.That(fromResource.SkillCount, Is.EqualTo(1));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
@@ -4487,7 +4487,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 14", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 15", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4514,7 +4514,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4751,7 +4751,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4783,7 +4783,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -5062,7 +5062,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -5246,7 +5246,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -5861,14 +5861,228 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void EquipmentManufacturing_OrganizationWorkshopSettlesBalancedBatch()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var system = new ProcessingProductionSystem();
+            var iron = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.IronMaterialProductId);
+            var timber = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.TimberMaterialProductId);
+            var ironBefore = iron.Quantity;
+            var timberBefore = timber.Quantity;
+
+            var order = system.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.ForgeLongSpearRecipeId,
+                CoreProductionContent.BlacksmithingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                2);
+
+            Assert.That(order.FinishDay, Is.EqualTo(world.AbsoluteDay + 10));
+            Assert.That(iron.ReservedQuantity, Is.EqualTo(4));
+            Assert.That(timber.ReservedQuantity, Is.EqualTo(6));
+            world.AbsoluteDay = order.FinishDay - 1;
+            system.ResolveDueOrders(world);
+            Assert.That(order.Status, Is.EqualTo(ProductionOrderStatus.Active));
+
+            world.AbsoluteDay = order.FinishDay;
+            system.ResolveDueOrders(world);
+
+            Assert.That(order.Status, Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(iron.Quantity, Is.EqualTo(ironBefore - 4));
+            Assert.That(timber.Quantity, Is.EqualTo(timberBefore - 6));
+            Assert.That(order.OutputBatchIds.Count, Is.EqualTo(1));
+            var output = world.ProductBatches.Find(item =>
+                item.Id == order.OutputBatchIds[0]);
+            Assert.That(output.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.LongSpearProductId));
+            Assert.That(output.Quantity, Is.EqualTo(2));
+            Assert.That(output.InventoryContainerId,
+                Is.EqualTo(
+                    MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId));
+            Assert.That(output.SourceWorkOrderId, Is.EqualTo(order.Id));
+            world.Validate();
+        }
+
+        [Test]
+        public void EquipmentManufacturing_InvalidManagerDoesNotReserveMaterial()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new ProcessingProductionSystem().CreateOrganizationOrder(
+                    world,
+                    CoreProductionContent.ForgeLongSpearRecipeId,
+                    CoreProductionContent.BlacksmithingMethodId,
+                    "organization.zhongshan_merchants",
+                    MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                    MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                    "person.zhang_shiping",
+                    ProductionControlMode.DelegatedPolicy,
+                    1));
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void EquipmentManufacturing_WorkshopBatchCanEnterProcurementJourney()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var processing = new ProcessingProductionSystem();
+            var workOrder = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.ForgeLongSpearRecipeId,
+                CoreProductionContent.BlacksmithingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.TargetInstruction,
+                5);
+            world.AbsoluteDay = workOrder.FinishDay;
+            processing.ResolveDueOrders(world);
+            var caravan = world.InventoryContainers.Find(item =>
+                item.Id == MilitaryProcurementSystem.PrototypeContainerId);
+            caravan.CapacityWeight = 200;
+            new ArmySystem().StartMarch(
+                world,
+                new StableId("person.zou_jing"),
+                new StableId("army.youzhou_reinforcement"),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"));
+
+            var order = new MilitaryProcurementSystem().CreateOrderAndDispatch(
+                world,
+                new StableId("person.zou_jing"),
+                new StableId("person.zhang_shiping"),
+                new StableId("army.youzhou_reinforcement"),
+                new StableId(MilitaryEquipmentSystem.LongSpearId),
+                5,
+                20,
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"));
+
+            Assert.That(order.InventoryContainerId,
+                Is.EqualTo(
+                    MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId));
+            Assert.That(order.SourceBatchId,
+                Is.EqualTo(workOrder.OutputBatchIds[0]));
+            Assert.That(order.Status,
+                Is.EqualTo(MilitaryProcurementStatus.InTransit));
+            world.Validate();
+        }
+
+        [Test]
+        public void EquipmentRepair_ReservesMaterialAndReturnsDamagedStock()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var issue = world.MilitaryEquipmentIssues.Find(item =>
+                item.ArmyId == "army.youzhou_reinforcement" &&
+                item.EquipmentDefinitionId ==
+                    MilitaryEquipmentSystem.LongSpearId);
+            Assert.That(issue, Is.Not.Null);
+            var stock = world.MilitaryArmoryStocks.Find(item =>
+                item.ArmyId == issue.ArmyId &&
+                item.EquipmentDefinitionId == issue.EquipmentDefinitionId);
+            world.MilitaryEquipmentIssues.Remove(issue);
+            stock.DamagedQuantity++;
+            world.MilitaryEquipmentTransactions.Add(
+                new MilitaryEquipmentTransactionState
+                {
+                    Id = "equipment_transaction.test.damage_for_repair",
+                    Day = world.AbsoluteDay,
+                    Type = MilitaryEquipmentTransactionType.Damage,
+                    EquipmentDefinitionId = issue.EquipmentDefinitionId,
+                    Quantity = 1,
+                    FromArmyId = issue.ArmyId,
+                    MilitaryServiceId = issue.MilitaryServiceId,
+                    Summary = "Test equipment recovered damaged."
+                });
+            world.Validate();
+            var iron = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                CoreProductionContent.IronMaterialProductId);
+            var ironBefore = iron.Quantity;
+            var availableBefore = stock.AvailableQuantity;
+            var system = new MilitaryEquipmentRepairSystem();
+
+            var order = system.CreateOrder(
+                world,
+                issue.ArmyId,
+                issue.EquipmentDefinitionId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                "person.su_shuang",
+                ProductionControlMode.DirectAssignment,
+                1);
+
+            Assert.That(stock.ReservedDamagedQuantity, Is.EqualTo(1));
+            Assert.That(iron.ReservedQuantity, Is.EqualTo(1));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedOrder = loaded.MilitaryEquipmentRepairOrders.Find(
+                item => item.Id == order.Id);
+            loaded.AbsoluteDay = loadedOrder.FinishDay;
+            system.ResolveDueOrders(loaded);
+            var loadedStock = loaded.MilitaryArmoryStocks.Find(item =>
+                item.Id == stock.Id);
+            var loadedIron = loaded.ProductBatches.Find(item =>
+                item.Id == iron.Id);
+
+            Assert.That(loadedOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(loadedStock.DamagedQuantity, Is.EqualTo(0));
+            Assert.That(loadedStock.ReservedDamagedQuantity, Is.EqualTo(0));
+            Assert.That(loadedStock.AvailableQuantity,
+                Is.EqualTo(availableBefore + 1));
+            Assert.That(loadedIron.Quantity, Is.EqualTo(ironBefore - 1));
+            Assert.That(loadedIron.ReservedQuantity, Is.EqualTo(0));
+            Assert.That(loaded.MilitaryEquipmentTransactions.Exists(item =>
+                item.SourceRepairOrderId == loadedOrder.Id &&
+                item.Type == MilitaryEquipmentTransactionType.Repair),
+                Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFourteenWithoutFabricatingWorkshopOrders()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 14");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ProductionSites, Is.Empty);
+            Assert.That(loaded.MilitaryEquipmentRepairOrders, Is.Empty);
+            Assert.That(loaded.ProcessingWorkOrders, Is.Empty);
+            Assert.That(loaded.MilitaryEquipmentDefinitions.TrueForAll(item =>
+                !string.IsNullOrEmpty(
+                    item.RepairMaterialProductDefinitionId)), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
         public void MilitaryProcurement_PrototypeCreatesMappedSupplierStock()
         {
             var world = PrototypeWorldFactory.Create184World(184);
 
-            Assert.That(world.InventoryContainers.Count, Is.EqualTo(1));
+            Assert.That(world.InventoryContainers.Count, Is.EqualTo(2));
             Assert.That(
-                world.InventoryContainers[0].Id,
-                Is.EqualTo(MilitaryProcurementSystem.PrototypeContainerId));
+                world.InventoryContainers.Exists(item =>
+                    item.Id == MilitaryProcurementSystem.PrototypeContainerId),
+                Is.True);
             Assert.That(
                 world.ProductBatches.FindAll(batch =>
                     batch.InventoryContainerId ==
@@ -6071,7 +6285,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 14", "\"SchemaVersion\": 13");
+                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 13");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 

@@ -20,6 +20,8 @@ namespace Mandate.Simulation
         private readonly ResearchSystem _researchSystem;
         private readonly ProcessingProductionSystem _processingSystem;
         private readonly MilitaryProcurementSystem _militaryProcurementSystem;
+        private readonly MilitaryEquipmentRepairSystem _militaryRepairSystem =
+            new MilitaryEquipmentRepairSystem();
         private readonly CountyGovernanceSystem _countyGovernanceSystem =
             new CountyGovernanceSystem();
 
@@ -99,6 +101,7 @@ namespace Mandate.Simulation
             _taskSystem.ResolveDailyProgress(world);
             _researchSystem.ResolveDailyProjects(world);
             _processingSystem.ResolveDueOrders(world);
+            _militaryRepairSystem.ResolveDueOrders(world);
             _villageLifeSystem.ResolveMonthly(world);
             _lifeSimulationSystem.ResolveMonthly(world);
             VillageLifeSystem.RefreshAllCaches(world, _personRepository);

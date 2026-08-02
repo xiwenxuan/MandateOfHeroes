@@ -208,7 +208,9 @@ namespace Mandate.Simulation
                 BatchId = batch.Id,
                 ProductDefinitionId = batch.ProductDefinitionId,
                 OwnerFamilyId = batch.OwnerFamilyId,
+                OwnerOrganizationId = batch.OwnerOrganizationId,
                 StorageFacilityId = batch.StorageFacilityId,
+                InventoryContainerId = batch.InventoryContainerId,
                 UnitId = batch.UnitId,
                 QuantityDelta = quantityDelta,
                 ReservedQuantityDelta = reservedDelta
@@ -247,6 +249,34 @@ namespace Mandate.Simulation
                 FreshnessBasisPoints = 10_000,
                 SeedVigorBasisPoints = seedVigor,
                 SeedPurityBasisPoints = seedPurity
+            };
+        }
+
+        internal static ProductBatchState NewOrganizationBatch(
+            WorldState world,
+            ProductDefinition product,
+            InventoryContainerState container,
+            string sourceTransactionId,
+            string sourceWorkOrderId,
+            long quantity,
+            int qualityBasisPoints)
+        {
+            return new ProductBatchState
+            {
+                Id = $"product_batch.{world.AbsoluteDay}." +
+                     $"{world.ProductBatches.Count:D6}",
+                ProductDefinitionId = product.Id,
+                OwnerOrganizationId = container.OwnerOrganizationId,
+                InventoryContainerId = container.Id,
+                OriginLocationId = container.LocationId,
+                SourceWorkOrderId = sourceWorkOrderId,
+                SourceTransactionId = sourceTransactionId,
+                UnitId = product.UnitId,
+                UnitWeight = product.BaseWeight,
+                ProducedDay = world.AbsoluteDay,
+                Quantity = quantity,
+                QualityBasisPoints = qualityBasisPoints,
+                FreshnessBasisPoints = 10_000
             };
         }
 
@@ -360,7 +390,8 @@ namespace Mandate.Simulation
             }
 
             var reservations = BuildReservations(
-                world, recipe, family.Id, storage.Id, runCount);
+                world, recipe, family.Id, string.Empty, storage.Id,
+                string.Empty, runCount);
             var order = new ProcessingWorkOrderState
             {
                 Id = $"processing.{world.AbsoluteDay}." +
@@ -401,6 +432,101 @@ namespace Mandate.Simulation
             return order;
         }
 
+        public ProcessingWorkOrderState CreateOrganizationOrder(
+            WorldState world,
+            string recipeDefinitionId,
+            string methodDefinitionId,
+            string organizationId,
+            string productionSiteId,
+            string inventoryContainerId,
+            string managerPersonId,
+            ProductionControlMode controlMode,
+            int runCount)
+        {
+            ProductInventorySystem.RequireWorld(world);
+            _content.ValidateManifest(world.ProductionContentManifest);
+            if (runCount <= 0 ||
+                !Enum.IsDefined(typeof(ProductionControlMode), controlMode))
+            {
+                throw new ArgumentOutOfRangeException(nameof(runCount));
+            }
+
+            var recipe = _content.GetRecipe(recipeDefinitionId);
+            var method = _content.GetMethod(methodDefinitionId);
+            var site = FindProductionSite(world, productionSiteId);
+            var container = FindContainer(world, inventoryContainerId);
+            var manager = ProductInventorySystem.FindPerson(world, managerPersonId);
+            if (!string.IsNullOrEmpty(recipe.CropDefinitionId) ||
+                !method.RecipeDefinitionIds.Contains(recipe.Id) ||
+                method.YieldBasisPoints != 10_000 ||
+                site.OwnerOrganizationId != organizationId ||
+                site.InventoryContainerId != container.Id ||
+                site.ManagerPersonId != manager.Id ||
+                site.LocationId != container.LocationId ||
+                container.OwnerOrganizationId != organizationId ||
+                !string.IsNullOrEmpty(container.CarrierPersonId) ||
+                !manager.IsAlive || manager.LocationId != site.LocationId ||
+                !HasMembership(world, manager.Id, organizationId) ||
+                !HasCompatibleFacilityTag(recipe, site) ||
+                ActiveOrdersAtSite(world, site.Id) >=
+                    site.ConcurrentOrderCapacity)
+            {
+                throw new InvalidOperationException(
+                    "Organization processing order references incompatible content, site, inventory, or actors.");
+            }
+
+            var reservations = BuildReservations(
+                world, recipe, string.Empty, organizationId, string.Empty,
+                container.Id, runCount);
+            var order = new ProcessingWorkOrderState
+            {
+                Id = $"processing.{world.AbsoluteDay}." +
+                     $"{world.ProcessingWorkOrders.Count:D6}",
+                RecipeDefinitionId = recipe.Id,
+                MethodDefinitionId = method.Id,
+                OwnerOrganizationId = organizationId,
+                ProductionSiteId = site.Id,
+                InventoryContainerId = container.Id,
+                ManagerPersonId = manager.Id,
+                ControlMode = controlMode,
+                Status = ProductionOrderStatus.Active,
+                CreatedDay = world.AbsoluteDay,
+                FinishDay = checked(world.AbsoluteDay +
+                    (long)recipe.DurationDays * runCount),
+                RunCount = runCount,
+                InputReservations = reservations
+            };
+            Reserve(world, order, reservations);
+            return order;
+        }
+
+        private static void Reserve(
+            WorldState world,
+            ProcessingWorkOrderState order,
+            List<BatchReservationState> reservations)
+        {
+            var transaction = ProductInventorySystem.NewTransaction(
+                world,
+                InventoryTransactionType.Reserved,
+                order.ManagerPersonId,
+                order.Id,
+                0,
+                0,
+                0,
+                $"Reserved inputs for {order.Id}.");
+            for (var i = 0; i < reservations.Count; i++)
+            {
+                var batch = FindBatch(world, reservations[i].BatchId);
+                batch.ReservedQuantity = checked(
+                    batch.ReservedQuantity + reservations[i].Quantity);
+                transaction.Lines.Add(ProductInventorySystem.Line(
+                    batch, 0, reservations[i].Quantity));
+            }
+
+            world.ProcessingWorkOrders.Add(order);
+            world.InventoryTransactions.Add(transaction);
+        }
+
         public void ResolveDueOrders(WorldState world)
         {
             ProductInventorySystem.RequireWorld(world);
@@ -409,7 +535,8 @@ namespace Mandate.Simulation
             {
                 var order = world.ProcessingWorkOrders[i];
                 if (order.Status == ProductionOrderStatus.Active &&
-                    order.FinishDay <= world.AbsoluteDay)
+                    order.FinishDay <= world.AbsoluteDay &&
+                    CanSettle(world, order))
                 {
                     due.Add(order);
                 }
@@ -425,10 +552,22 @@ namespace Mandate.Simulation
         private void Settle(WorldState world, ProcessingWorkOrderState order)
         {
             var recipe = _content.GetRecipe(order.RecipeDefinitionId);
-            var family = ProductInventorySystem.FindFamily(
-                world, order.OwnerFamilyId);
-            var storage = ProductInventorySystem.FindFacility(
-                world, order.StorageFacilityId);
+            var organizationOrder =
+                !string.IsNullOrEmpty(order.OwnerOrganizationId);
+            FamilyState family = null;
+            VillageFacilityState storage = null;
+            InventoryContainerState container = null;
+            if (organizationOrder)
+            {
+                container = FindContainer(world, order.InventoryContainerId);
+            }
+            else
+            {
+                family = ProductInventorySystem.FindFamily(
+                    world, order.OwnerFamilyId);
+                storage = ProductInventorySystem.FindFacility(
+                    world, order.StorageFacilityId);
+            }
             long inputWeight = 0;
             var minimumQuality = 10_000;
             for (var i = 0; i < order.InputReservations.Count; i++)
@@ -485,17 +624,15 @@ namespace Mandate.Simulation
             {
                 var output = recipe.Outputs[i];
                 var product = _content.GetProduct(output.ProductDefinitionId);
-                var batch = ProductInventorySystem.NewBatch(
-                    world,
-                    product,
-                    family,
-                    storage,
-                    transaction.Id,
-                    order.Id,
-                    checked(output.QuantityPerLandUnit * order.RunCount),
-                    string.Empty,
-                    0,
-                    0);
+                var quantity = checked(
+                    output.QuantityPerLandUnit * order.RunCount);
+                var batch = organizationOrder
+                    ? ProductInventorySystem.NewOrganizationBatch(
+                        world, product, container, transaction.Id, order.Id,
+                        quantity, minimumQuality)
+                    : ProductInventorySystem.NewBatch(
+                        world, product, family, storage, transaction.Id,
+                        order.Id, quantity, string.Empty, 0, 0);
                 batch.QualityBasisPoints = minimumQuality;
                 world.ProductBatches.Add(batch);
                 order.OutputBatchIds.Add(batch.Id);
@@ -512,7 +649,9 @@ namespace Mandate.Simulation
             WorldState world,
             RecipeDefinition recipe,
             string familyId,
+            string organizationId,
             string storageId,
+            string containerId,
             int runCount)
         {
             var result = new List<BatchReservationState>();
@@ -524,8 +663,14 @@ namespace Mandate.Simulation
                 for (var i = 0; i < world.ProductBatches.Count; i++)
                 {
                     var batch = world.ProductBatches[i];
-                    if (batch.OwnerFamilyId == familyId &&
-                        batch.StorageFacilityId == storageId &&
+                    var ownershipMatches =
+                        !string.IsNullOrEmpty(familyId) &&
+                        batch.OwnerFamilyId == familyId &&
+                        batch.StorageFacilityId == storageId ||
+                        !string.IsNullOrEmpty(organizationId) &&
+                        batch.OwnerOrganizationId == organizationId &&
+                        batch.InventoryContainerId == containerId;
+                    if (ownershipMatches &&
                         batch.ProductDefinitionId == input.ProductDefinitionId &&
                         batch.Quantity > batch.ReservedQuantity)
                     {
@@ -593,6 +738,118 @@ namespace Mandate.Simulation
             }
 
             return result;
+        }
+
+        private static bool CanSettle(
+            WorldState world,
+            ProcessingWorkOrderState order)
+        {
+            var manager = ProductInventorySystem.FindPerson(
+                world, order.ManagerPersonId);
+            if (!manager.IsAlive)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(order.OwnerOrganizationId))
+            {
+                return manager.FamilyId == order.OwnerFamilyId;
+            }
+
+            var site = FindProductionSite(world, order.ProductionSiteId);
+            var container = FindContainer(world, order.InventoryContainerId);
+            return manager.LocationId == site.LocationId &&
+                   container.LocationId == site.LocationId &&
+                   HasMembership(world, manager.Id, order.OwnerOrganizationId);
+        }
+
+        private static bool HasCompatibleFacilityTag(
+            RecipeDefinition recipe,
+            ProductionSiteState site)
+        {
+            for (var i = 0; i < recipe.FacilityTags.Count; i++)
+            {
+                if (site.FacilityTags.Contains(recipe.FacilityTags[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static int ActiveOrdersAtSite(WorldState world, string siteId)
+        {
+            var count = 0;
+            for (var i = 0; i < world.ProcessingWorkOrders.Count; i++)
+            {
+                if (world.ProcessingWorkOrders[i].ProductionSiteId == siteId &&
+                    world.ProcessingWorkOrders[i].Status ==
+                    ProductionOrderStatus.Active)
+                {
+                    count++;
+                }
+            }
+
+            for (var i = 0; i < world.MilitaryEquipmentRepairOrders.Count; i++)
+            {
+                if (world.MilitaryEquipmentRepairOrders[i].ProductionSiteId ==
+                        siteId &&
+                    world.MilitaryEquipmentRepairOrders[i].Status ==
+                        ProductionOrderStatus.Active)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        internal static bool HasMembership(
+            WorldState world,
+            string personId,
+            string organizationId)
+        {
+            for (var i = 0; i < world.Memberships.Count; i++)
+            {
+                if (world.Memberships[i].PersonId == personId &&
+                    world.Memberships[i].OrganizationId == organizationId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static ProductionSiteState FindProductionSite(
+            WorldState world,
+            string id)
+        {
+            for (var i = 0; i < world.ProductionSites.Count; i++)
+            {
+                if (world.ProductionSites[i].Id == id)
+                {
+                    return world.ProductionSites[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing production site {id}.");
+        }
+
+        internal static InventoryContainerState FindContainer(
+            WorldState world,
+            string id)
+        {
+            for (var i = 0; i < world.InventoryContainers.Count; i++)
+            {
+                if (world.InventoryContainers[i].Id == id)
+                {
+                    return world.InventoryContainers[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing inventory container {id}.");
         }
 
         private static ProductBatchState FindBatch(WorldState world, string id)

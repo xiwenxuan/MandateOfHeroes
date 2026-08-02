@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 14;
+        public const int CurrentSchemaVersion = 15;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -229,6 +229,8 @@ namespace Mandate.Domain
             new List<ProductBatchState>();
         public List<InventoryContainerState> InventoryContainers =
             new List<InventoryContainerState>();
+        public List<ProductionSiteState> ProductionSites =
+            new List<ProductionSiteState>();
         public List<InventoryTransactionState> InventoryTransactions =
             new List<InventoryTransactionState>();
         public List<ProcessingWorkOrderState> ProcessingWorkOrders =
@@ -244,6 +246,9 @@ namespace Mandate.Domain
         public List<MilitaryProcurementLedgerEntryState>
             MilitaryProcurementLedgerEntries =
                 new List<MilitaryProcurementLedgerEntryState>();
+        public List<MilitaryEquipmentRepairOrderState>
+            MilitaryEquipmentRepairOrders =
+                new List<MilitaryEquipmentRepairOrderState>();
         public ProductionContentManifestState ProductionContentManifest;
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
@@ -380,6 +385,8 @@ namespace Mandate.Domain
             ValidateUniqueIds(
                 InventoryContainers, item => item.Id, "inventory container");
             ValidateUniqueIds(
+                ProductionSites, item => item.Id, "production site");
+            ValidateUniqueIds(
                 InventoryTransactions, item => item.Id, "inventory transaction");
             ValidateUniqueIds(
                 ProcessingWorkOrders, item => item.Id, "processing work order");
@@ -393,6 +400,10 @@ namespace Mandate.Domain
                 MilitaryProcurementOrders,
                 item => item.Id,
                 "military procurement order");
+            ValidateUniqueIds(
+                MilitaryEquipmentRepairOrders,
+                item => item.Id,
+                "military equipment repair order");
             ValidateUniqueIds(
                 MilitaryProcurementLedgerEntries,
                 item => item.Id,
@@ -1413,7 +1424,10 @@ namespace Mandate.Domain
                     !hasContainer ||
                     batch.InventoryContainerId != container.Id ||
                     container.OwnerOrganizationId != order.SupplierOrganizationId ||
-                    container.CarrierPersonId != order.CarrierPersonId ||
+                    !HasCarrierContainer(
+                        containers,
+                        order.CarrierPersonId,
+                        order.SupplierOrganizationId) ||
                     !routeIds.Contains(order.RouteId) ||
                     !locationIds.Contains(order.OriginLocationId) ||
                     !locationIds.Contains(order.DestinationLocationId) ||
@@ -1914,7 +1928,8 @@ namespace Mandate.Domain
                 if (MilitaryEquipmentDefinitions.Count != 0 ||
                     MilitaryArmoryStocks.Count != 0 ||
                     MilitaryEquipmentIssues.Count != 0 ||
-                    MilitaryEquipmentTransactions.Count != 0)
+                    MilitaryEquipmentTransactions.Count != 0 ||
+                    MilitaryEquipmentRepairOrders.Count != 0)
                 {
                     throw new InvalidOperationException(
                         "Uninitialized military equipment must not contain records.");
@@ -1940,6 +1955,23 @@ namespace Mandate.Domain
                     definition.ProductDefinitionId,
                     "military equipment product",
                     definition.Id);
+                var hasRepairContract =
+                    !string.IsNullOrEmpty(
+                        definition.RepairMaterialProductDefinitionId) ||
+                    !string.IsNullOrEmpty(definition.RepairFacilityTag) ||
+                    definition.RepairMaterialQuantityPerUnit != 0 ||
+                    definition.RepairDurationDays != 0;
+                if (hasRepairContract)
+                {
+                    ValidateContentReference(
+                        definition.RepairMaterialProductDefinitionId,
+                        "military equipment repair material",
+                        definition.Id);
+                    ValidateContentReference(
+                        definition.RepairFacilityTag,
+                        "military equipment repair facility",
+                        definition.Id);
+                }
                 if (string.IsNullOrWhiteSpace(definition.DisplayName) ||
                     definition.UnitWeight <= 0 ||
                     definition.MaximumConditionBasisPoints <= 0 ||
@@ -1953,7 +1985,13 @@ namespace Mandate.Domain
                     definition.RequiredStrengthBasisPoints < 0 ||
                     definition.RequiredStrengthBasisPoints > 10_000 ||
                     definition.RequiredDexterityBasisPoints < 0 ||
-                    definition.RequiredDexterityBasisPoints > 10_000)
+                    definition.RequiredDexterityBasisPoints > 10_000 ||
+                    hasRepairContract &&
+                    (definition.RepairMaterialQuantityPerUnit <= 0 ||
+                     definition.RepairDurationDays <= 0) ||
+                    !hasRepairContract &&
+                    (definition.RepairMaterialQuantityPerUnit != 0 ||
+                     definition.RepairDurationDays != 0))
                 {
                     throw new InvalidOperationException(
                         $"Invalid military equipment definition {definition.Id}.");
@@ -1987,6 +2025,8 @@ namespace Mandate.Domain
                     stocks.ContainsKey(key) ||
                     stock.AvailableQuantity < 0 ||
                     stock.DamagedQuantity < 0 ||
+                    stock.ReservedDamagedQuantity < 0 ||
+                    stock.ReservedDamagedQuantity > stock.DamagedQuantity ||
                     stock.OpeningQuantity < 0 ||
                     stock.AverageConditionBasisPoints < 0 ||
                     stock.AverageConditionBasisPoints > 10_000)
@@ -2067,6 +2107,11 @@ namespace Mandate.Domain
             {
                 procurementIds.Add(MilitaryProcurementOrders[i].Id);
             }
+            var repairIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryEquipmentRepairOrders.Count; i++)
+            {
+                repairIds.Add(MilitaryEquipmentRepairOrders[i].Id);
+            }
             long previousDay = -1;
             for (var i = 0; i < MilitaryEquipmentTransactions.Count; i++)
             {
@@ -2090,10 +2135,14 @@ namespace Mandate.Domain
                     !string.IsNullOrEmpty(transaction.SourceProcurementOrderId) &&
                     !procurementIds.Contains(
                         transaction.SourceProcurementOrderId) ||
+                    !string.IsNullOrEmpty(transaction.SourceRepairOrderId) &&
+                    !repairIds.Contains(transaction.SourceRepairOrderId) ||
                     (transaction.Type ==
                          MilitaryEquipmentTransactionType.ProcurementReceipt) !=
                     !string.IsNullOrEmpty(
                         transaction.SourceProcurementOrderId) ||
+                    !string.IsNullOrEmpty(transaction.SourceRepairOrderId) &&
+                    transaction.Type != MilitaryEquipmentTransactionType.Repair ||
                     string.IsNullOrWhiteSpace(transaction.Summary))
                 {
                     throw new InvalidOperationException(
@@ -3379,6 +3428,7 @@ namespace Mandate.Domain
                 StringComparer.Ordinal);
             var processingOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var procurementOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var repairOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var transactionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Families.Count; i++)
             {
@@ -3410,6 +3460,11 @@ namespace Mandate.Domain
                 procurementOrderIds.Add(MilitaryProcurementOrders[i].Id);
             }
 
+            for (var i = 0; i < MilitaryEquipmentRepairOrders.Count; i++)
+            {
+                repairOrderIds.Add(MilitaryEquipmentRepairOrders[i].Id);
+            }
+
             for (var i = 0; i < InventoryContainers.Count; i++)
             {
                 var container = InventoryContainers[i] ??
@@ -3432,6 +3487,49 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid inventory container {container.Id}.");
+                }
+            }
+
+            var productionSites = new Dictionary<string, ProductionSiteState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductionSites.Count; i++)
+            {
+                var site = ProductionSites[i] ??
+                    throw new InvalidOperationException(
+                        "A production site cannot be null.");
+                productionSites.Add(site.Id, site);
+                ValidateContentReference(site.KindId, "production site kind", site.Id);
+                if (!organizationIds.Contains(site.OwnerOrganizationId) ||
+                    !locationIds.Contains(site.LocationId) ||
+                    !personIds.Contains(site.ManagerPersonId) ||
+                    !containers.TryGetValue(
+                        site.InventoryContainerId, out var siteContainer) ||
+                    siteContainer.OwnerOrganizationId != site.OwnerOrganizationId ||
+                    siteContainer.LocationId != site.LocationId ||
+                    !string.IsNullOrEmpty(siteContainer.CarrierPersonId) ||
+                    site.ConcurrentOrderCapacity <= 0 ||
+                    site.ConditionBasisPoints <= 0 ||
+                    site.ConditionBasisPoints > 10_000 ||
+                    site.FacilityTags == null || site.FacilityTags.Count == 0 ||
+                    !HasOrganizationMembership(
+                        site.ManagerPersonId, site.OwnerOrganizationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid production site {site.Id}.");
+                }
+
+                var tags = new HashSet<string>(StringComparer.Ordinal);
+                for (var tagIndex = 0;
+                     tagIndex < site.FacilityTags.Count;
+                     tagIndex++)
+                {
+                    ValidateContentReference(
+                        site.FacilityTags[tagIndex], "facility tag", site.Id);
+                    if (!tags.Add(site.FacilityTags[tagIndex]))
+                    {
+                        throw new InvalidOperationException(
+                            $"Duplicate facility tag on {site.Id}.");
+                    }
                 }
             }
 
@@ -3501,9 +3599,33 @@ namespace Mandate.Domain
                     order.RecipeDefinitionId, "processing recipe", order.Id);
                 ValidateContentReference(
                     order.MethodDefinitionId, "processing method", order.Id);
-                if (!familyIds.Contains(order.OwnerFamilyId) ||
-                    !facilities.TryGetValue(order.StorageFacilityId, out var facility) ||
-                    facility.OwnerFamilyId != order.OwnerFamilyId ||
+                var familyOrder =
+                    !string.IsNullOrEmpty(order.OwnerFamilyId) &&
+                    string.IsNullOrEmpty(order.OwnerOrganizationId);
+                var organizationOrder =
+                    string.IsNullOrEmpty(order.OwnerFamilyId) &&
+                    !string.IsNullOrEmpty(order.OwnerOrganizationId);
+                var validFamilyOrder = familyOrder &&
+                    familyIds.Contains(order.OwnerFamilyId) &&
+                    facilities.TryGetValue(
+                        order.StorageFacilityId, out var facility) &&
+                    facility.OwnerFamilyId == order.OwnerFamilyId &&
+                    string.IsNullOrEmpty(order.ProductionSiteId) &&
+                    string.IsNullOrEmpty(order.InventoryContainerId);
+                var validOrganizationOrder = organizationOrder &&
+                    organizationIds.Contains(order.OwnerOrganizationId) &&
+                    string.IsNullOrEmpty(order.StorageFacilityId) &&
+                    productionSites.TryGetValue(
+                        order.ProductionSiteId, out var productionSite) &&
+                    productionSite.OwnerOrganizationId ==
+                        order.OwnerOrganizationId &&
+                    productionSite.InventoryContainerId ==
+                        order.InventoryContainerId &&
+                    containers.TryGetValue(
+                        order.InventoryContainerId, out var orderContainer) &&
+                    orderContainer.OwnerOrganizationId ==
+                        order.OwnerOrganizationId;
+                if (!validFamilyOrder && !validOrganizationOrder ||
                     !personIds.Contains(order.ManagerPersonId) ||
                     !Enum.IsDefined(typeof(ProductionControlMode), order.ControlMode) ||
                     !Enum.IsDefined(typeof(ProductionOrderStatus), order.Status) ||
@@ -3529,7 +3651,17 @@ namespace Mandate.Domain
                 {
                     var reservation = order.InputReservations[reservationIndex];
                     if (reservation == null || reservation.Quantity <= 0 ||
-                        !batches.ContainsKey(reservation.BatchId) ||
+                        !batches.TryGetValue(
+                            reservation.BatchId, out var reservedBatch) ||
+                        familyOrder &&
+                        (reservedBatch.OwnerFamilyId != order.OwnerFamilyId ||
+                         reservedBatch.StorageFacilityId !=
+                            order.StorageFacilityId) ||
+                        organizationOrder &&
+                        (reservedBatch.OwnerOrganizationId !=
+                            order.OwnerOrganizationId ||
+                         reservedBatch.InventoryContainerId !=
+                            order.InventoryContainerId) ||
                         !reservationKeys.Add(reservation.BatchId))
                     {
                         throw new InvalidOperationException(
@@ -3545,11 +3677,210 @@ namespace Mandate.Domain
                     if (!batches.TryGetValue(
                             order.OutputBatchIds[outputIndex], out var output) ||
                         output.SourceWorkOrderId != order.Id ||
+                        familyOrder &&
+                        (output.OwnerFamilyId != order.OwnerFamilyId ||
+                         output.StorageFacilityId != order.StorageFacilityId) ||
+                        organizationOrder &&
+                        (output.OwnerOrganizationId !=
+                            order.OwnerOrganizationId ||
+                         output.InventoryContainerId !=
+                            order.InventoryContainerId) ||
                         !outputIds.Add(output.Id))
                     {
                         throw new InvalidOperationException(
                             $"Invalid output batch on {order.Id}.");
                     }
+                }
+            }
+
+            for (var i = 0; i < ProductionSites.Count; i++)
+            {
+                var active = 0;
+                for (var orderIndex = 0;
+                     orderIndex < ProcessingWorkOrders.Count;
+                     orderIndex++)
+                {
+                    if (ProcessingWorkOrders[orderIndex].ProductionSiteId ==
+                            ProductionSites[i].Id &&
+                        ProcessingWorkOrders[orderIndex].Status ==
+                            ProductionOrderStatus.Active)
+                    {
+                        active++;
+                    }
+                }
+
+                for (var orderIndex = 0;
+                     orderIndex < MilitaryEquipmentRepairOrders.Count;
+                     orderIndex++)
+                {
+                    if (MilitaryEquipmentRepairOrders[orderIndex]
+                            .ProductionSiteId == ProductionSites[i].Id &&
+                        MilitaryEquipmentRepairOrders[orderIndex].Status ==
+                            ProductionOrderStatus.Active)
+                    {
+                        active++;
+                    }
+                }
+
+                if (active > ProductionSites[i].ConcurrentOrderCapacity)
+                {
+                    throw new InvalidOperationException(
+                        $"Production site {ProductionSites[i].Id} exceeds capacity.");
+                }
+            }
+
+            var reservedDamagedByStock = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryEquipmentRepairOrders.Count; i++)
+            {
+                var order = MilitaryEquipmentRepairOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A military equipment repair order cannot be null.");
+                var definition = FindEquipmentDefinition(
+                    MilitaryEquipmentDefinitions,
+                    order.EquipmentDefinitionId);
+                var stock = FindArmoryStock(
+                    MilitaryArmoryStocks,
+                    order.ArmyId,
+                    order.EquipmentDefinitionId);
+                _ = FindArmy(Armies, order.ArmyId);
+                var validSite = productionSites.TryGetValue(
+                    order.ProductionSiteId, out var repairSite);
+                var validContainer = containers.TryGetValue(
+                    order.InventoryContainerId, out var repairContainer);
+                if (!validSite || !validContainer ||
+                    repairSite.InventoryContainerId != repairContainer.Id ||
+                    repairSite.OwnerOrganizationId !=
+                        repairContainer.OwnerOrganizationId ||
+                    !repairSite.FacilityTags.Contains(
+                        definition.RepairFacilityTag) ||
+                    !personIds.Contains(order.ManagerPersonId) ||
+                    repairSite.ManagerPersonId != order.ManagerPersonId ||
+                    !Enum.IsDefined(
+                        typeof(ProductionControlMode), order.ControlMode) ||
+                    !Enum.IsDefined(
+                        typeof(ProductionOrderStatus), order.Status) ||
+                    order.Quantity <= 0 || order.CreatedDay < 0 ||
+                    order.FinishDay <= order.CreatedDay ||
+                    order.SettledDay < -1 || order.SettledDay > AbsoluteDay ||
+                    order.MaterialReservations == null ||
+                    order.MaterialReservations.Count == 0 ||
+                    order.Status == ProductionOrderStatus.Active &&
+                    order.SettledDay != -1 ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                    order.SettledDay < order.FinishDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military equipment repair order {order.Id}.");
+                }
+
+                var reservationIds = new HashSet<string>(StringComparer.Ordinal);
+                long materialQuantity = 0;
+                for (var reservationIndex = 0;
+                     reservationIndex < order.MaterialReservations.Count;
+                     reservationIndex++)
+                {
+                    var reservation =
+                        order.MaterialReservations[reservationIndex];
+                    if (reservation == null || reservation.Quantity <= 0 ||
+                        !batches.TryGetValue(
+                            reservation.BatchId, out var materialBatch) ||
+                        materialBatch.ProductDefinitionId !=
+                            definition.RepairMaterialProductDefinitionId ||
+                        materialBatch.OwnerOrganizationId !=
+                            repairSite.OwnerOrganizationId ||
+                        materialBatch.InventoryContainerId !=
+                            repairContainer.Id ||
+                        !reservationIds.Add(reservation.BatchId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid repair material reservation on {order.Id}.");
+                    }
+
+                    materialQuantity = checked(
+                        materialQuantity + reservation.Quantity);
+                }
+
+                if (materialQuantity != checked(
+                        (long)definition.RepairMaterialQuantityPerUnit *
+                        order.Quantity))
+                {
+                    throw new InvalidOperationException(
+                        $"Repair material total is invalid on {order.Id}.");
+                }
+
+                var reservedTransactions = 0;
+                var settledTransactions = 0;
+                for (var transactionIndex = 0;
+                     transactionIndex < InventoryTransactions.Count;
+                     transactionIndex++)
+                {
+                    var transaction = InventoryTransactions[transactionIndex];
+                    if (transaction.SourceEquipmentRepairOrderId != order.Id)
+                    {
+                        continue;
+                    }
+
+                    if (transaction.Type ==
+                        InventoryTransactionType.EquipmentRepairReserved)
+                    {
+                        reservedTransactions++;
+                    }
+                    else if (transaction.Type ==
+                             InventoryTransactionType.EquipmentRepairSettled)
+                    {
+                        settledTransactions++;
+                    }
+                }
+
+                var equipmentTransactions = 0;
+                for (var transactionIndex = 0;
+                     transactionIndex < MilitaryEquipmentTransactions.Count;
+                     transactionIndex++)
+                {
+                    var transaction =
+                        MilitaryEquipmentTransactions[transactionIndex];
+                    if (transaction.SourceRepairOrderId == order.Id &&
+                        transaction.Type ==
+                            MilitaryEquipmentTransactionType.Repair &&
+                        transaction.EquipmentDefinitionId ==
+                            order.EquipmentDefinitionId &&
+                        transaction.FromArmyId == order.ArmyId &&
+                        transaction.ToArmyId == order.ArmyId &&
+                        transaction.Quantity == order.Quantity)
+                    {
+                        equipmentTransactions++;
+                    }
+                }
+
+                if (reservedTransactions != 1 ||
+                    order.Status == ProductionOrderStatus.Active &&
+                    (settledTransactions != 0 || equipmentTransactions != 0) ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                    (settledTransactions != 1 || equipmentTransactions != 1))
+                {
+                    throw new InvalidOperationException(
+                        $"Repair provenance is incomplete for {order.Id}.");
+                }
+
+                if (order.Status == ProductionOrderStatus.Active)
+                {
+                    var key = order.ArmyId + "|" + order.EquipmentDefinitionId;
+                    reservedDamagedByStock.TryGetValue(key, out var reserved);
+                    reservedDamagedByStock[key] = checked(
+                        reserved + order.Quantity);
+                }
+            }
+
+            for (var i = 0; i < MilitaryArmoryStocks.Count; i++)
+            {
+                var stock = MilitaryArmoryStocks[i];
+                var key = stock.ArmyId + "|" + stock.EquipmentDefinitionId;
+                reservedDamagedByStock.TryGetValue(key, out var reserved);
+                if (stock.ReservedDamagedQuantity != reserved)
+                {
+                    throw new InvalidOperationException(
+                        $"Reserved damaged equipment mismatch for {stock.Id}.");
                 }
             }
 
@@ -3571,6 +3902,10 @@ namespace Mandate.Domain
                         transaction.SourceMilitaryProcurementId) &&
                     !procurementOrderIds.Contains(
                         transaction.SourceMilitaryProcurementId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceEquipmentRepairOrderId) &&
+                    !repairOrderIds.Contains(
+                        transaction.SourceEquipmentRepairOrderId) ||
                     transaction.Lines == null || transaction.Lines.Count == 0)
                 {
                     throw new InvalidOperationException(
@@ -3584,11 +3919,19 @@ namespace Mandate.Domain
                     transaction.Type == InventoryTransactionType.RecipeSettled;
                 var requiresProcurement = transaction.Type ==
                     InventoryTransactionType.MilitaryProcurementDispatched;
+                var requiresRepair =
+                    transaction.Type ==
+                        InventoryTransactionType.EquipmentRepairReserved ||
+                    transaction.Type ==
+                        InventoryTransactionType.EquipmentRepairSettled;
                 if (requiresOrder !=
                     !string.IsNullOrEmpty(transaction.SourceWorkOrderId) ||
                     requiresProcurement !=
                     !string.IsNullOrEmpty(
                         transaction.SourceMilitaryProcurementId) ||
+                    requiresRepair !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceEquipmentRepairOrderId) ||
                     transaction.Type ==
                         InventoryTransactionType.LegacyBalanceConverted &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
@@ -3700,6 +4043,23 @@ namespace Mandate.Domain
         {
             totals.TryGetValue(id, out var current);
             totals[id] = checked(current + delta);
+        }
+
+        private static bool HasCarrierContainer(
+            IDictionary<string, InventoryContainerState> containers,
+            string carrierPersonId,
+            string organizationId)
+        {
+            foreach (var pair in containers)
+            {
+                if (pair.Value.CarrierPersonId == carrierPersonId &&
+                    pair.Value.OwnerOrganizationId == organizationId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void ValidateProduction(HashSet<string> personIds)
@@ -4002,6 +4362,56 @@ namespace Mandate.Domain
             }
 
             return false;
+        }
+
+        private bool HasOrganizationMembership(
+            string personId,
+            string organizationId)
+        {
+            for (var i = 0; i < Memberships.Count; i++)
+            {
+                if (Memberships[i].PersonId == personId &&
+                    Memberships[i].OrganizationId == organizationId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static MilitaryEquipmentDefinitionState FindEquipmentDefinition(
+            IList<MilitaryEquipmentDefinitionState> definitions,
+            string definitionId)
+        {
+            for (var i = 0; i < definitions.Count; i++)
+            {
+                if (definitions[i].Id == definitionId)
+                {
+                    return definitions[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing equipment definition {definitionId}.");
+        }
+
+        private static MilitaryArmoryStockState FindArmoryStock(
+            IList<MilitaryArmoryStockState> stocks,
+            string armyId,
+            string definitionId)
+        {
+            for (var i = 0; i < stocks.Count; i++)
+            {
+                if (stocks[i].ArmyId == armyId &&
+                    stocks[i].EquipmentDefinitionId == definitionId)
+                {
+                    return stocks[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing armory stock {armyId}/{definitionId}.");
         }
 
         private static EducationPlanState FindEducationPlan(

@@ -72,6 +72,8 @@ namespace Mandate.Presentation
             new MilitaryEquipmentSystem();
         private readonly MilitaryProcurementSystem _militaryProcurementSystem =
             new MilitaryProcurementSystem();
+        private readonly ProcessingProductionSystem _processingProductionSystem =
+            new ProcessingProductionSystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2855,6 +2857,15 @@ namespace Mandate.Presentation
             var equipmentBatch = _world.ProductBatches.Find(item =>
                 item.ProductDefinitionId ==
                 CoreProductionContent.LongSpearProductId);
+            var workshopSpearBatch = _world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.LongSpearProductId &&
+                item.InventoryContainerId ==
+                    MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId);
+            var manufacturingOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.ForgeLongSpearRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
             var spearStock = _world.MilitaryArmoryStocks.Find(item =>
                 item.ArmyId == army.Id &&
                 item.EquipmentDefinitionId ==
@@ -2863,6 +2874,44 @@ namespace Mandate.Presentation
                 $"军械采购原型：商号长矛{equipmentBatch?.Quantity ?? 0}件，" +
                 $"援军库内可用长矛{spearStock?.AvailableQuantity ?? 0}件",
                 _normalStyle);
+            GUILayout.Label(
+                $"中山军械工坊：长矛成品{workshopSpearBatch?.Quantity ?? 0}件，" +
+                $"制造订单{manufacturingOrder?.Status.ToString() ?? "无"}，" +
+                $"维修订单{_world.MilitaryEquipmentRepairOrders.Count}笔",
+                _normalStyle);
+            GUILayout.BeginHorizontal();
+            GUI.enabled = manufacturingOrder == null &&
+                FindPerson("person.su_shuang").LocationId ==
+                    "location.zhongshan";
+            if (GUILayout.Button("工坊制造5件长矛", GUILayout.Width(180)))
+            {
+                manufacturingOrder =
+                    _processingProductionSystem.CreateOrganizationOrder(
+                        _world,
+                        CoreProductionContent.ForgeLongSpearRecipeId,
+                        CoreProductionContent.BlacksmithingMethodId,
+                        "organization.zhongshan_merchants",
+                        MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                        MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                        "person.su_shuang",
+                        ProductionControlMode.WorkOrder,
+                        5);
+                _message = $"制造订单{manufacturingOrder.Id}已预留原料。";
+            }
+
+            GUI.enabled = manufacturingOrder != null;
+            if (GUILayout.Button("推进至制造完成", GUILayout.Width(180)))
+            {
+                var days = Math.Max(
+                    1,
+                    (int)(manufacturingOrder.FinishDay -
+                        _world.AbsoluteDay));
+                _simulator.AdvanceDays(_world, days);
+                _message = "已按世界时间推进并结算军械制造。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUI.enabled =
                 _world.MilitaryProcurementOrders.Count == 0 &&

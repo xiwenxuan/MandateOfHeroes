@@ -1019,6 +1019,10 @@ namespace Mandate.Domain
         public const string WheatFlourProductId = "product.wheat_flour";
         public const string WheatBranProductId = "product.wheat_bran";
         public const string DryRationProductId = "product.dry_ration";
+        public const string IronMaterialProductId = "product.material.iron";
+        public const string TimberMaterialProductId = "product.material.timber";
+        public const string LeatherMaterialProductId = "product.material.leather";
+        public const string HornMaterialProductId = "product.material.horn";
         public const string RingSwordProductId =
             "product.equipment.han_ring_sword";
         public const string WoodenShieldProductId =
@@ -1036,12 +1040,40 @@ namespace Mandate.Domain
             "recipe.processing.hand_mill_wheat";
         public const string MakeDryRationRecipeId =
             "recipe.processing.make_dry_ration";
+        public const string ForgeRingSwordRecipeId =
+            "recipe.manufacturing.forge_ring_sword";
+        public const string MakeWoodenShieldRecipeId =
+            "recipe.manufacturing.make_wooden_shield";
+        public const string ForgeLongSpearRecipeId =
+            "recipe.manufacturing.forge_long_spear";
+        public const string MakeHornBowRecipeId =
+            "recipe.manufacturing.make_horn_bow";
+        public const string MakeArrowBundleRecipeId =
+            "recipe.manufacturing.make_arrow_bundle";
+        public const string MakeLamellarArmorRecipeId =
+            "recipe.manufacturing.make_lamellar_armor";
         public const string PrototypeDrylandMethodId =
             "method.farming.prototype_dryland";
         public const string HandMillingMethodId =
             "method.processing.hand_milling";
         public const string DryRationMethodId =
             "method.processing.dry_ration";
+        public const string BlacksmithingMethodId =
+            "method.manufacturing.blacksmithing";
+        public const string WoodworkingMethodId =
+            "method.manufacturing.woodworking";
+        public const string BowmakingMethodId =
+            "method.manufacturing.bowmaking";
+        public const string ArmoringMethodId =
+            "method.manufacturing.armoring";
+        public const string BlacksmithFacilityTag =
+            "facility.blacksmith_workshop";
+        public const string WoodworkingFacilityTag =
+            "facility.woodworking_workshop";
+        public const string BowmakingFacilityTag =
+            "facility.bowmaking_workshop";
+        public const string ArmoringFacilityTag =
+            "facility.armoring_workshop";
         public const string GrainUnitId = "unit.grain";
         public const string LaborDayUnitId = "unit.labor_day";
         public const string ItemUnitId = "unit.item";
@@ -1051,7 +1083,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "4.0.0",
+                Version = "5.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1148,6 +1180,10 @@ namespace Mandate.Domain
                     "product.military_supply"
                 }
             });
+            AddMaterialProduct(package, IronMaterialProductId, "铁料");
+            AddMaterialProduct(package, TimberMaterialProductId, "木料");
+            AddMaterialProduct(package, LeatherMaterialProductId, "皮革");
+            AddMaterialProduct(package, HornMaterialProductId, "角料");
             AddMilitaryEquipmentProduct(
                 package, RingSwordProductId, "环首刀", 3,
                 "product.equipment.melee");
@@ -1247,6 +1283,42 @@ namespace Mandate.Domain
                     }
                 }
             });
+            AddManufacturingRecipe(
+                package, ForgeRingSwordRecipeId, "锻造环首刀", 6,
+                BlacksmithFacilityTag,
+                RingSwordProductId,
+                IronMaterialProductId, 2,
+                TimberMaterialProductId, 1);
+            AddManufacturingRecipe(
+                package, MakeWoodenShieldRecipeId, "制作木盾", 4,
+                WoodworkingFacilityTag,
+                WoodenShieldProductId,
+                TimberMaterialProductId, 4,
+                LeatherMaterialProductId, 1);
+            AddManufacturingRecipe(
+                package, ForgeLongSpearRecipeId, "锻造长矛", 5,
+                BlacksmithFacilityTag,
+                LongSpearProductId,
+                IronMaterialProductId, 2,
+                TimberMaterialProductId, 3);
+            AddManufacturingRecipe(
+                package, MakeHornBowRecipeId, "制作角弓", 7,
+                BowmakingFacilityTag,
+                HornBowProductId,
+                TimberMaterialProductId, 1,
+                HornMaterialProductId, 1);
+            AddManufacturingRecipe(
+                package, MakeArrowBundleRecipeId, "制作箭束", 2,
+                WoodworkingFacilityTag,
+                ArrowBundleProductId,
+                TimberMaterialProductId, 1,
+                IronMaterialProductId, 1);
+            AddManufacturingRecipe(
+                package, MakeLamellarArmorRecipeId, "制作札甲", 12,
+                ArmoringFacilityTag,
+                LamellarArmorProductId,
+                IronMaterialProductId, 8,
+                LeatherMaterialProductId, 2);
             package.Methods.Add(new ProductionMethodDefinition
             {
                 Id = PrototypeDrylandMethodId,
@@ -1280,6 +1352,18 @@ namespace Mandate.Domain
                 LaborBasisPoints = 10_000,
                 HistoricalStatus = "historical_inference"
             });
+            AddManufacturingMethod(
+                package, BlacksmithingMethodId, "锻打",
+                ForgeRingSwordRecipeId, ForgeLongSpearRecipeId);
+            AddManufacturingMethod(
+                package, WoodworkingMethodId, "木作",
+                MakeWoodenShieldRecipeId, MakeArrowBundleRecipeId);
+            AddManufacturingMethod(
+                package, BowmakingMethodId, "制弓",
+                MakeHornBowRecipeId);
+            AddManufacturingMethod(
+                package, ArmoringMethodId, "制甲",
+                MakeLamellarArmorRecipeId);
             package.Skills.Add(new SkillDefinition
             {
                 Id = CoreSkillIds.Agriculture,
@@ -1353,6 +1437,86 @@ namespace Mandate.Domain
                     "product.military_supply",
                     categoryTag
                 }
+            });
+        }
+
+        private static void AddMaterialProduct(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName)
+        {
+            package.Products.Add(new ProductDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                UnitId = ItemUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 0,
+                CategoryTags = new List<string>
+                {
+                    "product.material",
+                    "product.market",
+                    "product.manufacturing_input"
+                }
+            });
+        }
+
+        private static void AddManufacturingRecipe(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            int durationDays,
+            string facilityTag,
+            string outputProductId,
+            string firstInputProductId,
+            long firstInputQuantity,
+            string secondInputProductId,
+            long secondInputQuantity)
+        {
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                DurationDays = durationDays,
+                FacilityTags = new List<string> { facilityTag },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = firstInputProductId,
+                        QuantityPerLandUnit = firstInputQuantity
+                    },
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = secondInputProductId,
+                        QuantityPerLandUnit = secondInputQuantity
+                    }
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = outputProductId,
+                        QuantityPerLandUnit = 1
+                    }
+                }
+            });
+        }
+
+        private static void AddManufacturingMethod(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            params string[] recipeIds)
+        {
+            package.Methods.Add(new ProductionMethodDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                RecipeDefinitionIds = new List<string>(recipeIds),
+                YieldBasisPoints = 10_000,
+                LaborBasisPoints = 10_000,
+                HistoricalStatus = "historical_inference"
             });
         }
 

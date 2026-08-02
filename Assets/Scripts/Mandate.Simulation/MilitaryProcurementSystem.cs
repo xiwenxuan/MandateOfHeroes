@@ -104,27 +104,41 @@ namespace Mandate.Simulation
 
             var definition = FindEquipment(
                 world, equipmentDefinitionId.Value);
-            var container = FindContainerByCarrier(
+            var carrierContainer = FindContainerByCarrier(
                 world, carrierPersonId.Value);
             var carrier = PeopleFor(world).GetRequired(carrierPersonId.Value);
-            if (!carrier.IsAlive || carrier.LocationId != container.LocationId)
+            if (!carrier.IsAlive ||
+                carrier.LocationId != carrierContainer.LocationId)
             {
                 throw new InvalidOperationException(
                     "The carrier and cargo container must be alive and co-located.");
             }
 
             if (!HasMembership(
-                    world, carrier.Id, container.OwnerOrganizationId))
+                    world, carrier.Id,
+                    carrierContainer.OwnerOrganizationId))
             {
                 throw new InvalidOperationException(
                     "The carrier must belong to the supplier organization.");
             }
 
-            var batch = FindAvailableBatch(
+            var batch = FindAvailableSupplierBatch(
                 world,
-                container.Id,
+                carrierContainer,
                 definition.ProductDefinitionId,
                 quantity);
+            var sourceContainer = FindContainer(
+                world, batch.InventoryContainerId, true);
+            var cargoWeight = checked((long)definition.UnitWeight * quantity);
+            var carrierLoad = CalculateContainerWeight(
+                world, carrierContainer.Id);
+            if (sourceContainer.Id != carrierContainer.Id &&
+                checked(carrierLoad + cargoWeight) >
+                    carrierContainer.CapacityWeight)
+            {
+                throw new InvalidOperationException(
+                    "The carrier container lacks capacity for workshop cargo.");
+            }
             var route = FindRoute(world, routeId.Value);
             var connects = route.FromLocationId == carrier.LocationId &&
                            route.ToLocationId == destinationLocationId.Value ||
@@ -140,7 +154,7 @@ namespace Mandate.Simulation
 
             var buyer = FindOrganization(world, army.OrganizationId);
             var supplier = FindOrganization(
-                world, container.OwnerOrganizationId);
+                world, sourceContainer.OwnerOrganizationId);
             var totalPaid = checked(unitPrice * quantity);
             if (buyer.Treasury < totalPaid)
             {
@@ -172,7 +186,7 @@ namespace Mandate.Simulation
                 EquipmentDefinitionId = definition.Id,
                 ProductDefinitionId = definition.ProductDefinitionId,
                 SourceBatchId = batch.Id,
-                InventoryContainerId = container.Id,
+                InventoryContainerId = sourceContainer.Id,
                 RouteId = route.Id,
                 JourneyId = journey.Id,
                 OriginLocationId = journey.OriginLocationId,
@@ -247,8 +261,8 @@ namespace Mandate.Simulation
                 }
 
                 var army = FindArmy(world, order.TargetArmyId);
-                var container = FindContainer(
-                    world, order.InventoryContainerId, true);
+                var container = FindContainerByCarrier(
+                    world, order.CarrierPersonId);
                 if (army.LocationId != order.DestinationLocationId ||
                     container.LocationId != order.DestinationLocationId)
                 {
@@ -422,25 +436,68 @@ namespace Mandate.Simulation
             return false;
         }
 
-        private static ProductBatchState FindAvailableBatch(
+        private static ProductBatchState FindAvailableSupplierBatch(
             WorldState world,
-            string containerId,
+            InventoryContainerState carrierContainer,
             string productId,
             int quantity)
         {
+            ProductBatchState fallback = null;
             for (var i = 0; i < world.ProductBatches.Count; i++)
             {
                 var batch = world.ProductBatches[i];
-                if (batch.InventoryContainerId == containerId &&
-                    batch.ProductDefinitionId == productId &&
-                    batch.Quantity - batch.ReservedQuantity >= quantity)
+                if (batch.OwnerOrganizationId !=
+                        carrierContainer.OwnerOrganizationId ||
+                    batch.ProductDefinitionId != productId ||
+                    batch.Quantity - batch.ReservedQuantity < quantity)
+                {
+                    continue;
+                }
+
+                var container = FindContainer(
+                    world, batch.InventoryContainerId, true);
+                if (container.LocationId != carrierContainer.LocationId)
+                {
+                    continue;
+                }
+
+                if (container.Id == carrierContainer.Id)
                 {
                     return batch;
                 }
+
+                if (fallback == null || string.CompareOrdinal(
+                        batch.Id, fallback.Id) < 0)
+                {
+                    fallback = batch;
+                }
+            }
+
+            if (fallback != null)
+            {
+                return fallback;
             }
 
             throw new InvalidOperationException(
                 "The supplier lacks an available product batch.");
+        }
+
+        private static long CalculateContainerWeight(
+            WorldState world,
+            string containerId)
+        {
+            long total = 0;
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                if (world.ProductBatches[i].InventoryContainerId == containerId)
+                {
+                    total = checked(total +
+                        world.ProductBatches[i].Quantity *
+                        world.ProductBatches[i].UnitWeight);
+                }
+            }
+
+            return total;
         }
 
         private static InventoryContainerState FindContainerByCarrier(
