@@ -26,14 +26,19 @@ namespace Mandate.Simulation
         private readonly NamedRandom _random;
         private readonly ProductionContentRegistry _content;
         private readonly ResearchSystem _research;
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
 
         public AgricultureProductionSystem(
             ulong masterSeed,
-            ProductionContentRegistry content = null)
+            ProductionContentRegistry content = null,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
             _content = content ?? ProductionContentRegistry.CreateCore();
             _research = new ResearchSystem(_content);
+            _people = people;
         }
 
         public AgricultureWorkOrderState CreateOrder(
@@ -515,7 +520,7 @@ namespace Mandate.Simulation
             return false;
         }
 
-        private static List<string> AvailableFamilyWorkers(
+        private List<string> AvailableFamilyWorkers(
             WorldState world,
             VillageState village,
             FamilyState family)
@@ -657,17 +662,25 @@ namespace Mandate.Simulation
             throw new InvalidOperationException($"Missing family {id}.");
         }
 
-        private static PersonState FindPerson(WorldState world, string id)
+        private PersonState FindPerson(WorldState world, string id)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            return PeopleFor(world).GetRequired(id);
+        }
+
+        private IPersonRepository PeopleFor(WorldState world)
+        {
+            if (_people != null)
             {
-                if (world.People[i].Id == id)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {id}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         private static VillageFacilityState FindFacility(

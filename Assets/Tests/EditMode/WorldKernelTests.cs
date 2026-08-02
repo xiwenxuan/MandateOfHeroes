@@ -3549,6 +3549,115 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void Agriculture_InjectedRepositoryPreservesProductionFacts()
+        {
+            var inline = VillagePrototypeFactory.Create(200, 21_301);
+            var accessed = VillagePrototypeFactory.Create(200, 21_301);
+            inline.AbsoluteDay = 90;
+            accessed.AbsoluteDay = 90;
+            var inlineFamily = inline.Families[0];
+            var accessedFamily = accessed.Families[0];
+            var inlineField = inline.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var accessedField = accessed.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var inlineStorage = inline.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == inlineFamily.Id);
+            var accessedStorage = accessed.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == accessedFamily.Id);
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineSystem = new AgricultureProductionSystem(
+                inline.MasterSeed);
+            var accessedSystem = new AgricultureProductionSystem(
+                accessed.MasterSeed, null, repository);
+
+            inlineSystem.CreateOrder(
+                inline,
+                inline.Villages[0].Id,
+                inlineFamily.Id,
+                inlineField.Id,
+                inlineStorage.Id,
+                inlineFamily.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.WorkOrder,
+                inlineFamily.FarmlandUnits,
+                AvailableAgricultureWorkers(inline, inlineFamily),
+                270);
+            accessedSystem.CreateOrder(
+                accessed,
+                accessed.Villages[0].Id,
+                accessedFamily.Id,
+                accessedField.Id,
+                accessedStorage.Id,
+                accessedFamily.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.WorkOrder,
+                accessedFamily.FarmlandUnits,
+                AvailableAgricultureWorkers(accessed, accessedFamily),
+                270);
+            inline.AbsoluteDay = 270;
+            accessed.AbsoluteDay = 270;
+
+            inlineSystem.ResolveDueOrders(inline, inline.Villages[0].Id);
+            accessedSystem.ResolveDueOrders(accessed, accessed.Villages[0].Id);
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(accessedSystem.Audit(accessed).IsBalanced, Is.True);
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+        }
+
+        [Test]
+        public void Agriculture_RepositoryRejectsMissingManagerWithoutDirtyingPeople()
+        {
+            var world = VillagePrototypeFactory.Create(200, 21_302);
+            world.AbsoluteDay = 90;
+            var family = world.Families[0];
+            var field = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == family.Id);
+            var repository = new WorldStatePersonRepository(world);
+            var system = new AgricultureProductionSystem(
+                world.MasterSeed, null, repository);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() => system.CreateOrder(
+                world,
+                world.Villages[0].Id,
+                family.Id,
+                field.Id,
+                storage.Id,
+                "person.missing.agriculture_manager",
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.DirectAssignment,
+                1,
+                AvailableAgricultureWorkers(world, family),
+                270));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world), Is.EqualTo(before));
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+        }
+
+        [Test]
         public void Agriculture_StorageOverflowIsLostAndAudited()
         {
             var world = VillagePrototypeFactory.Create(200, 20_003);

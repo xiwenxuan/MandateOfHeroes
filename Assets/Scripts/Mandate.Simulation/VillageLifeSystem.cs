@@ -62,7 +62,8 @@ namespace Mandate.Simulation
             _people = people;
             _population = new PopulationLedgerSystem(people);
             _agricultureProduction =
-                new AgricultureProductionSystem(masterSeed, productionContent);
+                new AgricultureProductionSystem(
+                    masterSeed, productionContent, people);
         }
 
         public void ResolveMonthly(WorldState world)
