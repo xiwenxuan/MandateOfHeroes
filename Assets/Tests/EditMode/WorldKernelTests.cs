@@ -1022,6 +1022,116 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void MedicalTreatment_InjectedRepositoryTracksRecoveredPatientsOnly()
+        {
+            var inline = BuildGuangzongBattleWorld();
+            var accessed = BuildGuangzongBattleWorld();
+            new BattleResolver(inline.MasterSeed).Resolve(
+                inline,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            new BattleResolver(accessed.MasterSeed).Resolve(
+                accessed,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            var inlinePhysician = inline.People.Find(
+                item => item.Id == "person.generated.physician_001");
+            var accessedPhysician = accessed.People.Find(
+                item => item.Id == "person.generated.physician_001");
+            var inlineArmy = inline.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var accessedArmy = accessed.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            Assert.That(
+                new TradingSystem().Buy(
+                    inline,
+                    new StableId(inlinePhysician.Id),
+                    new StableId("commodity.herbs"),
+                    5).Success,
+                Is.True);
+            Assert.That(
+                new TradingSystem().Buy(
+                    accessed,
+                    new StableId(accessedPhysician.Id),
+                    new StableId("commodity.herbs"),
+                    5).Success,
+                Is.True);
+            var repository = new WorldStatePersonRepository(accessed);
+
+            var inlineResult = new MedicalSystem(inline.MasterSeed)
+                .TreatArmyWounded(
+                    inline,
+                    new StableId(inlinePhysician.Id),
+                    new StableId(inlineArmy.Id),
+                    25);
+            var accessedResult = new MedicalSystem(
+                accessed.MasterSeed, repository).TreatArmyWounded(
+                    accessed,
+                    new StableId(accessedPhysician.Id),
+                    new StableId(accessedArmy.Id),
+                    25);
+
+            Assert.That(accessedResult.Success, Is.True, accessedResult.Message);
+            Assert.That(
+                accessedResult.RecoveredTroops,
+                Is.EqualTo(inlineResult.RecoveredTroops));
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            var changedPeople = repository.GetChangedPersonIds();
+            Assert.That(changedPeople.Count, Is.EqualTo(
+                accessedResult.RecoveredTroops));
+            Assert.That(changedPeople, Does.Not.Contain(accessedPhysician.Id));
+            for (var i = 0; i < changedPeople.Count; i++)
+            {
+                var service = accessed.MilitaryServices.Find(
+                    item => item.PersonId == changedPeople[i]);
+                Assert.That(service, Is.Not.Null);
+                Assert.That(
+                    service.Status,
+                    Is.EqualTo(MilitaryServiceStatus.Active));
+                Assert.That(
+                    repository.GetRequired(changedPeople[i]).HealthBasisPoints,
+                    Is.GreaterThanOrEqualTo(6_000));
+            }
+
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+        }
+
+        [Test]
+        public void MedicalTreatment_FailureReadsStayClean()
+        {
+            var world = BuildGuangzongBattleWorld();
+            new BattleResolver(world.MasterSeed).Resolve(
+                world,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            var physician = world.People.Find(
+                item => item.Id == "person.generated.physician_001");
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var repository = new WorldStatePersonRepository(world);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            var result = new MedicalSystem(
+                world.MasterSeed, repository).TreatArmyWounded(
+                    world,
+                    new StableId(physician.Id),
+                    new StableId(army.Id),
+                    20);
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+        }
+
+        [Test]
         public void Snapshot_RoundTripPreservesMedicalTreatmentHistory()
         {
             var world = BuildGuangzongBattleWorld();

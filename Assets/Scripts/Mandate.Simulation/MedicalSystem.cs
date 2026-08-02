@@ -30,10 +30,16 @@ namespace Mandate.Simulation
     {
         public const int PatientsPerHerbUnit = 5;
         private readonly NamedRandom _random;
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
 
-        public MedicalSystem(ulong masterSeed)
+        public MedicalSystem(
+            ulong masterSeed,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
+            _people = people;
         }
 
         public MedicalTreatmentResult TreatArmyWounded(
@@ -115,7 +121,8 @@ namespace Mandate.Simulation
                 world,
                 armyId,
                 recovered,
-                sequence);
+                sequence,
+                PeopleFor(world));
             if (army.Troops > army.MaximumTroops)
             {
                 throw new InvalidOperationException(
@@ -193,17 +200,25 @@ namespace Mandate.Simulation
             return null;
         }
 
-        private static PersonState FindPerson(WorldState world, string personId)
+        private PersonState FindPerson(WorldState world, string personId)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            return PeopleFor(world).GetRequired(personId);
+        }
+
+        private IPersonRepository PeopleFor(WorldState world)
+        {
+            if (_people != null)
             {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {personId}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         private static ArmyState FindArmy(WorldState world, string armyId)

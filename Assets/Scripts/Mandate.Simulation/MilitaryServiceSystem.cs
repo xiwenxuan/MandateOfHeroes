@@ -272,7 +272,8 @@ namespace Mandate.Simulation
             WorldState world,
             StableId armyId,
             int requested,
-            long sequence)
+            long sequence,
+            IPersonRepository people = null)
         {
             if (!world.MilitaryServiceInitialized)
             {
@@ -286,14 +287,20 @@ namespace Mandate.Simulation
             var selected = SelectServices(
                 world, armyId.Value, MilitaryServiceStatus.Wounded,
                 requested, sequence, "recovery");
+            people = people ?? new WorldStatePersonRepository(world);
             for (var i = 0; i < selected.Count; i++)
             {
                 var service = selected[i];
                 service.Status = MilitaryServiceStatus.Active;
                 service.LastStatusChangeDay = world.AbsoluteDay;
-                var person = FindPerson(world, service.PersonId);
-                person.HealthBasisPoints = Math.Max(
+                var person = people.GetRequired(service.PersonId);
+                var recoveredHealth = Math.Max(
                     person.HealthBasisPoints, 6_000);
+                if (recoveredHealth != person.HealthBasisPoints)
+                {
+                    people.GetRequiredForUpdate(service.PersonId)
+                        .HealthBasisPoints = recoveredHealth;
+                }
             }
 
             SynchronizeArmyCaches(world, armyId.Value);
