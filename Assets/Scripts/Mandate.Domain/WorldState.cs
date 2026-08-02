@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 10;
+        public const int CurrentSchemaVersion = 11;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -153,6 +153,10 @@ namespace Mandate.Domain
         public List<RouteState> Routes = new List<RouteState>();
         public List<JourneyState> Journeys = new List<JourneyState>();
         public List<RelationshipState> Relationships = new List<RelationshipState>();
+        public List<AttentionFocusState> AttentionFocuses =
+            new List<AttentionFocusState>();
+        public List<AttentionLedgerEntryState> AttentionLedgerEntries =
+            new List<AttentionLedgerEntryState>();
         public List<OrganizationState> Organizations = new List<OrganizationState>();
         public List<PositionState> Positions = new List<PositionState>();
         public List<MembershipState> Memberships = new List<MembershipState>();
@@ -272,6 +276,12 @@ namespace Mandate.Domain
             ValidateUniqueIds(Routes, route => route.Id, "route");
             ValidateUniqueIds(Journeys, journey => journey.Id, "journey");
             ValidateUniqueIds(Relationships, relationship => relationship.Id, "relationship");
+            ValidateUniqueIds(
+                AttentionFocuses, attention => attention.Id, "attention focus");
+            ValidateUniqueIds(
+                AttentionLedgerEntries,
+                entry => entry.Id,
+                "attention ledger entry");
             ValidateUniqueIds(Organizations, organization => organization.Id, "organization");
             ValidateUniqueIds(Positions, position => position.Id, "position");
             ValidateUniqueIds(Memberships, membership => membership.Id, "membership");
@@ -1247,6 +1257,118 @@ namespace Mandate.Domain
 
             ValidateEducation(personIds, positionIds);
             ValidateMilitaryService(personIds, locationIds, armyIds);
+            ValidateAttention(personIds);
+        }
+
+        private void ValidateAttention(HashSet<string> personIds)
+        {
+            var focusKeys = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < AttentionFocuses.Count; i++)
+            {
+                var focus = AttentionFocuses[i];
+                _ = new StableId(focus.ReasonId);
+                _ = new StableId(focus.TargetId);
+                if (!personIds.Contains(focus.ObserverPersonId) ||
+                    !Enum.IsDefined(typeof(AttentionTargetKind), focus.TargetKind) ||
+                    !Enum.IsDefined(typeof(AttentionLevel), focus.Level) ||
+                    focus.Level == AttentionLevel.None ||
+                    focus.CreatedDay < 0 ||
+                    focus.LastChangedDay < focus.CreatedDay ||
+                    focus.LastChangedDay > AbsoluteDay ||
+                    !AttentionTargetExists(focus.TargetKind, focus.TargetId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid attention focus {focus.Id}.");
+                }
+
+                var key = focus.ObserverPersonId + "|" +
+                          (byte)focus.TargetKind + "|" + focus.TargetId + "|" +
+                          focus.ReasonId;
+                if (!focusKeys.Add(key))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate attention reason for {key}.");
+                }
+            }
+
+            for (var i = 0; i < AttentionLedgerEntries.Count; i++)
+            {
+                var entry = AttentionLedgerEntries[i];
+                _ = new StableId(entry.ReasonId);
+                _ = new StableId(entry.TargetId);
+                if (entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !personIds.Contains(entry.ObserverPersonId) ||
+                    !Enum.IsDefined(typeof(AttentionTargetKind), entry.TargetKind) ||
+                    !Enum.IsDefined(
+                        typeof(AttentionLedgerChangeKind), entry.ChangeKind) ||
+                    !Enum.IsDefined(typeof(AttentionLevel), entry.PreviousLevel) ||
+                    !Enum.IsDefined(typeof(AttentionLevel), entry.NewLevel) ||
+                    !AttentionTargetExists(entry.TargetKind, entry.TargetId) ||
+                    !ValidAttentionTransition(entry))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid attention ledger entry {entry.Id}.");
+                }
+            }
+        }
+
+        private bool AttentionTargetExists(
+            AttentionTargetKind kind,
+            string targetId)
+        {
+            switch (kind)
+            {
+                case AttentionTargetKind.Person:
+                    return ContainsId(People, item => item.Id, targetId);
+                case AttentionTargetKind.Family:
+                    return ContainsId(Families, item => item.Id, targetId);
+                case AttentionTargetKind.Village:
+                    return ContainsId(Villages, item => item.Id, targetId);
+                case AttentionTargetKind.Facility:
+                    return ContainsId(
+                        VillageFacilities, item => item.Id, targetId);
+                case AttentionTargetKind.Organization:
+                    return ContainsId(
+                        Organizations, item => item.Id, targetId);
+                default:
+                    return false;
+            }
+        }
+
+        private static bool ValidAttentionTransition(
+            AttentionLedgerEntryState entry)
+        {
+            switch (entry.ChangeKind)
+            {
+                case AttentionLedgerChangeKind.Added:
+                    return entry.PreviousLevel == AttentionLevel.None &&
+                           entry.NewLevel != AttentionLevel.None;
+                case AttentionLedgerChangeKind.Updated:
+                    return entry.PreviousLevel != AttentionLevel.None &&
+                           entry.NewLevel != AttentionLevel.None &&
+                           entry.PreviousLevel != entry.NewLevel;
+                case AttentionLedgerChangeKind.Removed:
+                    return entry.PreviousLevel != AttentionLevel.None &&
+                           entry.NewLevel == AttentionLevel.None;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool ContainsId<T>(
+            IList<T> items,
+            Func<T, string> selectId,
+            string id)
+        {
+            for (var i = 0; i < items.Count; i++)
+            {
+                if (string.Equals(selectId(items[i]), id, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void ValidateMilitaryService(

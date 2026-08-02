@@ -1085,6 +1085,13 @@ namespace Mandate.Persistence
 
         public int HotCount => hotPeople.Count;
 
+        public IReadOnlyList<string> GetHotPersonIds()
+        {
+            var result = new List<string>(hotPeople.Keys);
+            result.Sort(StringComparer.Ordinal);
+            return result;
+        }
+
         public PersonState Promote(string personId)
         {
             if (hotPeople.TryGetValue(personId, out var existing))
@@ -1139,5 +1146,65 @@ namespace Mandate.Persistence
 
             hotPeople.Remove(personId);
         }
+
+        public PopulationResidencyReconciliationResult ReconcileAttention(
+            IEnumerable<string> desiredHotPersonIds)
+        {
+            if (desiredHotPersonIds == null)
+            {
+                throw new ArgumentNullException(nameof(desiredHotPersonIds));
+            }
+
+            var desired = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var personId in desiredHotPersonIds)
+            {
+                _ = new StableId(personId);
+                desired.Add(personId);
+            }
+
+            var desiredSorted = new List<string>(desired);
+            desiredSorted.Sort(StringComparer.Ordinal);
+            var result = new PopulationResidencyReconciliationResult();
+            for (var i = 0; i < desiredSorted.Count; i++)
+            {
+                if (!hotPeople.ContainsKey(desiredSorted[i]))
+                {
+                    Promote(desiredSorted[i]);
+                    result.PromotedPersonIds.Add(desiredSorted[i]);
+                }
+            }
+
+            var existing = new List<string>(hotPeople.Keys);
+            existing.Sort(StringComparer.Ordinal);
+            for (var i = 0; i < existing.Count; i++)
+            {
+                var personId = existing[i];
+                if (desired.Contains(personId))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    DemoteUnchanged(personId);
+                    result.DemotedPersonIds.Add(personId);
+                }
+                catch (InvalidOperationException)
+                {
+                    result.DirtyRetainedPersonIds.Add(personId);
+                }
+            }
+
+            result.FinalHotPersonIds.AddRange(GetHotPersonIds());
+            return result;
+        }
+    }
+
+    public sealed class PopulationResidencyReconciliationResult
+    {
+        public readonly List<string> PromotedPersonIds = new List<string>();
+        public readonly List<string> DemotedPersonIds = new List<string>();
+        public readonly List<string> DirtyRetainedPersonIds = new List<string>();
+        public readonly List<string> FinalHotPersonIds = new List<string>();
     }
 }

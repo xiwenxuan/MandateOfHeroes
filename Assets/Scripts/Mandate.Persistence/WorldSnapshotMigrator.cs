@@ -55,6 +55,9 @@ namespace Mandate.Persistence
                     case 9:
                         MigrateVersionNineToTen(world, content);
                         break;
+                    case 10:
+                        MigrateVersionTenToEleven(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -202,6 +205,15 @@ namespace Mandate.Persistence
             world.ProductionContentManifest =
                 productionContent.CreateManifest();
             world.SchemaVersion = 10;
+        }
+
+        private static void MigrateVersionTenToEleven(WorldState world)
+        {
+            world.AttentionFocuses ??=
+                new System.Collections.Generic.List<AttentionFocusState>();
+            world.AttentionLedgerEntries ??=
+                new System.Collections.Generic.List<AttentionLedgerEntryState>();
+            world.SchemaVersion = 11;
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

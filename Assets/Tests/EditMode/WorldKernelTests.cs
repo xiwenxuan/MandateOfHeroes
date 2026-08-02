@@ -3025,7 +3025,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 10", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 11", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3048,7 +3048,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 10", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 11", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3571,7 +3571,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 10", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 11", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3598,7 +3598,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -3835,7 +3835,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -3846,7 +3846,9 @@ namespace Mandate.Tests
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(10));
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.ProductBatches, Is.Not.Null);
             Assert.That(loaded.InventoryTransactions, Is.Not.Null);
             Assert.That(loaded.ProcessingWorkOrders, Is.Not.Null);
@@ -3865,7 +3867,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 10", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -3961,6 +3963,216 @@ namespace Mandate.Tests
             {
                 DeletePopulationStoreTestRoot(root);
             }
+        }
+
+        [Test]
+        public void Attention_ReasonsAggregateAndRoundTripWithoutChangingPeople()
+        {
+            var world = BuildMinimalWorld();
+            world.PlayerPersonId = "person.liu_bei";
+            var target = world.People.Find(item => item.Id == "person.guan_yu");
+            var originalWealth = target.Wealth;
+            var originalRelationshipCount = world.Relationships.Count;
+            var system = new AttentionSystem();
+
+            system.SetReason(
+                world,
+                world.PlayerPersonId,
+                AttentionTargetKind.Person,
+                target.Id,
+                AttentionSystem.ManualReasonId,
+                AttentionLevel.Normal);
+            system.SetReason(
+                world,
+                world.PlayerPersonId,
+                AttentionTargetKind.Person,
+                target.Id,
+                "attention.reason.active_event",
+                AttentionLevel.Deep);
+            Assert.That(
+                system.GetEffectiveLevel(
+                    world,
+                    world.PlayerPersonId,
+                    AttentionTargetKind.Person,
+                    target.Id),
+                Is.EqualTo(AttentionLevel.Deep));
+
+            system.ClearReason(
+                world,
+                world.PlayerPersonId,
+                AttentionTargetKind.Person,
+                target.Id,
+                "attention.reason.active_event");
+
+            Assert.That(
+                system.GetEffectiveLevel(
+                    world,
+                    world.PlayerPersonId,
+                    AttentionTargetKind.Person,
+                    target.Id),
+                Is.EqualTo(AttentionLevel.Normal));
+            Assert.That(world.AttentionFocuses.Count, Is.EqualTo(1));
+            Assert.That(world.AttentionLedgerEntries.Count, Is.EqualTo(3));
+            Assert.That(target.Wealth, Is.EqualTo(originalWealth));
+            Assert.That(
+                world.Relationships.Count,
+                Is.EqualTo(originalRelationshipCount));
+            world.Validate();
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.AttentionFocuses.Count, Is.EqualTo(1));
+            Assert.That(loaded.AttentionLedgerEntries.Count, Is.EqualTo(3));
+            Assert.That(
+                loaded.AttentionFocuses[0].ReasonId,
+                Is.EqualTo(AttentionSystem.ManualReasonId));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Attention_LocalRelationshipNetworkIsBoundedAndDoesNotAddEdges()
+        {
+            var world = BuildMinimalWorld();
+            var family = world.Families[0];
+            family.MemberIds.Add("person.guan_yu");
+            world.People[0].FamilyId = family.Id;
+            world.People[1].FamilyId = family.Id;
+            world.Relationships.Add(new RelationshipState
+            {
+                Id = "relationship.person.liu_bei.person.guan_yu",
+                FromPersonId = "person.liu_bei",
+                ToPersonId = "person.guan_yu",
+                Affection = 5_000,
+                Trust = 5_000,
+                Respect = 5_000
+            });
+            var relationshipCount = world.Relationships.Count;
+            var system = new AttentionSystem();
+
+            var first = system.BuildLocalRelationshipNetwork(
+                world, "person.liu_bei", 2);
+            var second = system.BuildLocalRelationshipNetwork(
+                world, "person.liu_bei", 2);
+
+            Assert.That(first.PersonIds.Count, Is.EqualTo(2));
+            Assert.That(first.PersonIds, Is.EqualTo(second.PersonIds));
+            Assert.That(
+                first.ExplicitRelationshipIds,
+                Is.EqualTo(second.ExplicitRelationshipIds));
+            Assert.That(first.FamilyIds, Does.Contain(family.Id));
+            Assert.That(world.Relationships.Count, Is.EqualTo(relationshipCount));
+            world.Validate();
+        }
+
+        [Test]
+        public void Attention_ResidencyPlanPromotesDemotesAndRetainsDirtyPeople()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                world.PlayerPersonId = "person.liu_bei";
+                world.Relationships.Add(new RelationshipState
+                {
+                    Id = "relationship.person.guan_yu.person.liu_bei",
+                    FromPersonId = "person.guan_yu",
+                    ToPersonId = "person.liu_bei",
+                    Affection = 5_000,
+                    Trust = 5_000,
+                    Respect = 5_000
+                });
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.attention_residency",
+                    4,
+                    1);
+                var attention = new AttentionSystem();
+                attention.SetReason(
+                    world,
+                    world.PlayerPersonId,
+                    AttentionTargetKind.Person,
+                    "person.guan_yu",
+                    AttentionSystem.ManualReasonId,
+                    AttentionLevel.Deep);
+                var session = new PopulationResidencySession(store);
+
+                var promoted = session.ReconcileAttention(
+                    attention.BuildResidencyPlan(world, world.PlayerPersonId, 2)
+                        .HotPersonIds);
+                Assert.That(promoted.PromotedPersonIds.Count, Is.EqualTo(2));
+                Assert.That(session.HotCount, Is.EqualTo(2));
+
+                attention.ClearReason(
+                    world,
+                    world.PlayerPersonId,
+                    AttentionTargetKind.Person,
+                    "person.guan_yu",
+                    AttentionSystem.ManualReasonId);
+                var demoted = session.ReconcileAttention(
+                    attention.BuildResidencyPlan(world, world.PlayerPersonId, 2)
+                        .HotPersonIds);
+                Assert.That(
+                    demoted.DemotedPersonIds,
+                    Does.Contain("person.guan_yu"));
+                Assert.That(session.HotCount, Is.EqualTo(1));
+
+                var dirty = session.Promote("person.guan_yu");
+                dirty.Wealth++;
+                var retained = session.ReconcileAttention(
+                    attention.BuildResidencyPlan(world, world.PlayerPersonId, 2)
+                        .HotPersonIds);
+                Assert.That(
+                    retained.DirtyRetainedPersonIds,
+                    Does.Contain("person.guan_yu"));
+                Assert.That(session.HotCount, Is.EqualTo(2));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionTenToEmptyAttentionCollections()
+        {
+            var world = BuildMinimalWorld();
+            var originalPeople = world.People.Count;
+            var originalPersonId = world.People[0].Id;
+            var originalPersonWealth = world.People[0].Wealth;
+            var originalFamilies = world.Families.Count;
+            var originalFamilyMembers = world.Families[0].MemberIds.Count;
+            var originalRelationships = world.Relationships.Count;
+            var storageMode = world.PopulationStorage.Mode;
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 11", "\"SchemaVersion\": 10")
+                .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
+                .Replace(
+                    "\"AttentionLedgerEntries\": []",
+                    "\"AttentionLedgerEntries\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.AttentionFocuses, Is.Empty);
+            Assert.That(loaded.AttentionLedgerEntries, Is.Empty);
+            Assert.That(loaded.People.Count, Is.EqualTo(originalPeople));
+            Assert.That(loaded.People[0].Id, Is.EqualTo(originalPersonId));
+            Assert.That(
+                loaded.People[0].Wealth,
+                Is.EqualTo(originalPersonWealth));
+            Assert.That(loaded.Families.Count, Is.EqualTo(originalFamilies));
+            Assert.That(
+                loaded.Families[0].MemberIds.Count,
+                Is.EqualTo(originalFamilyMembers));
+            Assert.That(
+                loaded.Relationships.Count,
+                Is.EqualTo(originalRelationships));
+            Assert.That(loaded.PopulationStorage.Mode, Is.EqualTo(storageMode));
+            loaded.Validate();
         }
 
         [Test]

@@ -222,6 +222,9 @@
 - `TASK_M15_P6_FORMAL_PARTITIONED_POPULATION_ADAPTER_AND_RESIDENCY_CONTRACT.md` 已进入正式
   `Mandate.Persistence`接入，负责V7共存迁移、分区人口包、校验清单和冷热扩展合同；
   当前仍保留内联`WorldState.People`以兼容既有模拟系统，不能误写为5000万完整运行时；
+- `TASK_M20_P0_ATTENTION_LOCAL_RELATIONSHIP_AND_RESIDENCY.md` 已建立V11关注原因账、人物—
+  家庭—村庄—组织的有界局部关系快照，以及关注热计划到M15-P6驻留会话的安全升降温；
+  该底座不改变人物事实，也尚未把全部模拟系统切换到人物仓储访问层；
 - 累计5000万人完整游戏负载仍必须依据后续压力证据另行验收，不能由任务编号、基础索引
   或设计目标自动视为完成。
 
