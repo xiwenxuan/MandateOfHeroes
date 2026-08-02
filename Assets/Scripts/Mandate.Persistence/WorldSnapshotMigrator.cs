@@ -61,6 +61,9 @@ namespace Mandate.Persistence
                     case 11:
                         MigrateVersionElevenToTwelve(world);
                         break;
+                    case 12:
+                        MigrateVersionTwelveToThirteen(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -230,6 +233,22 @@ namespace Mandate.Persistence
             world.CountyFiscalLedgerEntries ??=
                 new System.Collections.Generic.List<CountyFiscalLedgerEntryState>();
             world.SchemaVersion = 12;
+        }
+
+        private static void MigrateVersionTwelveToThirteen(WorldState world)
+        {
+            world.MilitaryEquipmentInitialized = false;
+            world.MilitaryEquipmentDefinitions =
+                new System.Collections.Generic.List<
+                    MilitaryEquipmentDefinitionState>();
+            world.MilitaryArmoryStocks =
+                new System.Collections.Generic.List<MilitaryArmoryStockState>();
+            world.MilitaryEquipmentIssues =
+                new System.Collections.Generic.List<MilitaryEquipmentIssueState>();
+            world.MilitaryEquipmentTransactions =
+                new System.Collections.Generic.List<
+                    MilitaryEquipmentTransactionState>();
+            world.SchemaVersion = 13;
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

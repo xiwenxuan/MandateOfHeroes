@@ -58,8 +58,19 @@ namespace Mandate.Simulation
             var attackerInitial = attacker.Troops;
             var defenderInitial = defender.Troops;
             var sequence = world.Battles.Count;
-            var attackerPower = CalculatePower(attacker, sequence, "attacker");
-            var defenderPower = CalculatePower(defender, sequence, "defender");
+            var equipment = new MilitaryEquipmentSystem(_people);
+            var attackerReadiness = world.MilitaryEquipmentInitialized
+                ? equipment.BuildReadinessReport(world, attacker.Id)
+                    .ReadinessBasisPoints
+                : 10_000;
+            var defenderReadiness = world.MilitaryEquipmentInitialized
+                ? equipment.BuildReadinessReport(world, defender.Id)
+                    .ReadinessBasisPoints
+                : 10_000;
+            var attackerPower = CalculatePower(
+                attacker, sequence, "attacker", attackerReadiness);
+            var defenderPower = CalculatePower(
+                defender, sequence, "defender", defenderReadiness);
             var largestPower = Math.Max(attackerPower, defenderPower);
             var closeBattle = Math.Abs(attackerPower - defenderPower) <= largestPower / 20;
 
@@ -102,18 +113,20 @@ namespace Mandate.Simulation
             var defenderWounded = CalculateWounded(
                 defender, defenderCasualties, sequence);
             var militaryService = new MilitaryServiceSystem(_people);
-            militaryService.ApplyCasualties(
+            var attackerAffected = militaryService.ApplyCasualties(
                 world,
                 attackerArmyId,
                 attackerCasualties,
                 attackerWounded,
-                sequence);
-            militaryService.ApplyCasualties(
+                sequence,
+                deferEquipmentResolution: true);
+            var defenderAffected = militaryService.ApplyCasualties(
                 world,
                 defenderArmyId,
                 defenderCasualties,
                 defenderWounded,
-                sequence);
+                sequence,
+                deferEquipmentResolution: true);
             UpdateMobilization(attacker);
             UpdateMobilization(defender);
             ReduceLocalOrder(
@@ -134,6 +147,8 @@ namespace Mandate.Simulation
                 DefenderCasualties = defenderCasualties,
                 AttackerWounded = attackerWounded,
                 DefenderWounded = defenderWounded,
+                AttackerEquipmentReadinessBasisPoints = attackerReadiness,
+                DefenderEquipmentReadinessBasisPoints = defenderReadiness,
                 Result = result,
                 WinnerArmyId = winnerArmyId,
                 Summary =
@@ -142,6 +157,8 @@ namespace Mandate.Simulation
                     $"其中伤兵{attackerWounded}/{defenderWounded}人。"
             };
             world.Battles.Add(record);
+            equipment.ResolveBattleEquipment(
+                world, record, attackerAffected, defenderAffected);
             world.Validate();
             return new BattleOutcome(record);
         }
@@ -149,7 +166,8 @@ namespace Mandate.Simulation
         private long CalculatePower(
             ArmyState army,
             long sequence,
-            string role)
+            string role,
+            int equipmentReadinessBasisPoints)
         {
             var basePower =
                 (long)army.Troops *
@@ -163,7 +181,30 @@ namespace Mandate.Simulation
                 role + "_power",
                 9_000,
                 11_001);
-            return basePower * variation / 10_000;
+            return ApplyEquipmentReadinessModifier(
+                basePower * variation / 10_000,
+                equipmentReadinessBasisPoints);
+        }
+
+        public static long ApplyEquipmentReadinessModifier(
+            long basePower,
+            int equipmentReadinessBasisPoints)
+        {
+            if (basePower < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(basePower));
+            }
+
+            if (equipmentReadinessBasisPoints < 0 ||
+                equipmentReadinessBasisPoints > 10_000)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(equipmentReadinessBasisPoints));
+            }
+
+            var equipmentFactor = 8_000 +
+                                  equipmentReadinessBasisPoints / 5;
+            return basePower * equipmentFactor / 10_000;
         }
 
         private int RollCasualtyRate(

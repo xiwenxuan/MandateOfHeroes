@@ -68,6 +68,8 @@ namespace Mandate.Presentation
             new MilitaryServiceSystem();
         private readonly MilitaryAuthoritySystem _militaryAuthoritySystem =
             new MilitaryAuthoritySystem();
+        private readonly MilitaryEquipmentSystem _militaryEquipmentSystem =
+            new MilitaryEquipmentSystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2574,6 +2576,29 @@ namespace Mandate.Presentation
                         $"被俘{audit.Captured}、退役{audit.Retired}、死亡{audit.Dead}；" +
                         $"玩家权限：{playerAuthority}",
                         _normalStyle);
+                    if (_world.MilitaryEquipmentInitialized)
+                    {
+                        var readiness =
+                            _militaryEquipmentSystem.BuildReadinessReport(
+                                _world, army.Id);
+                        var equipmentAudit =
+                            _militaryEquipmentSystem.AuditArmy(_world, army.Id);
+                        GUILayout.Label(
+                            $"　军械：战备{readiness.ReadinessBasisPoints / 100f:F1}%　" +
+                            $"库存{equipmentAudit.Available}、在用{equipmentAudit.Issued}、" +
+                            $"损坏{equipmentAudit.Damaged}　" +
+                            $"弓手{TroopCount(readiness, MilitaryEquipmentSystem.ArcherTroopId)}、" +
+                            $"矛兵{TroopCount(readiness, MilitaryEquipmentSystem.SpearTroopId)}、" +
+                            $"刀盾{TroopCount(readiness, MilitaryEquipmentSystem.SwordShieldTroopId)}、" +
+                            $"轻兵{TroopCount(readiness, MilitaryEquipmentSystem.LightInfantryTroopId)}、" +
+                            $"徒手{TroopCount(readiness, MilitaryEquipmentSystem.UnarmedTroopId)}　" +
+                            $"账实：{(equipmentAudit.IsBalanced ? "平衡" : "异常")}",
+                            _normalStyle);
+                        GUILayout.Label(
+                            $"　主将携行：{EquipmentLoadout(army.CommanderPersonId)}",
+                            _normalStyle);
+                    }
+
                     for (var formationIndex = 0;
                          formationIndex < _world.MilitaryFormations.Count;
                          formationIndex++)
@@ -2584,11 +2609,18 @@ namespace Mandate.Presentation
                             continue;
                         }
 
+                        var formationEquipment = _world.MilitaryEquipmentInitialized
+                            ? _militaryEquipmentSystem.BuildReadinessReport(
+                                _world, army.Id, formation.Id)
+                            : null;
                         GUILayout.Label(
                             $"{(string.IsNullOrEmpty(formation.ParentFormationId) ? "　" : "　　↳ ")}" +
                             $"{formation.DisplayName} [{formation.Kind}]　" +
                             $"指挥：{FindPersonName(formation.CommanderPersonId)}　" +
-                            $"额定：{formation.AuthorizedStrength}",
+                            $"额定：{formation.AuthorizedStrength}" +
+                            (formationEquipment == null
+                                ? string.Empty
+                                : $"　战备：{formationEquipment.ReadinessBasisPoints / 100f:F1}%"),
                             _normalStyle);
                     }
                 }
@@ -2646,6 +2678,26 @@ namespace Mandate.Presentation
                 GUILayout.Label(
                     $"第{_world.Battles[i].Day}日　{_world.Battles[i].Summary}",
                     _normalStyle);
+            }
+
+            if (_world.MilitaryEquipmentInitialized &&
+                _world.MilitaryEquipmentTransactions.Count > 0)
+            {
+                GUILayout.Label("近期军械流水", _sectionStyle);
+                var firstEquipmentTransaction = Math.Max(
+                    0, _world.MilitaryEquipmentTransactions.Count - 5);
+                for (var i = _world.MilitaryEquipmentTransactions.Count - 1;
+                     i >= firstEquipmentTransaction;
+                     i--)
+                {
+                    var transaction = _world.MilitaryEquipmentTransactions[i];
+                    GUILayout.Label(
+                        $"第{transaction.Day}日　{transaction.Type}　" +
+                        $"{FindEquipmentName(transaction.EquipmentDefinitionId)}×" +
+                        $"{transaction.Quantity}　" +
+                        $"{transaction.FromArmyId} → {transaction.ToArmyId}",
+                        _normalStyle);
+                }
             }
 
             if (_world.MilitaryServiceInitialized &&
@@ -3280,6 +3332,54 @@ namespace Mandate.Presentation
             }
 
             return commodityId;
+        }
+
+        private string FindEquipmentName(string equipmentId)
+        {
+            for (var i = 0;
+                 i < _world.MilitaryEquipmentDefinitions.Count;
+                 i++)
+            {
+                var definition = _world.MilitaryEquipmentDefinitions[i];
+                if (definition.Id == equipmentId)
+                {
+                    return definition.DisplayName;
+                }
+            }
+
+            return equipmentId;
+        }
+
+        private string EquipmentLoadout(string personId)
+        {
+            var result = string.Empty;
+            for (var i = 0; i < _world.MilitaryEquipmentIssues.Count; i++)
+            {
+                var issue = _world.MilitaryEquipmentIssues[i];
+                if (issue.PersonId != personId)
+                {
+                    continue;
+                }
+
+                if (result.Length > 0)
+                {
+                    result += "、";
+                }
+
+                result += FindEquipmentName(issue.EquipmentDefinitionId) +
+                          "×" + issue.Quantity;
+            }
+
+            return result.Length == 0 ? "无" : result;
+        }
+
+        private static int TroopCount(
+            MilitaryEquipmentReadinessReport report,
+            string troopTypeId)
+        {
+            return report.TroopCounts.TryGetValue(troopTypeId, out var count)
+                ? count
+                : 0;
         }
 
         private string CargoSummary(string personId)

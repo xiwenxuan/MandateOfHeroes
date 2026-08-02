@@ -946,6 +946,11 @@ namespace Mandate.Tests
                 item => item.Id == "army.han_jizhou_vanguard");
             var woundedBefore = firstArmy.WoundedTroops;
             var troopsBefore = firstArmy.Troops;
+            var equipmentIssuesBefore = first.MilitaryEquipmentIssues.Count;
+            var equipmentTransactionsBefore =
+                first.MilitaryEquipmentTransactions.Count;
+            var equipmentStocksBefore =
+                EquipmentStockQuantity(first);
             Assert.That(woundedBefore, Is.GreaterThan(0));
             Assert.That(
                 new TradingSystem().Buy(
@@ -985,6 +990,15 @@ namespace Mandate.Tests
                 firstArmy.Troops,
                 Is.EqualTo(troopsBefore + firstResult.RecoveredTroops));
             Assert.That(first.MedicalTreatments.Count, Is.EqualTo(1));
+            Assert.That(
+                first.MilitaryEquipmentIssues.Count,
+                Is.EqualTo(equipmentIssuesBefore));
+            Assert.That(
+                first.MilitaryEquipmentTransactions.Count,
+                Is.EqualTo(equipmentTransactionsBefore));
+            Assert.That(
+                EquipmentStockQuantity(first),
+                Is.EqualTo(equipmentStocksBefore));
             var remainingHerbs = first.Inventories.Find(
                 item =>
                     item.OwnerPersonId == firstPhysician.Id &&
@@ -2819,6 +2833,267 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void MilitaryEquipment_PrototypeCreatesAuditableArmoriesAndIssues()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var equipment = new MilitaryEquipmentSystem();
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(13));
+            Assert.That(world.MilitaryEquipmentInitialized, Is.True);
+            Assert.That(world.MilitaryEquipmentDefinitions.Count, Is.EqualTo(6));
+            Assert.That(
+                world.MilitaryArmoryStocks.Count,
+                Is.EqualTo(world.Armies.Count * 6));
+            Assert.That(world.MilitaryEquipmentIssues.Count, Is.GreaterThan(0));
+            Assert.That(
+                world.MilitaryEquipmentTransactions.Count,
+                Is.GreaterThan(world.MilitaryEquipmentIssues.Count));
+            for (var i = 0; i < world.Armies.Count; i++)
+            {
+                var audit = equipment.AuditArmy(world, world.Armies[i].Id);
+                Assert.That(audit.Opening, Is.GreaterThan(0));
+                Assert.That(audit.IsBalanced, Is.True);
+            }
+
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryEquipment_TroopTypeDerivesFromEquipmentAndAbility()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var equipment = new MilitaryEquipmentSystem();
+            MilitaryServiceState archer = null;
+            for (var i = 0; i < world.MilitaryServices.Count; i++)
+            {
+                var service = world.MilitaryServices[i];
+                var troop = equipment.DeriveTroop(world, service);
+                if (troop.TroopTypeId == MilitaryEquipmentSystem.ArcherTroopId)
+                {
+                    archer = service;
+                    Assert.That(troop.MeetsMinimumEquipment, Is.True);
+                    break;
+                }
+            }
+
+            Assert.That(archer, Is.Not.Null);
+            var person = world.People.Find(item => item.Id == archer.PersonId);
+            person.Aptitudes.Dexterity = 0;
+            person.Aptitudes.Perception = 0;
+
+            var reduced = equipment.DeriveTroop(world, archer);
+
+            Assert.That(
+                reduced.TroopTypeId,
+                Is.EqualTo(MilitaryEquipmentSystem.LightInfantryTroopId));
+            Assert.That(reduced.MeetsMinimumEquipment, Is.False);
+        }
+
+        [Test]
+        public void MilitaryEquipment_ReadinessExcludesSupportAndAggregatesFormations()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var equipment = new MilitaryEquipmentSystem();
+            var army = world.Armies[0];
+            var armyReport = equipment.BuildReadinessReport(world, army.Id);
+            var formationCombat = 0;
+            var formationReady = 0;
+            var activeServices = 0;
+            for (var i = 0; i < world.MilitaryFormations.Count; i++)
+            {
+                var formation = world.MilitaryFormations[i];
+                if (formation.ArmyId != army.Id)
+                {
+                    continue;
+                }
+
+                var report = equipment.BuildReadinessReport(
+                    world, army.Id, formation.Id);
+                formationCombat += report.CombatMembers;
+                formationReady += report.ReadyMembers;
+            }
+
+            for (var i = 0; i < world.MilitaryServices.Count; i++)
+            {
+                var service = world.MilitaryServices[i];
+                if (service.ArmyId == army.Id &&
+                    (service.Status == MilitaryServiceStatus.Active ||
+                     service.Status == MilitaryServiceStatus.Mustering))
+                {
+                    activeServices++;
+                }
+            }
+
+            var troopCount = 0;
+            foreach (var pair in armyReport.TroopCounts)
+            {
+                troopCount += pair.Value;
+            }
+
+            Assert.That(armyReport.CombatMembers, Is.EqualTo(formationCombat));
+            Assert.That(armyReport.ReadyMembers, Is.EqualTo(formationReady));
+            Assert.That(troopCount, Is.EqualTo(activeServices));
+            Assert.That(armyReport.CombatMembers, Is.LessThan(activeServices));
+            Assert.That(armyReport.ReadinessBasisPoints, Is.InRange(0, 10_000));
+        }
+
+        [Test]
+        public void MilitaryEquipment_ReadinessAppliesBoundedBattlePowerModifier()
+        {
+            const long basePower = 100_000;
+
+            Assert.That(
+                BattleResolver.ApplyEquipmentReadinessModifier(
+                    basePower, 10_000),
+                Is.EqualTo(basePower));
+            Assert.That(
+                BattleResolver.ApplyEquipmentReadinessModifier(
+                    basePower, 5_000),
+                Is.EqualTo(90_000));
+            Assert.That(
+                BattleResolver.ApplyEquipmentReadinessModifier(
+                    basePower, 0),
+                Is.EqualTo(80_000));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                BattleResolver.ApplyEquipmentReadinessModifier(
+                    basePower, 10_001));
+        }
+
+        [Test]
+        public void MilitaryEquipment_BattleRecordsReadinessAndDisposesDeadIssues()
+        {
+            var world = BuildGuangzongBattleWorld();
+            var equipment = new MilitaryEquipmentSystem();
+            var attacker = "army.han_jizhou_vanguard";
+            var defender = "army.yellow_turban_guangzong";
+            var attackerReadiness = equipment.BuildReadinessReport(
+                world, attacker).ReadinessBasisPoints;
+            var defenderReadiness = equipment.BuildReadinessReport(
+                world, defender).ReadinessBasisPoints;
+            var transactionCount = world.MilitaryEquipmentTransactions.Count;
+
+            var outcome = new BattleResolver(world.MasterSeed).Resolve(
+                world,
+                new StableId("person.guo_dian"),
+                new StableId(attacker),
+                new StableId(defender));
+
+            Assert.That(
+                outcome.Record.AttackerEquipmentReadinessBasisPoints,
+                Is.EqualTo(attackerReadiness));
+            Assert.That(
+                outcome.Record.DefenderEquipmentReadinessBasisPoints,
+                Is.EqualTo(defenderReadiness));
+            Assert.That(
+                world.MilitaryEquipmentTransactions.Count,
+                Is.GreaterThan(transactionCount));
+            for (var i = 0; i < world.MilitaryServices.Count; i++)
+            {
+                var service = world.MilitaryServices[i];
+                if (service.Status != MilitaryServiceStatus.Dead)
+                {
+                    continue;
+                }
+
+                Assert.That(
+                    world.MilitaryEquipmentIssues.Exists(
+                        item => item.MilitaryServiceId == service.Id),
+                    Is.False);
+            }
+
+            Assert.That(equipment.AuditArmy(world, attacker).IsBalanced, Is.True);
+            Assert.That(equipment.AuditArmy(world, defender).IsBalanced, Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryEquipment_DataDrivenDefinitionDoesNotChangeSchema()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var schema = world.SchemaVersion;
+            const string equipmentId = "mod.example.equipment.test_staff";
+            world.MilitaryEquipmentDefinitions.Add(
+                new MilitaryEquipmentDefinitionState
+                {
+                    Id = equipmentId,
+                    DisplayName = "试制长杖",
+                    CategoryId = "mod.example.equipment_category.staff",
+                    SlotId = "equipment_slot.main_hand",
+                    UnitWeight = 4,
+                    MaximumConditionBasisPoints = 10_000,
+                    MeleePowerBasisPoints = 2_000
+                });
+            for (var i = 0; i < world.Armies.Count; i++)
+            {
+                world.MilitaryArmoryStocks.Add(new MilitaryArmoryStockState
+                {
+                    Id = "armory_stock." + world.Armies[i].Id + "." +
+                         equipmentId,
+                    ArmyId = world.Armies[i].Id,
+                    EquipmentDefinitionId = equipmentId,
+                    AverageConditionBasisPoints = 10_000
+                });
+            }
+
+            world.Validate();
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(schema));
+            Assert.That(
+                world.MilitaryEquipmentDefinitions.Exists(
+                    item => item.Id == equipmentId),
+                Is.True);
+        }
+
+        [Test]
+        public void MilitaryEquipment_ValidationRejectsStockAndLedgerTampering()
+        {
+            var negativeWorld = PrototypeWorldFactory.Create184World(184);
+            negativeWorld.MilitaryArmoryStocks[0].AvailableQuantity = -1;
+            Assert.Throws<InvalidOperationException>(negativeWorld.Validate);
+
+            var openingWorld = PrototypeWorldFactory.Create184World(184);
+            openingWorld.MilitaryArmoryStocks[0].OpeningQuantity++;
+            Assert.Throws<InvalidOperationException>(openingWorld.Validate);
+
+            var issueWorld = PrototypeWorldFactory.Create184World(184);
+            issueWorld.MilitaryEquipmentIssues[0].PersonId = "person.liu_bei";
+            Assert.Throws<InvalidOperationException>(issueWorld.Validate);
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionTwelveWithoutFabricatingEquipment()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var people = world.People.Count;
+            var families = world.Families.Count;
+            var services = world.MilitaryServices.Count;
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 12");
+            var equipmentStart = json.IndexOf(
+                "  \"MilitaryEquipmentInitialized\":",
+                StringComparison.Ordinal);
+            var villagesStart = json.IndexOf(
+                "  \"Villages\":", StringComparison.Ordinal);
+            Assert.That(equipmentStart, Is.GreaterThan(0));
+            Assert.That(villagesStart, Is.GreaterThan(equipmentStart));
+            json = json.Substring(0, equipmentStart) +
+                   json.Substring(villagesStart);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(13));
+            Assert.That(loaded.MilitaryEquipmentInitialized, Is.False);
+            Assert.That(loaded.MilitaryEquipmentDefinitions, Is.Empty);
+            Assert.That(loaded.MilitaryArmoryStocks, Is.Empty);
+            Assert.That(loaded.MilitaryEquipmentIssues, Is.Empty);
+            Assert.That(loaded.MilitaryEquipmentTransactions, Is.Empty);
+            Assert.That(loaded.People.Count, Is.EqualTo(people));
+            Assert.That(loaded.Families.Count, Is.EqualTo(families));
+            Assert.That(loaded.MilitaryServices.Count, Is.EqualTo(services));
+            loaded.Validate();
+        }
+
+        [Test]
         public void MilitaryAuthority_RecordsAuthorizedAndRejectedOrders()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -3077,6 +3352,41 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void MilitaryEquipment_DesertionRemovesCarriedEquipmentFromArmyAssets()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var army = world.Armies.Find(
+                item => item.Id == "army.han_jizhou_vanguard");
+            var issuesBefore = world.MilitaryEquipmentIssues.FindAll(
+                item => item.ArmyId == army.Id).Count;
+            var transactionsBefore = world.MilitaryEquipmentTransactions.Count;
+
+            var applied = new MilitaryServiceSystem().ApplyDesertion(
+                world, new StableId(army.Id), army.Troops, 77);
+
+            Assert.That(applied, Is.EqualTo(80));
+            Assert.That(issuesBefore, Is.GreaterThan(0));
+            Assert.That(
+                world.MilitaryEquipmentIssues.Exists(
+                    item => item.ArmyId == army.Id),
+                Is.False);
+            Assert.That(
+                world.MilitaryEquipmentTransactions.FindAll(
+                    item =>
+                        item.Type == MilitaryEquipmentTransactionType.Loss &&
+                        item.FromArmyId == army.Id).Count,
+                Is.GreaterThan(0));
+            Assert.That(
+                world.MilitaryEquipmentTransactions.Count,
+                Is.GreaterThan(transactionsBefore));
+            Assert.That(
+                new MilitaryEquipmentSystem().AuditArmy(world, army.Id)
+                    .IsBalanced,
+                Is.True);
+            world.Validate();
+        }
+
+        [Test]
         public void Starvation_DesertionDoesNotDirtyUnchangedPeople()
         {
             var inline = PrototypeWorldFactory.Create184World(184);
@@ -3140,6 +3450,19 @@ namespace Mandate.Tests
                 loaded.MilitaryFormations.Count,
                 Is.EqualTo(world.MilitaryFormations.Count));
             Assert.That(loaded.MilitaryOrders.Count, Is.EqualTo(1));
+            Assert.That(loaded.MilitaryEquipmentInitialized, Is.True);
+            Assert.That(
+                loaded.MilitaryEquipmentDefinitions.Count,
+                Is.EqualTo(world.MilitaryEquipmentDefinitions.Count));
+            Assert.That(
+                loaded.MilitaryArmoryStocks.Count,
+                Is.EqualTo(world.MilitaryArmoryStocks.Count));
+            Assert.That(
+                loaded.MilitaryEquipmentIssues.Count,
+                Is.EqualTo(world.MilitaryEquipmentIssues.Count));
+            Assert.That(
+                loaded.MilitaryEquipmentTransactions.Count,
+                Is.EqualTo(world.MilitaryEquipmentTransactions.Count));
             loaded.Validate();
         }
 
@@ -3505,7 +3828,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 12", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 13", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3528,7 +3851,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 12", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 13", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4160,7 +4483,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 12", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 13", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4187,7 +4510,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4424,7 +4747,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4456,7 +4779,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4735,7 +5058,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -4919,7 +5242,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 12", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 13", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -5630,6 +5953,18 @@ namespace Mandate.Tests
                 HistoricalStatus = "test_only"
             });
             return package;
+        }
+
+        private static int EquipmentStockQuantity(WorldState world)
+        {
+            var result = 0;
+            for (var i = 0; i < world.MilitaryArmoryStocks.Count; i++)
+            {
+                result += world.MilitaryArmoryStocks[i].AvailableQuantity;
+                result += world.MilitaryArmoryStocks[i].DamagedQuantity;
+            }
+
+            return result;
         }
 
         private static string TestProductionModJson()

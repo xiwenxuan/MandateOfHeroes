@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 12;
+        public const int CurrentSchemaVersion = 13;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -207,6 +207,15 @@ namespace Mandate.Domain
             new List<MilitaryServiceState>();
         public List<MilitaryOrderState> MilitaryOrders =
             new List<MilitaryOrderState>();
+        public bool MilitaryEquipmentInitialized;
+        public List<MilitaryEquipmentDefinitionState> MilitaryEquipmentDefinitions =
+            new List<MilitaryEquipmentDefinitionState>();
+        public List<MilitaryArmoryStockState> MilitaryArmoryStocks =
+            new List<MilitaryArmoryStockState>();
+        public List<MilitaryEquipmentIssueState> MilitaryEquipmentIssues =
+            new List<MilitaryEquipmentIssueState>();
+        public List<MilitaryEquipmentTransactionState> MilitaryEquipmentTransactions =
+            new List<MilitaryEquipmentTransactionState>();
         public List<VillageState> Villages = new List<VillageState>();
         public List<VillageFacilityState> VillageFacilities =
             new List<VillageFacilityState>();
@@ -335,6 +344,22 @@ namespace Mandate.Domain
                 MilitaryServices, item => item.Id, "military service");
             ValidateUniqueIds(
                 MilitaryOrders, item => item.Id, "military order");
+            ValidateUniqueIds(
+                MilitaryEquipmentDefinitions,
+                item => item.Id,
+                "military equipment definition");
+            ValidateUniqueIds(
+                MilitaryArmoryStocks,
+                item => item.Id,
+                "military armory stock");
+            ValidateUniqueIds(
+                MilitaryEquipmentIssues,
+                item => item.Id,
+                "military equipment issue");
+            ValidateUniqueIds(
+                MilitaryEquipmentTransactions,
+                item => item.Id,
+                "military equipment transaction");
             ValidateUniqueIds(Villages, item => item.Id, "village");
             ValidateUniqueIds(
                 VillageFacilities, item => item.Id, "village facility");
@@ -969,6 +994,10 @@ namespace Mandate.Domain
                     battle.DefenderWounded < 0 ||
                     battle.AttackerWounded > battle.AttackerCasualties ||
                     battle.DefenderWounded > battle.DefenderCasualties ||
+                    battle.AttackerEquipmentReadinessBasisPoints < 0 ||
+                    battle.AttackerEquipmentReadinessBasisPoints > 10_000 ||
+                    battle.DefenderEquipmentReadinessBasisPoints < 0 ||
+                    battle.DefenderEquipmentReadinessBasisPoints > 10_000 ||
                     !string.IsNullOrEmpty(battle.WinnerArmyId) &&
                     !armyIds.Contains(battle.WinnerArmyId))
                 {
@@ -1278,6 +1307,7 @@ namespace Mandate.Domain
 
             ValidateEducation(personIds, positionIds);
             ValidateMilitaryService(personIds, locationIds, armyIds);
+            ValidateMilitaryEquipment(personIds, armyIds);
             ValidateAttention(personIds);
         }
 
@@ -1608,6 +1638,371 @@ namespace Mandate.Domain
                         $"Invalid military order {order.Id}.");
                 }
             }
+        }
+
+        private sealed class EquipmentLedgerBalance
+        {
+            public int Opening;
+            public int Available;
+            public int Damaged;
+            public int Issued;
+        }
+
+        private void ValidateMilitaryEquipment(
+            HashSet<string> personIds,
+            HashSet<string> armyIds)
+        {
+            if (!MilitaryEquipmentInitialized)
+            {
+                if (MilitaryEquipmentDefinitions.Count != 0 ||
+                    MilitaryArmoryStocks.Count != 0 ||
+                    MilitaryEquipmentIssues.Count != 0 ||
+                    MilitaryEquipmentTransactions.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Uninitialized military equipment must not contain records.");
+                }
+
+                return;
+            }
+
+            if (!MilitaryServiceInitialized)
+            {
+                throw new InvalidOperationException(
+                    "Military equipment requires real military service.");
+            }
+
+            var definitions = new Dictionary<string,
+                MilitaryEquipmentDefinitionState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryEquipmentDefinitions.Count; i++)
+            {
+                var definition = MilitaryEquipmentDefinitions[i];
+                _ = new StableId(definition.CategoryId);
+                _ = new StableId(definition.SlotId);
+                if (string.IsNullOrWhiteSpace(definition.DisplayName) ||
+                    definition.UnitWeight <= 0 ||
+                    definition.MaximumConditionBasisPoints <= 0 ||
+                    definition.MaximumConditionBasisPoints > 10_000 ||
+                    definition.MeleePowerBasisPoints < 0 ||
+                    definition.MeleePowerBasisPoints > 10_000 ||
+                    definition.RangedPowerBasisPoints < 0 ||
+                    definition.RangedPowerBasisPoints > 10_000 ||
+                    definition.ProtectionBasisPoints < 0 ||
+                    definition.ProtectionBasisPoints > 10_000 ||
+                    definition.RequiredStrengthBasisPoints < 0 ||
+                    definition.RequiredStrengthBasisPoints > 10_000 ||
+                    definition.RequiredDexterityBasisPoints < 0 ||
+                    definition.RequiredDexterityBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military equipment definition {definition.Id}.");
+                }
+
+                definitions.Add(definition.Id, definition);
+            }
+
+            for (var i = 0; i < MilitaryEquipmentDefinitions.Count; i++)
+            {
+                var compatible =
+                    MilitaryEquipmentDefinitions[i].CompatibleEquipmentId;
+                if (!string.IsNullOrEmpty(compatible) &&
+                    !definitions.ContainsKey(compatible))
+                {
+                    throw new InvalidOperationException(
+                        $"Equipment {MilitaryEquipmentDefinitions[i].Id} " +
+                        "has missing compatibility equipment.");
+                }
+            }
+
+            var stocks = new Dictionary<string, MilitaryArmoryStockState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryArmoryStocks.Count; i++)
+            {
+                var stock = MilitaryArmoryStocks[i];
+                var key = EquipmentLedgerKey(
+                    stock.ArmyId, stock.EquipmentDefinitionId);
+                if (!armyIds.Contains(stock.ArmyId) ||
+                    !definitions.ContainsKey(stock.EquipmentDefinitionId) ||
+                    stocks.ContainsKey(key) ||
+                    stock.AvailableQuantity < 0 ||
+                    stock.DamagedQuantity < 0 ||
+                    stock.OpeningQuantity < 0 ||
+                    stock.AverageConditionBasisPoints < 0 ||
+                    stock.AverageConditionBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military armory stock {stock.Id}.");
+                }
+
+                stocks.Add(key, stock);
+            }
+
+            var services = new Dictionary<string, MilitaryServiceState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryServices.Count; i++)
+            {
+                services.Add(MilitaryServices[i].Id, MilitaryServices[i]);
+            }
+
+            var issueSlots = new HashSet<string>(StringComparer.Ordinal);
+            var issuedByLedger = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var definitionsByService = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryEquipmentIssues.Count; i++)
+            {
+                var issue = MilitaryEquipmentIssues[i];
+                if (!services.TryGetValue(
+                        issue.MilitaryServiceId, out var service) ||
+                    !personIds.Contains(issue.PersonId) ||
+                    !armyIds.Contains(issue.ArmyId) ||
+                    !definitions.TryGetValue(
+                        issue.EquipmentDefinitionId, out var definition) ||
+                    service.PersonId != issue.PersonId ||
+                    service.ArmyId != issue.ArmyId ||
+                    definition.SlotId != issue.SlotId ||
+                    !issueSlots.Add(
+                        issue.MilitaryServiceId + "|" + issue.SlotId) ||
+                    issue.Quantity <= 0 ||
+                    definition.IsUnique && issue.Quantity != 1 ||
+                    issue.ConditionBasisPoints < 5_000 ||
+                    issue.ConditionBasisPoints >
+                    definition.MaximumConditionBasisPoints ||
+                    issue.IssuedDay < 0 ||
+                    issue.LastChangedDay < issue.IssuedDay ||
+                    issue.LastChangedDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military equipment issue {issue.Id}.");
+                }
+
+                var ledgerKey = EquipmentLedgerKey(
+                    issue.ArmyId, issue.EquipmentDefinitionId);
+                AddEquipmentCount(issuedByLedger, ledgerKey, issue.Quantity);
+                definitionsByService.Add(
+                    issue.MilitaryServiceId + "|" +
+                    issue.EquipmentDefinitionId);
+            }
+
+            for (var i = 0; i < MilitaryEquipmentIssues.Count; i++)
+            {
+                var issue = MilitaryEquipmentIssues[i];
+                var compatible =
+                    definitions[issue.EquipmentDefinitionId]
+                        .CompatibleEquipmentId;
+                if (!string.IsNullOrEmpty(compatible) &&
+                    !definitionsByService.Contains(
+                        issue.MilitaryServiceId + "|" + compatible))
+                {
+                    throw new InvalidOperationException(
+                        $"Equipment issue {issue.Id} lacks its compatible item.");
+                }
+            }
+
+            var balances = new Dictionary<string, EquipmentLedgerBalance>(
+                StringComparer.Ordinal);
+            long previousDay = -1;
+            for (var i = 0; i < MilitaryEquipmentTransactions.Count; i++)
+            {
+                var transaction = MilitaryEquipmentTransactions[i];
+                if (!definitions.ContainsKey(
+                        transaction.EquipmentDefinitionId) ||
+                    transaction.Quantity <= 0 ||
+                    transaction.Day < previousDay ||
+                    transaction.Day > AbsoluteDay ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryEquipmentTransactionType),
+                        transaction.Type) ||
+                    !string.IsNullOrEmpty(transaction.FromArmyId) &&
+                    !armyIds.Contains(transaction.FromArmyId) ||
+                    !string.IsNullOrEmpty(transaction.ToArmyId) &&
+                    !armyIds.Contains(transaction.ToArmyId) ||
+                    !string.IsNullOrEmpty(transaction.MilitaryServiceId) &&
+                    !services.ContainsKey(transaction.MilitaryServiceId) ||
+                    !string.IsNullOrEmpty(transaction.BattleId) &&
+                    !ContainsId(Battles, item => item.Id, transaction.BattleId) ||
+                    string.IsNullOrWhiteSpace(transaction.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military equipment transaction {transaction.Id}.");
+                }
+
+                previousDay = transaction.Day;
+                ApplyEquipmentTransaction(
+                    transaction, services, balances);
+            }
+
+            foreach (var pair in stocks)
+            {
+                var balance = GetEquipmentBalance(balances, pair.Key);
+                issuedByLedger.TryGetValue(pair.Key, out var issued);
+                if (balance.Opening != pair.Value.OpeningQuantity ||
+                    balance.Available != pair.Value.AvailableQuantity ||
+                    balance.Damaged != pair.Value.DamagedQuantity ||
+                    balance.Issued != issued ||
+                    balance.Available < 0 ||
+                    balance.Damaged < 0 ||
+                    balance.Issued < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Military equipment ledger mismatch at {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in balances)
+            {
+                if (!stocks.ContainsKey(pair.Key))
+                {
+                    throw new InvalidOperationException(
+                        $"Military equipment ledger has no stock {pair.Key}.");
+                }
+            }
+        }
+
+        private static void ApplyEquipmentTransaction(
+            MilitaryEquipmentTransactionState transaction,
+            Dictionary<string, MilitaryServiceState> services,
+            Dictionary<string, EquipmentLedgerBalance> balances)
+        {
+            EquipmentLedgerBalance from = null;
+            EquipmentLedgerBalance to = null;
+            if (!string.IsNullOrEmpty(transaction.FromArmyId))
+            {
+                from = GetEquipmentBalance(
+                    balances,
+                    EquipmentLedgerKey(
+                        transaction.FromArmyId,
+                        transaction.EquipmentDefinitionId));
+            }
+
+            if (!string.IsNullOrEmpty(transaction.ToArmyId))
+            {
+                to = GetEquipmentBalance(
+                    balances,
+                    EquipmentLedgerKey(
+                        transaction.ToArmyId,
+                        transaction.EquipmentDefinitionId));
+            }
+
+            var serviceArmyId = string.IsNullOrEmpty(
+                transaction.MilitaryServiceId)
+                ? string.Empty
+                : services[transaction.MilitaryServiceId].ArmyId;
+            var quantity = transaction.Quantity;
+            switch (transaction.Type)
+            {
+                case MilitaryEquipmentTransactionType.OpeningStock:
+                    RequireEquipmentTransaction(
+                        transaction, from == null && to != null &&
+                        string.IsNullOrEmpty(transaction.MilitaryServiceId));
+                    to.Opening += quantity;
+                    to.Available += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Issue:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to == null &&
+                        transaction.FromArmyId == serviceArmyId);
+                    from.Available -= quantity;
+                    from.Issued += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Return:
+                    RequireEquipmentTransaction(
+                        transaction, from == null && to != null &&
+                        transaction.ToArmyId == serviceArmyId);
+                    to.Issued -= quantity;
+                    to.Available += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Damage:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to == null &&
+                        transaction.FromArmyId == serviceArmyId);
+                    from.Issued -= quantity;
+                    from.Damaged += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Repair:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to != null &&
+                        transaction.FromArmyId == transaction.ToArmyId &&
+                        string.IsNullOrEmpty(transaction.MilitaryServiceId));
+                    from.Damaged -= quantity;
+                    to.Available += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Loss:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to == null &&
+                        transaction.FromArmyId == serviceArmyId);
+                    from.Issued -= quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Capture:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to != null &&
+                        transaction.FromArmyId == serviceArmyId &&
+                        transaction.FromArmyId != transaction.ToArmyId &&
+                        !string.IsNullOrEmpty(transaction.BattleId));
+                    from.Issued -= quantity;
+                    to.Available += quantity;
+                    break;
+                case MilitaryEquipmentTransactionType.Transfer:
+                    RequireEquipmentTransaction(
+                        transaction, from != null && to != null &&
+                        transaction.FromArmyId != transaction.ToArmyId &&
+                        string.IsNullOrEmpty(transaction.MilitaryServiceId));
+                    from.Available -= quantity;
+                    to.Available += quantity;
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        $"Unsupported equipment transaction {transaction.Id}.");
+            }
+
+            if (from != null &&
+                (from.Available < 0 || from.Damaged < 0 || from.Issued < 0) ||
+                to != null &&
+                (to.Available < 0 || to.Damaged < 0 || to.Issued < 0))
+            {
+                throw new InvalidOperationException(
+                    $"Equipment transaction {transaction.Id} overdraws assets.");
+            }
+        }
+
+        private static void RequireEquipmentTransaction(
+            MilitaryEquipmentTransactionState transaction,
+            bool valid)
+        {
+            if (!valid)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid equipment transaction shape {transaction.Id}.");
+            }
+        }
+
+        private static EquipmentLedgerBalance GetEquipmentBalance(
+            Dictionary<string, EquipmentLedgerBalance> balances,
+            string key)
+        {
+            if (!balances.TryGetValue(key, out var result))
+            {
+                result = new EquipmentLedgerBalance();
+                balances.Add(key, result);
+            }
+
+            return result;
+        }
+
+        private static string EquipmentLedgerKey(
+            string armyId,
+            string equipmentDefinitionId)
+        {
+            return armyId + "|" + equipmentDefinitionId;
+        }
+
+        private static void AddEquipmentCount(
+            Dictionary<string, int> counts,
+            string key,
+            int quantity)
+        {
+            counts.TryGetValue(key, out var current);
+            counts[key] = checked(current + quantity);
         }
 
         private static void AddCount(

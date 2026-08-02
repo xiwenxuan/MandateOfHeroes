@@ -603,6 +603,7 @@ namespace Mandate.Simulation
             }
 
             new MilitaryServiceSystem(people).InitializePrototype(world);
+            new MilitaryEquipmentSystem(people).InitializePrototype(world);
             world.Validate();
             return world;
         }

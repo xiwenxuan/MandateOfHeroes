@@ -59,6 +59,8 @@ namespace Mandate.Domain
         public int DefenderCasualties;
         public int AttackerWounded;
         public int DefenderWounded;
+        public int AttackerEquipmentReadinessBasisPoints;
+        public int DefenderEquipmentReadinessBasisPoints;
         public BattleResultType Result;
         public string WinnerArmyId;
         public string Summary;

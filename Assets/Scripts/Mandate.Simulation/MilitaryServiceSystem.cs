@@ -173,12 +173,13 @@ namespace Mandate.Simulation
             }
         }
 
-        public void ApplyCasualties(
+        public List<MilitaryServiceState> ApplyCasualties(
             WorldState world,
             StableId armyId,
             int casualties,
             int wounded,
-            long sequence)
+            long sequence,
+            bool deferEquipmentResolution = false)
         {
             if (casualties < 0 ||
                 wounded < 0 ||
@@ -193,7 +194,7 @@ namespace Mandate.Simulation
                 abstractArmy.Troops -= casualties;
                 abstractArmy.WoundedTroops = checked(
                     abstractArmy.WoundedTroops + wounded);
-                return;
+                return new List<MilitaryServiceState>();
             }
 
             var available = SelectServices(
@@ -247,7 +248,20 @@ namespace Mandate.Simulation
                 ledger.RecordDeaths(world, deceased, false);
             }
 
-            world.Validate();
+            if (world.MilitaryEquipmentInitialized &&
+                !deferEquipmentResolution)
+            {
+                new MilitaryEquipmentSystem(_people)
+                    .ResolveCasualtiesWithoutBattle(
+                        world, available, sequence);
+            }
+
+            if (!deferEquipmentResolution)
+            {
+                world.Validate();
+            }
+
+            return available;
         }
 
         public int ApplyDesertion(
@@ -276,6 +290,12 @@ namespace Mandate.Simulation
             {
                 selected[i].Status = MilitaryServiceStatus.Deserter;
                 selected[i].LastStatusChangeDay = world.AbsoluteDay;
+            }
+
+            if (world.MilitaryEquipmentInitialized)
+            {
+                new MilitaryEquipmentSystem(_people).ResolveDesertionLoss(
+                    world, selected, sequence);
             }
 
             SynchronizeArmyCaches(world, armyId.Value);
