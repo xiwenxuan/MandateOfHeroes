@@ -47,15 +47,20 @@ namespace Mandate.Simulation
     {
         private const int DaysPerYear = 360;
         private readonly NamedRandom _random;
-        private readonly PopulationLedgerSystem _population =
-            new PopulationLedgerSystem();
+        private readonly IPersonRepository _people;
+        private readonly PopulationLedgerSystem _population;
         private readonly AgricultureProductionSystem _agricultureProduction;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
 
         public VillageLifeSystem(
             ulong masterSeed,
-            ProductionContentRegistry productionContent = null)
+            ProductionContentRegistry productionContent = null,
+            IPersonRepository people = null)
         {
             _random = new NamedRandom(masterSeed);
+            _people = people;
+            _population = new PopulationLedgerSystem(people);
             _agricultureProduction =
                 new AgricultureProductionSystem(masterSeed, productionContent);
         }
@@ -81,16 +86,22 @@ namespace Mandate.Simulation
             }
         }
 
-        public static void RefreshAllCaches(WorldState world)
+        public static void RefreshAllCaches(
+            WorldState world,
+            IPersonRepository people = null)
         {
             for (var i = 0; i < world.Villages.Count; i++)
             {
-                RefreshCaches(world, world.Villages[i]);
+                RefreshCaches(world, world.Villages[i], people);
             }
         }
 
-        public static void RefreshCaches(WorldState world, VillageState village)
+        public static void RefreshCaches(
+            WorldState world,
+            VillageState village,
+            IPersonRepository people = null)
         {
+            people = people ?? new WorldStatePersonRepository(world);
             var living = 0;
             var working = 0;
             long foodSecurityTotal = 0;
@@ -102,7 +113,8 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var person = FindPerson(world, family.MemberIds[memberIndex]);
+                    var person = people.GetRequired(
+                        family.MemberIds[memberIndex]);
                     if (!person.IsAlive || person.LocationId != village.LocationId)
                     {
                         continue;
@@ -149,15 +161,17 @@ namespace Mandate.Simulation
 
         public VillageLifeAudit Audit(WorldState world, string villageId)
         {
+            var people = PeopleFor(world);
             var village = FindVillage(world, villageId);
             var audit = new VillageLifeAudit
             {
                 Households = village.HouseholdIds.Count,
                 PublicGranaryGrain = village.PublicGranaryGrain
             };
-            for (var i = 0; i < world.People.Count; i++)
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = world.People[i];
+                var person = knownPeople[i];
                 if (person.BirthLocationId == village.LocationId)
                 {
                     audit.PermanentPeople++;
@@ -178,7 +192,8 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var person = FindPerson(world, family.MemberIds[memberIndex]);
+                    var person = people.GetRequired(
+                        family.MemberIds[memberIndex]);
                     if (person.FamilyId != family.Id)
                     {
                         audit.InvalidFamilyReferences++;
@@ -296,15 +311,18 @@ namespace Mandate.Simulation
                 ResolveMarriages(world, village);
             }
 
+            var people = PeopleFor(world);
             for (var i = 0; i < families.Count; i++)
             {
                 for (var memberIndex = 0;
                      memberIndex < families[i].MemberIds.Count;
                      memberIndex++)
                 {
-                    var person = FindPerson(world, families[i].MemberIds[memberIndex]);
+                    var person = people.GetRequired(
+                        families[i].MemberIds[memberIndex]);
                     if (person.IsAlive)
                     {
+                        person = people.GetRequiredForUpdate(person.Id);
                         person.NextIndependentEventDay = world.AbsoluteDay + 30;
                         person.NextIndependentEventReason =
                             "monthly_household_settlement";
@@ -314,33 +332,38 @@ namespace Mandate.Simulation
 
             village.LastSettlementDay = world.AbsoluteDay;
             village.NextSettlementDay = world.AbsoluteDay + 30;
-            RefreshCaches(world, village);
+            RefreshCaches(world, village, _people);
         }
 
-        private static void ReleaseCompletedDuties(
+        private void ReleaseCompletedDuties(
             WorldState world,
             VillageState village)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world);
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = world.People[i];
+                var person = knownPeople[i];
                 if (person.LocationId == village.LocationId &&
                     person.LocalDuty != LocalDutyKind.None &&
                     person.LocalDutyUntilDay <= world.AbsoluteDay)
                 {
+                    person = people.GetRequiredForUpdate(person.Id);
                     person.LocalDuty = LocalDutyKind.None;
                     person.LocalDutyUntilDay = -1;
                 }
             }
         }
 
-        private static void UpdateLaborProfiles(
+        private void UpdateLaborProfiles(
             WorldState world,
             VillageState village)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world);
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = world.People[i];
+                var person = knownPeople[i];
                 if (!person.IsAlive || person.LocationId != village.LocationId)
                 {
                     continue;
@@ -348,6 +371,7 @@ namespace Mandate.Simulation
 
                 var age = Math.Max(
                     0, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
+                person = people.GetRequiredForUpdate(person.Id);
                 if (age < 15 || age > 65)
                 {
                     person.LaborCapacityBasisPoints = 0;
@@ -372,6 +396,7 @@ namespace Mandate.Simulation
             VillageState village,
             List<FamilyState> families)
         {
+            var people = PeopleFor(world);
             for (var i = 0; i < families.Count; i++)
             {
                 var family = families[i];
@@ -381,7 +406,8 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var person = FindPerson(world, family.MemberIds[memberIndex]);
+                    var person = people.GetRequired(
+                        family.MemberIds[memberIndex]);
                     if (!person.IsAlive || person.LocationId != village.LocationId ||
                         person.LocalDuty == LocalDutyKind.Levy)
                     {
@@ -428,10 +454,12 @@ namespace Mandate.Simulation
                      residentIndex < residents.Count;
                      residentIndex++)
                 {
-                    residents[residentIndex].HealthBasisPoints = Math.Max(
-                        0, residents[residentIndex].HealthBasisPoints - damage);
-                    residents[residentIndex].Needs.Livelihood = Math.Min(
-                        10_000, residents[residentIndex].Needs.Livelihood + 1_000);
+                    var resident = people.GetRequiredForUpdate(
+                        residents[residentIndex].Id);
+                    resident.HealthBasisPoints = Math.Max(
+                        0, resident.HealthBasisPoints - damage);
+                    resident.Needs.Livelihood = Math.Min(
+                        10_000, resident.Needs.Livelihood + 1_000);
                 }
             }
         }
@@ -458,7 +486,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveHarvest(
+        private void ResolveHarvest(
             WorldState world,
             VillageState village,
             List<FamilyState> families)
@@ -490,7 +518,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveTax(
+        private void ResolveTax(
             WorldState world,
             VillageState village,
             List<FamilyState> families)
@@ -520,7 +548,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveTools(
+        private void ResolveTools(
             WorldState world,
             VillageState village,
             List<FamilyState> families)
@@ -555,7 +583,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveMedicalCare(
+        private void ResolveMedicalCare(
             WorldState world,
             VillageState village)
         {
@@ -566,10 +594,12 @@ namespace Mandate.Simulation
                 return;
             }
 
+            var people = PeopleFor(world);
             var patients = new List<PersonState>();
-            for (var i = 0; i < world.People.Count; i++)
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = world.People[i];
+                var person = knownPeople[i];
                 if (person.IsAlive && person.LocationId == village.LocationId &&
                     person.HealthBasisPoints < 9_500)
                 {
@@ -588,7 +618,7 @@ namespace Mandate.Simulation
             treated = (int)Math.Min(treated, clinic.InventoryUnits);
             for (var i = 0; i < treated; i++)
             {
-                var patient = patients[i];
+                var patient = people.GetRequiredForUpdate(patients[i].Id);
                 var recovery = Math.Min(200, 10_000 - patient.HealthBasisPoints);
                 patient.HealthBasisPoints += recovery;
                 clinic.InventoryUnits--;
@@ -599,7 +629,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveCorvee(
+        private void ResolveCorvee(
             WorldState world,
             VillageState village,
             List<FamilyState> families)
@@ -619,6 +649,7 @@ namespace Mandate.Simulation
                     continue;
                 }
 
+                worker = PeopleFor(world).GetRequiredForUpdate(worker.Id);
                 worker.LocalDuty = LocalDutyKind.Corvee;
                 worker.LocalDutyUntilDay = world.AbsoluteDay + 10;
                 families[i].CorveeDaysThisYear += 10;
@@ -663,7 +694,8 @@ namespace Mandate.Simulation
                 Math.Max(1, village.LivingResidentCount / 100));
             for (var i = 0; i < quota; i++)
             {
-                var person = candidates[i];
+                var person = PeopleFor(world).GetRequiredForUpdate(
+                    candidates[i].Id);
                 person.LocalDuty = LocalDutyKind.Levy;
                 person.LocalDutyUntilDay = world.AbsoluteDay + 90;
                 village.LevyPersonDays += 90;
@@ -699,8 +731,8 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var candidate = FindPerson(
-                        world, family.MemberIds[memberIndex]);
+                    var candidate = PeopleFor(world).GetRequired(
+                        family.MemberIds[memberIndex]);
                     if (candidate.Id != family.HeadPersonId &&
                         candidate.IsAlive &&
                         candidate.LocationId == village.LocationId &&
@@ -731,7 +763,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static void ResolveMarriages(WorldState world, VillageState village)
+        private void ResolveMarriages(WorldState world, VillageState village)
         {
             var men = EligibleMarriageCandidates(world, village, PersonGender.Male);
             var women = EligibleMarriageCandidates(world, village, PersonGender.Female);
@@ -768,6 +800,9 @@ namespace Mandate.Simulation
 
                 originFamily.MemberIds.Remove(woman.Id);
                 destinationFamily.MemberIds.Add(woman.Id);
+                var people = PeopleFor(world);
+                man = people.GetRequiredForUpdate(man.Id);
+                woman = people.GetRequiredForUpdate(woman.Id);
                 woman.FamilyId = destinationFamily.Id;
                 man.SpousePersonId = woman.Id;
                 woman.SpousePersonId = man.Id;
@@ -783,15 +818,16 @@ namespace Mandate.Simulation
             }
         }
 
-        private static List<PersonState> EligibleMarriageCandidates(
+        private List<PersonState> EligibleMarriageCandidates(
             WorldState world,
             VillageState village,
             PersonGender gender)
         {
             var result = new List<PersonState>();
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world).GetKnownPeople();
+            for (var i = 0; i < people.Count; i++)
             {
-                var person = world.People[i];
+                var person = people[i];
                 var age = (world.AbsoluteDay - person.BirthDay) / DaysPerYear;
                 if (person.IsAlive && person.LocationId == village.LocationId &&
                     person.Gender == gender &&
@@ -807,7 +843,7 @@ namespace Mandate.Simulation
             return result;
         }
 
-        private static PersonState SelectWorker(
+        private PersonState SelectWorker(
             WorldState world,
             VillageState village,
             FamilyState family,
@@ -816,7 +852,8 @@ namespace Mandate.Simulation
             PersonState selected = null;
             for (var i = 0; i < family.MemberIds.Count; i++)
             {
-                var person = FindPerson(world, family.MemberIds[i]);
+                var person = PeopleFor(world).GetRequired(
+                    family.MemberIds[i]);
                 if (!person.IsAlive || person.LocationId != village.LocationId ||
                     person.LocalDuty != LocalDutyKind.None ||
                     person.LaborCapacityBasisPoints <= 0 ||
@@ -840,7 +877,7 @@ namespace Mandate.Simulation
             return selected;
         }
 
-        private static int HouseholdLabor(
+        private int HouseholdLabor(
             WorldState world,
             VillageState village,
             FamilyState family)
@@ -848,7 +885,8 @@ namespace Mandate.Simulation
             var total = 0;
             for (var i = 0; i < family.MemberIds.Count; i++)
             {
-                var person = FindPerson(world, family.MemberIds[i]);
+                var person = PeopleFor(world).GetRequired(
+                    family.MemberIds[i]);
                 if (person.IsAlive && person.LocationId == village.LocationId &&
                     person.LocalDuty == LocalDutyKind.None)
                 {
@@ -859,7 +897,7 @@ namespace Mandate.Simulation
             return Math.Min(10_000, total / Math.Max(1, family.FarmlandUnits / 4));
         }
 
-        private static bool FacilityOperational(
+        private bool FacilityOperational(
             WorldState world,
             VillageState village,
             VillageFacilityKind kind)
@@ -871,7 +909,8 @@ namespace Mandate.Simulation
                 return false;
             }
 
-            var manager = FindPerson(world, facility.ManagerPersonId);
+            var manager = PeopleFor(world).GetRequired(
+                facility.ManagerPersonId);
             return manager.IsAlive && manager.HealthBasisPoints > 0 &&
                    manager.LocationId == village.LocationId;
         }
@@ -999,17 +1038,20 @@ namespace Mandate.Simulation
             throw new InvalidOperationException($"Missing family {familyId}.");
         }
 
-        private static PersonState FindPerson(WorldState world, string personId)
+        private IPersonRepository PeopleFor(WorldState world)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            if (_people != null)
             {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
+                return _people;
             }
 
-            throw new InvalidOperationException($"Missing person {personId}.");
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
     }
 }

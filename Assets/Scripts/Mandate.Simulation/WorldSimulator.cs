@@ -7,6 +7,7 @@ namespace Mandate.Simulation
     public sealed class WorldSimulator
     {
         private readonly NamedRandom _random;
+        private readonly IPersonRepository _personRepository;
         private readonly TravelSystem _travelSystem;
         private readonly TaskSystem _taskSystem;
         private readonly HistoricalEventSystem _historicalEventSystem =
@@ -25,13 +26,14 @@ namespace Mandate.Simulation
             IPersonRepository personRepository = null)
         {
             _random = new NamedRandom(masterSeed);
+            _personRepository = personRepository;
             _travelSystem = new TravelSystem(personRepository);
             _taskSystem = new TaskSystem(personRepository);
             _lifeSimulationSystem = new LifeSimulationSystem(
                 masterSeed, personRepository);
             _marketSimulationSystem = new MarketSimulationSystem(masterSeed);
             _villageLifeSystem = new VillageLifeSystem(
-                masterSeed, productionContent);
+                masterSeed, productionContent, personRepository);
             _researchSystem = new ResearchSystem(productionContent);
             _processingSystem = new ProcessingProductionSystem(productionContent);
         }
@@ -91,7 +93,7 @@ namespace Mandate.Simulation
             _processingSystem.ResolveDueOrders(world);
             _villageLifeSystem.ResolveMonthly(world);
             _lifeSimulationSystem.ResolveMonthly(world);
-            VillageLifeSystem.RefreshAllCaches(world);
+            VillageLifeSystem.RefreshAllCaches(world, _personRepository);
             _educationSystem.ResolveDuePlans(world);
             _marketSimulationSystem.ResolveDailyPrices(world);
             var locations = new List<LocationState>(world.Locations);

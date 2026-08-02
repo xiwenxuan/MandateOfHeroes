@@ -1709,6 +1709,55 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void PopulationLedger_RepositoryTracksMaterializationMigrationAndDeath()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var repository = new WorldStatePersonRepository(world);
+            var system = new PopulationLedgerSystem(repository);
+            var person = new PersonState
+            {
+                Id = "person.generated.repository_population_test",
+                DisplayName = "仓储人口测试人物",
+                LocationId = "location.zhuo",
+                BirthLocationId = "location.zhuo",
+                BirthDay = world.AbsoluteDay - 20 * 360L,
+                Gender = PersonGender.Female
+            };
+
+            system.MaterializePerson(
+                world, person, PopulationOccupation.Agriculture);
+
+            Assert.That(
+                repository.GetAddedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            repository.AcceptAddedPeople(new[] { person.Id });
+
+            system.MoveIndependentPerson(
+                world, person, "location.zhongshan");
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+            var changedBeforeAudit = repository.GetChangedPersonIds();
+            Assert.That(system.Audit(world).IsBalanced, Is.True);
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(changedBeforeAudit));
+            repository.AcceptChanges(new[] { person.Id });
+
+            system.MoveIndependentPerson(
+                world, person, "location.zhongshan");
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+
+            system.RecordDeath(world, person);
+            Assert.That(person.IsAlive, Is.False);
+            Assert.That(
+                repository.GetChangedPersonIds(),
+                Is.EqualTo(new[] { person.Id }));
+            Assert.That(system.Audit(world).IsBalanced, Is.True);
+        }
+
+        [Test]
         public void Snapshot_MigratesVersionOneWorldToPopulationLedger()
         {
             const string legacyJson =
@@ -2865,6 +2914,68 @@ namespace Mandate.Tests
             Assert.That(world.VillageLedgerEntries.Count, Is.GreaterThan(0));
             Assert.That(world.AbsoluteDay, Is.EqualTo(30));
             world.Validate();
+        }
+
+        [Test]
+        public void VillageLife_InjectedRepositoryPreservesOneYearWorldFacts()
+        {
+            var inline = VillagePrototypeFactory.Create(200, 21_202);
+            var accessed = VillagePrototypeFactory.Create(200, 21_202);
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineVillage = new VillageLifeSystem(inline.MasterSeed);
+            var accessedVillage = new VillageLifeSystem(
+                accessed.MasterSeed, null, repository);
+            var inlineLife = new LifeSimulationSystem(inline.MasterSeed);
+            var accessedLife = new LifeSimulationSystem(
+                accessed.MasterSeed, repository);
+
+            for (var month = 1; month <= 12; month++)
+            {
+                inline.AbsoluteDay = month * 30L;
+                accessed.AbsoluteDay = month * 30L;
+                inlineVillage.ResolveMonthly(inline);
+                accessedVillage.ResolveMonthly(accessed);
+                inlineLife.ResolveMonthly(inline);
+                accessedLife.ResolveMonthly(accessed);
+                VillageLifeSystem.RefreshAllCaches(inline);
+                VillageLifeSystem.RefreshAllCaches(accessed, repository);
+            }
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(repository.GetChangedPersonIds(), Is.Not.Empty);
+            Assert.That(
+                new PopulationLedgerSystem(repository).Audit(accessed).IsBalanced,
+                Is.True);
+            Assert.That(
+                accessedVillage.Audit(accessed, accessed.Villages[0].Id).IsValid,
+                Is.True);
+        }
+
+        [Test]
+        public void VillageLife_AuditsAndAttentionReportsDoNotDirtyRepository()
+        {
+            var world = VillagePrototypeFactory.Create(200, 21_203);
+            var repository = new WorldStatePersonRepository(world);
+            var village = new VillageLifeSystem(
+                world.MasterSeed, null, repository);
+
+            var audit = village.Audit(world, world.Villages[0].Id);
+            var report = village.BuildAttentionReport(
+                world,
+                world.Villages[0].Id,
+                VillageAttentionLevel.Deep);
+            var populationAudit =
+                new PopulationLedgerSystem(repository).Audit(world);
+            VillageLifeSystem.RefreshAllCaches(
+                world, repository);
+
+            Assert.That(audit.IsValid, Is.True);
+            Assert.That(report.PermanentPeople, Is.EqualTo(200));
+            Assert.That(populationAudit.IsBalanced, Is.True);
+            Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
         }
 
         [Test]

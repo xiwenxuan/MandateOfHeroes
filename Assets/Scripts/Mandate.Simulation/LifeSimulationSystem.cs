@@ -9,8 +9,7 @@ namespace Mandate.Simulation
         private const int DaysPerYear = 360;
         private readonly NamedRandom _random;
         private readonly IPersonRepository _personRepository;
-        private readonly PopulationLedgerSystem _populationLedgerSystem =
-            new PopulationLedgerSystem();
+        private readonly PopulationLedgerSystem _populationLedgerSystem;
 
         public LifeSimulationSystem(
             ulong masterSeed,
@@ -18,6 +17,8 @@ namespace Mandate.Simulation
         {
             _random = new NamedRandom(masterSeed);
             _personRepository = personRepository;
+            _populationLedgerSystem =
+                new PopulationLedgerSystem(personRepository);
         }
 
         public void ResolveMonthly(WorldState world)

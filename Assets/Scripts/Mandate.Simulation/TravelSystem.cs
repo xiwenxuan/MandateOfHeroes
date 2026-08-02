@@ -5,13 +5,13 @@ namespace Mandate.Simulation
 {
     public sealed class TravelSystem
     {
-        private readonly PopulationLedgerSystem _populationLedgerSystem =
-            new PopulationLedgerSystem();
+        private readonly PopulationLedgerSystem _populationLedgerSystem;
         private readonly IPersonRepository _people;
 
         public TravelSystem(IPersonRepository people = null)
         {
             _people = people;
+            _populationLedgerSystem = new PopulationLedgerSystem(people);
         }
 
         public JourneyState StartJourney(

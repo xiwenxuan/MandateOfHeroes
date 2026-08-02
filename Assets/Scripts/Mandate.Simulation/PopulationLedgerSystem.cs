@@ -23,6 +23,15 @@ namespace Mandate.Simulation
 
     public sealed class PopulationLedgerSystem
     {
+        private readonly IPersonRepository _people;
+        private WorldState _fallbackWorld;
+        private IPersonRepository _fallbackPeople;
+
+        public PopulationLedgerSystem(IPersonRepository people = null)
+        {
+            _people = people;
+        }
+
         public void InitializeFromLocationSummaries(WorldState world)
         {
             PopulationLedgerBootstrap.Initialize(world);
@@ -72,10 +81,12 @@ namespace Mandate.Simulation
                     "Population ledger has not been initialized.");
             }
 
+            var repository = PeopleFor(world);
             var existingIds = new HashSet<string>(StringComparer.Ordinal);
-            for (var i = 0; i < world.People.Count; i++)
+            var knownPeople = repository.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                existingIds.Add(world.People[i].Id);
+                existingIds.Add(knownPeople[i].Id);
             }
 
             for (var personIndex = 0;
@@ -100,7 +111,7 @@ namespace Mandate.Simulation
                 RefreshCohortDemographics(cohort);
                 person.CountsTowardPopulation = true;
                 person.PopulationOriginLocationId = cohort.OriginLocationId;
-                world.People.Add(person);
+                repository.Add(person);
                 AddTransaction(
                     world,
                     PopulationTransactionType.Instantiation,
@@ -133,9 +144,12 @@ namespace Mandate.Simulation
                 return;
             }
 
+            var repository = PeopleFor(world);
+            child = repository.GetRequired(child.Id);
+            var location = FindLocation(world, child.LocationId);
+            child = repository.GetRequiredForUpdate(child.Id);
             child.CountsTowardPopulation = true;
             child.PopulationOriginLocationId = child.LocationId;
-            var location = FindLocation(world, child.LocationId);
             location.Population = checked(location.Population + 1);
             AddTransaction(
                 world,
@@ -186,16 +200,20 @@ namespace Mandate.Simulation
             }
 
             var affectedArmies = new HashSet<string>(StringComparer.Ordinal);
+            var repository = PeopleFor(world);
             for (var i = 0; i < people.Count; i++)
             {
-                var person = people[i] ??
+                var requestedPerson = people[i] ??
                     throw new InvalidOperationException(
                         "A deceased person cannot be null.");
+                var person = repository.GetRequired(requestedPerson.Id);
                 if (!person.IsAlive)
                 {
                     throw new InvalidOperationException(
                         $"Person {person.Id} is already deceased.");
                 }
+
+                person = repository.GetRequiredForUpdate(person.Id);
 
                 for (var serviceIndex = 0;
                      serviceIndex < world.MilitaryServices.Count;
@@ -256,6 +274,8 @@ namespace Mandate.Simulation
             }
 
             world.Validate();
+            var repository = PeopleFor(world);
+            person = repository.GetRequired(person.Id);
             var originLocationId = person.LocationId;
             if (originLocationId == destinationLocationId)
             {
@@ -264,6 +284,7 @@ namespace Mandate.Simulation
 
             var origin = FindLocation(world, originLocationId);
             var destination = FindLocation(world, destinationLocationId);
+            person = repository.GetRequiredForUpdate(person.Id);
             if (world.PopulationLedgerInitialized &&
                 person.CountsTowardPopulation &&
                 person.IsAlive)
@@ -315,11 +336,13 @@ namespace Mandate.Simulation
             }
 
             var destination = FindLocation(world, destinationLocationId);
+            var repository = PeopleFor(world);
             for (var i = 0; i < people.Count; i++)
             {
-                var person = people[i] ??
+                var requestedPerson = people[i] ??
                     throw new InvalidOperationException(
                         "A moving person cannot be null.");
+                var person = repository.GetRequired(requestedPerson.Id);
                 var originLocationId = person.LocationId;
                 if (originLocationId == destinationLocationId)
                 {
@@ -327,6 +350,7 @@ namespace Mandate.Simulation
                 }
 
                 var origin = FindLocation(world, originLocationId);
+                person = repository.GetRequiredForUpdate(person.Id);
                 if (world.PopulationLedgerInitialized &&
                     person.CountsTowardPopulation &&
                     person.IsAlive)
@@ -445,9 +469,10 @@ namespace Mandate.Simulation
                 byLocation[cohort.LocationId] += cohort.Population;
             }
 
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world).GetKnownPeople();
+            for (var i = 0; i < people.Count; i++)
             {
-                var person = world.People[i];
+                var person = people[i];
                 if (!person.CountsTowardPopulation || !person.IsAlive)
                 {
                     continue;
@@ -485,6 +510,22 @@ namespace Mandate.Simulation
             }
 
             return result;
+        }
+
+        private IPersonRepository PeopleFor(WorldState world)
+        {
+            if (_people != null)
+            {
+                return _people;
+            }
+
+            if (!ReferenceEquals(_fallbackWorld, world))
+            {
+                _fallbackWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+
+            return _fallbackPeople;
         }
 
         public static string OccupationName(
