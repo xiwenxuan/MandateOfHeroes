@@ -2960,11 +2960,25 @@ namespace Mandate.Presentation
 
         private void RebindServices()
         {
-            _simulator = new WorldSimulator(_world.MasterSeed);
+            _simulator = new WorldSimulator(
+                _world.MasterSeed, LoadProductionContent());
             _decisionSystem = new NpcDecisionSystem(_world.MasterSeed);
             _actionResolver = new NpcActionResolver(_world.MasterSeed);
             _battleResolver = new BattleResolver(_world.MasterSeed);
             _medicalSystem = new MedicalSystem(_world.MasterSeed);
+        }
+
+        private static ProductionContentRegistry LoadProductionContent()
+        {
+            var asset = Resources.Load<TextAsset>(
+                "Content/Core/Production/core-production");
+            if (asset == null)
+            {
+                throw new InvalidOperationException(
+                    "Core production content resource is missing.");
+            }
+
+            return ProductionContentRegistry.FromJson(asset.text);
         }
 
         private void ResolveMonthlyNpcActions()

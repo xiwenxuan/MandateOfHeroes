@@ -1,7 +1,9 @@
 {
   "name": "Mandate.Domain",
   "rootNamespace": "Mandate.Domain",
-  "references": [],
+  "references": [
+    "Unity.Newtonsoft.Json"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

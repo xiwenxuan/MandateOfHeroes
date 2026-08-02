@@ -567,6 +567,8 @@
 ## 11. 设施与生产
 
 设施不是图标，而是有所有权、人员、库存和账本的生产组织。
+作物、地方品种、产品、配方、生产方法、职业成长和分层生产委任的详细数据合同见
+[`PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md`](PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md)。
 
 ```text
 设施

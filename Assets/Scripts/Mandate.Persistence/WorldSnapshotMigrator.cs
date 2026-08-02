@@ -38,6 +38,15 @@ namespace Mandate.Persistence
                     case 5:
                         MigrateVersionFiveToSix(world);
                         break;
+                    case 6:
+                        MigrateVersionSixToSeven(world);
+                        break;
+                    case 7:
+                        MigrateVersionSevenToEight(world);
+                        break;
+                    case 8:
+                        MigrateVersionEightToNine(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -128,6 +137,48 @@ namespace Mandate.Persistence
             }
 
             world.SchemaVersion = 6;
+        }
+
+        private static void MigrateVersionSixToSeven(WorldState world)
+        {
+            world.PopulationStorage =
+                PopulationStorageState.CreateInline(world.People);
+            world.SchemaVersion = 7;
+        }
+
+        private static void MigrateVersionSevenToEight(WorldState world)
+        {
+            world.AgricultureWorkOrders ??=
+                new System.Collections.Generic.List<AgricultureWorkOrderState>();
+            world.ProductionLedgerEntries ??=
+                new System.Collections.Generic.List<ProductionLedgerEntryState>();
+            world.ProductionContentManifest =
+                ProductionContentRegistry.CreateCore().CreateManifest();
+            world.SchemaVersion = 8;
+        }
+
+        private static void MigrateVersionEightToNine(WorldState world)
+        {
+            world.ResearchProjects ??=
+                new System.Collections.Generic.List<ResearchProjectState>();
+            world.TechnologyApplications ??=
+                new System.Collections.Generic.List<TechnologyApplicationState>();
+            world.ResearchLedgerEntries ??=
+                new System.Collections.Generic.List<ResearchLedgerEntryState>();
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                var person = world.People[i];
+                person.SkillMasteries ??=
+                    new System.Collections.Generic.List<SkillMasteryState>();
+                person.KnowledgeMasteries ??=
+                    new System.Collections.Generic.List<KnowledgeMasteryState>();
+                person.TechnologyMasteries ??=
+                    new System.Collections.Generic.List<TechnologyMasteryState>();
+            }
+
+            world.ProductionContentManifest =
+                ProductionContentRegistry.CreateCore().CreateManifest();
+            world.SchemaVersion = 9;
         }
 
         private static PersonState FindPerson(WorldState world, string personId)

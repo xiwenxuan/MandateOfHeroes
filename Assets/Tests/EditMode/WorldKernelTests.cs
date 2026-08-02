@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Mandate.Domain;
 using Mandate.Persistence;
 using Mandate.Simulation;
@@ -3001,7 +3002,9 @@ namespace Mandate.Tests
             var loaded = WorldSnapshotSerializer.Deserialize(
                 WorldSnapshotSerializer.Serialize(world));
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(6));
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.People.Count, Is.EqualTo(world.People.Count));
             Assert.That(loaded.Families.Count, Is.EqualTo(world.Families.Count));
             Assert.That(loaded.Villages.Count, Is.EqualTo(1));
@@ -3018,24 +3021,939 @@ namespace Mandate.Tests
         }
 
         [Test]
-        public void Snapshot_MigratesVersionFiveFamilyReferencesToVersionSix()
+        public void Snapshot_MigratesVersionFiveFamilyReferencesToCurrent()
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 6", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 9", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
             var member = loaded.People.Find(
                 person => person.Id == family.MemberIds[0]);
 
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(6));
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(loaded.Villages, Is.Not.Null);
             Assert.That(loaded.VillageFacilities, Is.Not.Null);
             Assert.That(loaded.VillageLedgerEntries, Is.Not.Null);
             Assert.That(member.FamilyId, Is.EqualTo(family.Id));
             Assert.That(member.BirthLocationId, Is.Not.Empty);
             loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixToInlinePopulationContract()
+        {
+            var world = BuildMinimalWorld();
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": 9", "\"SchemaVersion\": 6");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(
+                loaded.PopulationStorage.Mode,
+                Is.EqualTo(PopulationStorageMode.InlineSnapshot));
+            Assert.That(
+                loaded.PopulationStorage.PermanentPersonCount,
+                Is.EqualTo(loaded.People.Count));
+            Assert.That(
+                loaded.PopulationStorage.LivingPersonCount,
+                Is.EqualTo(loaded.People.Count));
+            Assert.That(loaded.PopulationStorage.PackageId, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ProductionContent_CoreResourceMatchesBuiltInRegistry()
+        {
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Assets",
+                "Resources",
+                "Content",
+                "Core",
+                "Production",
+                "core-production.json");
+            var fromResource = ProductionContentRegistry.FromJson(
+                File.ReadAllText(path));
+            var builtIn = ProductionContentRegistry.CreateCore();
+
+            Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
+            Assert.That(fromResource.CropCount, Is.EqualTo(1));
+            Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(2));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(1));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(1));
+            Assert.That(fromResource.SkillCount, Is.EqualTo(1));
+            Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
+            Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
+            Assert.That(
+                fromResource.GetRecipe(CoreProductionContent.GrowWheatRecipeId)
+                    .Outputs[0].ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.WheatGrainProductId));
+        }
+
+        [Test]
+        public void ProductionContent_RejectsDuplicateMissingAndFreeDefinitions()
+        {
+            var registry = ProductionContentRegistry.CreateCore();
+            var duplicate = new ProductionContentPackageDefinition
+            {
+                PackageId = "content.test.duplicate",
+                Version = "1.0.0",
+                LoadOrder = 100,
+                Crops = new List<CropDefinition>
+                {
+                    new CropDefinition
+                    {
+                        Id = CoreProductionContent.WheatCropId,
+                        DisplayName = "重复小麦"
+                    }
+                }
+            };
+            Assert.Throws<ProductionContentException>(
+                () => registry.Register(duplicate));
+            Assert.That(registry.CropCount, Is.EqualTo(1));
+
+            var missing = BuildTestProductionPackage("content.test.missing");
+            missing.Recipes[0].Outputs[0].ProductDefinitionId =
+                "product.test.missing";
+            Assert.Throws<ProductionContentException>(
+                () => registry.Register(missing));
+
+            var free = BuildTestProductionPackage("content.test.free");
+            free.Recipes[0].Outputs[0].ProductDefinitionId =
+                free.Recipes[0].Inputs[0].ProductDefinitionId;
+            free.Recipes[0].Outputs[0].QuantityPerLandUnit =
+                free.Recipes[0].Inputs[0].QuantityPerLandUnit;
+            Assert.Throws<ProductionContentException>(
+                () => registry.Register(free));
+            Assert.That(registry.CropCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ProductionContent_ModPackageNeedsNoEnumOrSchemaChange()
+        {
+            var registry = ProductionContentRegistry.CreateCore();
+            registry.Register(ProductionContentJson.DeserializePackage(
+                TestProductionModJson()));
+            var world = BuildMinimalWorld();
+            world.ProductionContentManifest = registry.CreateManifest();
+            var schema = world.SchemaVersion;
+
+            var json = WorldSnapshotSerializer.Serialize(world, registry);
+            var loaded = WorldSnapshotSerializer.Deserialize(json, registry);
+
+            Assert.That(schema, Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.SchemaVersion, Is.EqualTo(schema));
+            Assert.That(registry.GetCrop("crop.mod_test.example").DisplayName,
+                Is.EqualTo("测试作物"));
+            Assert.That(registry.GetProduct("product.mod_test.example_harvest"),
+                Is.Not.Null);
+            Assert.That(loaded.ProductionContentManifest.Packages.Count,
+                Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Snapshot_MissingProductionModReportsOriginalPackageId()
+        {
+            var registry = ProductionContentRegistry.CreateCore();
+            registry.Register(ProductionContentJson.DeserializePackage(
+                TestProductionModJson()));
+            var world = BuildMinimalWorld();
+            world.ProductionContentManifest = registry.CreateManifest();
+            var json = WorldSnapshotSerializer.Serialize(world, registry);
+
+            var exception = Assert.Throws<ProductionContentException>(
+                () => WorldSnapshotSerializer.Deserialize(json));
+
+            Assert.That(exception.Message, Does.Contain("content.mod_test.production"));
+            Assert.That(json, Does.Contain("content.mod_test.production"));
+        }
+
+        [Test]
+        public void Research_MissingKnowledgeRejectsWithoutSpendingFamilyWealth()
+        {
+            var world = VillagePrototypeFactory.Create(200, 21_001);
+            var lead = world.People.Find(
+                item => item.VillageOccupation == VillageOccupation.Farmer);
+            var family = world.Families.Find(item => item.Id == lead.FamilyId);
+            var facility = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.AssemblyHall);
+            lead.ProfessionalSkills.Agriculture = 6_000;
+            family.Wealth = 1_000;
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var system = new ResearchSystem();
+
+            Assert.Throws<InvalidOperationException>(() => system.StartProject(
+                world,
+                CoreTechnologyIds.SeedSelection,
+                lead.Id,
+                facility.Id,
+                ResearchControlMode.WorkOrder));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world), Is.EqualTo(before));
+        }
+
+        [Test]
+        public void Research_ControlModesUseTheSameProgressFormula()
+        {
+            int? expectedProgress = null;
+            foreach (var mode in new[]
+                     {
+                         ResearchControlMode.PersonalLabor,
+                         ResearchControlMode.DelegatedPolicy
+                     })
+            {
+                var world = VillagePrototypeFactory.Create(200, 21_002);
+                var lead = world.People.Find(
+                    item => item.VillageOccupation == VillageOccupation.Farmer);
+                var family = world.Families.Find(
+                    item => item.Id == lead.FamilyId);
+                var facility = world.VillageFacilities.Find(
+                    item => item.Kind == VillageFacilityKind.AssemblyHall);
+                lead.ProfessionalSkills.Agriculture = 6_000;
+                family.Wealth = 1_000;
+                var system = new ResearchSystem();
+                system.GrantKnowledge(
+                    world,
+                    lead.Id,
+                    CoreKnowledgeIds.SeasonalObservation,
+                    6_000,
+                    "source.test.practice");
+                var project = system.StartProject(
+                    world,
+                    CoreTechnologyIds.SeedSelection,
+                    lead.Id,
+                    facility.Id,
+                    mode);
+                world.AbsoluteDay = 1;
+
+                system.ResolveDailyProjects(world);
+
+                if (expectedProgress.HasValue)
+                {
+                    Assert.That(
+                        project.ProgressResearchPoints,
+                        Is.EqualTo(expectedProgress.Value));
+                }
+                else
+                {
+                    expectedProgress = project.ProgressResearchPoints;
+                }
+
+                Assert.That(project.ProgressResearchPoints, Is.GreaterThan(0));
+                world.Validate();
+            }
+        }
+
+        [Test]
+        public void Research_CompletedTechnologyAppliesOnlyToTargetWorkOrder()
+        {
+            var world = VillagePrototypeFactory.Create(200, 21_003);
+            var lead = world.People.Find(
+                item => item.VillageOccupation == VillageOccupation.Farmer);
+            var family = world.Families.Find(item => item.Id == lead.FamilyId);
+            var researchFacility = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.AssemblyHall);
+            var field = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == family.Id);
+            lead.ProfessionalSkills.Agriculture = 6_000;
+            family.Wealth = 1_000;
+            var research = new ResearchSystem();
+            research.GrantKnowledge(
+                world,
+                lead.Id,
+                CoreKnowledgeIds.SeasonalObservation,
+                6_000,
+                "source.test.practice");
+            var project = research.StartProject(
+                world,
+                CoreTechnologyIds.SeedSelection,
+                lead.Id,
+                researchFacility.Id,
+                ResearchControlMode.DelegatedPolicy);
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 30);
+
+            Assert.That(project.Status, Is.EqualTo(ResearchProjectStatus.Completed));
+            Assert.That(
+                SkillMasteryAccess.HasTechnology(
+                    lead, CoreTechnologyIds.SeedSelection),
+                Is.True);
+            var application = research.ApplyTechnology(
+                world,
+                CoreTechnologyIds.SeedSelection,
+                field.Id,
+                lead.Id);
+            var agriculture = new AgricultureProductionSystem(world.MasterSeed);
+            var order = agriculture.CreateOrder(
+                world,
+                world.Villages[0].Id,
+                family.Id,
+                field.Id,
+                storage.Id,
+                lead.Id,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.TargetInstruction,
+                1,
+                AvailableAgricultureWorkers(world, family),
+                world.AbsoluteDay + 180);
+
+            Assert.That(order.TechnologyYieldBasisPoints, Is.EqualTo(10_300));
+            Assert.That(
+                order.AppliedTechnologyIds,
+                Is.EqualTo(new[] { CoreTechnologyIds.SeedSelection }));
+            application.IsActive = false;
+            world.AbsoluteDay = order.HarvestDay;
+            agriculture.ResolveDueOrders(world, world.Villages[0].Id);
+
+            Assert.That(order.Status, Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(order.ProducedQuantity, Is.GreaterThan(0));
+            Assert.That(order.TechnologyYieldBasisPoints, Is.EqualTo(10_300));
+            Assert.That(
+                world.ResearchLedgerEntries.Exists(
+                    item => item.Type ==
+                        ResearchLedgerEntryType.TechnologyApplied &&
+                        item.TechnologyApplicationId == application.Id),
+                Is.True);
+            world.Validate();
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedLead = loaded.People.Find(item => item.Id == lead.Id);
+            Assert.That(loaded.ResearchProjects.Count, Is.EqualTo(1));
+            Assert.That(loaded.TechnologyApplications.Count, Is.EqualTo(1));
+            Assert.That(loaded.ResearchLedgerEntries.Count, Is.GreaterThan(3));
+            Assert.That(
+                SkillMasteryAccess.HasTechnology(
+                    loadedLead, CoreTechnologyIds.SeedSelection),
+                Is.True);
+            Assert.That(
+                loaded.AgricultureWorkOrders[0].AppliedTechnologyIds,
+                Is.EqualTo(new[] { CoreTechnologyIds.SeedSelection }));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Agriculture_AllControlModesUseTheSameSettlementRules()
+        {
+            long? expectedHarvest = null;
+            foreach (ProductionControlMode mode in Enum.GetValues(
+                         typeof(ProductionControlMode)))
+            {
+                var world = VillagePrototypeFactory.Create(200, 20_001);
+                world.AbsoluteDay = 90;
+                var family = world.Families[0];
+                var field = world.VillageFacilities.Find(
+                    item => item.Kind == VillageFacilityKind.Farmland);
+                var storage = world.VillageFacilities.Find(
+                    item =>
+                        item.Kind == VillageFacilityKind.HouseholdGranary &&
+                        item.OwnerFamilyId == family.Id);
+                var workers = AvailableAgricultureWorkers(world, family);
+                var system = new AgricultureProductionSystem(world.MasterSeed);
+                var order = system.CreateOrder(
+                    world,
+                    world.Villages[0].Id,
+                    family.Id,
+                    field.Id,
+                    storage.Id,
+                    family.HeadPersonId,
+                    CoreProductionContent.WheatCropId,
+                    CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                    CoreProductionContent.GrowWheatRecipeId,
+                    CoreProductionContent.PrototypeDrylandMethodId,
+                    mode,
+                    family.FarmlandUnits,
+                    workers,
+                    270);
+                world.AbsoluteDay = 270;
+
+                system.ResolveDueOrders(world, world.Villages[0].Id);
+
+                Assert.That(order.Status, Is.EqualTo(
+                    ProductionOrderStatus.Completed));
+                Assert.That(order.ProducedQuantity, Is.GreaterThan(0));
+                if (expectedHarvest.HasValue)
+                {
+                    Assert.That(order.ProducedQuantity, Is.EqualTo(
+                        expectedHarvest.Value));
+                }
+                else
+                {
+                    expectedHarvest = order.ProducedQuantity;
+                }
+
+                Assert.That(system.Audit(world).IsBalanced, Is.True);
+                world.Validate();
+            }
+        }
+
+        [Test]
+        public void Agriculture_InsufficientSeedRejectsWithoutChangingWorld()
+        {
+            var world = VillagePrototypeFactory.Create(200, 20_002);
+            world.AbsoluteDay = 90;
+            var family = world.Families[0];
+            var field = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == family.Id);
+            family.SeedGrain = 0;
+            storage.InventoryUnits = family.Grain;
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var system = new AgricultureProductionSystem(world.MasterSeed);
+
+            Assert.Throws<InvalidOperationException>(() => system.CreateOrder(
+                world,
+                world.Villages[0].Id,
+                family.Id,
+                field.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.DirectAssignment,
+                1,
+                AvailableAgricultureWorkers(world, family),
+                270));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world), Is.EqualTo(before));
+        }
+
+        [Test]
+        public void Agriculture_StorageOverflowIsLostAndAudited()
+        {
+            var world = VillagePrototypeFactory.Create(200, 20_003);
+            world.AbsoluteDay = 90;
+            var family = world.Families[0];
+            var field = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == family.Id);
+            var system = new AgricultureProductionSystem(world.MasterSeed);
+            var order = system.CreateOrder(
+                world,
+                world.Villages[0].Id,
+                family.Id,
+                field.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.WorkOrder,
+                family.FarmlandUnits,
+                AvailableAgricultureWorkers(world, family),
+                270);
+            storage.Capacity = checked((int)storage.InventoryUnits + 1);
+            world.AbsoluteDay = 270;
+
+            system.ResolveDueOrders(world, world.Villages[0].Id);
+
+            Assert.That(order.StoredQuantity, Is.EqualTo(1));
+            Assert.That(order.LostQuantity, Is.GreaterThan(0));
+            Assert.That(storage.InventoryUnits, Is.EqualTo(storage.Capacity));
+            Assert.That(
+                world.ProductionLedgerEntries.Exists(
+                    item =>
+                        item.WorkOrderId == order.Id &&
+                        item.Type == ProductionLedgerEntryType.ProductLost &&
+                        item.ProductDefinitionId ==
+                        CoreProductionContent.WheatGrainProductId &&
+                        item.Quantity == order.LostQuantity),
+                Is.True);
+            Assert.That(system.Audit(world).IsBalanced, Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void Agriculture_MissingDefinitionIsRejectedBeforeSnapshotWrite()
+        {
+            var world = VillagePrototypeFactory.Create(200, 20_005);
+            world.AbsoluteDay = 90;
+            var family = world.Families[0];
+            var field = world.VillageFacilities.Find(
+                item => item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(
+                item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == family.Id);
+            var system = new AgricultureProductionSystem(world.MasterSeed);
+            var order = system.CreateOrder(
+                world,
+                world.Villages[0].Id,
+                family.Id,
+                field.Id,
+                storage.Id,
+                family.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.WorkOrder,
+                1,
+                AvailableAgricultureWorkers(world, family),
+                270);
+            order.RecipeDefinitionId = "recipe.missing";
+
+            var exception = Assert.Throws<ProductionContentException>(
+                () => WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(exception.Message, Does.Contain("recipe.missing"));
+        }
+
+        [Test]
+        public void Agriculture_VillageYearUsesPersistedWorkOrdersAndRoundTrips()
+        {
+            var world = VillagePrototypeFactory.Create(200, 20_004);
+
+            SimulateVillageMonths(world, 12);
+
+            var audit = new AgricultureProductionSystem(world.MasterSeed)
+                .Audit(world);
+            Assert.That(
+                world.AgricultureWorkOrders.Count,
+                Is.EqualTo(world.Families.Count));
+            Assert.That(audit.ActiveOrders, Is.EqualTo(0));
+            Assert.That(audit.CompletedOrders,
+                Is.EqualTo(world.AgricultureWorkOrders.Count));
+            Assert.That(audit.IsBalanced, Is.True);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(
+                loaded.AgricultureWorkOrders.Count,
+                Is.EqualTo(world.AgricultureWorkOrders.Count));
+            Assert.That(
+                loaded.ProductionLedgerEntries.Count,
+                Is.EqualTo(world.ProductionLedgerEntries.Count));
+            Assert.That(
+                loaded.AgricultureWorkOrders[0].CropDefinitionId,
+                Is.EqualTo(CoreProductionContent.WheatCropId));
+            Assert.That(
+                loaded.AgricultureWorkOrders[0].RecipeDefinitionId,
+                Is.EqualTo(CoreProductionContent.GrowWheatRecipeId));
+            Assert.That(
+                new AgricultureProductionSystem(loaded.MasterSeed)
+                    .Audit(loaded).IsBalanced,
+                Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSevenToProductionCollections()
+        {
+            var world = BuildMinimalWorld();
+            var populationMode = world.PopulationStorage.Mode;
+            var personIds = new List<string>();
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                personIds.Add(world.People[i].Id);
+            }
+
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": 9", "\"SchemaVersion\": 7");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.PopulationStorage.Mode, Is.EqualTo(populationMode));
+            Assert.That(loaded.AgricultureWorkOrders, Is.Not.Null);
+            Assert.That(loaded.ProductionLedgerEntries, Is.Not.Null);
+            Assert.That(loaded.ProductionContentManifest, Is.Not.Null);
+            Assert.That(
+                loaded.ProductionContentManifest.ResolvedHash,
+                Is.EqualTo(ProductionContentRegistry.CreateCore().ResolvedHash));
+            for (var i = 0; i < personIds.Count; i++)
+            {
+                Assert.That(loaded.People[i].Id, Is.EqualTo(personIds[i]));
+            }
+
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionEightToResearchCollections()
+        {
+            var world = BuildMinimalWorld();
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 9", "\"SchemaVersion\": 8")
+                .Replace(
+                    "\"ContentSchemaVersion\": 2",
+                    "\"ContentSchemaVersion\": 1")
+                .Replace("\"SkillMasteries\": []", "\"SkillMasteries\": null")
+                .Replace(
+                    "\"KnowledgeMasteries\": []",
+                    "\"KnowledgeMasteries\": null")
+                .Replace(
+                    "\"TechnologyMasteries\": []",
+                    "\"TechnologyMasteries\": null")
+                .Replace("\"ResearchProjects\": []", "\"ResearchProjects\": null")
+                .Replace(
+                    "\"TechnologyApplications\": []",
+                    "\"TechnologyApplications\": null")
+                .Replace(
+                    "\"ResearchLedgerEntries\": []",
+                    "\"ResearchLedgerEntries\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ResearchProjects, Is.Not.Null);
+            Assert.That(loaded.TechnologyApplications, Is.Not.Null);
+            Assert.That(loaded.ResearchLedgerEntries, Is.Not.Null);
+            Assert.That(loaded.People[0].SkillMasteries, Is.Not.Null);
+            Assert.That(loaded.People[0].KnowledgeMasteries, Is.Not.Null);
+            Assert.That(loaded.People[0].TechnologyMasteries, Is.Not.Null);
+            Assert.That(
+                loaded.ProductionContentManifest.ContentSchemaVersion,
+                Is.EqualTo(2));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PopulationStore_RoundTripPreservesCoreDetailAndAttachment()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = VillagePrototypeFactory.Create(200, 15_001);
+                var store = new PartitionedPopulationStore(root);
+                var manifest = PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.village",
+                    8,
+                    1);
+
+                PopulationStorageWorldAdapter.ValidateAttachedPackage(world, store);
+                var original = world.People[17];
+                Assert.That(
+                    store.TryReadCore(original.Id, out var core),
+                    Is.True);
+                Assert.That(core.Matches(original), Is.True);
+                Assert.That(
+                    store.TryReadDetail(original.Id, out var detail),
+                    Is.True);
+                Assert.That(detail.Id, Is.EqualTo(original.Id));
+                Assert.That(detail.FamilyId, Is.EqualTo(original.FamilyId));
+                Assert.That(
+                    detail.ProfessionalSkills.Agriculture,
+                    Is.EqualTo(original.ProfessionalSkills.Agriculture));
+                Assert.That(manifest.PermanentPersonCount, Is.EqualTo(200));
+                Assert.That(manifest.DetailExtensionCount, Is.EqualTo(200));
+                Assert.That(world.PopulationStorage.ManifestSha256, Is.Not.Empty);
+
+                var loaded = WorldSnapshotSerializer.Deserialize(
+                    WorldSnapshotSerializer.Serialize(world));
+                Assert.That(
+                    loaded.PopulationStorage.Mode,
+                    Is.EqualTo(PopulationStorageMode.PartitionedPackage));
+                Assert.That(
+                    loaded.PopulationStorage.ManifestSha256,
+                    Is.EqualTo(world.PopulationStorage.ManifestSha256));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationResidency_DemotionCannotDiscardDirtyDetail()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.residency",
+                    4,
+                    1);
+                var session = new PopulationResidencySession(store);
+                var person = session.Promote("person.liu_bei");
+
+                session.DemoteUnchanged(person.Id);
+                Assert.That(session.HotCount, Is.EqualTo(0));
+                person = session.Promote(person.Id);
+                person.Wealth++;
+
+                Assert.Throws<InvalidOperationException>(
+                    () => session.DemoteUnchanged(person.Id));
+                Assert.That(session.HotCount, Is.EqualTo(1));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_TamperedPartitionIsRejected()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                var manifest = PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.tamper",
+                    2,
+                    1);
+                var path = Path.Combine(
+                    root,
+                    manifest.Partitions[0].CoreRelativePath.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar));
+                using (var stream = new FileStream(
+                           path,
+                           FileMode.Append,
+                           FileAccess.Write,
+                           FileShare.None))
+                {
+                    stream.WriteByte(0x5A);
+                }
+
+                Assert.Throws<InvalidOperationException>(
+                    () => new PartitionedPopulationStore(root).OpenCurrent());
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_InputOrderDoesNotChangePartitionContent()
+        {
+            var firstRoot = NewPopulationStoreTestRoot();
+            var secondRoot = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = VillagePrototypeFactory.Create(200, 15_002);
+                var firstCheckpoint = PopulationCheckpoint.FromInlineWorld(
+                    world,
+                    "population.test.determinism",
+                    8,
+                    1);
+                var secondCheckpoint = PopulationCheckpoint.FromInlineWorld(
+                    world,
+                    "population.test.determinism",
+                    8,
+                    1);
+                secondCheckpoint.People.Reverse();
+                secondCheckpoint.DetailExtensions.Reverse();
+
+                var first = new PartitionedPopulationStore(firstRoot)
+                    .CommitCheckpoint(firstCheckpoint);
+                var second = new PartitionedPopulationStore(secondRoot)
+                    .CommitCheckpoint(secondCheckpoint);
+
+                Assert.That(
+                    second.ManifestSha256,
+                    Is.EqualTo(first.ManifestSha256));
+                for (var i = 0; i < first.Partitions.Count; i++)
+                {
+                    Assert.That(
+                        second.Partitions[i].CoreSha256,
+                        Is.EqualTo(first.Partitions[i].CoreSha256));
+                    Assert.That(
+                        second.Partitions[i].DetailSha256,
+                        Is.EqualTo(first.Partitions[i].DetailSha256));
+                }
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(firstRoot);
+                DeletePopulationStoreTestRoot(secondRoot);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_NewRevisionPersistsChangedHotDetail()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.revision",
+                    2,
+                    1);
+                world.People[0].Wealth = 4321;
+                world.People.Add(new PersonState
+                {
+                    Id = "person.test.newborn",
+                    DisplayName = "新生儿",
+                    LocationId = "location.zhuo",
+                    BirthLocationId = "location.zhuo",
+                    BirthDay = world.AbsoluteDay,
+                    Gender = PersonGender.Female
+                });
+                Assert.Throws<InvalidOperationException>(
+                    () => WorldSnapshotSerializer.Serialize(world));
+                var secondManifest = PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.revision",
+                    2,
+                    2);
+
+                Assert.That(secondManifest.StorageRevision, Is.EqualTo(2));
+                Assert.That(secondManifest.PermanentPersonCount, Is.EqualTo(3));
+                Assert.That(
+                    new PartitionedPopulationStore(root).TryReadDetail(
+                        world.People[0].Id,
+                        out var persisted),
+                    Is.True);
+                Assert.That(persisted.Wealth, Is.EqualTo(4321));
+                Assert.That(
+                    Directory.Exists(Path.Combine(
+                        root,
+                        "generations",
+                        "generation-00000000000000000001")),
+                    Is.True);
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        private static List<string> AvailableAgricultureWorkers(
+            WorldState world,
+            FamilyState family)
+        {
+            var result = new List<string>();
+            for (var i = 0; i < family.MemberIds.Count; i++)
+            {
+                var person = world.People.Find(
+                    item => item.Id == family.MemberIds[i]);
+                if (person.IsAlive &&
+                    person.LocalDuty == LocalDutyKind.None &&
+                    person.LaborCapacityBasisPoints > 0)
+                {
+                    result.Add(person.Id);
+                }
+            }
+
+            result.Sort(StringComparer.Ordinal);
+            return result;
+        }
+
+        private static ProductionContentPackageDefinition
+            BuildTestProductionPackage(string packageId)
+        {
+            var package = new ProductionContentPackageDefinition
+            {
+                PackageId = packageId,
+                Version = "1.0.0",
+                LoadOrder = 100,
+                Required = false
+            };
+            package.Crops.Add(new CropDefinition
+            {
+                Id = "crop.mod_test.example",
+                DisplayName = "测试作物",
+                HistoricalStatus = "test_only",
+                SourceNote = "自动测试内容，不进入正式历史内容。",
+                UsageTags = new List<string> { "usage.test" }
+            });
+            package.CropVarieties.Add(new CropVarietyDefinition
+            {
+                Id = "crop_variety.mod_test.example",
+                CropDefinitionId = "crop.mod_test.example",
+                DisplayName = "测试品种",
+                Provenance = "test_only"
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = "product.mod_test.example_seed",
+                DisplayName = "测试种子",
+                UnitId = CoreProductionContent.GrainUnitId,
+                CategoryTags = new List<string> { "product.seed" }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = "product.mod_test.example_harvest",
+                DisplayName = "测试收获物",
+                UnitId = CoreProductionContent.GrainUnitId,
+                CategoryTags = new List<string> { "product.test" }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = "recipe.mod_test.grow_example",
+                DisplayName = "种植测试作物",
+                CropDefinitionId = "crop.mod_test.example",
+                DurationDays = 30,
+                FacilityTags = new List<string> { "facility.farmland" },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = "product.mod_test.example_seed",
+                        QuantityPerLandUnit = 1
+                    }
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = "product.mod_test.example_harvest",
+                        QuantityPerLandUnit = 2
+                    }
+                }
+            });
+            package.Methods.Add(new ProductionMethodDefinition
+            {
+                Id = "method.mod_test.example",
+                DisplayName = "测试方法",
+                RecipeDefinitionIds = new List<string>
+                {
+                    "recipe.mod_test.grow_example"
+                },
+                YieldBasisPoints = 10_000,
+                LaborBasisPoints = 10_000,
+                HistoricalStatus = "test_only"
+            });
+            return package;
+        }
+
+        private static string TestProductionModJson()
+        {
+            return ProductionContentJson.SerializePackage(
+                BuildTestProductionPackage("content.mod_test.production"));
         }
 
         private static void SimulateVillageMonths(WorldState world, int months)
@@ -3049,6 +3967,22 @@ namespace Mandate.Tests
                 life.ResolveMonthly(world);
                 VillageLifeSystem.RefreshAllCaches(world);
                 world.Validate();
+            }
+        }
+
+        private static string NewPopulationStoreTestRoot()
+        {
+            return Path.Combine(
+                Path.GetTempPath(),
+                "mandate-population-store-tests",
+                Guid.NewGuid().ToString("N"));
+        }
+
+        private static void DeletePopulationStoreTestRoot(string root)
+        {
+            if (Directory.Exists(root))
+            {
+                Directory.Delete(root, true);
             }
         }
 

@@ -49,10 +49,15 @@ namespace Mandate.Simulation
         private readonly NamedRandom _random;
         private readonly PopulationLedgerSystem _population =
             new PopulationLedgerSystem();
+        private readonly AgricultureProductionSystem _agricultureProduction;
 
-        public VillageLifeSystem(ulong masterSeed)
+        public VillageLifeSystem(
+            ulong masterSeed,
+            ProductionContentRegistry productionContent = null)
         {
             _random = new NamedRandom(masterSeed);
+            _agricultureProduction =
+                new AgricultureProductionSystem(masterSeed, productionContent);
         }
 
         public void ResolveMonthly(WorldState world)
@@ -123,6 +128,21 @@ namespace Mandate.Simulation
             if (granary != null)
             {
                 granary.InventoryUnits = village.PublicGranaryGrain;
+            }
+
+            for (var familyIndex = 0;
+                 familyIndex < village.HouseholdIds.Count;
+                 familyIndex++)
+            {
+                var family = FindFamily(
+                    world, village.HouseholdIds[familyIndex]);
+                var householdGranary = FindHouseholdGranary(
+                    world, village.Id, family.Id);
+                if (householdGranary != null)
+                {
+                    householdGranary.InventoryUnits =
+                        family.Grain + family.SeedGrain;
+                }
             }
         }
 
@@ -246,7 +266,8 @@ namespace Mandate.Simulation
 
             if (monthInYear == 3)
             {
-                ResolvePlanting(world, village, families);
+                _agricultureProduction.CreateDelegatedSeasonOrders(
+                    world, village, world.AbsoluteDay + 180);
             }
 
             if (monthInYear == 4)
@@ -260,7 +281,7 @@ namespace Mandate.Simulation
 
             if (monthInYear == 9)
             {
-                ResolveHarvest(world, village, families);
+                _agricultureProduction.ResolveDueOrders(world, village.Id);
             }
 
             if (monthInYear == 10)
@@ -937,6 +958,25 @@ namespace Mandate.Simulation
             {
                 var facility = world.VillageFacilities[i];
                 if (facility.VillageId == villageId && facility.Kind == kind)
+                {
+                    return facility;
+                }
+            }
+
+            return null;
+        }
+
+        private static VillageFacilityState FindHouseholdGranary(
+            WorldState world,
+            string villageId,
+            string familyId)
+        {
+            for (var i = 0; i < world.VillageFacilities.Count; i++)
+            {
+                var facility = world.VillageFacilities[i];
+                if (facility.VillageId == villageId &&
+                    facility.Kind == VillageFacilityKind.HouseholdGranary &&
+                    facility.OwnerFamilyId == familyId)
                 {
                     return facility;
                 }

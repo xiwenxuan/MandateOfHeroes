@@ -138,7 +138,7 @@ namespace Mandate.Simulation
                 VillageId = village.Id,
                 Wealth = isMarginal ? 120 : 1_200 + familyIndex * 5,
                 Grain = isMarginal ? 3 : size * 42L + familyIndex % 9,
-                SeedGrain = isMarginal ? 1 : size * 8L,
+                SeedGrain = isMarginal ? 2 : size * 8L,
                 FarmlandUnits = isMarginal ? 2 : size * 3 + familyIndex % 4,
                 ToolConditionBasisPoints = isMarginal ? 3_500 : 8_000,
                 FoodSecurityBasisPoints = isMarginal ? 2_000 : 10_000
@@ -343,6 +343,30 @@ namespace Mandate.Simulation
             AddFacility(
                 world, village, "assembly", VillageFacilityKind.AssemblyHall,
                 headman, 500, 8_000, 0);
+            for (var familyIndex = 0;
+                 familyIndex < village.HouseholdIds.Count;
+                 familyIndex++)
+            {
+                var family = FindFamily(world, village.HouseholdIds[familyIndex]);
+                var manager = FindPerson(world, family.HeadPersonId);
+                world.VillageFacilities.Add(new VillageFacilityState
+                {
+                    Id = $"facility.{village.Id}.household_granary.{familyIndex:D3}",
+                    VillageId = village.Id,
+                    Kind = VillageFacilityKind.HouseholdGranary,
+                    OwnerFamilyId = family.Id,
+                    ManagerPersonId = manager.Id,
+                    Capacity = checked(
+                        (int)Math.Min(
+                            int.MaxValue,
+                            Math.Max(
+                                200L,
+                                family.Grain + family.SeedGrain +
+                                family.FarmlandUnits * 30L))),
+                    ConditionBasisPoints = 8_000,
+                    InventoryUnits = family.Grain + family.SeedGrain
+                });
+            }
         }
 
         private static void AddFacility(

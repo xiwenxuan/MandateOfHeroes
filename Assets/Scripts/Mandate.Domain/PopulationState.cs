@@ -2,6 +2,131 @@ using System;
 
 namespace Mandate.Domain
 {
+    public enum PopulationStorageMode : byte
+    {
+        InlineSnapshot,
+        PartitionedPackage
+    }
+
+    [Serializable]
+    public sealed class PopulationStorageState
+    {
+        public const int CurrentContractVersion = 1;
+
+        public int ContractVersion = CurrentContractVersion;
+        public PopulationStorageMode Mode = PopulationStorageMode.InlineSnapshot;
+        public string PackageId = string.Empty;
+        public int PartitionCount;
+        public long PermanentPersonCount;
+        public long LivingPersonCount;
+        public long DetailExtensionCount;
+        public long StorageRevision;
+        public string ManifestSha256 = string.Empty;
+
+        public static PopulationStorageState CreateInline(
+            System.Collections.Generic.IReadOnlyList<PersonState> people)
+        {
+            if (people == null)
+            {
+                throw new ArgumentNullException(nameof(people));
+            }
+
+            var state = new PopulationStorageState();
+            state.SynchronizeInlineCounts(people);
+            return state;
+        }
+
+        public void SynchronizeInlineCounts(
+            System.Collections.Generic.IReadOnlyList<PersonState> people)
+        {
+            if (people == null)
+            {
+                throw new ArgumentNullException(nameof(people));
+            }
+
+            Mode = PopulationStorageMode.InlineSnapshot;
+            PackageId = string.Empty;
+            PartitionCount = 0;
+            PermanentPersonCount = people.Count;
+            LivingPersonCount = 0;
+            for (var i = 0; i < people.Count; i++)
+            {
+                if (people[i] != null && people[i].IsAlive)
+                {
+                    LivingPersonCount++;
+                }
+            }
+
+            DetailExtensionCount = people.Count;
+            StorageRevision = 0;
+            ManifestSha256 = string.Empty;
+        }
+
+        public void Validate(int materializedPersonCount)
+        {
+            if (ContractVersion != CurrentContractVersion)
+            {
+                throw new InvalidOperationException(
+                    $"Unsupported population storage contract {ContractVersion}.");
+            }
+
+            if (!Enum.IsDefined(typeof(PopulationStorageMode), Mode) ||
+                materializedPersonCount < 0 ||
+                PermanentPersonCount < 0 ||
+                LivingPersonCount < 0 ||
+                DetailExtensionCount < 0 ||
+                StorageRevision < 0 ||
+                LivingPersonCount > PermanentPersonCount ||
+                DetailExtensionCount > PermanentPersonCount)
+            {
+                throw new InvalidOperationException(
+                    "Invalid population storage metadata.");
+            }
+
+            if (Mode == PopulationStorageMode.InlineSnapshot)
+            {
+                if (PartitionCount != 0 ||
+                    !string.IsNullOrEmpty(PackageId) ||
+                    !string.IsNullOrEmpty(ManifestSha256))
+                {
+                    throw new InvalidOperationException(
+                        "Inline population storage cannot reference an external package.");
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(PackageId) ||
+                PartitionCount <= 0 ||
+                !IsSha256(ManifestSha256))
+            {
+                throw new InvalidOperationException(
+                    "Invalid partitioned population package metadata.");
+            }
+        }
+
+        private static bool IsSha256(string value)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length != 64)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (!((c >= '0' && c <= '9') ||
+                      (c >= 'a' && c <= 'f') ||
+                      (c >= 'A' && c <= 'F')))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     public enum PopulationOccupation : byte
     {
         Agriculture,

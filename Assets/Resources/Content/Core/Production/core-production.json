@@ -1,0 +1,205 @@
+{
+  "PackageId": "content.core.production",
+  "Version": "2.0.0",
+  "LoadOrder": 0,
+  "Required": true,
+  "Crops": [
+    {
+      "Id": "crop.wheat",
+      "DisplayName": "小麦",
+      "UsageTags": [
+        "usage.staple",
+        "usage.seed",
+        "usage.fodder",
+        "usage.military_supply"
+      ],
+      "HistoricalStatus": "historical_core",
+      "SourceNote": "东汉核心历史作物；原型参数为原创玩法补全。"
+    }
+  ],
+  "CropVarieties": [
+    {
+      "Id": "crop_variety.wheat.prototype_northern",
+      "CropDefinitionId": "crop.wheat",
+      "DisplayName": "北方小麦原型品种",
+      "Provenance": "gameplay_completion",
+      "TraitIds": [
+        "trait.crop.prototype_dryland"
+      ]
+    }
+  ],
+  "Products": [
+    {
+      "Id": "product.wheat_seed",
+      "DisplayName": "小麦种子",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.seed",
+        "product.agriculture_input"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 1000
+    },
+    {
+      "Id": "product.wheat_grain",
+      "DisplayName": "麦粒",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.grain",
+        "product.market",
+        "product.military_supply"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 600
+    }
+  ],
+  "Recipes": [
+    {
+      "Id": "recipe.field.grow_wheat",
+      "DisplayName": "种植小麦",
+      "CropDefinitionId": "crop.wheat",
+      "DurationDays": 180,
+      "FacilityTags": [
+        "facility.farmland"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.wheat_seed",
+          "QuantityPerLandUnit": 2
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.wheat_grain",
+          "QuantityPerLandUnit": 15
+        }
+      ]
+    }
+  ],
+  "Methods": [
+    {
+      "Id": "method.farming.prototype_dryland",
+      "DisplayName": "原型旱作法",
+      "RecipeDefinitionIds": [
+        "recipe.field.grow_wheat"
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "gameplay_completion"
+    }
+  ],
+  "Skills": [
+    {
+      "Id": "skill.agriculture",
+      "DisplayName": "农业",
+      "FieldId": "field.agriculture_water",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "映射既有人物农业能力；后续子技艺继续使用稳定ID扩展。"
+    }
+  ],
+  "Knowledge": [
+    {
+      "Id": "knowledge.agriculture.seasonal_observation",
+      "DisplayName": "农时观察",
+      "FieldId": "field.agriculture_water",
+      "HistoricalStatus": "historical_inference",
+      "SourceNote": "基于长期农业实践的通用知识抽象；具体参数为原创玩法补全。"
+    }
+  ],
+  "Technologies": [
+    {
+      "Id": "technology.agriculture.seed_selection",
+      "DisplayName": "选种法",
+      "FieldId": "field.agriculture_water",
+      "Description": "按籽粒状态筛选并保存下一季种子。",
+      "HistoricalStatus": "historical_inference",
+      "SourceNote": "历史农业实践的机制抽象；数值为原创玩法补全。",
+      "RequiredSkillDefinitionId": "skill.agriculture",
+      "RequiredSkillBasisPoints": 4000,
+      "RequiredKnowledgeMasteryBasisPoints": 5000,
+      "ResearchPointsRequired": 8000,
+      "FundingCost": 20,
+      "ApplicationFundingCost": 5,
+      "RequiredKnowledgeDefinitionIds": [
+        "knowledge.agriculture.seasonal_observation"
+      ],
+      "ResearchFacilityTags": [
+        "facility.assembly_hall",
+        "facility.farmland"
+      ],
+      "Effects": [
+        {
+          "Id": "effect.agriculture.seed_selection",
+          "TargetFacilityTag": "facility.farmland",
+          "RecipeDefinitionId": "recipe.field.grow_wheat",
+          "MethodDefinitionId": "method.farming.prototype_dryland",
+          "YieldBasisPoints": 10300,
+          "LaborBasisPoints": 10000
+        }
+      ]
+    },
+    {
+      "Id": "technology.agriculture.ridge_sowing",
+      "DisplayName": "垄作播种",
+      "FieldId": "field.agriculture_water",
+      "Description": "通过垄沟组织播种与排水，换取更稳定的田间表现。",
+      "HistoricalStatus": "historical_inference",
+      "SourceNote": "历史农业实践的机制抽象；数值为原创玩法补全。",
+      "RequiredSkillDefinitionId": "skill.agriculture",
+      "RequiredSkillBasisPoints": 5000,
+      "RequiredKnowledgeMasteryBasisPoints": 5000,
+      "ResearchPointsRequired": 12000,
+      "FundingCost": 30,
+      "ApplicationFundingCost": 8,
+      "RequiredKnowledgeDefinitionIds": [
+        "knowledge.agriculture.seasonal_observation"
+      ],
+      "ResearchFacilityTags": [
+        "facility.assembly_hall",
+        "facility.farmland"
+      ],
+      "Effects": [
+        {
+          "Id": "effect.agriculture.ridge_sowing",
+          "TargetFacilityTag": "facility.farmland",
+          "RecipeDefinitionId": "recipe.field.grow_wheat",
+          "MethodDefinitionId": "method.farming.prototype_dryland",
+          "YieldBasisPoints": 10500,
+          "LaborBasisPoints": 10500
+        }
+      ]
+    },
+    {
+      "Id": "technology.agriculture.coordinated_fieldwork",
+      "DisplayName": "协同农作",
+      "FieldId": "field.agriculture_water",
+      "Description": "改进家庭与乡里劳作排程，降低同一工单的劳动需求。",
+      "HistoricalStatus": "historical_inference",
+      "SourceNote": "历史农业实践的机制抽象；数值为原创玩法补全。",
+      "RequiredSkillDefinitionId": "skill.agriculture",
+      "RequiredSkillBasisPoints": 4500,
+      "RequiredKnowledgeMasteryBasisPoints": 5000,
+      "ResearchPointsRequired": 9000,
+      "FundingCost": 25,
+      "ApplicationFundingCost": 6,
+      "RequiredKnowledgeDefinitionIds": [
+        "knowledge.agriculture.seasonal_observation"
+      ],
+      "ResearchFacilityTags": [
+        "facility.assembly_hall",
+        "facility.farmland"
+      ],
+      "Effects": [
+        {
+          "Id": "effect.agriculture.coordinated_fieldwork",
+          "TargetFacilityTag": "facility.farmland",
+          "RecipeDefinitionId": "recipe.field.grow_wheat",
+          "MethodDefinitionId": "method.farming.prototype_dryland",
+          "YieldBasisPoints": 10000,
+          "LaborBasisPoints": 9000
+        }
+      ]
+    }
+  ]
+}

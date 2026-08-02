@@ -84,6 +84,12 @@ namespace Mandate.Domain
         public CharacterAptitudeState Aptitudes = new CharacterAptitudeState();
         public ProfessionalSkillState ProfessionalSkills =
             new ProfessionalSkillState();
+        public List<SkillMasteryState> SkillMasteries =
+            new List<SkillMasteryState>();
+        public List<KnowledgeMasteryState> KnowledgeMasteries =
+            new List<KnowledgeMasteryState>();
+        public List<TechnologyMasteryState> TechnologyMasteries =
+            new List<TechnologyMasteryState>();
         public LifeGoalKind LifeGoal = LifeGoalKind.Unknown;
         public PersonalityState Personality = new PersonalityState();
         public NeedState Needs = new NeedState();
@@ -133,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 6;
+        public const int CurrentSchemaVersion = 9;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -176,6 +182,8 @@ namespace Mandate.Domain
             new List<PopulationCohortState>();
         public List<PopulationTransactionState> PopulationTransactions =
             new List<PopulationTransactionState>();
+        public PopulationStorageState PopulationStorage =
+            new PopulationStorageState();
         public List<EducationPlanState> EducationPlans =
             new List<EducationPlanState>();
         public List<LearningRecordState> LearningRecords =
@@ -192,6 +200,17 @@ namespace Mandate.Domain
             new List<VillageFacilityState>();
         public List<VillageLedgerEntryState> VillageLedgerEntries =
             new List<VillageLedgerEntryState>();
+        public List<AgricultureWorkOrderState> AgricultureWorkOrders =
+            new List<AgricultureWorkOrderState>();
+        public List<ProductionLedgerEntryState> ProductionLedgerEntries =
+            new List<ProductionLedgerEntryState>();
+        public List<ResearchProjectState> ResearchProjects =
+            new List<ResearchProjectState>();
+        public List<TechnologyApplicationState> TechnologyApplications =
+            new List<TechnologyApplicationState>();
+        public List<ResearchLedgerEntryState> ResearchLedgerEntries =
+            new List<ResearchLedgerEntryState>();
+        public ProductionContentManifestState ProductionContentManifest;
 
         public WorldTime Time => new WorldTime(AbsoluteDay, (DaySegment)Segment);
 
@@ -202,7 +221,9 @@ namespace Mandate.Domain
                 MasterSeed = masterSeed,
                 AbsoluteDay = 0,
                 Segment = (byte)DaySegment.Dawn,
-                Revision = 0
+                Revision = 0,
+                ProductionContentManifest =
+                    ProductionContentRegistry.CreateCore().CreateManifest()
             };
         }
 
@@ -232,6 +253,13 @@ namespace Mandate.Domain
             }
 
             _ = new WorldTime(AbsoluteDay, (DaySegment)Segment);
+            if (PopulationStorage == null)
+            {
+                throw new InvalidOperationException(
+                    "Population storage metadata cannot be null.");
+            }
+
+            PopulationStorage.Validate(People.Count);
             ValidateUniqueIds(People, person => person.Id, "person");
             ValidateUniqueIds(Locations, location => location.Id, "location");
             ValidateUniqueIds(Families, family => family.Id, "family");
@@ -278,6 +306,16 @@ namespace Mandate.Domain
                 VillageFacilities, item => item.Id, "village facility");
             ValidateUniqueIds(
                 VillageLedgerEntries, item => item.Id, "village ledger entry");
+            ValidateUniqueIds(
+                AgricultureWorkOrders, item => item.Id, "agriculture work order");
+            ValidateUniqueIds(
+                ProductionLedgerEntries, item => item.Id, "production ledger entry");
+            ValidateUniqueIds(
+                ResearchProjects, item => item.Id, "research project");
+            ValidateUniqueIds(
+                TechnologyApplications, item => item.Id, "technology application");
+            ValidateUniqueIds(
+                ResearchLedgerEntries, item => item.Id, "research ledger entry");
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -381,6 +419,7 @@ namespace Mandate.Domain
                     person.ProfessionalSkills.Intelligence,
                     person.Id,
                     "intelligence");
+                ValidatePersonProgression(person);
                 if (!Enum.IsDefined(typeof(LifeGoalKind), person.LifeGoal))
                 {
                     throw new InvalidOperationException(
@@ -609,6 +648,8 @@ namespace Mandate.Domain
             }
 
             ValidateVillages(personIds, locationIds);
+            ValidateProduction(personIds);
+            ValidateResearch(personIds);
 
             var routeIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Routes.Count; i++)
@@ -2029,7 +2070,9 @@ namespace Mandate.Domain
                     facility.Capacity < 0 ||
                     facility.ConditionBasisPoints < 0 ||
                     facility.ConditionBasisPoints > 10_000 ||
-                    facility.InventoryUnits < 0)
+                    facility.InventoryUnits < 0 ||
+                    facility.Kind == VillageFacilityKind.HouseholdGranary &&
+                    facility.InventoryUnits > facility.Capacity)
                 {
                     throw new InvalidOperationException(
                         $"Invalid village facility {facility.Id}.");
@@ -2055,6 +2098,462 @@ namespace Mandate.Domain
                         $"Invalid village ledger entry {entry.Id}.");
                 }
 
+            }
+        }
+
+        private void ValidatePersonProgression(PersonState person)
+        {
+            if (person.SkillMasteries == null ||
+                person.KnowledgeMasteries == null ||
+                person.TechnologyMasteries == null)
+            {
+                throw new InvalidOperationException(
+                    $"Missing progression collections for {person.Id}.");
+            }
+
+            var skillIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < person.SkillMasteries.Count; i++)
+            {
+                var mastery = person.SkillMasteries[i] ??
+                    throw new InvalidOperationException(
+                        $"Null skill mastery for {person.Id}.");
+                ValidateContentReference(
+                    mastery.SkillDefinitionId, "skill", person.Id);
+                if (!skillIds.Add(mastery.SkillDefinitionId) ||
+                    mastery.MasteryBasisPoints < 0 ||
+                    mastery.MasteryBasisPoints > 10_000 ||
+                    mastery.LastChangedDay < 0 ||
+                    mastery.LastChangedDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid skill mastery for {person.Id}.");
+                }
+            }
+
+            var knowledgeIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < person.KnowledgeMasteries.Count; i++)
+            {
+                var mastery = person.KnowledgeMasteries[i] ??
+                    throw new InvalidOperationException(
+                        $"Null knowledge mastery for {person.Id}.");
+                ValidateContentReference(
+                    mastery.KnowledgeDefinitionId, "knowledge", person.Id);
+                if (!knowledgeIds.Add(mastery.KnowledgeDefinitionId) ||
+                    mastery.MasteryBasisPoints <= 0 ||
+                    mastery.MasteryBasisPoints > 10_000 ||
+                    mastery.LearnedDay < 0 ||
+                    mastery.LearnedDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid knowledge mastery for {person.Id}.");
+                }
+            }
+
+            var technologyIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < person.TechnologyMasteries.Count; i++)
+            {
+                var mastery = person.TechnologyMasteries[i] ??
+                    throw new InvalidOperationException(
+                        $"Null technology mastery for {person.Id}.");
+                ValidateContentReference(
+                    mastery.TechnologyDefinitionId, "technology", person.Id);
+                if (!technologyIds.Add(mastery.TechnologyDefinitionId) ||
+                    mastery.MasteredDay < 0 ||
+                    mastery.MasteredDay > AbsoluteDay ||
+                    string.IsNullOrWhiteSpace(mastery.SourceId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid technology mastery for {person.Id}.");
+                }
+            }
+        }
+
+        private void ValidateResearch(HashSet<string> personIds)
+        {
+            var facilityIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                facilityIds.Add(VillageFacilities[i].Id);
+            }
+
+            var projectIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < ResearchProjects.Count; i++)
+            {
+                var project = ResearchProjects[i] ??
+                    throw new InvalidOperationException(
+                        "A research project cannot be null.");
+                projectIds.Add(project.Id);
+                ValidateContentReference(
+                    project.TechnologyDefinitionId, "technology", project.Id);
+                if (!personIds.Contains(project.LeadPersonId) ||
+                    !facilityIds.Contains(project.ResearchFacilityId) ||
+                    !Enum.IsDefined(
+                        typeof(ResearchControlMode), project.ControlMode) ||
+                    !Enum.IsDefined(
+                        typeof(ResearchProjectStatus), project.Status) ||
+                    project.StartedDay < 0 ||
+                    project.StartedDay > AbsoluteDay ||
+                    project.LastProgressDay < -1 ||
+                    project.LastProgressDay > AbsoluteDay ||
+                    project.CompletedDay < -1 ||
+                    project.CompletedDay > AbsoluteDay ||
+                    project.RequiredResearchPoints <= 0 ||
+                    project.ProgressResearchPoints < 0 ||
+                    project.ProgressResearchPoints >
+                        project.RequiredResearchPoints ||
+                    project.FundingCommitted < 0 ||
+                    project.Status == ResearchProjectStatus.Active &&
+                    (project.CompletedDay != -1 ||
+                     project.ProgressResearchPoints >=
+                        project.RequiredResearchPoints) ||
+                    project.Status == ResearchProjectStatus.Completed &&
+                    (project.CompletedDay < project.StartedDay ||
+                     project.ProgressResearchPoints !=
+                        project.RequiredResearchPoints))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid research project {project.Id}.");
+                }
+            }
+
+            for (var personIndex = 0; personIndex < People.Count; personIndex++)
+            {
+                var person = People[personIndex];
+                for (var masteryIndex = 0;
+                     masteryIndex < person.TechnologyMasteries.Count;
+                     masteryIndex++)
+                {
+                    var mastery = person.TechnologyMasteries[masteryIndex];
+                    if (!string.IsNullOrEmpty(mastery.ResearchProjectId) &&
+                        !projectIds.Contains(mastery.ResearchProjectId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Technology mastery for {person.Id} references " +
+                            $"missing project {mastery.ResearchProjectId}.");
+                    }
+                }
+            }
+
+            var applicationIds = new HashSet<string>(StringComparer.Ordinal);
+            var activeTargets = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < TechnologyApplications.Count; i++)
+            {
+                var application = TechnologyApplications[i] ??
+                    throw new InvalidOperationException(
+                        "A technology application cannot be null.");
+                applicationIds.Add(application.Id);
+                ValidateContentReference(
+                    application.TechnologyDefinitionId,
+                    "technology",
+                    application.Id);
+                if (!personIds.Contains(application.AppliedByPersonId) ||
+                    !facilityIds.Contains(application.TargetFacilityId) ||
+                    application.AppliedDay < 0 ||
+                    application.AppliedDay > AbsoluteDay ||
+                    application.IsActive &&
+                    !activeTargets.Add(
+                        application.TechnologyDefinitionId + "@" +
+                        application.TargetFacilityId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid technology application {application.Id}.");
+                }
+            }
+
+            for (var i = 0; i < ResearchLedgerEntries.Count; i++)
+            {
+                var entry = ResearchLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A research ledger entry cannot be null.");
+                var isKnowledge = entry.Type ==
+                    ResearchLedgerEntryType.KnowledgeLearned;
+                if (!Enum.IsDefined(
+                        typeof(ResearchLedgerEntryType), entry.Type) ||
+                    entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !personIds.Contains(entry.PersonId) ||
+                    !string.IsNullOrEmpty(entry.FacilityId) &&
+                    !facilityIds.Contains(entry.FacilityId) ||
+                    !string.IsNullOrEmpty(entry.ResearchProjectId) &&
+                    !projectIds.Contains(entry.ResearchProjectId) ||
+                    !string.IsNullOrEmpty(entry.TechnologyApplicationId) &&
+                    !applicationIds.Contains(entry.TechnologyApplicationId) ||
+                    entry.FundingDelta > 0 ||
+                    entry.ProgressDelta < 0 ||
+                    isKnowledge !=
+                    !string.IsNullOrEmpty(entry.KnowledgeDefinitionId) ||
+                    isKnowledge ==
+                    !string.IsNullOrEmpty(entry.TechnologyDefinitionId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid research ledger entry {entry.Id}.");
+                }
+
+                if (isKnowledge)
+                {
+                    ValidateContentReference(
+                        entry.KnowledgeDefinitionId, "knowledge", entry.Id);
+                }
+                else
+                {
+                    ValidateContentReference(
+                        entry.TechnologyDefinitionId, "technology", entry.Id);
+                }
+            }
+        }
+
+        private void ValidateProduction(HashSet<string> personIds)
+        {
+            ValidateProductionContentManifest();
+            var villageIds = new HashSet<string>(StringComparer.Ordinal);
+            var familyIds = new HashSet<string>(StringComparer.Ordinal);
+            var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                villageIds.Add(Villages[i].Id);
+            }
+
+            for (var i = 0; i < Families.Count; i++)
+            {
+                familyIds.Add(Families[i].Id);
+            }
+
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+            }
+
+            var ordersById = new Dictionary<string, AgricultureWorkOrderState>(
+                StringComparer.Ordinal);
+            var activeFamilyIds = new HashSet<string>(StringComparer.Ordinal);
+            var activeWorkerIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < AgricultureWorkOrders.Count; i++)
+            {
+                var order = AgricultureWorkOrders[i] ??
+                    throw new InvalidOperationException(
+                        "An agriculture work order cannot be null.");
+                ordersById.Add(order.Id, order);
+                ValidateContentReference(order.CropDefinitionId, "crop", order.Id);
+                ValidateContentReference(
+                    order.CropVarietyDefinitionId, "crop variety", order.Id);
+                ValidateContentReference(order.RecipeDefinitionId, "recipe", order.Id);
+                ValidateContentReference(
+                    order.MethodDefinitionId, "production method", order.Id);
+                ValidateContentReference(
+                    order.SeedProductDefinitionId, "seed product", order.Id);
+                ValidateContentReference(
+                    order.HarvestProductDefinitionId, "harvest product", order.Id);
+                ValidateContentReference(order.UnitId, "unit", order.Id);
+                if (!villageIds.Contains(order.VillageId) ||
+                    !familyIds.Contains(order.FamilyId) ||
+                    !facilities.TryGetValue(
+                        order.FieldFacilityId, out var field) ||
+                    field.Kind != VillageFacilityKind.Farmland ||
+                    field.VillageId != order.VillageId ||
+                    !facilities.TryGetValue(
+                        order.StorageFacilityId, out var storage) ||
+                    storage.VillageId != order.VillageId ||
+                    storage.Kind != VillageFacilityKind.HouseholdGranary ||
+                    storage.OwnerFamilyId != order.FamilyId ||
+                    !personIds.Contains(order.ManagerPersonId) ||
+                    !Enum.IsDefined(
+                        typeof(ProductionControlMode), order.ControlMode) ||
+                    !Enum.IsDefined(
+                        typeof(ProductionOrderStatus), order.Status) ||
+                    order.CreatedDay < 0 ||
+                    order.PlantingDay < order.CreatedDay ||
+                    order.HarvestDay <= order.PlantingDay ||
+                    order.HarvestDay > AbsoluteDay &&
+                    order.Status == ProductionOrderStatus.Completed ||
+                    order.SettledDay < -1 ||
+                    order.SettledDay > AbsoluteDay ||
+                    order.LandUnits <= 0 ||
+                    order.LandUnits > field.Capacity ||
+                    order.SeedQuantityCommitted <= 0 ||
+                    order.RequiredLaborDays <= 0 ||
+                    order.AssignedLaborDays < 0 ||
+                    order.TechnologyYieldBasisPoints <= 0 ||
+                    order.TechnologyYieldBasisPoints > 30_000 ||
+                    order.TechnologyLaborBasisPoints <= 0 ||
+                    order.TechnologyLaborBasisPoints > 30_000 ||
+                    order.ProducedQuantity < 0 ||
+                    order.StoredQuantity < 0 ||
+                    order.LostQuantity < 0 ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                    (order.SettledDay < order.HarvestDay ||
+                     order.ProducedQuantity !=
+                     order.StoredQuantity + order.LostQuantity) ||
+                    order.Status == ProductionOrderStatus.Active &&
+                    (order.SettledDay != -1 || order.ProducedQuantity != 0 ||
+                     order.StoredQuantity != 0 || order.LostQuantity != 0) ||
+                    order.AssignedWorkerIds == null ||
+                    order.AssignedWorkerIds.Count == 0 ||
+                    order.AppliedTechnologyIds == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid agriculture work order {order.Id}.");
+                }
+
+                var workerIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var workerIndex = 0;
+                     workerIndex < order.AssignedWorkerIds.Count;
+                     workerIndex++)
+                {
+                    var workerId = order.AssignedWorkerIds[workerIndex];
+                    if (!personIds.Contains(workerId) || !workerIds.Add(workerId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid worker on agriculture work order {order.Id}.");
+                    }
+
+                    if (order.Status == ProductionOrderStatus.Active &&
+                        !activeWorkerIds.Add(workerId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Worker {workerId} has overlapping agriculture work.");
+                    }
+                }
+
+                var technologyIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var technologyIndex = 0;
+                     technologyIndex < order.AppliedTechnologyIds.Count;
+                     technologyIndex++)
+                {
+                    var technologyId = order.AppliedTechnologyIds[technologyIndex];
+                    ValidateContentReference(
+                        technologyId, "technology", order.Id);
+                    if (!technologyIds.Add(technologyId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Duplicate technology {technologyId} on {order.Id}.");
+                    }
+                }
+
+                if (order.Status == ProductionOrderStatus.Active &&
+                    !activeFamilyIds.Add(order.FamilyId))
+                {
+                    throw new InvalidOperationException(
+                        $"Family {order.FamilyId} has overlapping agriculture work.");
+                }
+            }
+
+            for (var i = 0; i < ProductionLedgerEntries.Count; i++)
+            {
+                var entry = ProductionLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A production ledger entry cannot be null.");
+                if (!ordersById.TryGetValue(
+                        entry.WorkOrderId, out var ledgerOrder) ||
+                    !villageIds.Contains(entry.VillageId) ||
+                    !familyIds.Contains(entry.FamilyId) ||
+                    !facilities.ContainsKey(entry.FacilityId) ||
+                    !string.IsNullOrEmpty(entry.PersonId) &&
+                    !personIds.Contains(entry.PersonId) ||
+                    entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !Enum.IsDefined(
+                        typeof(ProductionLedgerEntryType), entry.Type) ||
+                    entry.Quantity < 0 ||
+                    !LedgerContentMatchesOrder(entry, ledgerOrder))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid production ledger entry {entry.Id}.");
+                }
+            }
+        }
+
+        private void ValidateProductionContentManifest()
+        {
+            var manifest = ProductionContentManifest;
+            if (manifest == null || manifest.ContentSchemaVersion != 2 ||
+                string.IsNullOrWhiteSpace(manifest.ResolvedHash) ||
+                manifest.Packages == null || manifest.Packages.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Production content manifest is missing or unsupported.");
+            }
+
+            var packageIds = new HashSet<string>(StringComparer.Ordinal);
+            ProductionContentPackageManifestState previous = null;
+            for (var i = 0; i < manifest.Packages.Count; i++)
+            {
+                var package = manifest.Packages[i];
+                if (package == null || string.IsNullOrWhiteSpace(package.Version) ||
+                    string.IsNullOrWhiteSpace(package.ContentHash))
+                {
+                    throw new InvalidOperationException(
+                        "Production content manifest contains an invalid package.");
+                }
+
+                ValidateContentReference(
+                    package.PackageId, "content package", "manifest");
+                if (!packageIds.Add(package.PackageId))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate production content package {package.PackageId}.");
+                }
+
+                if (previous != null &&
+                    (previous.LoadOrder > package.LoadOrder ||
+                     previous.LoadOrder == package.LoadOrder &&
+                     string.CompareOrdinal(
+                         previous.PackageId, package.PackageId) >= 0))
+                {
+                    throw new InvalidOperationException(
+                        "Production content manifest packages are not stably ordered.");
+                }
+
+                previous = package;
+            }
+        }
+
+        private static bool LedgerContentMatchesOrder(
+            ProductionLedgerEntryState entry,
+            AgricultureWorkOrderState order)
+        {
+            if (entry.UnitId == null)
+            {
+                return false;
+            }
+
+            ValidateContentReference(entry.UnitId, "ledger unit", entry.Id);
+            switch (entry.Type)
+            {
+                case ProductionLedgerEntryType.InputCommitted:
+                    return entry.ProductDefinitionId ==
+                               order.SeedProductDefinitionId &&
+                           entry.UnitId == order.UnitId;
+                case ProductionLedgerEntryType.LaborCommitted:
+                    return string.IsNullOrEmpty(entry.ProductDefinitionId) &&
+                           entry.UnitId == CoreProductionContent.LaborDayUnitId;
+                case ProductionLedgerEntryType.ProductStored:
+                case ProductionLedgerEntryType.ProductLost:
+                    return entry.ProductDefinitionId ==
+                               order.HarvestProductDefinitionId &&
+                           entry.UnitId == order.UnitId;
+                default:
+                    return false;
+            }
+        }
+
+        private static void ValidateContentReference(
+            string id,
+            string kind,
+            string ownerId)
+        {
+            try
+            {
+                _ = new StableId(id);
+            }
+            catch (ArgumentException exception)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid {kind} reference on {ownerId}: {exception.Message}");
+            }
+
+            if (id.IndexOf('.') <= 0)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid {kind} reference on {ownerId}: {id}.");
             }
         }
 

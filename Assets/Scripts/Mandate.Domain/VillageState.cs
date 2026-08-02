@@ -28,7 +28,8 @@ namespace Mandate.Domain
         Granary,
         Smithy,
         Clinic,
-        AssemblyHall
+        AssemblyHall,
+        HouseholdGranary
     }
 
     public enum VillageLedgerEntryType : byte
