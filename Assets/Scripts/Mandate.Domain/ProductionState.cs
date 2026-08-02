@@ -522,6 +522,11 @@ namespace Mandate.Domain
                 }
             }
 
+            for (var i = 0; i < world.ResourceBodies.Count; i++)
+            {
+                GetProduct(world.ResourceBodies[i].OutputProductDefinitionId);
+            }
+
             for (var i = 0; i < world.InventoryTransactions.Count; i++)
             {
                 var transaction = world.InventoryTransactions[i];
@@ -1023,6 +1028,10 @@ namespace Mandate.Domain
         public const string TimberMaterialProductId = "product.material.timber";
         public const string LeatherMaterialProductId = "product.material.leather";
         public const string HornMaterialProductId = "product.material.horn";
+        public const string IronOreProductId = "product.raw.iron_ore";
+        public const string CharcoalProductId = "product.material.charcoal";
+        public const string WoodAshProductId = "product.byproduct.wood_ash";
+        public const string SlagProductId = "product.byproduct.smelting_slag";
         public const string RingSwordProductId =
             "product.equipment.han_ring_sword";
         public const string WoodenShieldProductId =
@@ -1052,6 +1061,10 @@ namespace Mandate.Domain
             "recipe.manufacturing.make_arrow_bundle";
         public const string MakeLamellarArmorRecipeId =
             "recipe.manufacturing.make_lamellar_armor";
+        public const string BurnCharcoalRecipeId =
+            "recipe.primary_processing.burn_charcoal";
+        public const string SmeltBloomeryIronRecipeId =
+            "recipe.primary_processing.smelt_bloomery_iron";
         public const string PrototypeDrylandMethodId =
             "method.farming.prototype_dryland";
         public const string HandMillingMethodId =
@@ -1066,6 +1079,10 @@ namespace Mandate.Domain
             "method.manufacturing.bowmaking";
         public const string ArmoringMethodId =
             "method.manufacturing.armoring";
+        public const string EarthKilnCharcoalMethodId =
+            "method.primary_processing.earth_kiln_charcoal";
+        public const string BloomerySmeltingMethodId =
+            "method.primary_processing.bloomery_smelting";
         public const string BlacksmithFacilityTag =
             "facility.blacksmith_workshop";
         public const string WoodworkingFacilityTag =
@@ -1074,6 +1091,14 @@ namespace Mandate.Domain
             "facility.bowmaking_workshop";
         public const string ArmoringFacilityTag =
             "facility.armoring_workshop";
+        public const string IronMiningFacilityTag =
+            "facility.resource_extraction.iron_mine";
+        public const string LoggingFacilityTag =
+            "facility.resource_extraction.logging_camp";
+        public const string CharcoalKilnFacilityTag =
+            "facility.primary_processing.charcoal_kiln";
+        public const string BloomeryFacilityTag =
+            "facility.primary_processing.bloomery";
         public const string GrainUnitId = "unit.grain";
         public const string LaborDayUnitId = "unit.labor_day";
         public const string ItemUnitId = "unit.item";
@@ -1083,7 +1108,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "5.0.0",
+                Version = "6.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1184,6 +1209,10 @@ namespace Mandate.Domain
             AddMaterialProduct(package, TimberMaterialProductId, "木料");
             AddMaterialProduct(package, LeatherMaterialProductId, "皮革");
             AddMaterialProduct(package, HornMaterialProductId, "角料");
+            AddMaterialProduct(package, IronOreProductId, "铁矿石");
+            AddMaterialProduct(package, CharcoalProductId, "木炭");
+            AddByproduct(package, WoodAshProductId, "草木灰");
+            AddByproduct(package, SlagProductId, "炉渣");
             AddMilitaryEquipmentProduct(
                 package, RingSwordProductId, "环首刀", 3,
                 "product.equipment.melee");
@@ -1319,6 +1348,32 @@ namespace Mandate.Domain
                 LamellarArmorProductId,
                 IronMaterialProductId, 8,
                 LeatherMaterialProductId, 2);
+            AddPrimaryProcessingRecipe(
+                package,
+                BurnCharcoalRecipeId,
+                "烧制木炭",
+                3,
+                CharcoalKilnFacilityTag,
+                TimberMaterialProductId,
+                2,
+                CharcoalProductId,
+                1,
+                WoodAshProductId,
+                1);
+            AddPrimaryProcessingRecipe(
+                package,
+                SmeltBloomeryIronRecipeId,
+                "块炼铁冶炼",
+                5,
+                BloomeryFacilityTag,
+                IronOreProductId,
+                3,
+                IronMaterialProductId,
+                2,
+                SlagProductId,
+                2,
+                CharcoalProductId,
+                1);
             package.Methods.Add(new ProductionMethodDefinition
             {
                 Id = PrototypeDrylandMethodId,
@@ -1364,6 +1419,12 @@ namespace Mandate.Domain
             AddManufacturingMethod(
                 package, ArmoringMethodId, "制甲",
                 MakeLamellarArmorRecipeId);
+            AddManufacturingMethod(
+                package, EarthKilnCharcoalMethodId, "土窑烧炭",
+                BurnCharcoalRecipeId);
+            AddManufacturingMethod(
+                package, BloomerySmeltingMethodId, "块炼炉冶炼",
+                SmeltBloomeryIronRecipeId);
             package.Skills.Add(new SkillDefinition
             {
                 Id = CoreSkillIds.Agriculture,
@@ -1457,6 +1518,82 @@ namespace Mandate.Domain
                     "product.material",
                     "product.market",
                     "product.manufacturing_input"
+                }
+            });
+        }
+
+        private static void AddByproduct(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName)
+        {
+            package.Products.Add(new ProductDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                UnitId = ItemUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 0,
+                CategoryTags = new List<string>
+                {
+                    "product.byproduct",
+                    "product.material",
+                    "product.market"
+                }
+            });
+        }
+
+        private static void AddPrimaryProcessingRecipe(
+            ProductionContentPackageDefinition package,
+            string id,
+            string displayName,
+            int durationDays,
+            string facilityTag,
+            string firstInputProductId,
+            long firstInputQuantity,
+            string firstOutputProductId,
+            long firstOutputQuantity,
+            string secondOutputProductId,
+            long secondOutputQuantity,
+            string secondInputProductId = null,
+            long secondInputQuantity = 0)
+        {
+            var inputs = new List<ProductionQuantityDefinition>
+            {
+                new ProductionQuantityDefinition
+                {
+                    ProductDefinitionId = firstInputProductId,
+                    QuantityPerLandUnit = firstInputQuantity
+                }
+            };
+            if (!string.IsNullOrEmpty(secondInputProductId))
+            {
+                inputs.Add(new ProductionQuantityDefinition
+                {
+                    ProductDefinitionId = secondInputProductId,
+                    QuantityPerLandUnit = secondInputQuantity
+                });
+            }
+
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = id,
+                DisplayName = displayName,
+                DurationDays = durationDays,
+                FacilityTags = new List<string> { facilityTag },
+                Inputs = inputs,
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = firstOutputProductId,
+                        QuantityPerLandUnit = firstOutputQuantity
+                    },
+                    new ProductionQuantityDefinition
+                    {
+                        ProductDefinitionId = secondOutputProductId,
+                        QuantityPerLandUnit = secondOutputQuantity
+                    }
                 }
             });
         }

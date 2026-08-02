@@ -19,6 +19,8 @@ namespace Mandate.Simulation
         private readonly VillageLifeSystem _villageLifeSystem;
         private readonly ResearchSystem _researchSystem;
         private readonly ProcessingProductionSystem _processingSystem;
+        private readonly UpstreamResourceProductionSystem
+            _upstreamResourceSystem;
         private readonly MilitaryProcurementSystem _militaryProcurementSystem;
         private readonly MilitaryEquipmentRepairSystem _militaryRepairSystem =
             new MilitaryEquipmentRepairSystem();
@@ -43,6 +45,9 @@ namespace Mandate.Simulation
                 masterSeed, productionContent, personRepository);
             _researchSystem = new ResearchSystem(productionContent);
             _processingSystem = new ProcessingProductionSystem(productionContent);
+            _upstreamResourceSystem =
+                new UpstreamResourceProductionSystem(
+                    productionContent, personRepository);
             _militaryProcurementSystem =
                 new MilitaryProcurementSystem(personRepository);
         }
@@ -100,6 +105,7 @@ namespace Mandate.Simulation
             _historicalEventSystem.ResolveEligibleEvents(world);
             _taskSystem.ResolveDailyProgress(world);
             _researchSystem.ResolveDailyProjects(world);
+            _upstreamResourceSystem.ResolveDueOrders(world);
             _processingSystem.ResolveDueOrders(world);
             _militaryRepairSystem.ResolveDueOrders(world);
             _villageLifeSystem.ResolveMonthly(world);

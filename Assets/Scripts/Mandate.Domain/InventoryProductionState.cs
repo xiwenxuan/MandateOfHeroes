@@ -12,7 +12,8 @@ namespace Mandate.Domain
         OpeningBalance,
         MilitaryProcurementDispatched,
         EquipmentRepairReserved,
-        EquipmentRepairSettled
+        EquipmentRepairSettled,
+        ResourceExtractionSettled
     }
 
     [Serializable]
@@ -89,6 +90,7 @@ namespace Mandate.Domain
         public string SourceWorkOrderId;
         public string SourceMilitaryProcurementId;
         public string SourceEquipmentRepairOrderId;
+        public string SourceResourceExtractionOrderId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;
         public long FacilityInventoryDelta;
@@ -125,5 +127,64 @@ namespace Mandate.Domain
         public List<BatchReservationState> InputReservations =
             new List<BatchReservationState>();
         public List<string> OutputBatchIds = new List<string>();
+    }
+
+    public enum ResourceExtractionLedgerEntryType : byte
+    {
+        Reserved,
+        Settled
+    }
+
+    [Serializable]
+    public sealed class ResourceBodyState
+    {
+        public string Id;
+        public string ResourceKindId;
+        public string OutputProductDefinitionId;
+        public string LocationId;
+        public string Provenance;
+        public string GenerationRuleVersion;
+        public string RequiredFacilityTag;
+        public long InitialQuantity;
+        public long RemainingQuantity;
+        public long ReservedQuantity;
+        public int QualityBasisPoints = 10_000;
+        public int ExtractionDifficultyBasisPoints = 10_000;
+    }
+
+    [Serializable]
+    public sealed class ResourceExtractionOrderState
+    {
+        public string Id;
+        public string ResourceBodyId;
+        public string OwnerOrganizationId;
+        public string ProductionSiteId;
+        public string InventoryContainerId;
+        public string ManagerPersonId;
+        public List<string> WorkerPersonIds = new List<string>();
+        public ProductionControlMode ControlMode;
+        public ProductionOrderStatus Status;
+        public long CreatedDay;
+        public long FinishDay;
+        public long SettledDay = -1;
+        public long RequestedQuantity;
+        public long ExtractedQuantity;
+        public string OutputBatchId;
+    }
+
+    [Serializable]
+    public sealed class ResourceExtractionLedgerEntryState
+    {
+        public string Id;
+        public long Day;
+        public ResourceExtractionLedgerEntryType Type;
+        public string ResourceBodyId;
+        public string ResourceExtractionOrderId;
+        public string ActorPersonId;
+        public long RemainingQuantityDelta;
+        public long ReservedQuantityDelta;
+        public string OutputBatchId;
+        public long OutputQuantity;
+        public string Summary;
     }
 }

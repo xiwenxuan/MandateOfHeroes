@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "5.0.0",
+  "Version": "6.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -119,6 +119,38 @@
       "DisplayName": "角料",
       "UnitId": "unit.item",
       "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.raw.iron_ore",
+      "DisplayName": "铁矿石",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.material.charcoal",
+      "DisplayName": "木炭",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.material", "product.market", "product.manufacturing_input"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.byproduct.wood_ash",
+      "DisplayName": "草木灰",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.byproduct", "product.material", "product.market"],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.byproduct.smelting_slag",
+      "DisplayName": "炉渣",
+      "UnitId": "unit.item",
+      "CategoryTags": ["product.byproduct", "product.material", "product.market"],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 0
     },
@@ -322,6 +354,35 @@
       "Outputs": [
         {"ProductDefinitionId": "product.equipment.lamellar_armor", "QuantityPerLandUnit": 1}
       ]
+    },
+    {
+      "Id": "recipe.primary_processing.burn_charcoal",
+      "DisplayName": "烧制木炭",
+      "CropDefinitionId": null,
+      "DurationDays": 3,
+      "FacilityTags": ["facility.primary_processing.charcoal_kiln"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.material.timber", "QuantityPerLandUnit": 2}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.material.charcoal", "QuantityPerLandUnit": 1},
+        {"ProductDefinitionId": "product.byproduct.wood_ash", "QuantityPerLandUnit": 1}
+      ]
+    },
+    {
+      "Id": "recipe.primary_processing.smelt_bloomery_iron",
+      "DisplayName": "块炼铁冶炼",
+      "CropDefinitionId": null,
+      "DurationDays": 5,
+      "FacilityTags": ["facility.primary_processing.bloomery"],
+      "Inputs": [
+        {"ProductDefinitionId": "product.raw.iron_ore", "QuantityPerLandUnit": 3},
+        {"ProductDefinitionId": "product.material.charcoal", "QuantityPerLandUnit": 1}
+      ],
+      "Outputs": [
+        {"ProductDefinitionId": "product.material.iron", "QuantityPerLandUnit": 2},
+        {"ProductDefinitionId": "product.byproduct.smelting_slag", "QuantityPerLandUnit": 2}
+      ]
     }
   ],
   "Methods": [
@@ -383,6 +444,22 @@
       "Id": "method.manufacturing.armoring",
       "DisplayName": "制甲",
       "RecipeDefinitionIds": ["recipe.manufacturing.make_lamellar_armor"],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.primary_processing.earth_kiln_charcoal",
+      "DisplayName": "土窑烧炭",
+      "RecipeDefinitionIds": ["recipe.primary_processing.burn_charcoal"],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
+      "Id": "method.primary_processing.bloomery_smelting",
+      "DisplayName": "块炼炉冶炼",
+      "RecipeDefinitionIds": ["recipe.primary_processing.smelt_bloomery_iron"],
       "YieldBasisPoints": 10000,
       "LaborBasisPoints": 10000,
       "HistoricalStatus": "historical_inference"

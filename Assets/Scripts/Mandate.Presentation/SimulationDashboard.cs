@@ -74,6 +74,9 @@ namespace Mandate.Presentation
             new MilitaryProcurementSystem();
         private readonly ProcessingProductionSystem _processingProductionSystem =
             new ProcessingProductionSystem();
+        private readonly UpstreamResourceProductionSystem
+            _upstreamResourceProductionSystem =
+                new UpstreamResourceProductionSystem();
         private BattleResolver _battleResolver;
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
@@ -2879,6 +2882,144 @@ namespace Mandate.Presentation
                 $"制造订单{manufacturingOrder?.Status.ToString() ?? "无"}，" +
                 $"维修订单{_world.MilitaryEquipmentRepairOrders.Count}笔",
                 _normalStyle);
+            var ironResource = _world.ResourceBodies.Find(item =>
+                item.Id == UpstreamResourceProductionSystem.PrototypeIronBodyId);
+            var forestResource = _world.ResourceBodies.Find(item =>
+                item.Id == UpstreamResourceProductionSystem.PrototypeForestBodyId);
+            var ironExtraction = _world.ResourceExtractionOrders.Find(item =>
+                item.ResourceBodyId ==
+                    UpstreamResourceProductionSystem.PrototypeIronBodyId &&
+                item.Status == ProductionOrderStatus.Active);
+            var timberExtraction = _world.ResourceExtractionOrders.Find(item =>
+                item.ResourceBodyId ==
+                    UpstreamResourceProductionSystem.PrototypeForestBodyId &&
+                item.Status == ProductionOrderStatus.Active);
+            var charcoalOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.BurnCharcoalRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            var smeltOrder = _world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.SmeltBloomeryIronRecipeId &&
+                item.Status == ProductionOrderStatus.Active);
+            GUILayout.Label(
+                $"真实上游：铁矿余量{ironResource?.RemainingQuantity ?? 0}" +
+                $"（预留{ironResource?.ReservedQuantity ?? 0}），" +
+                $"林木余量{forestResource?.RemainingQuantity ?? 0}" +
+                $"（预留{forestResource?.ReservedQuantity ?? 0}）",
+                _normalStyle);
+            GUILayout.Label(
+                $"工坊仓：矿石{AvailableProductQuantity(CoreProductionContent.IronOreProductId)}，" +
+                $"木料{AvailableProductQuantity(CoreProductionContent.TimberMaterialProductId)}，" +
+                $"木炭{AvailableProductQuantity(CoreProductionContent.CharcoalProductId)}，" +
+                $"铁料{AvailableProductQuantity(CoreProductionContent.IronMaterialProductId)}",
+                _normalStyle);
+            GUILayout.BeginHorizontal();
+            GUI.enabled = ironExtraction == null &&
+                FindPerson("person.su_shuang").LocationId ==
+                    "location.zhongshan";
+            if (GUILayout.Button("采铁矿12单位", GUILayout.Width(150)))
+            {
+                ironExtraction = _upstreamResourceProductionSystem.CreateOrder(
+                    _world,
+                    UpstreamResourceProductionSystem.PrototypeIronBodyId,
+                    UpstreamResourceProductionSystem.PrototypeIronMineSiteId,
+                    "person.su_shuang",
+                    new[] { "person.su_shuang" },
+                    ProductionControlMode.WorkOrder,
+                    12);
+                _message = $"采矿订单{ironExtraction.Id}已预留矿体储量。";
+            }
+
+            GUI.enabled = timberExtraction == null &&
+                FindPerson("person.zhang_shiping").LocationId ==
+                    "location.zhongshan";
+            if (GUILayout.Button("伐木20单位", GUILayout.Width(150)))
+            {
+                timberExtraction =
+                    _upstreamResourceProductionSystem.CreateOrder(
+                        _world,
+                        UpstreamResourceProductionSystem.PrototypeForestBodyId,
+                        UpstreamResourceProductionSystem.PrototypeLoggingSiteId,
+                        "person.zhang_shiping",
+                        new[] { "person.zhang_shiping" },
+                        ProductionControlMode.WorkOrder,
+                        20);
+                _message = $"伐木订单{timberExtraction.Id}已预留林木储量。";
+            }
+
+            GUI.enabled = ironExtraction != null || timberExtraction != null;
+            if (GUILayout.Button("推进采集完成", GUILayout.Width(160)))
+            {
+                var finishDay = Math.Max(
+                    ironExtraction?.FinishDay ?? _world.AbsoluteDay,
+                    timberExtraction?.FinishDay ?? _world.AbsoluteDay);
+                _simulator.AdvanceDays(
+                    _world,
+                    Math.Max(1, (int)(finishDay - _world.AbsoluteDay)));
+                _message = "已按世界时间推进并结算资源采集。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUI.enabled = charcoalOrder == null &&
+                AvailableProductQuantity(
+                    CoreProductionContent.TimberMaterialProductId) >= 12;
+            if (GUILayout.Button("烧制6批木炭", GUILayout.Width(160)))
+            {
+                charcoalOrder =
+                    _processingProductionSystem.CreateOrganizationOrder(
+                        _world,
+                        CoreProductionContent.BurnCharcoalRecipeId,
+                        CoreProductionContent.EarthKilnCharcoalMethodId,
+                        "organization.zhongshan_merchants",
+                        UpstreamResourceProductionSystem
+                            .PrototypeCharcoalKilnSiteId,
+                        MilitaryEquipmentRepairSystem
+                            .PrototypeWorkshopContainerId,
+                        "person.zhang_shiping",
+                        ProductionControlMode.WorkOrder,
+                        6);
+                _message = $"烧炭订单{charcoalOrder.Id}已预留木料。";
+            }
+
+            GUI.enabled = smeltOrder == null &&
+                AvailableProductQuantity(
+                    CoreProductionContent.IronOreProductId) >= 12 &&
+                AvailableProductQuantity(
+                    CoreProductionContent.CharcoalProductId) >= 4;
+            if (GUILayout.Button("冶炼4批铁料", GUILayout.Width(160)))
+            {
+                smeltOrder =
+                    _processingProductionSystem.CreateOrganizationOrder(
+                        _world,
+                        CoreProductionContent.SmeltBloomeryIronRecipeId,
+                        CoreProductionContent.BloomerySmeltingMethodId,
+                        "organization.zhongshan_merchants",
+                        UpstreamResourceProductionSystem.PrototypeBloomerySiteId,
+                        MilitaryEquipmentRepairSystem
+                            .PrototypeWorkshopContainerId,
+                        "person.su_shuang",
+                        ProductionControlMode.WorkOrder,
+                        4);
+                _message = $"冶炼订单{smeltOrder.Id}已预留矿石与木炭。";
+            }
+
+            GUI.enabled = charcoalOrder != null || smeltOrder != null;
+            if (GUILayout.Button("推进初加工完成", GUILayout.Width(180)))
+            {
+                var finishDay = Math.Max(
+                    charcoalOrder?.FinishDay ?? _world.AbsoluteDay,
+                    smeltOrder?.FinishDay ?? _world.AbsoluteDay);
+                _simulator.AdvanceDays(
+                    _world,
+                    Math.Max(1, (int)(finishDay - _world.AbsoluteDay)));
+                _message = "已按世界时间推进并结算上游初加工。";
+            }
+
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUI.enabled = manufacturingOrder == null &&
                 FindPerson("person.su_shuang").LocationId ==
@@ -3459,6 +3600,24 @@ namespace Mandate.Presentation
             }
 
             return equipmentId;
+        }
+
+        private long AvailableProductQuantity(string productDefinitionId)
+        {
+            long quantity = 0;
+            for (var i = 0; i < _world.ProductBatches.Count; i++)
+            {
+                var batch = _world.ProductBatches[i];
+                if (batch.ProductDefinitionId == productDefinitionId &&
+                    batch.InventoryContainerId ==
+                        MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId)
+                {
+                    quantity = checked(quantity +
+                        batch.Quantity - batch.ReservedQuantity);
+                }
+            }
+
+            return quantity;
         }
 
         private string EquipmentLoadout(string personId)

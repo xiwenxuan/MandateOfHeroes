@@ -139,7 +139,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 15;
+        public const int CurrentSchemaVersion = 16;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -235,6 +235,13 @@ namespace Mandate.Domain
             new List<InventoryTransactionState>();
         public List<ProcessingWorkOrderState> ProcessingWorkOrders =
             new List<ProcessingWorkOrderState>();
+        public List<ResourceBodyState> ResourceBodies =
+            new List<ResourceBodyState>();
+        public List<ResourceExtractionOrderState> ResourceExtractionOrders =
+            new List<ResourceExtractionOrderState>();
+        public List<ResourceExtractionLedgerEntryState>
+            ResourceExtractionLedgerEntries =
+                new List<ResourceExtractionLedgerEntryState>();
         public List<ResearchProjectState> ResearchProjects =
             new List<ResearchProjectState>();
         public List<TechnologyApplicationState> TechnologyApplications =
@@ -390,6 +397,16 @@ namespace Mandate.Domain
                 InventoryTransactions, item => item.Id, "inventory transaction");
             ValidateUniqueIds(
                 ProcessingWorkOrders, item => item.Id, "processing work order");
+            ValidateUniqueIds(
+                ResourceBodies, item => item.Id, "resource body");
+            ValidateUniqueIds(
+                ResourceExtractionOrders,
+                item => item.Id,
+                "resource extraction order");
+            ValidateUniqueIds(
+                ResourceExtractionLedgerEntries,
+                item => item.Id,
+                "resource extraction ledger entry");
             ValidateUniqueIds(
                 ResearchProjects, item => item.Id, "research project");
             ValidateUniqueIds(
@@ -3427,6 +3444,8 @@ namespace Mandate.Domain
             var processingOrders = new Dictionary<string, ProcessingWorkOrderState>(
                 StringComparer.Ordinal);
             var processingOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var resourceExtractionOrderIds = new HashSet<string>(
+                StringComparer.Ordinal);
             var procurementOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var repairOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var transactionIds = new HashSet<string>(StringComparer.Ordinal);
@@ -3448,6 +3467,11 @@ namespace Mandate.Domain
             for (var i = 0; i < ProcessingWorkOrders.Count; i++)
             {
                 processingOrderIds.Add(ProcessingWorkOrders[i].Id);
+            }
+
+            for (var i = 0; i < ResourceExtractionOrders.Count; i++)
+            {
+                resourceExtractionOrderIds.Add(ResourceExtractionOrders[i].Id);
             }
 
             for (var i = 0; i < InventoryTransactions.Count; i++)
@@ -3570,7 +3594,9 @@ namespace Mandate.Domain
                     !locationIds.Contains(batch.OriginLocationId) ||
                     !transactionIds.Contains(batch.SourceTransactionId) ||
                     !string.IsNullOrEmpty(batch.SourceWorkOrderId) &&
-                    !processingOrderIds.Contains(batch.SourceWorkOrderId) ||
+                    !processingOrderIds.Contains(batch.SourceWorkOrderId) &&
+                    !resourceExtractionOrderIds.Contains(
+                        batch.SourceWorkOrderId) ||
                     batch.ProducedDay < 0 || batch.ProducedDay > AbsoluteDay ||
                     batch.UnitWeight <= 0 ||
                     batch.Quantity < 0 || batch.ReservedQuantity < 0 ||
@@ -3588,6 +3614,15 @@ namespace Mandate.Domain
                         $"Invalid product batch {batch.Id}.");
                 }
             }
+
+            ValidateResourceExtraction(
+                personIds,
+                locationIds,
+                organizationIds,
+                productionSites,
+                containers,
+                batches,
+                transactionIds);
 
             for (var i = 0; i < ProcessingWorkOrders.Count; i++)
             {
@@ -3716,6 +3751,19 @@ namespace Mandate.Domain
                     if (MilitaryEquipmentRepairOrders[orderIndex]
                             .ProductionSiteId == ProductionSites[i].Id &&
                         MilitaryEquipmentRepairOrders[orderIndex].Status ==
+                            ProductionOrderStatus.Active)
+                    {
+                        active++;
+                    }
+                }
+
+                for (var orderIndex = 0;
+                     orderIndex < ResourceExtractionOrders.Count;
+                     orderIndex++)
+                {
+                    if (ResourceExtractionOrders[orderIndex]
+                            .ProductionSiteId == ProductionSites[i].Id &&
+                        ResourceExtractionOrders[orderIndex].Status ==
                             ProductionOrderStatus.Active)
                     {
                         active++;
@@ -3906,6 +3954,10 @@ namespace Mandate.Domain
                         transaction.SourceEquipmentRepairOrderId) &&
                     !repairOrderIds.Contains(
                         transaction.SourceEquipmentRepairOrderId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceResourceExtractionOrderId) &&
+                    !resourceExtractionOrderIds.Contains(
+                        transaction.SourceResourceExtractionOrderId) ||
                     transaction.Lines == null || transaction.Lines.Count == 0)
                 {
                     throw new InvalidOperationException(
@@ -3924,6 +3976,8 @@ namespace Mandate.Domain
                         InventoryTransactionType.EquipmentRepairReserved ||
                     transaction.Type ==
                         InventoryTransactionType.EquipmentRepairSettled;
+                var requiresResourceExtraction = transaction.Type ==
+                    InventoryTransactionType.ResourceExtractionSettled;
                 if (requiresOrder !=
                     !string.IsNullOrEmpty(transaction.SourceWorkOrderId) ||
                     requiresProcurement !=
@@ -3932,6 +3986,9 @@ namespace Mandate.Domain
                     requiresRepair !=
                     !string.IsNullOrEmpty(
                         transaction.SourceEquipmentRepairOrderId) ||
+                    requiresResourceExtraction !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceResourceExtractionOrderId) ||
                     transaction.Type ==
                         InventoryTransactionType.LegacyBalanceConverted &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
@@ -4032,6 +4089,268 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Tracked batches exceed container capacity for {container.Id}.");
+                }
+            }
+        }
+
+        private void ValidateResourceExtraction(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds,
+            IDictionary<string, ProductionSiteState> productionSites,
+            IDictionary<string, InventoryContainerState> containers,
+            IDictionary<string, ProductBatchState> batches,
+            HashSet<string> transactionIds)
+        {
+            var resources = new Dictionary<string, ResourceBodyState>(
+                StringComparer.Ordinal);
+            var orders = new Dictionary<string, ResourceExtractionOrderState>(
+                StringComparer.Ordinal);
+            var remainingDeltas = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var reservedDeltas = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var reserveEntries = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var settleEntries = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+
+            for (var i = 0; i < ResourceBodies.Count; i++)
+            {
+                var resource = ResourceBodies[i] ??
+                    throw new InvalidOperationException(
+                        "A resource body cannot be null.");
+                resources.Add(resource.Id, resource);
+                ValidateContentReference(
+                    resource.ResourceKindId, "resource kind", resource.Id);
+                ValidateContentReference(
+                    resource.OutputProductDefinitionId,
+                    "resource output product",
+                    resource.Id);
+                ValidateContentReference(
+                    resource.RequiredFacilityTag,
+                    "resource facility tag",
+                    resource.Id);
+                if (!locationIds.Contains(resource.LocationId) ||
+                    string.IsNullOrWhiteSpace(resource.Provenance) ||
+                    string.IsNullOrWhiteSpace(resource.GenerationRuleVersion) ||
+                    resource.InitialQuantity <= 0 ||
+                    resource.RemainingQuantity < 0 ||
+                    resource.RemainingQuantity > resource.InitialQuantity ||
+                    resource.ReservedQuantity < 0 ||
+                    resource.ReservedQuantity > resource.RemainingQuantity ||
+                    resource.QualityBasisPoints <= 0 ||
+                    resource.QualityBasisPoints > 10_000 ||
+                    resource.ExtractionDifficultyBasisPoints <= 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid resource body {resource.Id}.");
+                }
+            }
+
+            for (var i = 0; i < ResourceExtractionOrders.Count; i++)
+            {
+                var order = ResourceExtractionOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A resource extraction order cannot be null.");
+                orders.Add(order.Id, order);
+                var validResource = resources.TryGetValue(
+                    order.ResourceBodyId, out var resource);
+                var validSite = productionSites.TryGetValue(
+                    order.ProductionSiteId, out var site);
+                var validContainer = containers.TryGetValue(
+                    order.InventoryContainerId, out var container);
+                if (!validResource || !validSite || !validContainer ||
+                    !organizationIds.Contains(order.OwnerOrganizationId) ||
+                    site.OwnerOrganizationId != order.OwnerOrganizationId ||
+                    site.InventoryContainerId != container.Id ||
+                    container.OwnerOrganizationId != order.OwnerOrganizationId ||
+                    site.LocationId != resource.LocationId ||
+                    !site.FacilityTags.Contains(resource.RequiredFacilityTag) ||
+                    site.ManagerPersonId != order.ManagerPersonId ||
+                    !personIds.Contains(order.ManagerPersonId) ||
+                    !HasOrganizationMembership(
+                        order.ManagerPersonId, order.OwnerOrganizationId) ||
+                    !Enum.IsDefined(
+                        typeof(ProductionControlMode), order.ControlMode) ||
+                    (order.Status != ProductionOrderStatus.Active &&
+                     order.Status != ProductionOrderStatus.Completed) ||
+                    order.CreatedDay < 0 || order.FinishDay <= order.CreatedDay ||
+                    order.SettledDay < -1 || order.SettledDay > AbsoluteDay ||
+                    order.RequestedQuantity <= 0 ||
+                    order.ExtractedQuantity < 0 ||
+                    order.ExtractedQuantity > order.RequestedQuantity ||
+                    order.WorkerPersonIds == null ||
+                    order.WorkerPersonIds.Count == 0 ||
+                    order.Status == ProductionOrderStatus.Active &&
+                    (order.SettledDay != -1 ||
+                     order.ExtractedQuantity != 0 ||
+                     !string.IsNullOrEmpty(order.OutputBatchId)) ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                    (order.SettledDay < order.FinishDay ||
+                     order.ExtractedQuantity != order.RequestedQuantity ||
+                     string.IsNullOrEmpty(order.OutputBatchId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid resource extraction order {order.Id}.");
+                }
+
+                var workers = new HashSet<string>(StringComparer.Ordinal);
+                string previous = null;
+                for (var workerIndex = 0;
+                     workerIndex < order.WorkerPersonIds.Count;
+                     workerIndex++)
+                {
+                    var workerId = order.WorkerPersonIds[workerIndex];
+                    if (!personIds.Contains(workerId) ||
+                        !HasOrganizationMembership(
+                            workerId, order.OwnerOrganizationId) ||
+                        !workers.Add(workerId) ||
+                        previous != null &&
+                        string.CompareOrdinal(previous, workerId) >= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid worker assignment on {order.Id}.");
+                    }
+
+                    previous = workerId;
+                }
+
+                if (order.Status == ProductionOrderStatus.Completed)
+                {
+                    if (!batches.TryGetValue(
+                            order.OutputBatchId, out var output) ||
+                        output.SourceWorkOrderId != order.Id ||
+                        output.ProductDefinitionId !=
+                            resource.OutputProductDefinitionId ||
+                        output.OwnerOrganizationId != order.OwnerOrganizationId ||
+                        output.InventoryContainerId != order.InventoryContainerId ||
+                        !transactionIds.Contains(output.SourceTransactionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid extraction output on {order.Id}.");
+                    }
+                }
+
+                var extractionTransactions = 0;
+                for (var transactionIndex = 0;
+                     transactionIndex < InventoryTransactions.Count;
+                     transactionIndex++)
+                {
+                    var transaction = InventoryTransactions[transactionIndex];
+                    if (transaction.SourceResourceExtractionOrderId == order.Id &&
+                        transaction.Type ==
+                            InventoryTransactionType.ResourceExtractionSettled)
+                    {
+                        if (transaction.Lines.Count != 1 ||
+                            transaction.Lines[0].BatchId != order.OutputBatchId ||
+                            transaction.Lines[0].QuantityDelta !=
+                                order.ExtractedQuantity ||
+                            transaction.Lines[0].ReservedQuantityDelta != 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Invalid extraction transaction for {order.Id}.");
+                        }
+
+                        extractionTransactions++;
+                    }
+                }
+
+                if (order.Status == ProductionOrderStatus.Active &&
+                        extractionTransactions != 0 ||
+                    order.Status == ProductionOrderStatus.Completed &&
+                        extractionTransactions != 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid extraction transaction count for {order.Id}.");
+                }
+            }
+
+            for (var i = 0; i < ResourceExtractionLedgerEntries.Count; i++)
+            {
+                var entry = ResourceExtractionLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A resource extraction ledger entry cannot be null.");
+                if (!resources.ContainsKey(entry.ResourceBodyId) ||
+                    !orders.TryGetValue(
+                        entry.ResourceExtractionOrderId, out var order) ||
+                    order.ResourceBodyId != entry.ResourceBodyId ||
+                    !personIds.Contains(entry.ActorPersonId) ||
+                    entry.ActorPersonId != order.ManagerPersonId ||
+                    entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !Enum.IsDefined(
+                        typeof(ResourceExtractionLedgerEntryType), entry.Type))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid resource extraction ledger entry {entry.Id}.");
+                }
+
+                AddDelta(
+                    remainingDeltas,
+                    entry.ResourceBodyId,
+                    entry.RemainingQuantityDelta);
+                AddDelta(
+                    reservedDeltas,
+                    entry.ResourceBodyId,
+                    entry.ReservedQuantityDelta);
+                if (entry.Type == ResourceExtractionLedgerEntryType.Reserved)
+                {
+                    if (entry.RemainingQuantityDelta != 0 ||
+                        entry.ReservedQuantityDelta != order.RequestedQuantity ||
+                        !string.IsNullOrEmpty(entry.OutputBatchId) ||
+                        entry.OutputQuantity != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid extraction reservation entry {entry.Id}.");
+                    }
+
+                    reserveEntries.TryGetValue(order.Id, out var count);
+                    reserveEntries[order.Id] = count + 1;
+                }
+                else
+                {
+                    if (entry.RemainingQuantityDelta !=
+                            -order.RequestedQuantity ||
+                        entry.ReservedQuantityDelta !=
+                            -order.RequestedQuantity ||
+                        entry.OutputBatchId != order.OutputBatchId ||
+                        entry.OutputQuantity != order.ExtractedQuantity ||
+                        !batches.ContainsKey(entry.OutputBatchId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid extraction settlement entry {entry.Id}.");
+                    }
+
+                    settleEntries.TryGetValue(order.Id, out var count);
+                    settleEntries[order.Id] = count + 1;
+                }
+            }
+
+            foreach (var pair in orders)
+            {
+                reserveEntries.TryGetValue(pair.Key, out var reservations);
+                settleEntries.TryGetValue(pair.Key, out var settlements);
+                if (reservations != 1 ||
+                    pair.Value.Status == ProductionOrderStatus.Active &&
+                        settlements != 0 ||
+                    pair.Value.Status == ProductionOrderStatus.Completed &&
+                        settlements != 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Incomplete resource provenance for {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in resources)
+            {
+                remainingDeltas.TryGetValue(pair.Key, out var remaining);
+                reservedDeltas.TryGetValue(pair.Key, out var reserved);
+                if (pair.Value.RemainingQuantity !=
+                        pair.Value.InitialQuantity + remaining ||
+                    pair.Value.ReservedQuantity != reserved)
+                {
+                    throw new InvalidOperationException(
+                        $"Resource ledger mismatch for {pair.Key}.");
                 }
             }
         }

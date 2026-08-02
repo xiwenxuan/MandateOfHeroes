@@ -3071,7 +3071,7 @@ namespace Mandate.Tests
             var families = world.Families.Count;
             var services = world.MilitaryServices.Count;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 12");
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 12");
             var equipmentStart = json.IndexOf(
                 "  \"MilitaryEquipmentInitialized\":",
                 StringComparison.Ordinal);
@@ -3832,7 +3832,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 15", "\"SchemaVersion\": 5");
+                "\"SchemaVersion\": 16", "\"SchemaVersion\": 5");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
             var family = loaded.Families[0];
@@ -3855,7 +3855,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 15", "\"SchemaVersion\": 6");
+                "\"SchemaVersion\": 16", "\"SchemaVersion\": 6");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -3893,9 +3893,9 @@ namespace Mandate.Tests
             Assert.That(fromResource.ResolvedHash, Is.EqualTo(builtIn.ResolvedHash));
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(15));
-            Assert.That(fromResource.RecipeCount, Is.EqualTo(9));
-            Assert.That(fromResource.MethodCount, Is.EqualTo(7));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(19));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(11));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(9));
             Assert.That(fromResource.SkillCount, Is.EqualTo(1));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
@@ -4487,7 +4487,7 @@ namespace Mandate.Tests
             }
 
             var json = WorldSnapshotSerializer.Serialize(world).Replace(
-                "\"SchemaVersion\": 15", "\"SchemaVersion\": 7");
+                "\"SchemaVersion\": 16", "\"SchemaVersion\": 7");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -4514,7 +4514,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 8")
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 8")
                 .Replace(
                     "\"ContentSchemaVersion\": 2",
                     "\"ContentSchemaVersion\": 1")
@@ -4751,7 +4751,7 @@ namespace Mandate.Tests
             var originalFamilies = world.Families.Count;
             var originalStorageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -4783,7 +4783,7 @@ namespace Mandate.Tests
             var world = BuildMinimalWorld();
             world.ProductionContentManifest = registry.CreateManifest();
             var json = WorldSnapshotSerializer.Serialize(world, registry)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 9")
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 9")
                 .Replace("\"ProductBatches\": []", "\"ProductBatches\": null")
                 .Replace(
                     "\"InventoryTransactions\": []",
@@ -5062,7 +5062,7 @@ namespace Mandate.Tests
             var originalRelationships = world.Relationships.Count;
             var storageMode = world.PopulationStorage.Mode;
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 10")
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 10")
                 .Replace("\"AttentionFocuses\": []", "\"AttentionFocuses\": null")
                 .Replace(
                     "\"AttentionLedgerEntries\": []",
@@ -5246,7 +5246,7 @@ namespace Mandate.Tests
         {
             var world = BuildMinimalWorld();
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 11")
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 11")
                 .Replace("\"CountyGovernances\": []", "\"CountyGovernances\": null")
                 .Replace("\"CountyGentryHouses\": []", "\"CountyGentryHouses\": null")
                 .Replace("\"CountyHouseholdTaxes\": []", "\"CountyHouseholdTaxes\": null")
@@ -6058,7 +6058,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 14");
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 14");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6070,6 +6070,147 @@ namespace Mandate.Tests
             Assert.That(loaded.MilitaryEquipmentDefinitions.TrueForAll(item =>
                 !string.IsNullOrEmpty(
                     item.RepairMaterialProductDefinitionId)), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ResourceExtraction_ReservesThenSettlesTraceableBatch()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var repository = new WorldStatePersonRepository(world);
+            var system = new UpstreamResourceProductionSystem(
+                null, repository);
+            var resource = world.ResourceBodies.Find(item =>
+                item.Id == UpstreamResourceProductionSystem.PrototypeIronBodyId);
+            var remainingBefore = resource.RemainingQuantity;
+
+            var order = system.CreateOrder(
+                world,
+                resource.Id,
+                UpstreamResourceProductionSystem.PrototypeIronMineSiteId,
+                "person.su_shuang",
+                new[] { "person.su_shuang" },
+                ProductionControlMode.WorkOrder,
+                12);
+
+            Assert.That(resource.ReservedQuantity, Is.EqualTo(12));
+            Assert.That(resource.RemainingQuantity, Is.EqualTo(remainingBefore));
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            Assert.That(order.FinishDay, Is.EqualTo(world.AbsoluteDay + 15));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedOrder = loaded.ResourceExtractionOrders.Find(item =>
+                item.Id == order.Id);
+            var loadedResource = loaded.ResourceBodies.Find(item =>
+                item.Id == resource.Id);
+            loaded.AbsoluteDay = loadedOrder.FinishDay - 1;
+            system.ResolveDueOrders(loaded);
+            Assert.That(loadedOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Active));
+
+            loaded.AbsoluteDay = loadedOrder.FinishDay;
+            system.ResolveDueOrders(loaded);
+
+            Assert.That(loadedOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(loadedResource.RemainingQuantity,
+                Is.EqualTo(remainingBefore - 12));
+            Assert.That(loadedResource.ReservedQuantity, Is.EqualTo(0));
+            var output = loaded.ProductBatches.Find(item =>
+                item.Id == loadedOrder.OutputBatchId);
+            Assert.That(output.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.IronOreProductId));
+            Assert.That(output.Quantity, Is.EqualTo(12));
+            Assert.That(output.SourceWorkOrderId, Is.EqualTo(loadedOrder.Id));
+            Assert.That(loaded.ResourceExtractionLedgerEntries.FindAll(item =>
+                item.ResourceExtractionOrderId == loadedOrder.Id).Count,
+                Is.EqualTo(2));
+            Assert.That(loaded.InventoryTransactions.Exists(item =>
+                item.SourceResourceExtractionOrderId == loadedOrder.Id &&
+                item.Type ==
+                    InventoryTransactionType.ResourceExtractionSettled),
+                Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ResourceExtraction_InvalidWorkersDoNotMutateWorld()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new UpstreamResourceProductionSystem().CreateOrder(
+                    world,
+                    UpstreamResourceProductionSystem.PrototypeIronBodyId,
+                    UpstreamResourceProductionSystem.PrototypeIronMineSiteId,
+                    "person.su_shuang",
+                    new[] { "person.su_shuang", "person.su_shuang" },
+                    ProductionControlMode.DirectAssignment,
+                    5));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void UpstreamProduction_ExtractsCarbonizesSmeltsAndMakesSpears()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+
+            ExecutePrototypeUpstreamChain(world);
+
+            var smelt = world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.SmeltBloomeryIronRecipeId);
+            var iron = world.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == smelt.Id &&
+                item.ProductDefinitionId ==
+                    CoreProductionContent.IronMaterialProductId);
+            var slag = world.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == smelt.Id &&
+                item.ProductDefinitionId == CoreProductionContent.SlagProductId);
+            var spearOrder = world.ProcessingWorkOrders.Find(item =>
+                item.RecipeDefinitionId ==
+                    CoreProductionContent.ForgeLongSpearRecipeId);
+            var spears = world.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == spearOrder.Id);
+
+            Assert.That(iron.Quantity, Is.EqualTo(4));
+            Assert.That(slag.Quantity, Is.EqualTo(8));
+            Assert.That(spears.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.LongSpearProductId));
+            Assert.That(spears.Quantity, Is.EqualTo(2));
+            world.Validate();
+        }
+
+        [Test]
+        public void UpstreamProduction_SameCommandsProduceSameSnapshot()
+        {
+            var first = PrototypeWorldFactory.Create184World(184);
+            var second = PrototypeWorldFactory.Create184World(184);
+
+            ExecutePrototypeUpstreamChain(first);
+            ExecutePrototypeUpstreamChain(second);
+
+            Assert.That(WorldSnapshotSerializer.Serialize(first),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(second)));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFifteenWithoutFabricatingResources()
+        {
+            var world = PrototypeWorldFactory.Create184World(184);
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 15");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ResourceBodies, Is.Empty);
+            Assert.That(loaded.ResourceExtractionOrders, Is.Empty);
+            Assert.That(loaded.ResourceExtractionLedgerEntries, Is.Empty);
             loaded.Validate();
         }
 
@@ -6285,7 +6426,7 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
             var json = WorldSnapshotSerializer.Serialize(world)
-                .Replace("\"SchemaVersion\": 15", "\"SchemaVersion\": 13");
+                .Replace("\"SchemaVersion\": 16", "\"SchemaVersion\": 13");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -6328,6 +6469,92 @@ namespace Mandate.Tests
                 routeId,
                 destinationId);
             new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 18);
+        }
+
+        private static void ExecutePrototypeUpstreamChain(WorldState world)
+        {
+            RemoveOpeningProduct(
+                world, CoreProductionContent.IronMaterialProductId);
+            RemoveOpeningProduct(
+                world, CoreProductionContent.TimberMaterialProductId);
+            world.Validate();
+            var extraction = new UpstreamResourceProductionSystem();
+            var ironOrder = extraction.CreateOrder(
+                world,
+                UpstreamResourceProductionSystem.PrototypeIronBodyId,
+                UpstreamResourceProductionSystem.PrototypeIronMineSiteId,
+                "person.su_shuang",
+                new[] { "person.su_shuang" },
+                ProductionControlMode.WorkOrder,
+                12);
+            var timberOrder = extraction.CreateOrder(
+                world,
+                UpstreamResourceProductionSystem.PrototypeForestBodyId,
+                UpstreamResourceProductionSystem.PrototypeLoggingSiteId,
+                "person.zhang_shiping",
+                new[] { "person.zhang_shiping" },
+                ProductionControlMode.WorkOrder,
+                20);
+            world.AbsoluteDay = Math.Max(
+                ironOrder.FinishDay, timberOrder.FinishDay);
+            extraction.ResolveDueOrders(world);
+
+            var processing = new ProcessingProductionSystem();
+            var charcoal = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.BurnCharcoalRecipeId,
+                CoreProductionContent.EarthKilnCharcoalMethodId,
+                "organization.zhongshan_merchants",
+                UpstreamResourceProductionSystem.PrototypeCharcoalKilnSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.zhang_shiping",
+                ProductionControlMode.WorkOrder,
+                6);
+            world.AbsoluteDay = charcoal.FinishDay;
+            processing.ResolveDueOrders(world);
+            var smelt = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.SmeltBloomeryIronRecipeId,
+                CoreProductionContent.BloomerySmeltingMethodId,
+                "organization.zhongshan_merchants",
+                UpstreamResourceProductionSystem.PrototypeBloomerySiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                4);
+            world.AbsoluteDay = smelt.FinishDay;
+            processing.ResolveDueOrders(world);
+            var spears = processing.CreateOrganizationOrder(
+                world,
+                CoreProductionContent.ForgeLongSpearRecipeId,
+                CoreProductionContent.BlacksmithingMethodId,
+                "organization.zhongshan_merchants",
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopSiteId,
+                MilitaryEquipmentRepairSystem.PrototypeWorkshopContainerId,
+                "person.su_shuang",
+                ProductionControlMode.WorkOrder,
+                2);
+            world.AbsoluteDay = spears.FinishDay;
+            processing.ResolveDueOrders(world);
+        }
+
+        private static void RemoveOpeningProduct(
+            WorldState world,
+            string productDefinitionId)
+        {
+            var batch = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId == productDefinitionId &&
+                item.Id.StartsWith(
+                    "product_batch.prototype_material.",
+                    StringComparison.Ordinal));
+            if (batch == null)
+            {
+                return;
+            }
+
+            world.ProductBatches.Remove(batch);
+            world.InventoryTransactions.RemoveAll(item =>
+                item.Id == batch.SourceTransactionId);
         }
 
         private static List<string> AvailableAgricultureWorkers(
