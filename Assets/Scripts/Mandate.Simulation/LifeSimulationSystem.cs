@@ -8,12 +8,16 @@ namespace Mandate.Simulation
     {
         private const int DaysPerYear = 360;
         private readonly NamedRandom _random;
+        private readonly IPersonRepository _personRepository;
         private readonly PopulationLedgerSystem _populationLedgerSystem =
             new PopulationLedgerSystem();
 
-        public LifeSimulationSystem(ulong masterSeed)
+        public LifeSimulationSystem(
+            ulong masterSeed,
+            IPersonRepository personRepository = null)
         {
             _random = new NamedRandom(masterSeed);
+            _personRepository = personRepository;
         }
 
         public void ResolveMonthly(WorldState world)
@@ -24,21 +28,26 @@ namespace Mandate.Simulation
             }
 
             var monthIndex = world.AbsoluteDay / 30;
-            ResolveDeathsAndSuccession(world);
-            ResolveHouseholdFinances(world, monthIndex);
-            ResolveHealth(world, monthIndex);
-            ResolveBirths(world, monthIndex);
-            ResolveDeathsAndSuccession(world);
+            var people = _personRepository ??
+                new WorldStatePersonRepository(world);
+            ResolveDeathsAndSuccession(world, people);
+            ResolveHouseholdFinances(world, people, monthIndex);
+            ResolveHealth(world, people, monthIndex);
+            ResolveBirths(world, people, monthIndex);
+            ResolveDeathsAndSuccession(world, people);
         }
 
-        private void ResolveHouseholdFinances(WorldState world, long monthIndex)
+        private void ResolveHouseholdFinances(
+            WorldState world,
+            IPersonRepository people,
+            long monthIndex)
         {
             var families = new List<FamilyState>(world.Families);
             families.Sort((left, right) => string.CompareOrdinal(left.Id, right.Id));
             for (var i = 0; i < families.Count; i++)
             {
                 var family = families[i];
-                var livingMembers = CountLivingMembers(world, family);
+                var livingMembers = CountLivingMembers(people, family);
                 var upkeep = livingMembers * 15L;
                 if (family.Wealth >= upkeep)
                 {
@@ -62,9 +71,10 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var person = FindPerson(world, family.MemberIds[memberIndex]);
+                    var person = people.GetRequired(family.MemberIds[memberIndex]);
                     if (person.IsAlive)
                     {
+                        person = people.GetRequiredForUpdate(person.Id);
                         person.Needs.Livelihood = Math.Min(
                             10_000,
                             person.Needs.Livelihood + 500);
@@ -73,13 +83,15 @@ namespace Mandate.Simulation
             }
         }
 
-        private void ResolveHealth(WorldState world, long monthIndex)
+        private void ResolveHealth(
+            WorldState world,
+            IPersonRepository people,
+            long monthIndex)
         {
-            var people = new List<PersonState>(world.People);
-            people.Sort((left, right) => string.CompareOrdinal(left.Id, right.Id));
-            for (var i = 0; i < people.Count; i++)
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = people[i];
+                var person = knownPeople[i];
                 if (!person.IsAlive)
                 {
                     continue;
@@ -98,6 +110,7 @@ namespace Mandate.Simulation
                         "illness",
                         illnessChance))
                 {
+                    person = people.GetRequiredForUpdate(person.Id);
                     var damage = _random.Range(
                         "life", personId, monthIndex, "illness_damage", 300, 1_001);
                     person.HealthBasisPoints = Math.Max(0, person.HealthBasisPoints - damage);
@@ -112,6 +125,7 @@ namespace Mandate.Simulation
                 }
                 else if (person.HealthBasisPoints < 10_000)
                 {
+                    person = people.GetRequiredForUpdate(person.Id);
                     var recovery = Math.Min(250, 10_000 - person.HealthBasisPoints);
                     person.HealthBasisPoints += recovery;
                     AddEvent(
@@ -126,10 +140,12 @@ namespace Mandate.Simulation
             }
         }
 
-        private void ResolveBirths(WorldState world, long monthIndex)
+        private void ResolveBirths(
+            WorldState world,
+            IPersonRepository people,
+            long monthIndex)
         {
-            var mothers = new List<PersonState>(world.People);
-            mothers.Sort((left, right) => string.CompareOrdinal(left.Id, right.Id));
+            var mothers = people.GetKnownPeople();
             for (var i = 0; i < mothers.Count; i++)
             {
                 var mother = mothers[i];
@@ -148,7 +164,7 @@ namespace Mandate.Simulation
                     continue;
                 }
 
-                var father = FindPerson(world, mother.SpousePersonId);
+                var father = people.GetRequired(mother.SpousePersonId);
                 if (!father.IsAlive || father.LocationId != mother.LocationId)
                 {
                     continue;
@@ -171,7 +187,7 @@ namespace Mandate.Simulation
                     continue;
                 }
 
-                var childIndex = CountChildren(world, mother.Id) + 1;
+                var childIndex = CountChildren(people, mother.Id) + 1;
                 var childId = $"person.generated.child.{mother.Id}.{childIndex}";
                 var child = new PersonState
                 {
@@ -197,12 +213,13 @@ namespace Mandate.Simulation
                 CharacterAbilityBootstrap.InitializeChild(
                     world,
                     child,
-                    father,
-                    mother);
-                world.People.Add(child);
+                    people.GetRequiredForUpdate(father.Id),
+                    people.GetRequiredForUpdate(mother.Id));
+                people.Add(child);
                 family.MemberIds.Add(child.Id);
                 _populationLedgerSystem.RecordBirth(world, child);
-                mother.LastChildbirthDay = world.AbsoluteDay;
+                people.GetRequiredForUpdate(mother.Id).LastChildbirthDay =
+                    world.AbsoluteDay;
                 AddEvent(
                     world,
                     LifeEventType.Birth,
@@ -214,13 +231,17 @@ namespace Mandate.Simulation
             }
         }
 
-        private void ResolveDeathsAndSuccession(WorldState world)
+        private void ResolveDeathsAndSuccession(
+            WorldState world,
+            IPersonRepository people)
         {
-            for (var i = 0; i < world.People.Count; i++)
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                var person = world.People[i];
+                var person = knownPeople[i];
                 if (person.IsAlive && person.HealthBasisPoints <= 0)
                 {
+                    person = people.GetRequiredForUpdate(person.Id);
                     _populationLedgerSystem.RecordDeath(world, person);
                     AddEvent(
                         world,
@@ -236,7 +257,7 @@ namespace Mandate.Simulation
             for (var familyIndex = 0; familyIndex < world.Families.Count; familyIndex++)
             {
                 var family = world.Families[familyIndex];
-                var head = FindPerson(world, family.HeadPersonId);
+                var head = people.GetRequired(family.HeadPersonId);
                 if (head.IsAlive)
                 {
                     continue;
@@ -247,7 +268,8 @@ namespace Mandate.Simulation
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
                 {
-                    var candidate = FindPerson(world, family.MemberIds[memberIndex]);
+                    var candidate = people.GetRequired(
+                        family.MemberIds[memberIndex]);
                     if (!candidate.IsAlive)
                     {
                         continue;
@@ -303,12 +325,14 @@ namespace Mandate.Simulation
             });
         }
 
-        private static int CountLivingMembers(WorldState world, FamilyState family)
+        private static int CountLivingMembers(
+            IPersonRepository people,
+            FamilyState family)
         {
             var count = 0;
             for (var i = 0; i < family.MemberIds.Count; i++)
             {
-                if (FindPerson(world, family.MemberIds[i]).IsAlive)
+                if (people.GetRequired(family.MemberIds[i]).IsAlive)
                 {
                     count++;
                 }
@@ -317,12 +341,15 @@ namespace Mandate.Simulation
             return count;
         }
 
-        private static int CountChildren(WorldState world, string motherId)
+        private static int CountChildren(
+            IPersonRepository people,
+            string motherId)
         {
             var count = 0;
-            for (var i = 0; i < world.People.Count; i++)
+            var knownPeople = people.GetKnownPeople();
+            for (var i = 0; i < knownPeople.Count; i++)
             {
-                if (world.People[i].MotherPersonId == motherId)
+                if (knownPeople[i].MotherPersonId == motherId)
                 {
                     count++;
                 }
@@ -348,19 +375,6 @@ namespace Mandate.Simulation
             }
 
             return null;
-        }
-
-        private static PersonState FindPerson(WorldState world, string personId)
-        {
-            for (var i = 0; i < world.People.Count; i++)
-            {
-                if (world.People[i].Id == personId)
-                {
-                    return world.People[i];
-                }
-            }
-
-            throw new InvalidOperationException($"Missing person {personId}.");
         }
 
         private static LocationState FindLocation(WorldState world, string locationId)

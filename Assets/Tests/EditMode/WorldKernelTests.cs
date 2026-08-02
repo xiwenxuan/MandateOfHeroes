@@ -4572,6 +4572,184 @@ namespace Mandate.Tests
             }
         }
 
+        [Test]
+        public void PersonRepository_TracksAddedPeopleSeparatelyFromUpdates()
+        {
+            var world = BuildMinimalWorld();
+            var repository = new WorldStatePersonRepository(world);
+            var newcomer = BuildIncrementalNewPerson();
+
+            repository.Add(newcomer);
+            repository.GetRequiredForUpdate(newcomer.Id).Wealth = 25;
+
+            Assert.That(world.People, Does.Contain(newcomer));
+            Assert.That(
+                repository.GetAddedPersonIds(),
+                Is.EqualTo(new[] { newcomer.Id }));
+            Assert.That(repository.GetChangedPersonIds(), Is.Empty);
+            Assert.Throws<InvalidOperationException>(
+                () => repository.Add(newcomer));
+        }
+
+        [Test]
+        public void LifeSimulation_InjectedRepositoryPreservesResultsAndTracksBirths()
+        {
+            var inline = VillagePrototypeFactory.Create();
+            var accessed = VillagePrototypeFactory.Create();
+            var repository = new WorldStatePersonRepository(accessed);
+            var inlineLife = new LifeSimulationSystem(inline.MasterSeed);
+            var accessedLife = new LifeSimulationSystem(
+                accessed.MasterSeed, repository);
+
+            for (var month = 1; month <= 12; month++)
+            {
+                inline.AbsoluteDay = month * 30L;
+                accessed.AbsoluteDay = month * 30L;
+                inlineLife.ResolveMonthly(inline);
+                accessedLife.ResolveMonthly(accessed);
+            }
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(accessed),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
+            Assert.That(repository.GetAddedPersonIds(), Is.Not.Empty);
+            Assert.That(
+                repository.GetAddedPersonIds().Count,
+                Is.EqualTo(accessed.People.Count - 300));
+            Assert.That(repository.GetChangedPersonIds(), Is.Not.Empty);
+        }
+
+        [Test]
+        public void PopulationStore_IncrementalCheckpointAddsPermanentPerson()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                var first = PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental_addition",
+                    4,
+                    1);
+                var repository = new WorldStatePersonRepository(world);
+                var newcomer = BuildIncrementalNewPerson();
+                repository.Add(newcomer);
+
+                Assert.Throws<InvalidOperationException>(
+                    () => WorldSnapshotSerializer.Serialize(world));
+
+                var session = new PopulationResidencySession(store);
+                var result = new PopulationPersonCheckpointCoordinator(
+                    store, session).CommitPendingPeople(
+                        world, repository, 2);
+
+                Assert.That(result.RewrittenPartitionCount, Is.EqualTo(1));
+                Assert.That(result.AddedPersonIds, Is.EqualTo(new[] { newcomer.Id }));
+                Assert.That(result.ChangedPersonIds, Is.Empty);
+                Assert.That(result.CommittedPersonIds, Is.EqualTo(new[] { newcomer.Id }));
+                Assert.That(repository.GetAddedPersonIds(), Is.Empty);
+                Assert.That(
+                    result.Manifest.PermanentPersonCount,
+                    Is.EqualTo(first.PermanentPersonCount + 1));
+                Assert.That(
+                    result.Manifest.LivingPersonCount,
+                    Is.EqualTo(first.LivingPersonCount + 1));
+                Assert.That(
+                    result.Manifest.DetailExtensionCount,
+                    Is.EqualTo(first.DetailExtensionCount + 1));
+                Assert.That(store.TryReadCore(newcomer.Id, out var core), Is.True);
+                Assert.That(store.TryReadDetail(newcomer.Id, out var detail), Is.True);
+                Assert.That(core.Matches(detail), Is.True);
+                Assert.That(
+                    WorldSnapshotSerializer.Deserialize(
+                        WorldSnapshotSerializer.Serialize(world)).People.Count,
+                    Is.EqualTo(world.People.Count));
+                Assert.That(session.Promote(newcomer.Id).Id, Is.EqualTo(newcomer.Id));
+                session.DemoteUnchanged(newcomer.Id);
+                Assert.That(session.HotCount, Is.EqualTo(0));
+                PopulationStorageWorldAdapter.ValidateAttachedPackage(world, store);
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_FailedAdditionKeepsPointerAndPendingPerson()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental_addition_failure",
+                    2,
+                    1);
+                var repository = new WorldStatePersonRepository(world);
+                var newcomer = BuildIncrementalNewPerson();
+                repository.Add(newcomer);
+                var originalWorldRevision =
+                    world.PopulationStorage.StorageRevision;
+
+                Assert.Throws<InvalidOperationException>(
+                    () => new PopulationPersonCheckpointCoordinator(store)
+                        .CommitPendingPeople(world, repository, 1));
+
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+                Assert.That(
+                    world.PopulationStorage.StorageRevision,
+                    Is.EqualTo(originalWorldRevision));
+                Assert.That(
+                    repository.GetAddedPersonIds(),
+                    Is.EqualTo(new[] { newcomer.Id }));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
+        [Test]
+        public void PopulationStore_IncrementalCheckpointRejectsExistingPersonAsAddition()
+        {
+            var root = NewPopulationStoreTestRoot();
+            try
+            {
+                var world = BuildMinimalWorld();
+                var store = new PartitionedPopulationStore(root);
+                PopulationStorageWorldAdapter.CommitInlineWorld(
+                    world,
+                    store,
+                    "population.test.incremental_existing_addition",
+                    2,
+                    1);
+                var checkpoint = new PopulationIncrementalCheckpoint
+                {
+                    StorageRevision = 2
+                };
+                checkpoint.AddedPeople.Add(world.People[0]);
+
+                Assert.Throws<InvalidOperationException>(
+                    () => store.CommitIncrementalCheckpoint(checkpoint));
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+
+                checkpoint.ChangedPeople.Add(world.People[0]);
+                Assert.Throws<InvalidOperationException>(
+                    () => store.CommitIncrementalCheckpoint(checkpoint));
+                Assert.That(store.OpenCurrent().StorageRevision, Is.EqualTo(1));
+            }
+            finally
+            {
+                DeletePopulationStoreTestRoot(root);
+            }
+        }
+
         private static List<string> AvailableAgricultureWorkers(
             WorldState world,
             FamilyState family)
@@ -4856,6 +5034,24 @@ namespace Mandate.Tests
             });
             world.Validate();
             return world;
+        }
+
+        private static PersonState BuildIncrementalNewPerson()
+        {
+            return new PersonState
+            {
+                Id = "person.generated.incremental_newborn",
+                DisplayName = "Incremental Newborn",
+                LocationId = "location.zhuo",
+                BirthLocationId = "location.zhuo",
+                BirthDay = 0,
+                CountsTowardPopulation = false,
+                VillageOccupation = VillageOccupation.Dependent,
+                LaborCapacityBasisPoints = 0,
+                NextIndependentEventDay = 30,
+                NextIndependentEventReason =
+                    "monthly_household_settlement"
+            };
         }
     }
 }

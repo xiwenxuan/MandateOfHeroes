@@ -206,47 +206,102 @@ namespace Mandate.Persistence
                 partitionChanges.Add(person);
             }
 
+            var addedByPartition = new Dictionary<int, List<PersonState>>();
+            for (var i = 0; i < checkpoint.AddedPeople.Count; i++)
+            {
+                var person = checkpoint.AddedPeople[i];
+                var partitionIndex = PartitionFor(
+                    person.Id, previous.PartitionCount);
+                if (!addedByPartition.TryGetValue(
+                        partitionIndex, out var partitionAdditions))
+                {
+                    partitionAdditions = new List<PersonState>();
+                    addedByPartition.Add(partitionIndex, partitionAdditions);
+                }
+
+                partitionAdditions.Add(person);
+            }
+
             var changedCores = new Dictionary<
                 int,
                 List<PermanentPersonCoreRecord>>();
             var changedDetails = new Dictionary<
                 int,
                 List<PersonDetailExtensionRecord>>();
-            foreach (var pair in changedByPartition)
+            var affectedPartitions = new HashSet<int>(changedByPartition.Keys);
+            affectedPartitions.UnionWith(addedByPartition.Keys);
+            var orderedAffectedPartitions = new List<int>(affectedPartitions);
+            orderedAffectedPartitions.Sort();
+            for (var affectedIndex = 0;
+                 affectedIndex < orderedAffectedPartitions.Count;
+                 affectedIndex++)
             {
+                var partitionIndex = orderedAffectedPartitions[affectedIndex];
                 var cores = new List<PermanentPersonCoreRecord>(
-                    LoadCorePartition(pair.Key));
+                    LoadCorePartition(partitionIndex));
                 var details = new List<PersonDetailExtensionRecord>(
-                    LoadDetailPartition(pair.Key));
-                pair.Value.Sort((left, right) =>
-                    string.CompareOrdinal(left.Id, right.Id));
-                for (var changeIndex = 0;
-                     changeIndex < pair.Value.Count;
-                     changeIndex++)
+                    LoadDetailPartition(partitionIndex));
+                if (changedByPartition.TryGetValue(
+                        partitionIndex, out var partitionChanges))
                 {
-                    var changedPerson = pair.Value[changeIndex];
-                    var coreIndex = FindCoreIndex(cores, changedPerson.Id);
-                    var detailIndex = FindDetailIndex(details, changedPerson.Id);
-                    if (coreIndex < 0 || detailIndex < 0)
+                    partitionChanges.Sort((left, right) =>
+                        string.CompareOrdinal(left.Id, right.Id));
+                    for (var changeIndex = 0;
+                         changeIndex < partitionChanges.Count;
+                         changeIndex++)
                     {
-                        throw new InvalidOperationException(
-                            $"Incremental checkpoint references unknown person " +
-                            $"{changedPerson.Id}.");
-                    }
+                        var changedPerson = partitionChanges[changeIndex];
+                        var coreIndex = FindCoreIndex(cores, changedPerson.Id);
+                        var detailIndex = FindDetailIndex(details, changedPerson.Id);
+                        if (coreIndex < 0 || detailIndex < 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Incremental checkpoint references unknown person " +
+                                $"{changedPerson.Id}.");
+                        }
 
-                    cores[coreIndex] =
-                        PermanentPersonCoreRecord.FromPerson(changedPerson);
-                    details[detailIndex] = new PersonDetailExtensionRecord
+                        cores[coreIndex] =
+                            PermanentPersonCoreRecord.FromPerson(changedPerson);
+                        details[detailIndex] = new PersonDetailExtensionRecord
+                        {
+                            StorageRevision = checkpoint.StorageRevision,
+                            Person = changedPerson
+                        };
+                    }
+                }
+
+                if (addedByPartition.TryGetValue(
+                        partitionIndex, out var partitionAdditions))
+                {
+                    partitionAdditions.Sort((left, right) =>
+                        string.CompareOrdinal(left.Id, right.Id));
+                    for (var additionIndex = 0;
+                         additionIndex < partitionAdditions.Count;
+                         additionIndex++)
                     {
-                        StorageRevision = checkpoint.StorageRevision,
-                        Person = changedPerson
-                    };
+                        var addedPerson = partitionAdditions[additionIndex];
+                        var coreIndex = FindCoreIndex(cores, addedPerson.Id);
+                        var detailIndex = FindDetailIndex(details, addedPerson.Id);
+                        if (coreIndex >= 0 || detailIndex >= 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Incremental checkpoint adds existing person " +
+                                $"{addedPerson.Id}.");
+                        }
+
+                        cores.Add(PermanentPersonCoreRecord.FromPerson(addedPerson));
+                        details.Add(new PersonDetailExtensionRecord
+                        {
+                            StorageRevision = checkpoint.StorageRevision,
+                            Person = addedPerson
+                        });
+                    }
                 }
 
                 cores.Sort(CoreComparer.Instance);
                 details.Sort(DetailComparer.Instance);
-                changedCores.Add(pair.Key, cores);
-                changedDetails.Add(pair.Key, details);
+                changedCores.Add(partitionIndex, cores);
+                changedDetails.Add(partitionIndex, details);
             }
 
             var generationName = "generation-" +
@@ -849,7 +904,9 @@ namespace Mandate.Persistence
             }
 
             if (checkpoint.StorageRevision < 0 ||
+                checkpoint.AddedPeople == null ||
                 checkpoint.ChangedPeople == null ||
+                checkpoint.AddedPeople.Count == 0 &&
                 checkpoint.ChangedPeople.Count == 0)
             {
                 throw new InvalidOperationException(
@@ -857,6 +914,18 @@ namespace Mandate.Persistence
             }
 
             var ids = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < checkpoint.AddedPeople.Count; i++)
+            {
+                var person = checkpoint.AddedPeople[i];
+                if (person == null || !ids.Add(person.Id))
+                {
+                    throw new InvalidOperationException(
+                        "Incremental checkpoint contains a null or duplicate person.");
+                }
+
+                ValidateCore(PermanentPersonCoreRecord.FromPerson(person));
+            }
+
             for (var i = 0; i < checkpoint.ChangedPeople.Count; i++)
             {
                 var person = checkpoint.ChangedPeople[i];

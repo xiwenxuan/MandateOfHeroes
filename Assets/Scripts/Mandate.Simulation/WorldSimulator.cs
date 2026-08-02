@@ -27,7 +27,8 @@ namespace Mandate.Simulation
             _random = new NamedRandom(masterSeed);
             _travelSystem = new TravelSystem(personRepository);
             _taskSystem = new TaskSystem(personRepository);
-            _lifeSimulationSystem = new LifeSimulationSystem(masterSeed);
+            _lifeSimulationSystem = new LifeSimulationSystem(
+                masterSeed, personRepository);
             _marketSimulationSystem = new MarketSimulationSystem(masterSeed);
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent);

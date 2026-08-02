@@ -8,6 +8,8 @@ namespace Mandate.Persistence
     {
         public PopulationPackageManifest Manifest;
         public readonly List<string> CommittedPersonIds = new List<string>();
+        public readonly List<string> AddedPersonIds = new List<string>();
+        public readonly List<string> ChangedPersonIds = new List<string>();
         public int RewrittenPartitionCount;
     }
 
@@ -29,6 +31,14 @@ namespace Mandate.Persistence
             IPersonRepository people,
             long storageRevision)
         {
+            return CommitPendingPeople(world, people, storageRevision);
+        }
+
+        public PersonCheckpointCommitResult CommitPendingPeople(
+            WorldState world,
+            IPersonRepository people,
+            long storageRevision)
+        {
             if (world == null)
             {
                 throw new ArgumentNullException(nameof(world));
@@ -40,11 +50,12 @@ namespace Mandate.Persistence
             }
 
             world.Validate();
+            var addedIds = people.GetAddedPersonIds();
             var changedIds = people.GetChangedPersonIds();
-            if (changedIds.Count == 0)
+            if (addedIds.Count == 0 && changedIds.Count == 0)
             {
                 throw new InvalidOperationException(
-                    "No changed people are available for checkpointing.");
+                    "No pending people are available for checkpointing.");
             }
 
             var previous = store.OpenCurrent();
@@ -52,6 +63,12 @@ namespace Mandate.Persistence
             {
                 StorageRevision = storageRevision
             };
+            for (var i = 0; i < addedIds.Count; i++)
+            {
+                checkpoint.AddedPeople.Add(
+                    people.GetRequired(addedIds[i]));
+            }
+
             for (var i = 0; i < changedIds.Count; i++)
             {
                 checkpoint.ChangedPeople.Add(
@@ -76,14 +93,21 @@ namespace Mandate.Persistence
             }
 
             world.PopulationStorage = manifest.ToDomainState();
-            residency?.RefreshCommitted(changedIds);
+            var committedIds = new List<string>(addedIds.Count + changedIds.Count);
+            committedIds.AddRange(addedIds);
+            committedIds.AddRange(changedIds);
+            committedIds.Sort(StringComparer.Ordinal);
+            residency?.RefreshCommitted(committedIds);
+            people.AcceptAddedPeople(addedIds);
             people.AcceptChanges(changedIds);
             var result = new PersonCheckpointCommitResult
             {
                 Manifest = manifest,
                 RewrittenPartitionCount = rewrittenPartitions
             };
-            result.CommittedPersonIds.AddRange(changedIds);
+            result.CommittedPersonIds.AddRange(committedIds);
+            result.AddedPersonIds.AddRange(addedIds);
+            result.ChangedPersonIds.AddRange(changedIds);
             return result;
         }
     }

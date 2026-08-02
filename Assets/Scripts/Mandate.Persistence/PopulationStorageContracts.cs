@@ -150,6 +150,7 @@ namespace Mandate.Persistence
     public sealed class PopulationIncrementalCheckpoint
     {
         public long StorageRevision;
+        public List<PersonState> AddedPeople = new List<PersonState>();
         public List<PersonState> ChangedPeople = new List<PersonState>();
     }
 
