@@ -58,6 +58,7 @@ namespace Mandate.Domain
         public string ParentLocationId;
         public List<string> HouseholdIds = new List<string>();
         public long PublicGranaryGrain;
+        public string PublicGranaryInventoryContainerId;
         public long TaxGrainCollected;
         public int CorveeDaysCompleted;
         public int LevyPersonDays;

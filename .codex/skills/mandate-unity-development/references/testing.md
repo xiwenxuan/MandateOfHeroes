@@ -11,7 +11,9 @@ For code changes, run:
 3. one controlled Unity test;
 4. `git diff --check`.
 
-Use `scripts/verify-project.ps1` for the standard sequence.
+Use `scripts/verify-project.ps1` for compilation plus a targeted core and Unity smoke. The current complete
+core and EditMode suites exceed a reliable single-process workflow, so complete regression evidence uses the
+grouped runners documented below rather than one unbounded unified invocation.
 
 ## Standard invocation
 
@@ -39,6 +41,38 @@ Use `-SkipUnity` only when Unity integration is not required or is blocked. Stat
 
 Do not infer Unity success from its process exit alone. Require its test-result XML. Do not infer core-test success without a `RESULT passed=N failed=0` summary.
 
+## Complete core regression groups
+
+The core suite can exceed the 300-second boundary when executed in one process. Prepare one immutable run,
+execute each group as a separate bounded invocation, and aggregate only after all groups finish:
+
+```powershell
+$runId = "manual-20260805"
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
+  -RunId $runId -GroupCount 12 -PrepareOnly -TimeoutSeconds 240
+1..12 | ForEach-Object {
+  powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
+    -RunId $runId -GroupCount 12 -GroupIndex $_ -TimeoutSeconds 240
+}
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
+  -RunId $runId -GroupCount 12 -AggregateOnly
+```
+
+Preparation compiles the solution and runner, discovers tests from the actual test assembly, and writes source
+and binary fingerprints. Each group requires an exact test-name set. Aggregation rejects changed sources or
+binaries, missing groups, missing tests, unexpected tests and duplicates. For Codex-controlled work, invoke one
+group per bounded external call and retain the per-group logs and JSON. A complete core claim requires the final
+aggregate `total=N passed=N failed=0`; a filtered runner result is only targeted evidence.
+
+The 2026-08-05 M25-P14 integration baseline discovered 332 core tests. Twelve groups (28 tests in groups 1-8
+and 27 tests in groups 9-12) passed 332/332. The slowest group took approximately 112.56 seconds, below the
+240-second group timeout. Its aggregate is under
+`tmp/core-test-groups/m25p14-integration-20260805/aggregate.json`.
+
+`verify-project.ps1 -CoreTestFilter <substring-or-exact-filter>` is the bounded targeted-core option. Exact
+multi-test filters use `exact:name1;name2`. Omitting the filter retains the legacy all-in-one core behavior and
+must not be used as complete evidence when it times out; use the grouped aggregate instead.
+
 ## Unity evidence
 
 - Invoke only `Tools/Run-UnityTestsSafe.ps1`.
@@ -46,8 +80,66 @@ Do not infer Unity success from its process exit alone. Require its test-result 
 - A project lock caused by the user's open Unity editor is `blocked`, not `failed`.
 - On timeout, retain the log tail and identify the owned process tree that was stopped.
 - If Unity creates no startup log before the safe runner's startup watchdog while running in the
-  workspace sandbox, stop that owned process and retry the same safe runner at most once with the
-  required sandbox escalation. Do not weaken the process, timeout, log, or XML requirements.
+  Codex workspace sandbox, stop that owned process and retry the same safe runner at most once with
+  the required sandbox escalation. The 2026-08-05 controlled comparison confirmed this boundary:
+  the sandboxed `EngineSmoke` produced no log in 45 seconds, while the same safe runner passed outside
+  the sandbox in 16.153 seconds. Do not weaken the process, timeout, log, or XML requirements.
+
+### Layered Unity diagnostics
+
+`Tools/Run-UnityTestsSafe.ps1` supports explicit modes. Use the smallest mode that can answer the
+current question:
+
+```powershell
+# Unity engine/licensing startup and normal exit.
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityTestsSafe.ps1 `
+  -Mode EngineSmoke -TimeoutSeconds 60
+
+# Real project load, package resolution and compilation without Test Runner.
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityTestsSafe.ps1 `
+  -Mode ProjectLoadSmoke -TimeoutSeconds 120
+
+# One exact EditMode smoke test with required XML.
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityTestsSafe.ps1 `
+  -Mode EditModeTests `
+  -TestFilter Mandate.Tests.WorldKernelTests.WorldScheduler_OrdersStableIdsAndHonorsCadence `
+  -TimeoutSeconds 120
+```
+
+Every run writes a Unity log, stdout/stderr evidence notes and a JSON summary under
+`tmp/unity-validation`. Test modes additionally require a non-empty, parseable NUnit XML. Result codes
+distinguish project lock, launch failure, compilation failure, invalid XML, total timeout, startup timeout,
+missing XML and actual test failure.
+
+On this Unity 2022.3 China build, Test Runner can finish and write complete XML but keep consuming CPU during
+native editor shutdown. The safe runner allows a bounded natural-exit grace period, then may terminate only its
+owned Unity process tree. Such a run is `passed` only when the XML is complete, reports zero failures and the
+JSON records `forcedCleanupAfterResult=true`; an absent or incomplete XML remains `blocked` or `failed`.
+
+### Complete EditMode regression groups
+
+The current EditMode suite is too large to rely on one near-300-second process. Generate a unique run ID and
+execute each group as a separate external invocation:
+
+```powershell
+$runId = "manual-20260805"
+1..12 | ForEach-Object {
+  powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityEditModeGroupsSafe.ps1 `
+    -RunId $runId -GroupCount 12 -GroupIndex $_ -UseGraphics -TimeoutSeconds 240
+}
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityEditModeGroupsSafe.ps1 `
+  -RunId $runId -GroupCount 12 -AggregateOnly
+```
+
+For Codex-controlled work, do not put all groups into one unbounded foreground call. Run one group per bounded
+external invocation, preserve its PID/log/XML, and aggregate only after every group has completed. The manifest
+uses a source fingerprint and exact test-name sets, so stale or mixed group results cannot satisfy aggregation.
+The current 333-test baseline is 12 groups (28 tests in groups 1-9 and 27 tests in groups 10-12); the
+2026-08-05 aggregate passed all 333 tests. Group 9 took 217.002 seconds, so do not reduce the group count
+or increase the 240-second timeout without a separate evidence-backed decision.
+
+`verify-project.ps1 -UnityTestFilter <exact-name>` is an explicit smoke option. Omitting the filter preserves
+the existing complete-test behavior; never present a filtered verification as the complete EditMode suite.
 
 ## Minimum coverage
 

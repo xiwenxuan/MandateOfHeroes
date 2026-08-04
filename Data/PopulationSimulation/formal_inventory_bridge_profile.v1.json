@@ -1,0 +1,10 @@
+{
+  "schema_version": "mandate.formal-inventory-bridge-profile.v1",
+  "id": "population.formal_inventory_bridge.core_single_crop.v1",
+  "source_layer": "gameplay_completion",
+  "formal_snapshot_contract": "world.snapshot.v10",
+  "require_single_agricultural_binding": true,
+  "food_quality_basis_points": 8000,
+  "seed_quality_basis_points": 8000,
+  "freshness_basis_points": 10000
+}

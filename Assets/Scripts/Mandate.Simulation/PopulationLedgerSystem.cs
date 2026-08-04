@@ -263,6 +263,19 @@ namespace Mandate.Simulation
             PersonState person,
             string destinationLocationId)
         {
+            MoveIndependentPerson(
+                world,
+                person,
+                destinationLocationId,
+                true);
+        }
+
+        public void MoveIndependentPerson(
+            WorldState world,
+            PersonState person,
+            string destinationLocationId,
+            bool validateWorld)
+        {
             if (world == null)
             {
                 throw new ArgumentNullException(nameof(world));
@@ -273,7 +286,10 @@ namespace Mandate.Simulation
                 throw new ArgumentNullException(nameof(person));
             }
 
-            world.Validate();
+            if (validateWorld)
+            {
+                world.Validate();
+            }
             var repository = PeopleFor(world);
             person = repository.GetRequired(person.Id);
             var originLocationId = person.LocationId;
@@ -311,7 +327,10 @@ namespace Mandate.Simulation
                     $"{destination.DisplayName}。");
             }
 
-            world.Validate();
+            if (validateWorld)
+            {
+                world.Validate();
+            }
         }
 
         public void MovePeople(

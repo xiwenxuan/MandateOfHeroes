@@ -1,10 +1,12 @@
 [CmdletBinding()]
 param(
     [string]$ProjectPath,
-    [ValidateRange(30, 1800)]
+    [ValidateRange(30, 300)]
     [int]$TimeoutSeconds = 300,
     [ValidateSet("EditMode", "PlayMode")]
     [string]$UnityTestPlatform = "EditMode",
+    [string]$CoreTestFilter = "",
+    [string]$UnityTestFilter = "",
     [switch]$SkipUnity,
     [switch]$DocumentationOnly
 )
@@ -196,10 +198,14 @@ try {
         -Destination (Join-Path $binaryDirectory "nunit.framework.dll") `
         -Force
 
+    $coreArguments = @($resolvedProject, $binaryDirectory)
+    if (-not [string]::IsNullOrWhiteSpace($CoreTestFilter)) {
+        $coreArguments += $CoreTestFilter
+    }
     $coreResult = Invoke-BoundedProcess `
         -Name "core-tests" `
         -FilePath $coreRunnerPath `
-        -ArgumentList @($resolvedProject, $binaryDirectory) `
+        -ArgumentList $coreArguments `
         -WorkingDirectory $resolvedProject `
         -LogDirectory $logDirectory `
         -HardTimeoutSeconds $TimeoutSeconds
@@ -219,17 +225,27 @@ try {
         }
 
         $unityInnerTimeout = [Math]::Max(30, $TimeoutSeconds - 15)
+        $unityMode = if ($UnityTestPlatform -eq "EditMode") {
+            "EditModeTests"
+        }
+        else {
+            "PlayModeTests"
+        }
+        $unityArguments = @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", $unityTestScript,
+            "-Mode", $unityMode,
+            "-TimeoutSeconds", $unityInnerTimeout,
+            "-ProjectPath", $resolvedProject
+        )
+        if (-not [string]::IsNullOrWhiteSpace($UnityTestFilter)) {
+            $unityArguments += @("-TestFilter", $UnityTestFilter)
+        }
         Invoke-BoundedProcess `
             -Name "unity-tests" `
             -FilePath "powershell.exe" `
-            -ArgumentList @(
-                "-NoProfile",
-                "-ExecutionPolicy", "Bypass",
-                "-File", $unityTestScript,
-                "-TestPlatform", $UnityTestPlatform,
-                "-TimeoutSeconds", $unityInnerTimeout,
-                "-ProjectPath", $resolvedProject
-            ) `
+            -ArgumentList $unityArguments `
             -WorkingDirectory $resolvedProject `
             -LogDirectory $logDirectory `
             -HardTimeoutSeconds $TimeoutSeconds | Out-Null

@@ -1,0 +1,16 @@
+{
+  "schema_version": "mandate.household-production-profile.v1",
+  "id": "household_production_profile.han140_baseline_test.v1",
+  "source_layer": "gameplay_completion",
+  "description": "Technical parameters for household land tenure, seed lots and annual farm work orders; not a claim about historical tenancy, rent, seeding, or yield.",
+  "owned_land_basis_points": 7000,
+  "opening_seed_conversion_basis_points": 1800,
+  "new_household_land_and_seed_transfer_basis_points": 1500,
+  "leased_land_rent_basis_points": 1800,
+  "seed_retention_target_basis_points": 12000,
+  "minimum_order_land_milli_mu": 100,
+  "opening_seed_vigor_min_basis_points": 8500,
+  "opening_seed_vigor_max_basis_points": 10001,
+  "opening_seed_purity_min_basis_points": 9000,
+  "opening_seed_purity_max_basis_points": 10001
+}

@@ -51,7 +51,13 @@ namespace Mandate.Domain
         HouseholdPayment,
         GrainRemittance,
         AdministrationStipend,
-        GrainRelief
+        GrainRelief,
+        GrainReliefShortfall,
+        GrainProcurement,
+        GrainProcurementUnfilled,
+        GrainExternalProcurement,
+        GrainExternalFreightEscrow,
+        GrainExternalProcurementUnfilled
     }
 
     [Serializable]
@@ -68,6 +74,7 @@ namespace Mandate.Domain
         public int GentryInfluenceBasisPoints;
         public int LastMarketPressureBasisPoints = 10_000;
         public long CountyGranaryGrain;
+        public string GranaryInventoryContainerId;
         public long TotalMoneyTaxCollected;
         public long TotalGrainTaxReceived;
         public long TotalAdministrationPaid;

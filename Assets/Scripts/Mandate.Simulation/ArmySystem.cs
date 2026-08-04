@@ -96,6 +96,44 @@ namespace Mandate.Simulation
                 world.ArmyMarches.RemoveAt(i);
                 var army = FindArmy(world, march.ArmyId);
                 army.LocationId = march.DestinationLocationId;
+                for (var orderIndex = 0;
+                     orderIndex < world.MilitaryLogisticsOrders.Count;
+                     orderIndex++)
+                {
+                    var order = world.MilitaryLogisticsOrders[orderIndex];
+                    if (order.ArmyMarchId != march.Id ||
+                        order.Status != MilitaryLogisticsStatus.InTransit)
+                    {
+                        continue;
+                    }
+
+                    order.Status = MilitaryLogisticsStatus.AwaitingArmy;
+                    for (var legIndex = 0;
+                         legIndex < world.MilitaryLogisticsLegs.Count;
+                         legIndex++)
+                    {
+                        var leg = world.MilitaryLogisticsLegs[legIndex];
+                        if (leg.LogisticsOrderId == order.Id &&
+                            leg.Sequence == order.CurrentLegSequence)
+                        {
+                            leg.Status =
+                                MilitaryLogisticsLegStatus.AwaitingReceipt;
+                            break;
+                        }
+                    }
+                    for (var containerIndex = 0;
+                         containerIndex < world.InventoryContainers.Count;
+                         containerIndex++)
+                    {
+                        if (world.InventoryContainers[containerIndex].Id ==
+                            order.TransportInventoryContainerId)
+                        {
+                            world.InventoryContainers[containerIndex].LocationId =
+                                march.DestinationLocationId;
+                            break;
+                        }
+                    }
+                }
                 if (world.MilitaryServiceInitialized)
                 {
                     var people = PeopleFor(world);

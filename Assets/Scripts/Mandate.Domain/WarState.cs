@@ -13,7 +13,8 @@ namespace Mandate.Domain
     {
         TaskDelivery,
         MerchantSale,
-        LocalMarketPurchase
+        LocalMarketPurchase,
+        LogisticsDelivery
     }
 
     [Serializable]
@@ -75,6 +76,7 @@ namespace Mandate.Domain
         public string ArmyId;
         public string SupplierPersonId;
         public string SourceTaskInstanceId;
+        public string SourceLogisticsOrderId;
         public int GrainUnits;
         public int ProvisionsAdded;
         public int UnitPrice;

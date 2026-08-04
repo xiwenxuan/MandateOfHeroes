@@ -44,7 +44,8 @@ namespace Mandate.Domain
         March,
         Engage,
         Retreat,
-        Resupply
+        Resupply,
+        RecoverLogistics
     }
 
     public enum MilitaryOrderResult : byte

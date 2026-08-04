@@ -44,6 +44,8 @@ namespace Mandate.Domain
         public List<QualityDimensionDefinition> QualityDimensions =
             new List<QualityDimensionDefinition>();
         public List<ProductDefinition> Products = new List<ProductDefinition>();
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<FoodDefinition> Foods;
         public List<RecipeDefinition> Recipes = new List<RecipeDefinition>();
         public List<ProductionMethodDefinition> Methods =
             new List<ProductionMethodDefinition>();
@@ -93,6 +95,20 @@ namespace Mandate.Domain
         public List<string> QualityDimensionIds = new List<string>();
         public int BaseWeight = 1;
         public int PerishabilityBasisPoints;
+    }
+
+    [Serializable]
+    public sealed class FoodDefinition
+    {
+        public string ProductDefinitionId;
+        public int OpeningShareBasisPoints;
+        public int NutritionBasisPoints = 10_000;
+        public int VolumeBasisPoints = 10_000;
+        public int SpoilageSensitivityBasisPoints = 10_000;
+        public int MarketValueBasisPoints = 10_000;
+        public int ConsumptionPriority;
+        public string SourceLayer;
+        public string SourceNote;
     }
 
     [Serializable]
@@ -178,6 +194,8 @@ namespace Mandate.Domain
                     StringComparer.Ordinal);
         private Dictionary<string, ProductDefinition> _products =
             new Dictionary<string, ProductDefinition>(StringComparer.Ordinal);
+        private Dictionary<string, FoodDefinition> _foods =
+            new Dictionary<string, FoodDefinition>(StringComparer.Ordinal);
         private Dictionary<string, RecipeDefinition> _recipes =
             new Dictionary<string, RecipeDefinition>(StringComparer.Ordinal);
         private Dictionary<string, ProductionMethodDefinition> _methods =
@@ -194,6 +212,7 @@ namespace Mandate.Domain
         public int CropVarietyCount => _varieties.Count;
         public int QualityDimensionCount => _qualityDimensions.Count;
         public int ProductCount => _products.Count;
+        public int FoodCount => _foods.Count;
         public int RecipeCount => _recipes.Count;
         public int MethodCount => _methods.Count;
         public int SkillCount => _skills.Count;
@@ -255,6 +274,7 @@ namespace Mandate.Domain
             var varieties = Copy(_varieties);
             var qualityDimensions = Copy(_qualityDimensions);
             var products = Copy(_products);
+            var foods = Copy(_foods);
             var recipes = Copy(_recipes);
             var methods = Copy(_methods);
             var skills = Copy(_skills);
@@ -269,6 +289,12 @@ namespace Mandate.Domain
                 item => item.Id,
                 "quality dimension");
             AddDefinitions(products, package.Products, item => item.Id, "product");
+            ValidateFoodPackage(package.Foods);
+            AddOptionalDefinitions(
+                foods,
+                package.Foods,
+                item => item.ProductDefinitionId,
+                "food product");
             AddDefinitions(recipes, package.Recipes, item => item.Id, "recipe");
             AddDefinitions(methods, package.Methods, item => item.Id, "method");
             AddDefinitions(skills, package.Skills, item => item.Id, "skill");
@@ -284,6 +310,7 @@ namespace Mandate.Domain
                 varieties,
                 qualityDimensions,
                 products,
+                foods,
                 recipes,
                 methods,
                 skills,
@@ -299,6 +326,7 @@ namespace Mandate.Domain
             _varieties = varieties;
             _qualityDimensions = qualityDimensions;
             _products = products;
+            _foods = foods;
             _recipes = recipes;
             _methods = methods;
             _skills = skills;
@@ -320,6 +348,33 @@ namespace Mandate.Domain
         public ProductDefinition GetProduct(string id)
         {
             return Get(_products, id, "product");
+        }
+
+        public FoodDefinition GetFood(string productDefinitionId)
+        {
+            return Get(_foods, productDefinitionId, "food product");
+        }
+
+        public bool TryGetFood(
+            string productDefinitionId,
+            out FoodDefinition definition)
+        {
+            if (string.IsNullOrWhiteSpace(productDefinitionId))
+            {
+                definition = null;
+                return false;
+            }
+
+            return _foods.TryGetValue(productDefinitionId, out definition);
+        }
+
+        public IReadOnlyList<FoodDefinition> GetFoodsInStableOrder()
+        {
+            var result = new List<FoodDefinition>(_foods.Values);
+            result.Sort((left, right) => string.CompareOrdinal(
+                left.ProductDefinitionId,
+                right.ProductDefinitionId));
+            return result;
         }
 
         public QualityDimensionDefinition GetQualityDimension(string id)
@@ -422,9 +477,13 @@ namespace Mandate.Domain
             }
 
             ValidateManifest(world.ProductionContentManifest);
+            var agricultureOrdersById =
+                new Dictionary<string, AgricultureWorkOrderState>(
+                    StringComparer.Ordinal);
             for (var i = 0; i < world.AgricultureWorkOrders.Count; i++)
             {
                 var order = world.AgricultureWorkOrders[i];
+                agricultureOrdersById.Add(order.Id, order);
                 var crop = GetCrop(order.CropDefinitionId);
                 var variety = GetCropVariety(order.CropVarietyDefinitionId);
                 var recipe = GetRecipe(order.RecipeDefinitionId);
@@ -543,12 +602,59 @@ namespace Mandate.Domain
 
                 if (!string.IsNullOrEmpty(batch.CropVarietyDefinitionId))
                 {
-                    GetCropVariety(batch.CropVarietyDefinitionId);
+                    var variety = GetCropVariety(
+                        batch.CropVarietyDefinitionId);
                     if (!product.CategoryTags.Contains("product.seed"))
                     {
-                        throw new ProductionContentException(
-                            $"Non-seed batch {batch.Id} declares a crop variety.");
+                        if (!agricultureOrdersById.TryGetValue(
+                                batch.SourceWorkOrderId ?? string.Empty,
+                                out var sourceOrder) ||
+                            sourceOrder.HarvestProductDefinitionId != product.Id ||
+                            sourceOrder.CropVarietyDefinitionId != variety.Id ||
+                            sourceOrder.CropDefinitionId !=
+                                variety.CropDefinitionId)
+                        {
+                            throw new ProductionContentException(
+                                $"Batch {batch.Id} declares an unrelated crop variety.");
+                        }
                     }
+                }
+            }
+
+            for (var i = 0; i < world.FormalMarketOrders.Count; i++)
+            {
+                var order = world.FormalMarketOrders[i];
+                GetProduct(order.ProductDefinitionId);
+                GetFood(order.ProductDefinitionId);
+            }
+
+            for (var i = 0; i < world.FormalMarketTrades.Count; i++)
+            {
+                var trade = world.FormalMarketTrades[i];
+                GetProduct(trade.ProductDefinitionId);
+                GetFood(trade.ProductDefinitionId);
+            }
+
+            for (var i = 0; i < world.FormalMarketPrices.Count; i++)
+            {
+                var price = world.FormalMarketPrices[i];
+                GetProduct(price.ProductDefinitionId);
+                GetFood(price.ProductDefinitionId);
+            }
+
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                var product = GetProduct(freight.ProductDefinitionId);
+                var food = GetFood(freight.ProductDefinitionId);
+                if (freight.ProductPerishabilityBasisPoints !=
+                        product.PerishabilityBasisPoints ||
+                    freight.FoodSpoilageSensitivityBasisPoints !=
+                        food.SpoilageSensitivityBasisPoints ||
+                    freight.CargoUnitWeight != product.BaseWeight)
+                {
+                    throw new ProductionContentException(
+                        $"Civilian freight {freight.Id} has invalid content snapshots.");
                 }
             }
 
@@ -626,6 +732,7 @@ namespace Mandate.Domain
             Dictionary<string, CropVarietyDefinition> varieties,
             Dictionary<string, QualityDimensionDefinition> qualityDimensions,
             Dictionary<string, ProductDefinition> products,
+            Dictionary<string, FoodDefinition> foods,
             Dictionary<string, RecipeDefinition> recipes,
             Dictionary<string, ProductionMethodDefinition> methods,
             Dictionary<string, SkillDefinition> skills,
@@ -686,6 +793,33 @@ namespace Mandate.Domain
                             $"Product {pair.Key} has invalid quality dimension " +
                             $"{dimensionId}.");
                     }
+                }
+            }
+
+            foreach (var pair in foods)
+            {
+                var food = pair.Value;
+                if (!products.TryGetValue(
+                        food.ProductDefinitionId,
+                        out var product) ||
+                    product.CategoryTags == null ||
+                    !product.CategoryTags.Contains("product.food") ||
+                    food.OpeningShareBasisPoints < 0 ||
+                    food.OpeningShareBasisPoints > 10_000 ||
+                    food.NutritionBasisPoints < 1_000 ||
+                    food.NutritionBasisPoints > 20_000 ||
+                    food.VolumeBasisPoints < 1_000 ||
+                    food.VolumeBasisPoints > 30_000 ||
+                    food.SpoilageSensitivityBasisPoints < 0 ||
+                    food.SpoilageSensitivityBasisPoints > 30_000 ||
+                    food.MarketValueBasisPoints < 1_000 ||
+                    food.MarketValueBasisPoints > 30_000 ||
+                    food.ConsumptionPriority < 0 ||
+                    string.IsNullOrWhiteSpace(food.SourceLayer) ||
+                    string.IsNullOrWhiteSpace(food.SourceNote))
+                {
+                    throw new ProductionContentException(
+                        $"Food definition for {pair.Key} is invalid.");
                 }
             }
 
@@ -977,6 +1111,46 @@ namespace Mandate.Domain
                 }
 
                 target.Add(id, definition);
+            }
+        }
+
+        private static void AddOptionalDefinitions<T>(
+            IDictionary<string, T> target,
+            IList<T> definitions,
+            Func<T, string> idSelector,
+            string kind)
+            where T : class
+        {
+            if (definitions != null)
+            {
+                AddDefinitions(target, definitions, idSelector, kind);
+            }
+        }
+
+        private static void ValidateFoodPackage(IList<FoodDefinition> foods)
+        {
+            if (foods == null || foods.Count == 0)
+            {
+                return;
+            }
+
+            long openingShare = 0;
+            for (var i = 0; i < foods.Count; i++)
+            {
+                if (foods[i] == null)
+                {
+                    throw new ProductionContentException(
+                        "Production content package contains a null food definition.");
+                }
+
+                openingShare = checked(
+                    openingShare + foods[i].OpeningShareBasisPoints);
+            }
+
+            if (openingShare != 0 && openingShare != 10_000)
+            {
+                throw new ProductionContentException(
+                    "Non-zero food opening shares in a package must total 10000.");
             }
         }
 

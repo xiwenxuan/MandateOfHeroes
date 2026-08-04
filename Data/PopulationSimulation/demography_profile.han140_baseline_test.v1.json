@@ -1,0 +1,44 @@
+{
+  "schema_version": "mandate.demography-profile.v1",
+  "id": "demography_profile.han140_baseline_test.v1",
+  "source_layer": "gameplay_completion",
+  "description": "用于百万永久人物五十年长跑的确定性人口学技术参数，不代表东汉逐年真实生育率或死亡率。",
+  "days_per_year": 360,
+  "female_basis_points": 4900,
+  "minimum_marriage_age_female": 18,
+  "maximum_marriage_age_female": 42,
+  "minimum_marriage_age_male": 18,
+  "maximum_marriage_age_male": 55,
+  "minimum_childbirth_spacing_days": 300,
+  "remarriage_delay_days": 360,
+  "maximum_age_years": 105,
+  "initial_age_bands": [
+    { "minimum_age": 0, "maximum_age": 4, "weight_basis_points": 1050 },
+    { "minimum_age": 5, "maximum_age": 14, "weight_basis_points": 2050 },
+    { "minimum_age": 15, "maximum_age": 24, "weight_basis_points": 1850 },
+    { "minimum_age": 25, "maximum_age": 39, "weight_basis_points": 2350 },
+    { "minimum_age": 40, "maximum_age": 59, "weight_basis_points": 1750 },
+    { "minimum_age": 60, "maximum_age": 79, "weight_basis_points": 850 },
+    { "minimum_age": 80, "maximum_age": 95, "weight_basis_points": 100 }
+  ],
+  "fertility_bands": [
+    { "minimum_age": 18, "maximum_age": 22, "annual_probability_basis_points": 1550 },
+    { "minimum_age": 23, "maximum_age": 27, "annual_probability_basis_points": 2150 },
+    { "minimum_age": 28, "maximum_age": 32, "annual_probability_basis_points": 1900 },
+    { "minimum_age": 33, "maximum_age": 37, "annual_probability_basis_points": 1250 },
+    { "minimum_age": 38, "maximum_age": 42, "annual_probability_basis_points": 500 }
+  ],
+  "mortality_bands": [
+    { "minimum_age": 0, "maximum_age": 0, "annual_probability_basis_points": 1100 },
+    { "minimum_age": 1, "maximum_age": 4, "annual_probability_basis_points": 180 },
+    { "minimum_age": 5, "maximum_age": 14, "annual_probability_basis_points": 35 },
+    { "minimum_age": 15, "maximum_age": 24, "annual_probability_basis_points": 55 },
+    { "minimum_age": 25, "maximum_age": 39, "annual_probability_basis_points": 75 },
+    { "minimum_age": 40, "maximum_age": 49, "annual_probability_basis_points": 140 },
+    { "minimum_age": 50, "maximum_age": 59, "annual_probability_basis_points": 300 },
+    { "minimum_age": 60, "maximum_age": 69, "annual_probability_basis_points": 700 },
+    { "minimum_age": 70, "maximum_age": 79, "annual_probability_basis_points": 1650 },
+    { "minimum_age": 80, "maximum_age": 89, "annual_probability_basis_points": 3600 },
+    { "minimum_age": 90, "maximum_age": 105, "annual_probability_basis_points": 7000 }
+  ]
+}

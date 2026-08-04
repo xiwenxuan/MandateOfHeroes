@@ -453,7 +453,21 @@ namespace Mandate.Simulation
                 order.LandUnits * input.QuantityPerLandUnit);
             var foodStored = stored - seedSaved;
             family.SeedGrain += seedSaved;
-            family.Grain += foodStored;
+            if (world.FoodInventoryAuthorityMode ==
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                StoreFormalHarvest(
+                    world,
+                    order,
+                    family,
+                    storage,
+                    manager,
+                    foodStored);
+            }
+            else
+            {
+                family.Grain += foodStored;
+            }
             family.LastHarvestGrain = stored;
             family.CultivatedLandUnits = 0;
             family.PlantedSeedGrain = 0;
@@ -474,7 +488,10 @@ namespace Mandate.Simulation
                 order.UnitId,
                 stored,
                 seedSaved,
-                foodStored,
+                world.FoodInventoryAuthorityMode ==
+                    FoodInventoryAuthorityMode.FormalProductBatches
+                    ? 0
+                    : foodStored,
                 stored,
                 $"{family.DisplayName} stored {stored} units from " +
                 $"{order.CropVarietyDefinitionId}.");
@@ -495,9 +512,60 @@ namespace Mandate.Simulation
                 world,
                 order,
                 VillageLedgerEntryType.Harvest,
-                foodStored,
+                world.FoodInventoryAuthorityMode ==
+                    FoodInventoryAuthorityMode.FormalProductBatches
+                    ? 0
+                    : foodStored,
                 (int)Math.Min(int.MaxValue, harvest),
                 $"{family.DisplayName} harvested {harvest}, stored {stored}, lost {lost}.");
+        }
+
+        private void StoreFormalHarvest(
+            WorldState world,
+            AgricultureWorkOrderState order,
+            FamilyState family,
+            VillageFacilityState storage,
+            PersonState manager,
+            long foodStored)
+        {
+            if (foodStored <= 0)
+            {
+                return;
+            }
+
+            var product = _content.GetProduct(
+                order.HarvestProductDefinitionId);
+            if (!_content.TryGetFood(product.Id, out _))
+            {
+                throw new InvalidOperationException(
+                    $"Formal agriculture output {product.Id} is not registered as food.");
+            }
+
+            var transaction = ProductInventorySystem.NewTransaction(
+                world,
+                InventoryTransactionType.FoodHarvested,
+                manager.Id,
+                order.Id,
+                0,
+                0,
+                checked(foodStored * product.BaseWeight),
+                $"Stored {foodStored} food units from {order.Id}.");
+            transaction.SourceVillageId = order.VillageId;
+            var batch = ProductInventorySystem.NewBatch(
+                world,
+                product,
+                family,
+                storage,
+                transaction.Id,
+                order.Id,
+                foodStored,
+                order.CropVarietyDefinitionId,
+                0,
+                0);
+            transaction.Lines.Add(ProductInventorySystem.Line(
+                batch, foodStored, 0));
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(transaction);
         }
 
         private static long ApplyFactor(long value, int factorBasisPoints)

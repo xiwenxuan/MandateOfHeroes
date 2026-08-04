@@ -1,0 +1,14 @@
+{
+  "schema_version": "mandate.food-product-provenance-profile.v1",
+  "id": "population.food_product_provenance.han_food_ecology.v1",
+  "source_layer": "gameplay_completion",
+  "description": "M24-P7 technical food mix; product identities are historical candidates while shares are gameplay calibration inputs, not a historical population diet claim.",
+  "products": [
+    { "product_definition_id": "product.wheat_grain", "opening_share_basis_points": 3000 },
+    { "product_definition_id": "product.millet_grain", "opening_share_basis_points": 2500 },
+    { "product_definition_id": "product.broomcorn_millet_grain", "opening_share_basis_points": 1000 },
+    { "product_definition_id": "product.rice_grain", "opening_share_basis_points": 1500 },
+    { "product_definition_id": "product.soybean", "opening_share_basis_points": 1500 },
+    { "product_definition_id": "product.dry_ration", "opening_share_basis_points": 500 }
+  ]
+}

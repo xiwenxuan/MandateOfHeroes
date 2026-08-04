@@ -1,0 +1,13 @@
+{
+  "schema_version": "mandate.population-resource-calibration-profile.v1",
+  "id": "population_resource_calibration_profile.han140_candidate.v1",
+  "source_layer": "gameplay_completion",
+  "description": "Technical acceptance thresholds and seasonal public-land leasing for a no-scripted-war calibration scenario; not a historical population claim.",
+  "enable_seasonal_public_land_leasing": true,
+  "minimum_final_population_basis_points": 7500,
+  "maximum_final_population_basis_points": 15000,
+  "minimum_five_year_average_food_satisfaction_basis_points": 8500,
+  "maximum_five_year_average_famine_death_basis_points": 100,
+  "low_cultivation_basis_points": 6000,
+  "high_unused_public_land_basis_points": 1500
+}

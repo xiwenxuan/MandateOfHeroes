@@ -1,0 +1,44 @@
+{
+  "PackageId": "content.scenario.han_food_extension",
+  "Version": "1.0.0",
+  "LoadOrder": 100,
+  "Required": true,
+  "Crops": [
+    { "Id": "crop.millet", "DisplayName": "粟", "UsageTags": ["usage.staple", "usage.seed", "usage.fodder"], "HistoricalStatus": "historical_core", "SourceNote": "汉代核心旱作粮食；数值为玩法补全。" },
+    { "Id": "crop.broomcorn_millet", "DisplayName": "黍", "UsageTags": ["usage.staple", "usage.seed", "usage.fodder"], "HistoricalStatus": "historical_core", "SourceNote": "汉代旱作粮食；数值为玩法补全。" },
+    { "Id": "crop.rice", "DisplayName": "稻", "UsageTags": ["usage.staple", "usage.seed", "usage.irrigated"], "HistoricalStatus": "historical_core", "SourceNote": "汉代核心水田粮食；数值为玩法补全。" },
+    { "Id": "crop.soybean", "DisplayName": "菽", "UsageTags": ["usage.food", "usage.seed", "usage.rotation", "usage.fodder"], "HistoricalStatus": "historical_core", "SourceNote": "汉代豆菽类代表；数值为玩法补全。" }
+  ],
+  "CropVarieties": [
+    { "Id": "crop_variety.millet.northern_prototype", "CropDefinitionId": "crop.millet", "DisplayName": "北方粟原型品种", "Provenance": "gameplay_completion", "TraitIds": ["trait.crop.drought_tolerant"] },
+    { "Id": "crop_variety.broomcorn_millet.northern_prototype", "CropDefinitionId": "crop.broomcorn_millet", "DisplayName": "北方黍原型品种", "Provenance": "gameplay_completion", "TraitIds": ["trait.crop.low_input"] },
+    { "Id": "crop_variety.rice.southern_wetland_prototype", "CropDefinitionId": "crop.rice", "DisplayName": "南方水稻原型品种", "Provenance": "gameplay_completion", "TraitIds": ["trait.crop.irrigated"] },
+    { "Id": "crop_variety.soybean.han_prototype", "CropDefinitionId": "crop.soybean", "DisplayName": "汉代菽原型品种", "Provenance": "gameplay_completion", "TraitIds": ["trait.crop.rotation_support"] }
+  ],
+  "QualityDimensions": [],
+  "Products": [
+    { "Id": "product.millet_seed", "DisplayName": "粟种", "UnitId": "unit.grain", "CategoryTags": ["product.seed", "product.agriculture_input"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 900 },
+    { "Id": "product.millet_grain", "DisplayName": "粟米", "UnitId": "unit.grain", "CategoryTags": ["product.food", "product.grain", "product.market", "product.military_supply"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 500 },
+    { "Id": "product.broomcorn_millet_seed", "DisplayName": "黍种", "UnitId": "unit.grain", "CategoryTags": ["product.seed", "product.agriculture_input"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 850 },
+    { "Id": "product.broomcorn_millet_grain", "DisplayName": "黍米", "UnitId": "unit.grain", "CategoryTags": ["product.food", "product.grain", "product.market"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 450 },
+    { "Id": "product.rice_seed", "DisplayName": "稻种", "UnitId": "unit.grain", "CategoryTags": ["product.seed", "product.agriculture_input"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 1100 },
+    { "Id": "product.rice_grain", "DisplayName": "稻谷", "UnitId": "unit.grain", "CategoryTags": ["product.food", "product.grain", "product.market"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 750 },
+    { "Id": "product.soybean_seed", "DisplayName": "菽种", "UnitId": "unit.grain", "CategoryTags": ["product.seed", "product.agriculture_input"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 1000 },
+    { "Id": "product.soybean", "DisplayName": "菽豆", "UnitId": "unit.grain", "CategoryTags": ["product.food", "product.legume", "product.market", "product.fodder"], "QualityDimensionIds": [], "BaseWeight": 1, "PerishabilityBasisPoints": 700 }
+  ],
+  "Recipes": [
+    { "Id": "recipe.field.grow_millet", "DisplayName": "种植粟", "CropDefinitionId": "crop.millet", "DurationDays": 150, "FacilityTags": ["facility.farmland"], "Inputs": [{ "ProductDefinitionId": "product.millet_seed", "QuantityPerLandUnit": 2 }], "Outputs": [{ "ProductDefinitionId": "product.millet_grain", "QuantityPerLandUnit": 14 }] },
+    { "Id": "recipe.field.grow_broomcorn_millet", "DisplayName": "种植黍", "CropDefinitionId": "crop.broomcorn_millet", "DurationDays": 140, "FacilityTags": ["facility.farmland"], "Inputs": [{ "ProductDefinitionId": "product.broomcorn_millet_seed", "QuantityPerLandUnit": 2 }], "Outputs": [{ "ProductDefinitionId": "product.broomcorn_millet_grain", "QuantityPerLandUnit": 12 }] },
+    { "Id": "recipe.field.grow_rice", "DisplayName": "种植稻", "CropDefinitionId": "crop.rice", "DurationDays": 180, "FacilityTags": ["facility.farmland", "facility.irrigated_field"], "Inputs": [{ "ProductDefinitionId": "product.rice_seed", "QuantityPerLandUnit": 3 }], "Outputs": [{ "ProductDefinitionId": "product.rice_grain", "QuantityPerLandUnit": 18 }] },
+    { "Id": "recipe.field.grow_soybean", "DisplayName": "种植菽", "CropDefinitionId": "crop.soybean", "DurationDays": 130, "FacilityTags": ["facility.farmland"], "Inputs": [{ "ProductDefinitionId": "product.soybean_seed", "QuantityPerLandUnit": 3 }], "Outputs": [{ "ProductDefinitionId": "product.soybean", "QuantityPerLandUnit": 11 }] }
+  ],
+  "Methods": [
+    { "Id": "method.farming.millet_dryland", "DisplayName": "粟作旱地法", "RecipeDefinitionIds": ["recipe.field.grow_millet"], "PracticeSkillDefinitionId": null, "PracticeDifficultyBasisPoints": 9000, "QualityDimensionModifiers": [], "YieldBasisPoints": 10000, "LaborBasisPoints": 9000, "HistoricalStatus": "historical_inference" },
+    { "Id": "method.farming.broomcorn_low_input", "DisplayName": "黍作低投入法", "RecipeDefinitionIds": ["recipe.field.grow_broomcorn_millet"], "PracticeSkillDefinitionId": null, "PracticeDifficultyBasisPoints": 8500, "QualityDimensionModifiers": [], "YieldBasisPoints": 10000, "LaborBasisPoints": 8500, "HistoricalStatus": "historical_inference" },
+    { "Id": "method.farming.rice_irrigated", "DisplayName": "稻作水田法", "RecipeDefinitionIds": ["recipe.field.grow_rice"], "PracticeSkillDefinitionId": null, "PracticeDifficultyBasisPoints": 12000, "QualityDimensionModifiers": [], "YieldBasisPoints": 10000, "LaborBasisPoints": 12000, "HistoricalStatus": "historical_inference" },
+    { "Id": "method.farming.soybean_rotation", "DisplayName": "菽作轮替法", "RecipeDefinitionIds": ["recipe.field.grow_soybean"], "PracticeSkillDefinitionId": null, "PracticeDifficultyBasisPoints": 9500, "QualityDimensionModifiers": [], "YieldBasisPoints": 10000, "LaborBasisPoints": 9000, "HistoricalStatus": "historical_inference" }
+  ],
+  "Skills": [],
+  "Knowledge": [],
+  "Technologies": []
+}

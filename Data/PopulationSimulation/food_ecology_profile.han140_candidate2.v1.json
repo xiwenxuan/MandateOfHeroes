@@ -1,0 +1,24 @@
+{
+  "schema_version": "mandate.food-ecology-profile.v1",
+  "id": "population.food_ecology.han140_candidate2.v1",
+  "source_layer": "gameplay_completion",
+  "description": "Second M24-P7 calibration candidate. It retains product differences while centering the weighted market basket and restoring diversified crop yield after the first candidate fell below the declared population envelope.",
+  "products": [
+    { "product_definition_id": "product.wheat_grain", "opening_share_basis_points": 3000, "nutrition_basis_points": 10000, "volume_basis_points": 10000, "spoilage_basis_points": 10000, "market_value_basis_points": 9500, "consumption_priority": 40 },
+    { "product_definition_id": "product.millet_grain", "opening_share_basis_points": 2500, "nutrition_basis_points": 10200, "volume_basis_points": 9500, "spoilage_basis_points": 8000, "market_value_basis_points": 9000, "consumption_priority": 50 },
+    { "product_definition_id": "product.broomcorn_millet_grain", "opening_share_basis_points": 1000, "nutrition_basis_points": 9800, "volume_basis_points": 9000, "spoilage_basis_points": 7000, "market_value_basis_points": 8500, "consumption_priority": 60 },
+    { "product_definition_id": "product.rice_grain", "opening_share_basis_points": 1500, "nutrition_basis_points": 10500, "volume_basis_points": 10500, "spoilage_basis_points": 12000, "market_value_basis_points": 11000, "consumption_priority": 20 },
+    { "product_definition_id": "product.soybean", "opening_share_basis_points": 1500, "nutrition_basis_points": 12500, "volume_basis_points": 11500, "spoilage_basis_points": 11000, "market_value_basis_points": 11500, "consumption_priority": 30 },
+    { "product_definition_id": "product.dry_ration", "opening_share_basis_points": 500, "nutrition_basis_points": 11000, "volume_basis_points": 8000, "spoilage_basis_points": 4000, "market_value_basis_points": 12500, "consumption_priority": 10 }
+  ],
+  "crops": [
+    { "recipe_definition_id": "recipe.field.grow_wheat", "household_share_basis_points": 3000, "yield_basis_points": 10500, "rotation_support_basis_points": 0, "rotation_response_basis_points": 500 },
+    { "recipe_definition_id": "recipe.field.grow_millet", "household_share_basis_points": 2500, "yield_basis_points": 10200, "rotation_support_basis_points": 0, "rotation_response_basis_points": 600 },
+    { "recipe_definition_id": "recipe.field.grow_broomcorn_millet", "household_share_basis_points": 1000, "yield_basis_points": 9500, "rotation_support_basis_points": 0, "rotation_response_basis_points": 700 },
+    { "recipe_definition_id": "recipe.field.grow_rice", "household_share_basis_points": 1500, "yield_basis_points": 12000, "rotation_support_basis_points": 0, "rotation_response_basis_points": 300 },
+    { "recipe_definition_id": "recipe.field.grow_soybean", "household_share_basis_points": 2000, "yield_basis_points": 9000, "rotation_support_basis_points": 2500, "rotation_response_basis_points": 0 }
+  ],
+  "processing": [
+    { "input_product_definition_id": "product.wheat_grain", "output_product_definition_id": "product.dry_ration", "annual_share_basis_points": 300 }
+  ]
+}

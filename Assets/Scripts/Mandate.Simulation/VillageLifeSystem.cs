@@ -43,6 +43,18 @@ namespace Mandate.Simulation
             PublicGranaryGrain >= 0;
     }
 
+    public sealed class FormalHouseholdFoodSettlementResult
+    {
+        public string VillageId;
+        public int HouseholdsProcessed;
+        public long RequiredNutritionBasisUnits;
+        public long ProvidedNutritionBasisUnits;
+        public long ConsumedPhysicalQuantity;
+        public readonly List<string> ShortfallFamilyIds = new List<string>();
+
+        public bool HasShortfall => ShortfallFamilyIds.Count > 0;
+    }
+
     public sealed class VillageLifeSystem
     {
         private const int DaysPerYear = 360;
@@ -50,6 +62,8 @@ namespace Mandate.Simulation
         private readonly IPersonRepository _people;
         private readonly PopulationLedgerSystem _population;
         private readonly AgricultureProductionSystem _agricultureProduction;
+        private readonly ProductionContentRegistry _productionContent;
+        private readonly FoodInventorySystem _foodInventory;
         private WorldState _fallbackWorld;
         private IPersonRepository _fallbackPeople;
 
@@ -61,12 +75,132 @@ namespace Mandate.Simulation
             _random = new NamedRandom(masterSeed);
             _people = people;
             _population = new PopulationLedgerSystem(people);
+            _productionContent = productionContent ??
+                ProductionContentRegistry.CreateCore();
+            _foodInventory = new FoodInventorySystem(_productionContent);
             _agricultureProduction =
                 new AgricultureProductionSystem(
-                    masterSeed, productionContent, people);
+                    masterSeed, _productionContent, people);
         }
 
         public void ResolveMonthly(WorldState world)
+        {
+            ResolveMonthlyCore(world, true, true);
+        }
+
+        public void ResolveMonthlyAfterFormalFoodCommands(WorldState world)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            if (world.FoodInventoryAuthorityMode !=
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                throw new InvalidOperationException(
+                    "Only formal food worlds can skip committed food settlement.");
+            }
+            ResolveMonthlyCore(world, false, true);
+        }
+
+        public void ResolveMonthlyAfterFormalFoodAndPublicFoodCommands(
+            WorldState world)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            if (world.FoodInventoryAuthorityMode !=
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                throw new InvalidOperationException(
+                    "Only formal food worlds can skip committed food and tax settlement.");
+            }
+            ResolveMonthlyCore(world, false, false);
+        }
+
+        public FormalHouseholdFoodSettlementResult ResolveFormalFoodMonthly(
+            WorldState world,
+            string villageId,
+            long expectedDay)
+        {
+            ValidateFormalFoodMonthly(world, villageId, expectedDay);
+            var village = FindVillage(world, villageId);
+            return ResolveFormalFood(
+                world,
+                village,
+                FamiliesForVillage(world, village));
+        }
+
+        public void ValidateFormalFoodMonthly(
+            WorldState world,
+            string villageId,
+            long expectedDay)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            world.Validate();
+            _productionContent.ValidateWorldReferences(world);
+            var village = FindVillage(world, villageId);
+            if (world.FoodInventoryAuthorityMode !=
+                    FoodInventoryAuthorityMode.FormalProductBatches ||
+                expectedDay != world.AbsoluteDay ||
+                expectedDay <= 0 ||
+                expectedDay % 30 != 0 ||
+                village.LastSettlementDay == expectedDay ||
+                village.HouseholdIds.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Formal household food monthly settlement is not due.");
+            }
+        }
+
+        public long ResolveFormalTaxMonthly(
+            WorldState world,
+            string villageId,
+            long expectedDay)
+        {
+            ValidateFormalTaxMonthly(world, villageId, expectedDay);
+            var village = FindVillage(world, villageId);
+            var before = village.TaxGrainCollected;
+            ResolveTax(world, village, FamiliesForVillage(world, village));
+            return checked(village.TaxGrainCollected - before);
+        }
+
+        public void ValidateFormalTaxMonthly(
+            WorldState world,
+            string villageId,
+            long expectedDay)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            world.Validate();
+            _productionContent.ValidateWorldReferences(world);
+            var village = FindVillage(world, villageId);
+            var monthInYear =
+                (int)(((expectedDay / 30) - 1) % 12) + 1;
+            if (world.FoodInventoryAuthorityMode !=
+                    FoodInventoryAuthorityMode.FormalProductBatches ||
+                expectedDay != world.AbsoluteDay ||
+                expectedDay <= 0 ||
+                expectedDay % 30 != 0 ||
+                monthInYear != 10 ||
+                village.LastSettlementDay != expectedDay ||
+                village.HouseholdIds.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Formal household grain tax settlement is not due.");
+            }
+        }
+
+        private void ResolveMonthlyCore(
+            WorldState world,
+            bool resolveFood,
+            bool resolveTax)
         {
             if (world == null)
             {
@@ -83,7 +217,7 @@ namespace Mandate.Simulation
                 string.CompareOrdinal(left.Id, right.Id));
             for (var i = 0; i < villages.Count; i++)
             {
-                ResolveVillage(world, villages[i]);
+                ResolveVillage(world, villages[i], resolveFood, resolveTax);
             }
         }
 
@@ -167,7 +301,13 @@ namespace Mandate.Simulation
             var audit = new VillageLifeAudit
             {
                 Households = village.HouseholdIds.Count,
-                PublicGranaryGrain = village.PublicGranaryGrain
+                PublicGranaryGrain = world.FoodInventoryAuthorityMode ==
+                    FoodInventoryAuthorityMode.FormalProductBatches
+                    ? _foodInventory.SummarizeContainer(
+                        world,
+                        village.PublicGranaryInventoryContainerId)
+                        .PhysicalQuantity
+                    : village.PublicGranaryGrain
             };
             var knownPeople = people.GetKnownPeople();
             for (var i = 0; i < knownPeople.Count; i++)
@@ -187,7 +327,8 @@ namespace Mandate.Simulation
             for (var i = 0; i < village.HouseholdIds.Count; i++)
             {
                 var family = FindFamily(world, village.HouseholdIds[i]);
-                audit.FamilyGrain += family.Grain;
+                audit.FamilyGrain += FamilyFoodQuantity(
+                    world, village, family);
                 audit.HouseholdMembers += family.MemberIds.Count;
                 for (var memberIndex = 0;
                      memberIndex < family.MemberIds.Count;
@@ -250,7 +391,8 @@ namespace Mandate.Simulation
                     {
                         report.HouseholdDetails.Add(
                             $"{family.Id}|members={family.MemberIds.Count}|" +
-                            $"grain={family.Grain}|food={family.FoodSecurityBasisPoints}|" +
+                            $"grain={FamilyFoodQuantity(world, village, family)}|" +
+                            $"food={family.FoodSecurityBasisPoints}|" +
                             $"tax_arrears={family.TaxArrearsGrain}");
                     }
                 }
@@ -270,7 +412,11 @@ namespace Mandate.Simulation
             return report;
         }
 
-        private void ResolveVillage(WorldState world, VillageState village)
+        private void ResolveVillage(
+            WorldState world,
+            VillageState village,
+            bool resolveFood,
+            bool resolveTax)
         {
             var monthInYear = (int)(((world.AbsoluteDay / 30) - 1) % 12) + 1;
             ReleaseCompletedDuties(world, village);
@@ -292,7 +438,10 @@ namespace Mandate.Simulation
                 ResolveLevy(world, village, families);
             }
 
-            ResolveFood(world, village, families);
+            if (resolveFood)
+            {
+                ResolveFood(world, village, families);
+            }
             ResolveTools(world, village, families);
             ResolveMedicalCare(world, village);
 
@@ -301,7 +450,7 @@ namespace Mandate.Simulation
                 _agricultureProduction.ResolveDueOrders(world, village.Id);
             }
 
-            if (monthInYear == 10)
+            if (resolveTax && monthInYear == 10)
             {
                 ResolveTax(world, village, families);
             }
@@ -397,6 +546,13 @@ namespace Mandate.Simulation
             VillageState village,
             List<FamilyState> families)
         {
+            if (world.FoodInventoryAuthorityMode ==
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                ResolveFormalFood(world, village, families);
+                return;
+            }
+
             var people = PeopleFor(world);
             for (var i = 0; i < families.Count; i++)
             {
@@ -463,6 +619,154 @@ namespace Mandate.Simulation
                         10_000, resident.Needs.Livelihood + 1_000);
                 }
             }
+        }
+
+        private FormalHouseholdFoodSettlementResult ResolveFormalFood(
+            WorldState world,
+            VillageState village,
+            List<FamilyState> families)
+        {
+            var result = new FormalHouseholdFoodSettlementResult
+            {
+                VillageId = village.Id
+            };
+            var people = PeopleFor(world);
+            for (var i = 0; i < families.Count; i++)
+            {
+                var family = families[i];
+                result.HouseholdsProcessed++;
+                var required = 0;
+                var residents = new List<PersonState>();
+                for (var memberIndex = 0;
+                     memberIndex < family.MemberIds.Count;
+                     memberIndex++)
+                {
+                    var person = people.GetRequired(
+                        family.MemberIds[memberIndex]);
+                    if (!person.IsAlive ||
+                        person.LocationId != village.LocationId ||
+                        person.LocalDuty == LocalDutyKind.Levy)
+                    {
+                        continue;
+                    }
+
+                    residents.Add(person);
+                    var age = Math.Max(
+                        0, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
+                    required += age < 15 || age > 60 ? 2 : 3;
+                }
+
+                if (required == 0)
+                {
+                    family.LastConsumptionGrain = 0;
+                    family.FoodSecurityBasisPoints = 10_000;
+                    continue;
+                }
+
+                var storage = FindHouseholdGranary(
+                    world, village.Id, family.Id) ??
+                    throw new InvalidOperationException(
+                        $"Family {family.Id} has no household granary.");
+                var requiredNutrition = checked((long)required * 10_000L);
+                result.RequiredNutritionBasisUnits = checked(
+                    result.RequiredNutritionBasisUnits + requiredNutrition);
+                var opening = _foodInventory.SummarizeFamilyGranary(
+                    world, family.Id, storage.Id);
+                var shortfall = Math.Max(
+                    0L, requiredNutrition - opening.NutritionBasisUnits);
+                if (shortfall > 0)
+                {
+                    var relief = _foodInventory
+                        .TransferContainerToFamilyByNutrition(
+                            world,
+                            village.PublicGranaryInventoryContainerId,
+                            family.Id,
+                            storage.Id,
+                            residents[0].Id,
+                            shortfall,
+                            InventoryTransactionType
+                                .FoodVillageReliefTransferred,
+                            village.Id);
+                    if (relief.TransferredPhysicalQuantity > 0)
+                    {
+                        AddLedger(
+                            world,
+                            village,
+                            VillageLedgerEntryType.GrainRelief,
+                            family.Id,
+                            residents[0].Id,
+                            0,
+                            0,
+                            (int)Math.Min(
+                                int.MaxValue,
+                                relief.TransferredPhysicalQuantity),
+                            $"{family.DisplayName}从公共粮仓获得" +
+                            $"{relief.TransferredPhysicalQuantity}单位食品救济。");
+                    }
+                }
+
+                var consumed = _foodInventory.ConsumeFamilyFood(
+                    world,
+                    family.Id,
+                    storage.Id,
+                    residents[0].Id,
+                    requiredNutrition);
+                result.ProvidedNutritionBasisUnits = checked(
+                    result.ProvidedNutritionBasisUnits +
+                    consumed.ProvidedNutritionBasisUnits);
+                result.ConsumedPhysicalQuantity = checked(
+                    result.ConsumedPhysicalQuantity +
+                    consumed.ConsumedPhysicalQuantity);
+                family.LastConsumptionGrain =
+                    consumed.ConsumedPhysicalQuantity;
+                family.FoodSecurityBasisPoints = (int)Math.Min(
+                    10_000L,
+                    consumed.ProvidedNutritionBasisUnits * 10_000L /
+                    requiredNutrition);
+                AddLedger(
+                    world,
+                    village,
+                    VillageLedgerEntryType.FoodConsumption,
+                    family.Id,
+                    residents[0].Id,
+                    0,
+                    0,
+                    (int)Math.Min(
+                        int.MaxValue,
+                        consumed.ConsumedPhysicalQuantity),
+                    $"{family.DisplayName}本月获得营养" +
+                    $"{consumed.ProvidedNutritionBasisUnits}/" +
+                    $"{requiredNutrition}。");
+
+                if (consumed.Fulfilled)
+                {
+                    continue;
+                }
+
+                var missingNutrition = Math.Max(
+                    0L,
+                    requiredNutrition -
+                    consumed.ProvidedNutritionBasisUnits);
+                result.ShortfallFamilyIds.Add(family.Id);
+                var damage = (int)Math.Max(
+                    100L,
+                    missingNutrition * 1_000L /
+                    Math.Max(1L, requiredNutrition));
+                for (var residentIndex = 0;
+                     residentIndex < residents.Count;
+                     residentIndex++)
+                {
+                    var resident = people.GetRequiredForUpdate(
+                        residents[residentIndex].Id);
+                    resident.HealthBasisPoints = Math.Max(
+                        0, resident.HealthBasisPoints - damage);
+                    resident.Needs.Livelihood = Math.Min(
+                        10_000, resident.Needs.Livelihood + 1_000);
+                }
+            }
+
+            result.ShortfallFamilyIds.Sort(StringComparer.Ordinal);
+            return result;
         }
 
         private static void ResolvePlanting(
@@ -536,17 +840,70 @@ namespace Mandate.Simulation
                     world, village, VillageLedgerEntryType.TaxAssessment,
                     family.Id, string.Empty, 0, 0, (int)Math.Min(int.MaxValue, due),
                     $"{family.DisplayName}本年应纳税粮{due}。");
-                var paid = Math.Min(due, family.Grain);
-                family.Grain -= paid;
+                long paid;
+                if (world.FoodInventoryAuthorityMode ==
+                    FoodInventoryAuthorityMode.FormalProductBatches)
+                {
+                    var storage = FindHouseholdGranary(
+                        world, village.Id, family.Id) ??
+                        throw new InvalidOperationException(
+                            $"Family {family.Id} has no household granary.");
+                    var available = _foodInventory.SummarizeFamilyGranary(
+                        world, family.Id, storage.Id).PhysicalQuantity;
+                    var requested = Math.Min(due, available);
+                    paid = requested <= 0
+                        ? 0
+                        : _foodInventory.TransferFamilyToContainer(
+                            world,
+                            family.Id,
+                            storage.Id,
+                            village.PublicGranaryInventoryContainerId,
+                            family.HeadPersonId,
+                            requested,
+                            InventoryTransactionType.FoodTaxTransferred,
+                            village.Id).TransferredPhysicalQuantity;
+                }
+                else
+                {
+                    paid = Math.Min(due, family.Grain);
+                    family.Grain -= paid;
+                    village.PublicGranaryGrain += paid;
+                }
                 family.TaxArrearsGrain = due - paid;
-                village.PublicGranaryGrain += paid;
                 village.TaxGrainCollected += paid;
                 AddLedger(
                     world, village, VillageLedgerEntryType.TaxPayment,
-                    family.Id, string.Empty, -paid, paid,
+                    family.Id, string.Empty,
+                    world.FoodInventoryAuthorityMode ==
+                        FoodInventoryAuthorityMode.FormalProductBatches
+                        ? 0
+                        : -paid,
+                    world.FoodInventoryAuthorityMode ==
+                        FoodInventoryAuthorityMode.FormalProductBatches
+                        ? 0
+                        : paid,
                     (int)Math.Min(int.MaxValue, paid),
                     $"{family.DisplayName}缴纳税粮{paid}，欠税{family.TaxArrearsGrain}。");
             }
+        }
+
+        private long FamilyFoodQuantity(
+            WorldState world,
+            VillageState village,
+            FamilyState family)
+        {
+            if (world.FoodInventoryAuthorityMode ==
+                FoodInventoryAuthorityMode.LegacyScalar)
+            {
+                return family.Grain;
+            }
+
+            var storage = FindHouseholdGranary(
+                world, village.Id, family.Id);
+            return storage == null
+                ? 0
+                : _foodInventory.SummarizeFamilyGranary(
+                    world, family.Id, storage.Id).PhysicalQuantity;
         }
 
         private void ResolveTools(
@@ -1053,6 +1410,257 @@ namespace Mandate.Simulation
             }
 
             return _fallbackPeople;
+        }
+    }
+
+    public sealed class FormalHouseholdFoodMonthlyCommandScheduler
+    {
+        public const string CommandTypeId =
+            "mandate.command.formal_food.resolve_household_monthly";
+        public const string IssuerId = "system.formal_household_food";
+        public const string ExpectedDayArgumentId = "expected_day";
+        public const string VillageIdArgumentId = "village_id";
+        public const string TransactionKindId =
+            "mandate.transaction.formal_food.resolve_household_monthly";
+        public const string ShortfallEventTypeId =
+            "mandate.event.formal_food.household_shortfall_detected";
+        public const string ProjectionHandlerId =
+            "mandate.handler.formal_food.shortfall_projection";
+
+        private readonly VillageLifeSystem _villageLife;
+
+        public FormalHouseholdFoodMonthlyCommandScheduler(
+            VillageLifeSystem villageLife)
+        {
+            _villageLife = villageLife ?? throw new ArgumentNullException(
+                nameof(villageLife));
+        }
+
+        public int EnsureDueCommands(
+            WorldState world,
+            WorldCommandRuntime commandRuntime)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            if (commandRuntime == null)
+            {
+                throw new ArgumentNullException(nameof(commandRuntime));
+            }
+            if (world.FoodInventoryAuthorityMode !=
+                    FoodInventoryAuthorityMode.FormalProductBatches ||
+                world.AbsoluteDay <= 0 ||
+                world.AbsoluteDay % 30 != 0)
+            {
+                return 0;
+            }
+
+            var villages = new List<VillageState>(world.Villages);
+            villages.Sort((left, right) =>
+                string.CompareOrdinal(left.Id, right.Id));
+            var created = 0;
+            for (var villageIndex = 0;
+                 villageIndex < villages.Count;
+                 villageIndex++)
+            {
+                var village = villages[villageIndex];
+                if (village.HouseholdIds.Count == 0 ||
+                    village.LastSettlementDay == world.AbsoluteDay)
+                {
+                    continue;
+                }
+                var commandId = MonthlyCommandId(
+                    world.AbsoluteDay,
+                    village.Id);
+                if (HasCommand(world, commandId))
+                {
+                    continue;
+                }
+
+                commandRuntime.Enqueue(
+                    world,
+                    new WorldCommandEnvelope(
+                        commandId,
+                        CommandTypeId,
+                        IssuerId,
+                        world.AbsoluteDay,
+                        (DaySegment)world.Segment,
+                        55,
+                        new Dictionary<string, string>
+                        {
+                            {
+                                ExpectedDayArgumentId,
+                                Invariant(world.AbsoluteDay)
+                            },
+                            { VillageIdArgumentId, village.Id }
+                        }));
+                created++;
+            }
+            return created;
+        }
+
+        public IWorldCommandHandler CreateCommandHandler() =>
+            new FormalHouseholdFoodMonthlyCommandHandler(_villageLife);
+
+        public IWorldRuntimeEventHandler CreateProjectionHandler() =>
+            new FormalHouseholdFoodShortfallProjectionHandler();
+
+        public static string MonthlyCommandId(long day, string villageId) =>
+            string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                "formal_food.monthly_command.{0:D10}.{1}",
+                day,
+                villageId);
+
+        public static string MonthlyTransactionId(
+            long day,
+            string villageId) => string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                "formal_food.monthly_transaction.{0:D10}.{1}",
+                day,
+                villageId);
+
+        public static string MonthlyShortfallEventId(
+            long day,
+            string villageId) => string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                "formal_food.household_shortfall.{0:D10}.{1}",
+                day,
+                villageId);
+
+        private static string Invariant(long value) => value.ToString(
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        private static bool HasCommand(WorldState world, string commandId)
+        {
+            for (var i = 0; i < world.PersistentWorldCommands.Count; i++)
+            {
+                if (world.PersistentWorldCommands[i].Id == commandId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private sealed class FormalHouseholdFoodMonthlyCommandHandler :
+            IWorldCommandHandler
+        {
+            private readonly VillageLifeSystem _villageLife;
+
+            public FormalHouseholdFoodMonthlyCommandHandler(
+                VillageLifeSystem villageLife)
+            {
+                _villageLife = villageLife;
+            }
+
+            public string CommandTypeId =>
+                FormalHouseholdFoodMonthlyCommandScheduler.CommandTypeId;
+
+            public void Plan(
+                WorldCommandEnvelope command,
+                WorldTransactionBuffer transactions)
+            {
+                if (command.Arguments.Count != 2 ||
+                    !command.Arguments.TryGetValue(
+                        ExpectedDayArgumentId,
+                        out var expectedDayText) ||
+                    !long.TryParse(
+                        expectedDayText,
+                        System.Globalization.NumberStyles.None,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out var expectedDay) ||
+                    expectedDay <= 0 ||
+                    !command.Arguments.TryGetValue(
+                        VillageIdArgumentId,
+                        out var villageId) ||
+                    string.IsNullOrEmpty(villageId))
+                {
+                    throw new InvalidOperationException(
+                        "Formal household food monthly command arguments are invalid.");
+                }
+                _ = new StableId(villageId);
+                transactions.Add(
+                    new FormalHouseholdFoodMonthlyTransaction(
+                        _villageLife,
+                        expectedDay,
+                        villageId));
+            }
+        }
+
+        private sealed class FormalHouseholdFoodMonthlyTransaction :
+            IWorldTransaction
+        {
+            private readonly VillageLifeSystem _villageLife;
+            private readonly long _expectedDay;
+            private readonly string _villageId;
+
+            public FormalHouseholdFoodMonthlyTransaction(
+                VillageLifeSystem villageLife,
+                long expectedDay,
+                string villageId)
+            {
+                _villageLife = villageLife;
+                _expectedDay = expectedDay;
+                _villageId = villageId;
+                Id = MonthlyTransactionId(expectedDay, villageId);
+            }
+
+            public string Id { get; }
+
+            public string KindId => TransactionKindId;
+
+            public int Priority => 55;
+
+            public void Validate(
+                WorldState world,
+                WorldTransactionValidationContext validation)
+            {
+                _villageLife.ValidateFormalFoodMonthly(
+                    world,
+                    _villageId,
+                    _expectedDay);
+                validation.Reserve(
+                    "formal_food.household_monthly." +
+                        Invariant(_expectedDay) + "." + _villageId,
+                    1,
+                    1,
+                    Id);
+            }
+
+            public void Apply(WorldState world, WorldEventBuffer events)
+            {
+                var result = _villageLife.ResolveFormalFoodMonthly(
+                    world,
+                    _villageId,
+                    _expectedDay);
+                if (result.HasShortfall)
+                {
+                    events.Add(new WorldRuntimeEvent(
+                        MonthlyShortfallEventId(_expectedDay, _villageId),
+                        ShortfallEventTypeId,
+                        Id,
+                        world.AbsoluteDay,
+                        (DaySegment)world.Segment));
+                }
+            }
+        }
+
+        private sealed class FormalHouseholdFoodShortfallProjectionHandler :
+            IWorldRuntimeEventHandler
+        {
+            public string HandlerId => ProjectionHandlerId;
+
+            public string EventTypeId => ShortfallEventTypeId;
+
+            public void Handle(
+                WorldRuntimeEvent worldEvent,
+                WorldCommandRuntime commandRuntime)
+            {
+                // The committed transaction owns inventory and household
+                // consequences. This handler only acknowledges the event.
+            }
         }
     }
 }

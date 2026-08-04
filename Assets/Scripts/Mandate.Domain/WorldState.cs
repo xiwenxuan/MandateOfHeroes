@@ -136,10 +136,93 @@ namespace Mandate.Domain
         public List<string> MemberIds = new List<string>();
     }
 
+    public enum PersistentWorldCommandStatus : byte
+    {
+        Pending,
+        Completed,
+        Cancelled
+    }
+
+    public enum WorldCommandBatchOutcome : byte
+    {
+        Succeeded,
+        Rejected
+    }
+
+    public enum WorldEventDispatchStatus : byte
+    {
+        Pending,
+        Dispatched
+    }
+
+    [Serializable]
+    public sealed class WorldCommandArgumentState
+    {
+        public string Key;
+        public string Value;
+    }
+
+    [Serializable]
+    public sealed class PersistentWorldCommandState
+    {
+        public string Id;
+        public string CommandTypeId;
+        public string IssuerId;
+        public long CreatedDay;
+        public byte CreatedSegment;
+        public long DueDay;
+        public byte DueSegment;
+        public int Priority;
+        public PersistentWorldCommandStatus Status;
+        public int AttemptCount;
+        public string LastAttemptResultId;
+        public long CompletedDay = -1;
+        public byte CompletedSegment;
+        public string CompletionResultId;
+        public List<WorldCommandArgumentState> Arguments =
+            new List<WorldCommandArgumentState>();
+    }
+
+    [Serializable]
+    public sealed class WorldTransactionExecutionState
+    {
+        public string TransactionId;
+        public string TransactionKindId;
+        public int Priority;
+    }
+
+    [Serializable]
+    public sealed class WorldCommandBatchResultState
+    {
+        public string Id;
+        public WorldCommandBatchOutcome Outcome;
+        public long Day;
+        public byte Segment;
+        public string FailureCode;
+        public List<string> CommandIds = new List<string>();
+        public List<WorldTransactionExecutionState> Transactions =
+            new List<WorldTransactionExecutionState>();
+        public List<string> PublishedEventIds = new List<string>();
+    }
+
+    [Serializable]
+    public sealed class WorldEventOutboxState
+    {
+        public string Id;
+        public string EventTypeId;
+        public string SourceTransactionId;
+        public long Day;
+        public byte Segment;
+        public WorldEventDispatchStatus DispatchStatus;
+        public long DispatchedDay = -1;
+        public byte DispatchedSegment;
+        public List<string> DeliveredHandlerIds = new List<string>();
+    }
+
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 18;
+        public const int CurrentSchemaVersion = 36;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -147,6 +230,12 @@ namespace Mandate.Domain
         public byte Segment;
         public long Revision;
         public string PlayerPersonId;
+        public List<PersistentWorldCommandState> PersistentWorldCommands =
+            new List<PersistentWorldCommandState>();
+        public List<WorldCommandBatchResultState> WorldCommandBatchResults =
+            new List<WorldCommandBatchResultState>();
+        public List<WorldEventOutboxState> WorldEventOutbox =
+            new List<WorldEventOutboxState>();
         public List<PersonState> People = new List<PersonState>();
         public List<LocationState> Locations = new List<LocationState>();
         public List<FamilyState> Families = new List<FamilyState>();
@@ -179,6 +268,28 @@ namespace Mandate.Domain
         public List<MarketListingState> MarketListings = new List<MarketListingState>();
         public List<InventoryStackState> Inventories = new List<InventoryStackState>();
         public List<TradeRecordState> TradeRecords = new List<TradeRecordState>();
+        public List<FormalMarketOrderState> FormalMarketOrders =
+            new List<FormalMarketOrderState>();
+        public List<FormalMarketTradeState> FormalMarketTrades =
+            new List<FormalMarketTradeState>();
+        public List<PublicReliefProcurementTradeState>
+            PublicReliefProcurementTrades =
+                new List<PublicReliefProcurementTradeState>();
+        public List<PublicReliefRecoveryState> PublicReliefRecoveries =
+            new List<PublicReliefRecoveryState>();
+        public List<FormalMarketPriceState> FormalMarketPrices =
+            new List<FormalMarketPriceState>();
+        public List<CivilianFreightState> CivilianFreights =
+            new List<CivilianFreightState>();
+        public List<CivilianFreightLedgerEntryState> CivilianFreightLedgerEntries =
+            new List<CivilianFreightLedgerEntryState>();
+        public List<CivilianFreightDemandState> CivilianFreightDemands =
+            new List<CivilianFreightDemandState>();
+        public List<CivilianCarrierRegistrationState>
+            CivilianCarrierRegistrations =
+                new List<CivilianCarrierRegistrationState>();
+        public List<CivilianCarrierOfferState> CivilianCarrierOffers =
+            new List<CivilianCarrierOfferState>();
         public List<ArmyState> Armies = new List<ArmyState>();
         public List<ArmyMarchState> ArmyMarches = new List<ArmyMarchState>();
         public List<BattleRecordState> Battles = new List<BattleRecordState>();
@@ -227,6 +338,8 @@ namespace Mandate.Domain
             new List<ProductionLedgerEntryState>();
         public List<ProductBatchState> ProductBatches =
             new List<ProductBatchState>();
+        public FoodInventoryAuthorityMode FoodInventoryAuthorityMode =
+            FoodInventoryAuthorityMode.LegacyScalar;
         public List<InventoryContainerState> InventoryContainers =
             new List<InventoryContainerState>();
         public List<ProductionSiteState> ProductionSites =
@@ -256,6 +369,31 @@ namespace Mandate.Domain
         public List<MilitaryProcurementLedgerEntryState>
             MilitaryProcurementLedgerEntries =
                 new List<MilitaryProcurementLedgerEntryState>();
+        public List<MilitaryLogisticsOrderState> MilitaryLogisticsOrders =
+            new List<MilitaryLogisticsOrderState>();
+        public List<MilitaryLogisticsLegState> MilitaryLogisticsLegs =
+            new List<MilitaryLogisticsLegState>();
+        public List<MilitaryLogisticsEscortState> MilitaryLogisticsEscorts =
+            new List<MilitaryLogisticsEscortState>();
+        public List<MilitaryLogisticsIncidentState> MilitaryLogisticsIncidents =
+            new List<MilitaryLogisticsIncidentState>();
+        public List<MilitaryLogisticsClashState> MilitaryLogisticsClashes =
+            new List<MilitaryLogisticsClashState>();
+        public List<MilitaryLogisticsLiabilitySettlementState>
+            MilitaryLogisticsLiabilitySettlements =
+                new List<MilitaryLogisticsLiabilitySettlementState>();
+        public List<MilitaryLogisticsDelegationGoalState>
+            MilitaryLogisticsDelegationGoals =
+                new List<MilitaryLogisticsDelegationGoalState>();
+        public List<MilitaryLogisticsDelegationOfferState>
+            MilitaryLogisticsDelegationOffers =
+                new List<MilitaryLogisticsDelegationOfferState>();
+        public List<MilitaryLogisticsDelegationReportState>
+            MilitaryLogisticsDelegationReports =
+                new List<MilitaryLogisticsDelegationReportState>();
+        public List<MilitaryLogisticsLedgerEntryState>
+            MilitaryLogisticsLedgerEntries =
+                new List<MilitaryLogisticsLedgerEntryState>();
         public List<MilitaryEquipmentRepairOrderState>
             MilitaryEquipmentRepairOrders =
                 new List<MilitaryEquipmentRepairOrderState>();
@@ -308,7 +446,42 @@ namespace Mandate.Domain
                     "Population storage metadata cannot be null.");
             }
 
+            if (!Enum.IsDefined(
+                    typeof(FoodInventoryAuthorityMode),
+                    FoodInventoryAuthorityMode))
+            {
+                throw new InvalidOperationException(
+                    "Food inventory authority mode is invalid.");
+            }
+
+            if (FoodInventoryAuthorityMode ==
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                for (var familyIndex = 0;
+                     familyIndex < Families.Count;
+                     familyIndex++)
+                {
+                    if (Families[familyIndex].Grain != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Formal food inventory cannot retain legacy grain for {Families[familyIndex].Id}.");
+                    }
+                }
+            }
+
             PopulationStorage.Validate(People.Count);
+            ValidateUniqueIds(
+                PersistentWorldCommands,
+                item => item.Id,
+                "persistent world command");
+            ValidateUniqueIds(
+                WorldCommandBatchResults,
+                item => item.Id,
+                "world command batch result");
+            ValidateUniqueIds(
+                WorldEventOutbox,
+                item => item.Id,
+                "world event outbox entry");
             ValidateUniqueIds(People, person => person.Id, "person");
             ValidateUniqueIds(Locations, location => location.Id, "location");
             ValidateUniqueIds(Families, family => family.Id, "family");
@@ -344,6 +517,38 @@ namespace Mandate.Domain
             ValidateUniqueIds(MarketListings, item => item.Id, "market listing");
             ValidateUniqueIds(Inventories, item => item.Id, "inventory stack");
             ValidateUniqueIds(TradeRecords, item => item.Id, "trade record");
+            ValidateUniqueIds(
+                FormalMarketOrders, item => item.Id, "formal market order");
+            ValidateUniqueIds(
+                FormalMarketTrades, item => item.Id, "formal market trade");
+            ValidateUniqueIds(
+                PublicReliefProcurementTrades,
+                item => item.Id,
+                "public relief procurement trade");
+            ValidateUniqueIds(
+                PublicReliefRecoveries,
+                item => item.Id,
+                "public relief recovery");
+            ValidateUniqueIds(
+                FormalMarketPrices, item => item.Id, "formal market price");
+            ValidateUniqueIds(
+                CivilianFreights, item => item.Id, "civilian freight");
+            ValidateUniqueIds(
+                CivilianFreightLedgerEntries,
+                item => item.Id,
+                "civilian freight ledger entry");
+            ValidateUniqueIds(
+                CivilianFreightDemands,
+                item => item.Id,
+                "civilian freight demand");
+            ValidateUniqueIds(
+                CivilianCarrierRegistrations,
+                item => item.Id,
+                "civilian carrier registration");
+            ValidateUniqueIds(
+                CivilianCarrierOffers,
+                item => item.Id,
+                "civilian carrier offer");
             ValidateUniqueIds(Armies, item => item.Id, "army");
             ValidateUniqueIds(ArmyMarches, item => item.Id, "army march");
             ValidateUniqueIds(Battles, item => item.Id, "battle");
@@ -432,6 +637,48 @@ namespace Mandate.Domain
                 MilitaryProcurementLedgerEntries,
                 item => item.Id,
                 "military procurement ledger entry");
+            ValidateUniqueIds(
+                MilitaryLogisticsOrders,
+                item => item.Id,
+                "military logistics order");
+            ValidateUniqueIds(
+                MilitaryLogisticsLegs,
+                item => item.Id,
+                "military logistics leg");
+            ValidateUniqueIds(
+                MilitaryLogisticsEscorts,
+                item => item.Id,
+                "military logistics escort");
+            ValidateUniqueIds(
+                MilitaryLogisticsIncidents,
+                item => item.Id,
+                "military logistics incident");
+            ValidateUniqueIds(
+                MilitaryLogisticsClashes,
+                item => item.Id,
+                "military logistics clash");
+            ValidateUniqueIds(
+                MilitaryLogisticsLiabilitySettlements,
+                item => item.Id,
+                "military logistics liability settlement");
+            ValidateUniqueIds(
+                MilitaryLogisticsDelegationGoals,
+                item => item.Id,
+                "military logistics delegation goal");
+            ValidateUniqueIds(
+                MilitaryLogisticsDelegationOffers,
+                item => item.Id,
+                "military logistics delegation offer");
+            ValidateUniqueIds(
+                MilitaryLogisticsDelegationReports,
+                item => item.Id,
+                "military logistics delegation report");
+            ValidateUniqueIds(
+                MilitaryLogisticsLedgerEntries,
+                item => item.Id,
+                "military logistics ledger entry");
+
+            ValidatePersistentWorldExecution();
 
             var personIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < People.Count; i++)
@@ -765,6 +1012,9 @@ namespace Mandate.Domain
 
             ValidateVillages(personIds, locationIds);
             ValidateInventoryProduction(personIds, locationIds);
+            ValidateFormalMarket(locationIds);
+            ValidateCivilianFreight(personIds, locationIds);
+            ValidatePublicReliefRecovery();
             ValidateProduction(personIds);
             ValidateResearch(personIds);
 
@@ -1069,6 +1319,13 @@ namespace Mandate.Domain
                     !personIds.Contains(supply.SupplierPersonId) ||
                     !string.IsNullOrEmpty(supply.SourceTaskInstanceId) &&
                     !taskInstanceIds.Contains(supply.SourceTaskInstanceId) ||
+                    !string.IsNullOrEmpty(supply.SourceLogisticsOrderId) &&
+                    !ContainsId(
+                        MilitaryLogisticsOrders,
+                        item => item.Id,
+                        supply.SourceLogisticsOrderId) ||
+                    (supply.Type == MilitarySupplyType.LogisticsDelivery) !=
+                    !string.IsNullOrEmpty(supply.SourceLogisticsOrderId) ||
                     supply.Day < 0 ||
                     supply.GrainUnits < 0 ||
                     supply.ProvisionsAdded <= 0 ||
@@ -1362,7 +1619,1630 @@ namespace Mandate.Domain
             ValidateMilitaryEquipment(personIds, armyIds);
             ValidateMilitaryProcurement(
                 personIds, locationIds, organizationIds, armyIds, routeIds);
+            ValidateMilitaryLogistics(
+                personIds, locationIds, organizationIds, armyIds, routeIds);
+            ValidateMilitaryLogisticsDelegation(
+                personIds, locationIds, organizationIds, armyIds, routeIds);
             ValidateAttention(personIds);
+        }
+
+        private void ValidateMilitaryLogisticsDelegation(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds,
+            HashSet<string> armyIds,
+            HashSet<string> routeIds)
+        {
+            var goals = new Dictionary<string,
+                MilitaryLogisticsDelegationGoalState>(StringComparer.Ordinal);
+            var offers = new Dictionary<string,
+                MilitaryLogisticsDelegationOfferState>(StringComparer.Ordinal);
+            var logisticsOrders = new Dictionary<string,
+                MilitaryLogisticsOrderState>(StringComparer.Ordinal);
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsOrders.Count; i++)
+            {
+                logisticsOrders.Add(
+                    MilitaryLogisticsOrders[i].Id,
+                    MilitaryLogisticsOrders[i]);
+            }
+
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(
+                    InventoryContainers[i].Id,
+                    InventoryContainers[i]);
+            }
+
+            for (var i = 0;
+                 i < MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = MilitaryLogisticsDelegationGoals[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics delegation goal cannot be null.");
+                _ = new StableId(goal.ProductDefinitionId);
+                _ = new StableId(goal.CarrierPreferenceId);
+                _ = new StableId(goal.CargoConsumptionPolicyId);
+                _ = new StableId(goal.RiskPolicyId);
+                _ = new StableId(goal.FulfillmentPolicyId);
+                _ = new StableId(goal.ReplacementProcurementPolicyId);
+                if (!string.IsNullOrEmpty(goal.CancellationReasonId))
+                {
+                    _ = new StableId(goal.CancellationReasonId);
+                }
+                if (!string.IsNullOrEmpty(goal.ReplacesGoalId))
+                {
+                    _ = new StableId(goal.ReplacesGoalId);
+                }
+                if (!string.IsNullOrEmpty(
+                        goal.LastReplacementAuthorizationReasonId))
+                {
+                    _ = new StableId(
+                        goal.LastReplacementAuthorizationReasonId);
+                }
+                var validPreference = goal.CarrierPreferenceId ==
+                        MilitaryLogisticsDelegationCarrierPreferenceIds.LowestCost ||
+                    goal.CarrierPreferenceId ==
+                        MilitaryLogisticsDelegationCarrierPreferenceIds.SafestRoute ||
+                    goal.CarrierPreferenceId ==
+                        MilitaryLogisticsDelegationCarrierPreferenceIds
+                            .OwnOrganizationFirst;
+                var validRisk = goal.RiskPolicyId ==
+                        MilitaryLogisticsRiskPolicyIds.None &&
+                    string.IsNullOrEmpty(goal.ThreatOrganizationId) ||
+                    goal.RiskPolicyId ==
+                        MilitaryLogisticsRiskPolicyIds.Standard &&
+                    organizationIds.Contains(goal.ThreatOrganizationId);
+                var strictFulfillment = goal.FulfillmentPolicyId ==
+                    MilitaryLogisticsDelegationFulfillmentPolicyIds
+                        .FullReceiptRequired;
+                var legacyFulfillment = goal.FulfillmentPolicyId ==
+                    MilitaryLogisticsDelegationFulfillmentPolicyIds
+                        .LegacyOrderCompletion;
+                var waitForCustody = goal.ReplacementProcurementPolicyId ==
+                    MilitaryLogisticsReplacementProcurementPolicyIds
+                        .WaitForCustodyResolution;
+                var explicitReplacement =
+                    goal.ReplacementProcurementPolicyId ==
+                        MilitaryLogisticsReplacementProcurementPolicyIds
+                            .ExplicitAuthorization;
+                var legacyReplacement =
+                    goal.ReplacementProcurementPolicyId ==
+                        MilitaryLogisticsReplacementProcurementPolicyIds
+                            .LegacyUnrestricted;
+                var hasReplacementAudit =
+                    goal.LastReplacementAuthorizedDay >= 0 ||
+                    !string.IsNullOrEmpty(
+                        goal.LastReplacementAuthorizedByPersonId) ||
+                    !string.IsNullOrEmpty(
+                        goal.LastReplacementAuthorizationReasonId);
+                if (!Enum.IsDefined(
+                        typeof(MilitaryLogisticsDelegationStatus),
+                        goal.Status) ||
+                    !personIds.Contains(goal.IssuerPersonId) ||
+                    !personIds.Contains(goal.AssigneePersonId) ||
+                    !string.IsNullOrEmpty(goal.DelegatedByPersonId) &&
+                        !personIds.Contains(goal.DelegatedByPersonId) ||
+                    !string.IsNullOrEmpty(goal.CancelledByPersonId) &&
+                        !personIds.Contains(goal.CancelledByPersonId) ||
+                    !armyIds.Contains(goal.TargetArmyId) ||
+                    !locationIds.Contains(goal.DestinationLocationId) ||
+                    goal.CreatedDay < 0 || goal.CreatedDay > AbsoluteDay ||
+                    goal.DeadlineDay < goal.CreatedDay ||
+                    goal.ReportIntervalDays <= 0 ||
+                    goal.LastEvaluatedDay < -1 ||
+                    goal.LastEvaluatedDay > AbsoluteDay ||
+                    goal.LastEvaluatedDay >= 0 &&
+                        goal.LastEvaluatedDay < goal.CreatedDay ||
+                    goal.NextEvaluationDay < goal.CreatedDay ||
+                    goal.FulfilledDay < -1 ||
+                    goal.FulfilledDay > AbsoluteDay ||
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Fulfilled &&
+                        goal.FulfilledDay < goal.CreatedDay ||
+                    goal.Status !=
+                        MilitaryLogisticsDelegationStatus.Fulfilled &&
+                        goal.FulfilledDay != -1 ||
+                    goal.ChildGoalIds == null ||
+                    goal.ReplacementGoalIds == null ||
+                    goal.CompletedLogisticsOrderIds == null ||
+                    goal.DelegationDepth < 0 ||
+                    goal.DelegationDepth >
+                        MilitaryLogisticsDelegationContract
+                            .MaximumDelegationDepth ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        goal.AssigneeAuthorityAtDelegation) ||
+                    goal.AssigneeAuthorityAtDelegation ==
+                        MilitaryAuthorityLevel.None ||
+                    goal.RequestedCargoQuantity <= 0 ||
+                    goal.ReceivedCargoQuantity < 0 ||
+                    goal.ReceivedCargoQuantity >
+                        goal.RequestedCargoQuantity ||
+                    goal.OutstandingCargoQuantity < 0 ||
+                    goal.OutstandingCargoQuantity >
+                        goal.RequestedCargoQuantity ||
+                    strictFulfillment &&
+                        goal.ReceivedCargoQuantity +
+                            goal.OutstandingCargoQuantity !=
+                        goal.RequestedCargoQuantity ||
+                    legacyFulfillment &&
+                        (goal.Status !=
+                             MilitaryLogisticsDelegationStatus.Fulfilled ||
+                         goal.OutstandingCargoQuantity != 0) ||
+                    !strictFulfillment && !legacyFulfillment ||
+                    strictFulfillment &&
+                        goal.Status ==
+                            MilitaryLogisticsDelegationStatus.Fulfilled &&
+                        goal.OutstandingCargoQuantity != 0 ||
+                    !waitForCustody && !explicitReplacement &&
+                        !legacyReplacement ||
+                    goal.AuthorizedReplacementQuantity < 0 ||
+                    goal.ConsumedReplacementAuthorizationQuantity < 0 ||
+                    goal.ConsumedReplacementAuthorizationQuantity >
+                        goal.AuthorizedReplacementQuantity ||
+                    explicitReplacement &&
+                    (goal.AuthorizedReplacementQuantity <= 0 ||
+                     goal.LastReplacementAuthorizedDay < goal.CreatedDay ||
+                     goal.LastReplacementAuthorizedDay > AbsoluteDay ||
+                     !personIds.Contains(
+                         goal.LastReplacementAuthorizedByPersonId) ||
+                     string.IsNullOrEmpty(
+                         goal.LastReplacementAuthorizationReasonId)) ||
+                    !explicitReplacement &&
+                    (goal.AuthorizedReplacementQuantity != 0 ||
+                     goal.ConsumedReplacementAuthorizationQuantity != 0 ||
+                     hasReplacementAudit) ||
+                    goal.CompensationReceived < 0 ||
+                    goal.CompensationReceived > goal.CommittedCost ||
+                    goal.MaximumUnitPrice < 0 || goal.BudgetLimit < 0 ||
+                    goal.UnassignedCargoQuantity < 0 ||
+                    goal.UnassignedCargoQuantity >
+                        goal.RequestedCargoQuantity ||
+                    goal.AvailableBudgetReserve < 0 ||
+                    goal.AvailableBudgetReserve > goal.BudgetLimit ||
+                    goal.CancelledDay < -1 ||
+                    goal.CancelledDay > AbsoluteDay ||
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Cancelled &&
+                    (goal.CancelledDay < goal.CreatedDay ||
+                     string.IsNullOrEmpty(goal.CancelledByPersonId) ||
+                     string.IsNullOrEmpty(goal.CancellationReasonId)) ||
+                    goal.Status !=
+                        MilitaryLogisticsDelegationStatus.Cancelled &&
+                    (goal.CancelledDay != -1 ||
+                     !string.IsNullOrEmpty(goal.CancelledByPersonId) ||
+                     !string.IsNullOrEmpty(goal.CancellationReasonId)) ||
+                    goal.CommittedCost < 0 ||
+                    goal.CommittedCost - goal.CompensationReceived >
+                        goal.BudgetLimit ||
+                    !validPreference || !validRisk)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics delegation goal {goal.Id}.");
+                }
+
+                goals.Add(goal.Id, goal);
+            }
+
+            ValidateMilitaryLogisticsDelegationHierarchy(goals);
+
+            var selectedOfferCounts = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                var offer = MilitaryLogisticsDelegationOffers[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics delegation offer cannot be null.");
+                _ = new StableId(offer.AcquisitionMethodId);
+                _ = new StableId(offer.LiabilityPolicyId);
+                if (!string.IsNullOrEmpty(offer.LogisticsOrderId))
+                {
+                    _ = new StableId(offer.LogisticsOrderId);
+                }
+                MilitaryLogisticsOrderState linkedOrder = null;
+                var hasLinkedOrder = !string.IsNullOrEmpty(
+                        offer.LogisticsOrderId) &&
+                    logisticsOrders.TryGetValue(
+                        offer.LogisticsOrderId, out linkedOrder);
+                var hasGoal = goals.TryGetValue(
+                    offer.GoalId, out var goal);
+                var requiredOfferQuantity = hasLinkedOrder
+                    ? linkedOrder.DispatchedCargoQuantity
+                    : hasGoal
+                        ? goal.OutstandingCargoQuantity
+                        : int.MaxValue;
+                var isClosedOffer = offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Withdrawn ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Expired ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.GoalCancelled ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Completed;
+                if (!hasGoal ||
+                    goal.ChildGoalIds.Count != 0 ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryLogisticsDelegationOfferStatus),
+                        offer.Status) ||
+                    !personIds.Contains(offer.CarrierPersonId) ||
+                    !organizationIds.Contains(offer.CarrierOrganizationId) ||
+                    !organizationIds.Contains(offer.LossBearerOrganizationId) ||
+                    !batches.TryGetValue(
+                        offer.SourceCargoBatchId,
+                        out var cargoBatch) ||
+                    cargoBatch.ProductDefinitionId != goal.ProductDefinitionId ||
+                    !containers.TryGetValue(
+                        offer.TransportInventoryContainerId,
+                        out var transportContainer) ||
+                    transportContainer.CarrierPersonId != offer.CarrierPersonId ||
+                    transportContainer.OwnerOrganizationId !=
+                        offer.CarrierOrganizationId ||
+                    !locationIds.Contains(offer.OriginLocationId) ||
+                    !routeIds.Contains(offer.RouteId) ||
+                    !RouteConnects(
+                        FindRoute(Routes, offer.RouteId),
+                        offer.OriginLocationId,
+                        goal.DestinationLocationId) ||
+                    offer.SubmittedDay < goal.CreatedDay ||
+                    offer.SubmittedDay > AbsoluteDay ||
+                    offer.ValidUntilDay < offer.SubmittedDay ||
+                    offer.ValidUntilDay > goal.DeadlineDay ||
+                    offer.ClosedDay < -1 ||
+                    offer.ClosedDay > AbsoluteDay ||
+                    isClosedOffer &&
+                        offer.ClosedDay < offer.SubmittedDay ||
+                    !isClosedOffer &&
+                        offer.ClosedDay != -1 ||
+                    (offer.Status ==
+                         MilitaryLogisticsDelegationOfferStatus.Selected ||
+                     offer.Status ==
+                         MilitaryLogisticsDelegationOfferStatus.Completed) !=
+                        hasLinkedOrder ||
+                    hasLinkedOrder &&
+                    (linkedOrder.TargetArmyId != goal.TargetArmyId ||
+                     linkedOrder.IssuerPersonId != goal.IssuerPersonId ||
+                     linkedOrder.LiabilityPolicyId !=
+                        offer.LiabilityPolicyId ||
+                     linkedOrder.CargoProductDefinitionId !=
+                        goal.ProductDefinitionId ||
+                     linkedOrder.FinalDestinationLocationId !=
+                        goal.DestinationLocationId) ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Completed &&
+                        !goal.CompletedLogisticsOrderIds.Contains(
+                            offer.LogisticsOrderId) ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Selected &&
+                        (goal.Status !=
+                             MilitaryLogisticsDelegationStatus.Dispatched ||
+                         goal.SelectedOfferId != offer.Id ||
+                         goal.LogisticsOrderId != offer.LogisticsOrderId) ||
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.GoalCancelled &&
+                        goal.Status !=
+                            MilitaryLogisticsDelegationStatus.Cancelled ||
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Cancelled &&
+                        offer.Status ==
+                            MilitaryLogisticsDelegationOfferStatus.Active ||
+                    offer.AvailableCargoQuantity < requiredOfferQuantity ||
+                    offer.ConvoyProvisionQuantity < 0 ||
+                    offer.DailyConvoyProvisionUse <= 0 ||
+                    offer.UnitPrice < 0 ||
+                    offer.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds.BuyerRetainsRisk &&
+                    offer.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LossBearerCompensates &&
+                    offer.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LegacyNoRetroactiveSettlement ||
+                    offer.LiabilityPolicyId ==
+                        MilitaryLogisticsLiabilityPolicyIds.BuyerRetainsRisk &&
+                        offer.LossBearerOrganizationId !=
+                            FindArmy(Armies, goal.TargetArmyId)
+                                .OrganizationId ||
+                    offer.LiabilityPolicyId ==
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LossBearerCompensates &&
+                        offer.LossBearerOrganizationId !=
+                            offer.CarrierOrganizationId ||
+                    offer.ConvoyProvisionQuantity > 0 &&
+                    (!batches.TryGetValue(
+                         offer.SourceProvisionBatchId,
+                         out var provisionBatch) ||
+                     provisionBatch.OwnerOrganizationId !=
+                         offer.CarrierOrganizationId) ||
+                    offer.AcquisitionMethodId !=
+                        MilitarySupplyAcquisitionMethodIds.CommercialPurchase &&
+                    offer.AcquisitionMethodId !=
+                        MilitarySupplyAcquisitionMethodIds.InternalDepotTransfer ||
+                    offer.AcquisitionMethodId ==
+                        MilitarySupplyAcquisitionMethodIds.CommercialPurchase &&
+                    (offer.UnitPrice <= 0 ||
+                     cargoBatch.OwnerOrganizationId ==
+                        FindArmy(Armies, goal.TargetArmyId).OrganizationId) ||
+                    offer.AcquisitionMethodId ==
+                        MilitarySupplyAcquisitionMethodIds.InternalDepotTransfer &&
+                    (offer.UnitPrice != 0 ||
+                     cargoBatch.OwnerOrganizationId !=
+                        FindArmy(Armies, goal.TargetArmyId).OrganizationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics delegation offer {offer.Id}.");
+                }
+
+                offers.Add(offer.Id, offer);
+                if (offer.Status ==
+                    MilitaryLogisticsDelegationOfferStatus.Selected)
+                {
+                    selectedOfferCounts.TryGetValue(
+                        offer.GoalId, out var selectedCount);
+                    selectedOfferCounts[offer.GoalId] = selectedCount + 1;
+                }
+            }
+
+            foreach (var pair in goals)
+            {
+                var goal = pair.Value;
+                selectedOfferCounts.TryGetValue(goal.Id, out var selectedCount);
+                var completedOrderIds = new HashSet<string>(
+                    StringComparer.Ordinal);
+                long expectedCommittedCost = 0;
+                var completedReceipt = 0;
+                var validHistory = true;
+                for (var i = 0;
+                     i < goal.CompletedLogisticsOrderIds.Count;
+                     i++)
+                {
+                    var orderId = goal.CompletedLogisticsOrderIds[i];
+                    if (!completedOrderIds.Add(orderId) ||
+                        !logisticsOrders.TryGetValue(
+                            orderId, out var completedOrder) ||
+                        completedOrder.Status !=
+                            MilitaryLogisticsStatus.Delivered ||
+                        completedOrder.TargetArmyId != goal.TargetArmyId ||
+                        completedOrder.IssuerPersonId != goal.IssuerPersonId ||
+                        completedOrder.CargoProductDefinitionId !=
+                            goal.ProductDefinitionId ||
+                        completedOrder.FinalDestinationLocationId !=
+                            goal.DestinationLocationId)
+                    {
+                        validHistory = false;
+                        break;
+                    }
+
+                    var completedOfferCount = 0;
+                    foreach (var offerPair in offers)
+                    {
+                        var completedOffer = offerPair.Value;
+                        if (completedOffer.GoalId == goal.Id &&
+                            completedOffer.LogisticsOrderId == orderId)
+                        {
+                            completedOfferCount++;
+                            validHistory &= completedOffer.Status ==
+                                MilitaryLogisticsDelegationOfferStatus.Completed;
+                        }
+                    }
+                    validHistory &= completedOfferCount == 1;
+                    completedReceipt = checked(
+                        completedReceipt +
+                        completedOrder.DeliveredCargoQuantity);
+                    expectedCommittedCost = checked(
+                        expectedCommittedCost + completedOrder.TotalPaid);
+                }
+
+                if (goal.ChildGoalIds.Count == 0)
+                {
+                    validHistory &= completedReceipt ==
+                        goal.ReceivedCargoQuantity;
+                }
+                else
+                {
+                    validHistory &=
+                        goal.CompletedLogisticsOrderIds.Count == 0;
+                }
+
+                var hasActiveDispatch = goal.Status ==
+                    MilitaryLogisticsDelegationStatus.Dispatched;
+                if (hasActiveDispatch)
+                {
+                    validHistory &= selectedCount == 1 &&
+                        offers.TryGetValue(
+                            goal.SelectedOfferId, out var selectedOffer) &&
+                        selectedOffer.GoalId == goal.Id &&
+                        selectedOffer.Status ==
+                            MilitaryLogisticsDelegationOfferStatus.Selected &&
+                        selectedOffer.LogisticsOrderId ==
+                            goal.LogisticsOrderId &&
+                        logisticsOrders.TryGetValue(
+                            goal.LogisticsOrderId, out var logisticsOrder) &&
+                        logisticsOrder.TargetArmyId == goal.TargetArmyId &&
+                        logisticsOrder.IssuerPersonId == goal.IssuerPersonId &&
+                        logisticsOrder.CargoProductDefinitionId ==
+                            goal.ProductDefinitionId &&
+                        logisticsOrder.FinalDestinationLocationId ==
+                            goal.DestinationLocationId &&
+                        logisticsOrder.DispatchedCargoQuantity ==
+                            goal.OutstandingCargoQuantity;
+                    if (logisticsOrders.TryGetValue(
+                            goal.LogisticsOrderId, out var activeOrder))
+                    {
+                        expectedCommittedCost = checked(
+                            expectedCommittedCost + activeOrder.TotalPaid);
+                    }
+                }
+                else
+                {
+                    validHistory &= selectedCount == 0 &&
+                        string.IsNullOrEmpty(goal.SelectedOfferId) &&
+                        string.IsNullOrEmpty(goal.LogisticsOrderId);
+                }
+
+                validHistory &= goal.CommittedCost == expectedCommittedCost;
+                if (!validHistory)
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics delegation link diverged for {goal.Id}.");
+                }
+            }
+
+            var settledOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var compensationByGoal = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryLogisticsLiabilitySettlements.Count;
+                 i++)
+            {
+                var settlement =
+                    MilitaryLogisticsLiabilitySettlements[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics liability settlement cannot be null.");
+                _ = new StableId(settlement.LiabilityPolicyId);
+                var hasGoal = goals.TryGetValue(
+                    settlement.GoalId, out var goal);
+                var hasOrder = logisticsOrders.TryGetValue(
+                    settlement.LogisticsOrderId, out var order);
+                var expectedDue = hasOrder &&
+                    order.LiabilityPolicyId ==
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LossBearerCompensates &&
+                    order.LossBearerOrganizationId !=
+                        order.BuyerOrganizationId &&
+                    order.UnitPrice > 0
+                        ? Math.Min(
+                            order.TotalPaid,
+                            checked(order.UnitPrice *
+                                (order.NaturalLossQuantity +
+                                 order.HostileLossQuantity)))
+                        : 0;
+                var validStatus = settlement.OutstandingAmount == 0 &&
+                        settlement.Status ==
+                            MilitaryLogisticsLiabilitySettlementStatus.Settled ||
+                    settlement.OutstandingAmount > 0 &&
+                        settlement.Status ==
+                            MilitaryLogisticsLiabilitySettlementStatus.InArrears;
+                if (!hasGoal || !hasOrder ||
+                    !settledOrderIds.Add(settlement.LogisticsOrderId) ||
+                    !goal.CompletedLogisticsOrderIds.Contains(order.Id) ||
+                    order.Status != MilitaryLogisticsStatus.Delivered ||
+                    settlement.LiabilityPolicyId !=
+                        order.LiabilityPolicyId ||
+                    settlement.PayerOrganizationId !=
+                        order.LossBearerOrganizationId ||
+                    settlement.PayeeOrganizationId !=
+                        order.BuyerOrganizationId ||
+                    !organizationIds.Contains(
+                        settlement.PayerOrganizationId) ||
+                    !organizationIds.Contains(
+                        settlement.PayeeOrganizationId) ||
+                    settlement.NaturalLossQuantity !=
+                        order.NaturalLossQuantity ||
+                    settlement.HostileLossQuantity !=
+                        order.HostileLossQuantity ||
+                    settlement.UnitValue != order.UnitPrice ||
+                    settlement.AmountDue != expectedDue ||
+                    settlement.AmountPaid < 0 ||
+                    settlement.AmountPaid > settlement.AmountDue ||
+                    settlement.OutstandingAmount !=
+                        settlement.AmountDue - settlement.AmountPaid ||
+                    settlement.CreatedDay < order.DeliveredDay ||
+                    settlement.CreatedDay > AbsoluteDay ||
+                    settlement.LastPaymentDay < -1 ||
+                    settlement.LastPaymentDay > AbsoluteDay ||
+                    settlement.AmountPaid == 0 &&
+                        settlement.LastPaymentDay != -1 ||
+                    settlement.AmountPaid > 0 &&
+                        settlement.LastPaymentDay < settlement.CreatedDay ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryLogisticsLiabilitySettlementStatus),
+                        settlement.Status) ||
+                    !validStatus)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics liability settlement " +
+                        $"{settlement.Id}.");
+                }
+
+                compensationByGoal.TryGetValue(
+                    goal.Id, out var compensation);
+                compensationByGoal[goal.Id] = checked(
+                    compensation + settlement.AmountPaid);
+            }
+
+            foreach (var pair in goals)
+            {
+                var goal = pair.Value;
+                compensationByGoal.TryGetValue(
+                    goal.Id, out var compensation);
+                var validSettlementHistory =
+                    compensation == goal.CompensationReceived;
+                for (var i = 0;
+                     i < goal.CompletedLogisticsOrderIds.Count;
+                     i++)
+                {
+                    var order = logisticsOrders[
+                        goal.CompletedLogisticsOrderIds[i]];
+                    if (order.LiabilityPolicyId !=
+                            MilitaryLogisticsLiabilityPolicyIds
+                                .LegacyNoRetroactiveSettlement &&
+                        !settledOrderIds.Contains(order.Id))
+                    {
+                        validSettlementHistory = false;
+                    }
+                }
+
+                if (!validSettlementHistory)
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics liability history diverged for " +
+                        $"{goal.Id}.");
+                }
+            }
+
+            for (var i = 0;
+                 i < MilitaryLogisticsDelegationReports.Count;
+                 i++)
+            {
+                var report = MilitaryLogisticsDelegationReports[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics delegation report cannot be null.");
+                _ = new StableId(report.TypeId);
+                var isExceptionType = report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.NoOffer ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .OfferInvalidated ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .BudgetExceeded ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.AuthorityLost ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.DeadlineExpired ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.DispatchRejected ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .AssigneeUnavailable ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.ChildException ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.AllocationGap ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .DeliveryShortfall ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .LiabilityArrears ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .ReplacementAuthorizationRequired;
+                var isNormalType = report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.GoalCreated ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.OfferSubmitted ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.Dispatched ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.OfferWithdrawn ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.OfferExpired ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.Progress ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.Fulfilled ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.SubgoalCreated ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .DelegatedProgress ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds.GoalCancelled ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .OfferClosedByCancellation ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .AllocationRecovered ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .ReplacementGoalCreated ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .SubgoalReassigned ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .AttemptCompleted ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .SupplementalDispatched ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .LiabilitySettled ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .LiabilityPayment ||
+                    report.TypeId ==
+                        MilitaryLogisticsDelegationReportTypeIds
+                            .ReplacementAuthorized;
+                if (!goals.TryGetValue(report.GoalId, out var goal) ||
+                    !personIds.Contains(report.ActorPersonId) ||
+                    report.Day < goal.CreatedDay || report.Day > AbsoluteDay ||
+                    !isExceptionType && !isNormalType ||
+                    report.IsException != isExceptionType ||
+                    !string.IsNullOrEmpty(report.RelatedOfferId) &&
+                    (!offers.TryGetValue(
+                         report.RelatedOfferId, out var relatedOffer) ||
+                     relatedOffer.GoalId != goal.Id) ||
+                    !string.IsNullOrEmpty(report.LogisticsOrderId) &&
+                    !logisticsOrders.ContainsKey(report.LogisticsOrderId) ||
+                    !string.IsNullOrEmpty(report.RelatedGoalId) &&
+                    (!goals.TryGetValue(
+                         report.RelatedGoalId, out var relatedGoal) ||
+                     relatedGoal.ParentGoalId != goal.Id &&
+                     goal.ParentGoalId != relatedGoal.Id) ||
+                    string.IsNullOrWhiteSpace(report.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics delegation report {report.Id}.");
+                }
+            }
+        }
+
+        private static void ValidateMilitaryLogisticsDelegationHierarchy(
+            IDictionary<string, MilitaryLogisticsDelegationGoalState> goals)
+        {
+            foreach (var pair in goals)
+            {
+                var goal = pair.Value;
+                if (string.IsNullOrEmpty(goal.ParentGoalId))
+                {
+                    if (goal.DelegationDepth != 0 ||
+                        goal.AssigneePersonId != goal.IssuerPersonId ||
+                        !string.IsNullOrEmpty(goal.DelegatedByPersonId) ||
+                        goal.AssigneeAuthorityAtDelegation !=
+                            MilitaryAuthorityLevel.Army)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid root military logistics goal {goal.Id}.");
+                    }
+                }
+                else
+                {
+                    if (!goals.TryGetValue(
+                            goal.ParentGoalId, out var parent) ||
+                        goal.DelegationDepth != parent.DelegationDepth + 1 ||
+                        goal.DelegationDepth >
+                            MilitaryLogisticsDelegationContract
+                                .MaximumDelegationDepth ||
+                        goal.DelegatedByPersonId != parent.AssigneePersonId ||
+                        goal.AssigneeAuthorityAtDelegation >=
+                            parent.AssigneeAuthorityAtDelegation ||
+                        !parent.ChildGoalIds.Contains(goal.Id) ||
+                        goal.IssuerPersonId != parent.IssuerPersonId ||
+                        goal.TargetArmyId != parent.TargetArmyId ||
+                        goal.DestinationLocationId !=
+                            parent.DestinationLocationId ||
+                        goal.ProductDefinitionId != parent.ProductDefinitionId ||
+                        goal.CargoConsumptionPolicyId !=
+                            parent.CargoConsumptionPolicyId ||
+                        goal.RiskPolicyId != parent.RiskPolicyId ||
+                        goal.ThreatOrganizationId !=
+                            parent.ThreatOrganizationId ||
+                        goal.MaximumUnitPrice > parent.MaximumUnitPrice ||
+                        goal.DeadlineDay > parent.DeadlineDay)
+                    {
+                        throw new InvalidOperationException(
+                            $"Military logistics child goal {goal.Id} " +
+                            "diverged from its parent contract.");
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(goal.ReplacesGoalId))
+                {
+                    if (!goals.TryGetValue(
+                            goal.ReplacesGoalId, out var replaced) ||
+                        replaced.Status !=
+                            MilitaryLogisticsDelegationStatus.Cancelled ||
+                        replaced.ParentGoalId != goal.ParentGoalId ||
+                        !replaced.ReplacementGoalIds.Contains(goal.Id))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid replaced allocation on military " +
+                            $"logistics goal {goal.Id}.");
+                    }
+                }
+
+                var replacementIds = new HashSet<string>(
+                    StringComparer.Ordinal);
+                long replacementQuantity = 0;
+                long replacementBudget = 0;
+                for (var i = 0; i < goal.ReplacementGoalIds.Count; i++)
+                {
+                    var replacementId = goal.ReplacementGoalIds[i];
+                    if (!replacementIds.Add(replacementId) ||
+                        !goals.TryGetValue(
+                            replacementId, out var replacement) ||
+                        goal.Status !=
+                            MilitaryLogisticsDelegationStatus.Cancelled ||
+                        replacement.ParentGoalId != goal.ParentGoalId ||
+                        replacement.ReplacesGoalId != goal.Id)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid replacement index on military " +
+                            $"logistics goal {goal.Id}.");
+                    }
+
+                    replacementQuantity = checked(
+                        replacementQuantity +
+                        replacement.RequestedCargoQuantity);
+                    replacementBudget = checked(
+                        replacementBudget + replacement.BudgetLimit);
+                }
+                if (goal.ReplacementGoalIds.Count != 0 &&
+                    (replacementQuantity != goal.RequestedCargoQuantity ||
+                     replacementBudget > goal.BudgetLimit))
+                {
+                    throw new InvalidOperationException(
+                        $"Replacement allocation diverged for military " +
+                        $"logistics goal {goal.Id}.");
+                }
+
+                if (goal.ChildGoalIds.Count == 0)
+                {
+                    if (goal.UnassignedCargoQuantity != 0 ||
+                        goal.AvailableBudgetReserve != 0 ||
+                        goal.Status ==
+                            MilitaryLogisticsDelegationStatus.Delegated)
+                    {
+                        throw new InvalidOperationException(
+                            $"Military logistics leaf goal {goal.Id} has an " +
+                            "invalid aggregate status.");
+                    }
+                    continue;
+                }
+
+                if (goal.Status != MilitaryLogisticsDelegationStatus.Delegated &&
+                    goal.Status !=
+                        MilitaryLogisticsDelegationStatus.NeedsAttention &&
+                    goal.Status != MilitaryLogisticsDelegationStatus.Fulfilled &&
+                    goal.Status != MilitaryLogisticsDelegationStatus.Expired &&
+                    goal.Status != MilitaryLogisticsDelegationStatus.Cancelled)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid delegated parent goal {goal.Id}.");
+                }
+
+                var childIds = new HashSet<string>(StringComparer.Ordinal);
+                long totalQuantity = 0;
+                long totalBudget = 0;
+                long totalReceived = 0;
+                var allFulfilled = true;
+                var activeChildCount = 0;
+                for (var i = 0; i < goal.ChildGoalIds.Count; i++)
+                {
+                    var childId = goal.ChildGoalIds[i];
+                    if (!childIds.Add(childId) ||
+                        !goals.TryGetValue(childId, out var child) ||
+                        child.ParentGoalId != goal.Id)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid child index on military logistics goal " +
+                            $"{goal.Id}.");
+                    }
+
+                    if (child.Status ==
+                        MilitaryLogisticsDelegationStatus.Cancelled)
+                    {
+                        continue;
+                    }
+
+                    activeChildCount++;
+                    totalQuantity = checked(
+                        totalQuantity + child.RequestedCargoQuantity);
+                    totalBudget = checked(totalBudget + child.BudgetLimit);
+                    totalReceived = checked(
+                        totalReceived + child.ReceivedCargoQuantity);
+                    allFulfilled &= child.Status ==
+                        MilitaryLogisticsDelegationStatus.Fulfilled;
+                }
+
+                if (activeChildCount >
+                        MilitaryLogisticsDelegationContract
+                            .MaximumDirectSubgoals ||
+                    totalQuantity + goal.UnassignedCargoQuantity !=
+                        goal.RequestedCargoQuantity ||
+                    totalBudget + goal.AvailableBudgetReserve !=
+                        goal.BudgetLimit ||
+                    totalReceived != goal.ReceivedCargoQuantity ||
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Delegated &&
+                        goal.UnassignedCargoQuantity != 0 ||
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Fulfilled &&
+                    (goal.UnassignedCargoQuantity != 0 ||
+                     !allFulfilled ||
+                     goal.FulfillmentPolicyId ==
+                         MilitaryLogisticsDelegationFulfillmentPolicyIds
+                             .FullReceiptRequired &&
+                         goal.OutstandingCargoQuantity != 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics child allocation diverged for " +
+                        $"{goal.Id}.");
+                }
+            }
+        }
+
+        private void ValidateMilitaryLogistics(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds,
+            HashSet<string> armyIds,
+            HashSet<string> routeIds)
+        {
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            var journeys = new Dictionary<string, JourneyState>(
+                StringComparer.Ordinal);
+            var marches = new Dictionary<string, ArmyMarchState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            }
+
+            for (var i = 0; i < Journeys.Count; i++)
+            {
+                journeys.Add(Journeys[i].Id, Journeys[i]);
+            }
+
+            for (var i = 0; i < ArmyMarches.Count; i++)
+            {
+                marches.Add(ArmyMarches[i].Id, ArmyMarches[i]);
+            }
+
+            var orders = new Dictionary<string, MilitaryLogisticsOrderState>(
+                StringComparer.Ordinal);
+            var transportLoads = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                var batch = ProductBatches[i];
+                if (string.IsNullOrEmpty(batch.InventoryContainerId))
+                {
+                    continue;
+                }
+
+                AddLong(
+                    transportLoads,
+                    batch.InventoryContainerId,
+                    checked(batch.Quantity * batch.UnitWeight));
+            }
+
+            for (var i = 0; i < MilitaryLogisticsOrders.Count; i++)
+            {
+                var order = MilitaryLogisticsOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics order cannot be null.");
+                orders.Add(order.Id, order);
+                _ = new StableId(order.AcquisitionMethodId);
+                _ = new StableId(order.CargoConsumptionPolicyId);
+                _ = new StableId(order.LiabilityPolicyId);
+                var hasJourney = journeys.TryGetValue(
+                    order.JourneyId, out var journey);
+                var hasMarch = marches.TryGetValue(
+                    order.ArmyMarchId, out var march);
+                var validJourney = hasJourney && !hasMarch &&
+                    string.IsNullOrEmpty(order.ArmyMarchId) &&
+                    journey.PersonId == order.CarrierPersonId &&
+                    journey.RouteId == order.RouteId &&
+                    journey.OriginLocationId == order.OriginLocationId &&
+                    journey.DestinationLocationId == order.DestinationLocationId;
+                var validMarch = hasMarch && !hasJourney &&
+                    string.IsNullOrEmpty(order.JourneyId) &&
+                    march.ArmyId == order.TargetArmyId &&
+                    march.RouteId == order.RouteId &&
+                    march.OriginLocationId == order.OriginLocationId &&
+                    march.DestinationLocationId == order.DestinationLocationId;
+                var validStatus =
+                    order.Status == MilitaryLogisticsStatus.InTransit &&
+                    order.DeliveredDay == -1 &&
+                    (validJourney || validMarch) ||
+                    order.Status == MilitaryLogisticsStatus.AwaitingHandoff &&
+                    order.DeliveredDay == -1 &&
+                    !hasJourney && !hasMarch ||
+                    order.Status == MilitaryLogisticsStatus.AwaitingArmy &&
+                    order.DeliveredDay == -1 &&
+                    !hasJourney && !hasMarch ||
+                    order.Status == MilitaryLogisticsStatus.Delivered &&
+                    order.DeliveredDay >= order.CreatedDay &&
+                    order.DeliveredDay <= AbsoluteDay &&
+                    !hasJourney && !hasMarch;
+                var hasCargoBatch = batches.TryGetValue(
+                    order.SourceCargoBatchId, out var cargoBatch);
+                var hasProvisionBatch =
+                    string.IsNullOrEmpty(order.SourceProvisionBatchId) ||
+                    batches.TryGetValue(
+                        order.SourceProvisionBatchId, out var provisionBatch);
+                var hasSourceContainer = containers.TryGetValue(
+                    order.SourceInventoryContainerId,
+                    out var sourceContainer);
+                var hasTransportContainer = containers.TryGetValue(
+                    order.TransportInventoryContainerId,
+                    out var transportContainer);
+                var cargoBalanced = order.DispatchedCargoQuantity ==
+                    order.RemainingCargoQuantity +
+                    order.DeliveredCargoQuantity +
+                    order.NaturalLossQuantity +
+                    order.HostileLossQuantity +
+                    order.CargoConsumedAsProvisionsQuantity;
+                var provisionsBalanced = order.ConvoyProvisionsLoaded ==
+                    order.ConvoyProvisionsRemaining +
+                    order.ConvoyProvisionsConsumed;
+                if (!Enum.IsDefined(
+                        typeof(MilitaryLogisticsStatus), order.Status) ||
+                    !personIds.Contains(order.IssuerPersonId) ||
+                    !personIds.Contains(order.CarrierPersonId) ||
+                    !organizationIds.Contains(order.BuyerOrganizationId) ||
+                    !organizationIds.Contains(order.SourceOrganizationId) ||
+                    !organizationIds.Contains(order.CarrierOrganizationId) ||
+                    !organizationIds.Contains(order.LossBearerOrganizationId) ||
+                    order.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds.BuyerRetainsRisk &&
+                    order.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LossBearerCompensates &&
+                    order.LiabilityPolicyId !=
+                        MilitaryLogisticsLiabilityPolicyIds
+                            .LegacyNoRetroactiveSettlement ||
+                    !armyIds.Contains(order.TargetArmyId) ||
+                    FindArmy(Armies, order.TargetArmyId).OrganizationId !=
+                        order.BuyerOrganizationId ||
+                    !hasCargoBatch ||
+                    cargoBatch.ProductDefinitionId !=
+                        order.CargoProductDefinitionId ||
+                    cargoBatch.OwnerOrganizationId !=
+                        order.SourceOrganizationId ||
+                    !hasProvisionBatch ||
+                    !hasSourceContainer ||
+                    cargoBatch.InventoryContainerId != sourceContainer.Id ||
+                    !hasTransportContainer ||
+                    transportContainer.CarrierPersonId !=
+                        order.CarrierPersonId ||
+                    transportContainer.OwnerOrganizationId !=
+                        order.CarrierOrganizationId ||
+                    !routeIds.Contains(order.RouteId) ||
+                    !locationIds.Contains(order.OriginLocationId) ||
+                    !locationIds.Contains(order.DestinationLocationId) ||
+                    !locationIds.Contains(order.FinalDestinationLocationId) ||
+                    order.PlannedLegCount < 0 ||
+                    order.CurrentLegSequence < 0 ||
+                    order.PlannedLegCount == 0 &&
+                    order.CurrentLegSequence != 0 ||
+                    order.PlannedLegCount > 0 &&
+                    order.CurrentLegSequence >= order.PlannedLegCount ||
+                    order.CreatedDay < 0 || order.CreatedDay > AbsoluteDay ||
+                    order.DispatchedCargoQuantity <= 0 ||
+                    order.RemainingCargoQuantity < 0 ||
+                    order.DeliveredCargoQuantity < 0 ||
+                    order.NaturalLossQuantity < 0 ||
+                    order.HostileLossQuantity < 0 ||
+                    order.RecoveredCargoQuantity < 0 ||
+                    order.CargoConsumedAsProvisionsQuantity < 0 ||
+                    !cargoBalanced ||
+                    order.ConvoyProvisionsLoaded < 0 ||
+                    order.ConvoyProvisionsRemaining < 0 ||
+                    order.ConvoyProvisionsConsumed < 0 ||
+                    !provisionsBalanced ||
+                    order.DailyConvoyProvisionUse <= 0 ||
+                    order.DailyNaturalLossBasisPoints < 0 ||
+                    order.DailyNaturalLossBasisPoints > 10_000 ||
+                    order.NaturalLossRemainderBasisPoints < 0 ||
+                    order.NaturalLossRemainderBasisPoints >= 10_000 ||
+                    order.CargoUnitWeightAtDispatch <= 0 ||
+                    order.ConvoyProvisionsLoaded > 0 &&
+                    order.ConvoyProvisionUnitWeightAtDispatch <= 0 ||
+                    order.CargoQualityDimensionsAtDispatch == null ||
+                    order.CargoQualityDimensionsAtDispatch.Count == 0 ||
+                    order.CargoQualityBasisPointsAtDispatch !=
+                    ProductQualityRules.CalculateSummary(
+                        order.CargoQualityDimensionsAtDispatch) ||
+                    order.CargoFreshnessBasisPointsAtDispatch < 0 ||
+                    order.CargoFreshnessBasisPointsAtDispatch > 10_000 ||
+                    order.UnitPrice < 0 || order.TotalPaid < 0 ||
+                    order.TotalPaid != checked(
+                        order.UnitPrice * order.DispatchedCargoQuantity) ||
+                    order.OriginPublicOrderDelta > 0 ||
+                    !validStatus)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics order {order.Id}: " +
+                        $"status={validStatus}/{order.Status}, " +
+                        $"people={personIds.Contains(order.IssuerPersonId)}/" +
+                        $"{personIds.Contains(order.CarrierPersonId)}, " +
+                        $"organizations=" +
+                        $"{organizationIds.Contains(order.BuyerOrganizationId)}/" +
+                        $"{organizationIds.Contains(order.SourceOrganizationId)}/" +
+                        $"{organizationIds.Contains(order.CarrierOrganizationId)}/" +
+                        $"{organizationIds.Contains(order.LossBearerOrganizationId)}, " +
+                        $"army={armyIds.Contains(order.TargetArmyId)}, " +
+                        $"batches={hasCargoBatch}/{hasProvisionBatch}, " +
+                        $"containers={hasSourceContainer}/{hasTransportContainer}, " +
+                        $"cargo={cargoBalanced} " +
+                        $"({order.DispatchedCargoQuantity}/" +
+                        $"{order.RemainingCargoQuantity}/" +
+                        $"{order.DeliveredCargoQuantity}/" +
+                        $"{order.NaturalLossQuantity}/" +
+                        $"{order.CargoConsumedAsProvisionsQuantity}), " +
+                        $"provisions={provisionsBalanced} " +
+                        $"({order.ConvoyProvisionsLoaded}/" +
+                        $"{order.ConvoyProvisionsRemaining}/" +
+                        $"{order.ConvoyProvisionsConsumed}), " +
+                        $"quality={order.CargoQualityBasisPointsAtDispatch}/" +
+                        $"{ProductQualityRules.CalculateSummary(order.CargoQualityDimensionsAtDispatch)}, " +
+                        $"money={order.TotalPaid}/" +
+                        $"{checked(order.UnitPrice * order.DispatchedCargoQuantity)}.");
+                }
+
+                AddLong(
+                    transportLoads,
+                    order.TransportInventoryContainerId,
+                    checked(
+                        (long)order.RemainingCargoQuantity *
+                        order.CargoUnitWeightAtDispatch +
+                        (long)order.ConvoyProvisionsRemaining *
+                        order.ConvoyProvisionUnitWeightAtDispatch));
+            }
+
+            var legCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+            var legSequences = new HashSet<string>(StringComparer.Ordinal);
+            var legsById = new Dictionary<string, MilitaryLogisticsLegState>(
+                StringComparer.Ordinal);
+            var plannedProvisionReservations =
+                new Dictionary<string, long>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsLegs.Count; i++)
+            {
+                var leg = MilitaryLogisticsLegs[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics leg cannot be null.");
+                _ = new StableId(leg.RiskPolicyId);
+                var validRisk =
+                    leg.RiskPolicyId == MilitaryLogisticsRiskPolicyIds.None &&
+                    string.IsNullOrEmpty(leg.ThreatOrganizationId) ||
+                    leg.RiskPolicyId ==
+                        MilitaryLogisticsRiskPolicyIds.Standard &&
+                    organizationIds.Contains(leg.ThreatOrganizationId);
+                if (!orders.TryGetValue(leg.LogisticsOrderId, out var order) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryLogisticsLegStatus), leg.Status) ||
+                    leg.Sequence < 0 ||
+                    leg.Sequence >= order.PlannedLegCount ||
+                    !legSequences.Add($"{order.Id}#{leg.Sequence}") ||
+                    !personIds.Contains(leg.CarrierPersonId) ||
+                    !organizationIds.Contains(leg.CarrierOrganizationId) ||
+                    !containers.TryGetValue(
+                        leg.TransportInventoryContainerId,
+                        out var legContainer) ||
+                    legContainer.CarrierPersonId != leg.CarrierPersonId ||
+                    legContainer.OwnerOrganizationId !=
+                        leg.CarrierOrganizationId ||
+                    !routeIds.Contains(leg.RouteId) ||
+                    !locationIds.Contains(leg.OriginLocationId) ||
+                    !locationIds.Contains(leg.DestinationLocationId) ||
+                    !RouteConnects(
+                        FindRoute(Routes, leg.RouteId),
+                        leg.OriginLocationId,
+                        leg.DestinationLocationId) ||
+                    leg.PlannedProvisionQuantity < 0 ||
+                    leg.LoadedProvisionQuantity < 0 ||
+                    leg.ConsumedProvisionQuantity < 0 ||
+                    leg.NaturalLossQuantity < 0 ||
+                    leg.HostileLossQuantity < 0 ||
+                    leg.RecoveredCargoQuantity < 0 ||
+                    leg.CargoReceivedQuantity < 0 ||
+                    leg.CargoTransferredQuantity < 0 ||
+                    leg.CargoTransferredQuantity >
+                        leg.CargoReceivedQuantity ||
+                    leg.DailyProvisionUse <= 0 ||
+                    !validRisk ||
+                    leg.StartedDay < -1 || leg.StartedDay > AbsoluteDay ||
+                    leg.CompletedDay < -1 || leg.CompletedDay > AbsoluteDay ||
+                    leg.CompletedDay >= 0 && leg.StartedDay < 0 ||
+                    leg.CompletedDay >= 0 &&
+                        leg.CompletedDay < leg.StartedDay ||
+                    leg.PlannedProvisionQuantity > 0 &&
+                    leg.Status == MilitaryLogisticsLegStatus.Planned &&
+                    (!batches.TryGetValue(
+                        leg.ProvisionBatchId,
+                        out var legProvisionBatch) ||
+                     legProvisionBatch.OwnerOrganizationId !=
+                        leg.CarrierOrganizationId ||
+                     !containers.TryGetValue(
+                        legProvisionBatch.InventoryContainerId,
+                        out var legProvisionContainer) ||
+                     legProvisionContainer.LocationId !=
+                        leg.OriginLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics leg {leg.Id}.");
+                }
+
+                var isCurrent = leg.Sequence == order.CurrentLegSequence;
+                var validLegStatus =
+                    leg.Sequence < order.CurrentLegSequence &&
+                    leg.Status == MilitaryLogisticsLegStatus.Completed ||
+                    leg.Sequence > order.CurrentLegSequence &&
+                    leg.Status == MilitaryLogisticsLegStatus.Planned ||
+                    isCurrent &&
+                    order.Status == MilitaryLogisticsStatus.InTransit &&
+                    leg.Status == MilitaryLogisticsLegStatus.InTransit ||
+                    isCurrent &&
+                    order.Status == MilitaryLogisticsStatus.AwaitingHandoff &&
+                    leg.Status == MilitaryLogisticsLegStatus.AwaitingHandoff ||
+                    isCurrent &&
+                    order.Status == MilitaryLogisticsStatus.AwaitingArmy &&
+                    leg.Status == MilitaryLogisticsLegStatus.AwaitingReceipt ||
+                    isCurrent &&
+                    order.Status == MilitaryLogisticsStatus.Delivered &&
+                    leg.Status == MilitaryLogisticsLegStatus.Completed;
+                if (!validLegStatus ||
+                    isCurrent &&
+                    (order.RouteId != leg.RouteId ||
+                     order.OriginLocationId != leg.OriginLocationId ||
+                     order.DestinationLocationId != leg.DestinationLocationId ||
+                     order.CarrierPersonId != leg.CarrierPersonId ||
+                     order.CarrierOrganizationId !=
+                        leg.CarrierOrganizationId ||
+                     order.TransportInventoryContainerId !=
+                        leg.TransportInventoryContainerId) ||
+                    leg.Sequence == order.PlannedLegCount - 1 &&
+                    leg.DestinationLocationId !=
+                        order.FinalDestinationLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics leg state diverged for {leg.Id}.");
+                }
+
+                legCounts.TryGetValue(order.Id, out var count);
+                legCounts[order.Id] = count + 1;
+                legsById.Add(leg.Id, leg);
+                if (leg.Status == MilitaryLogisticsLegStatus.Planned &&
+                    leg.PlannedProvisionQuantity > 0)
+                {
+                    AddLong(
+                        plannedProvisionReservations,
+                        leg.ProvisionBatchId,
+                        leg.PlannedProvisionQuantity);
+                }
+            }
+
+            foreach (var pair in orders)
+            {
+                legCounts.TryGetValue(pair.Key, out var count);
+                if (pair.Value.PlannedLegCount != count)
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics leg count diverged for {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in plannedProvisionReservations)
+            {
+                if (!batches.TryGetValue(pair.Key, out var batch) ||
+                    batch.ReservedQuantity < pair.Value)
+                {
+                    throw new InvalidOperationException(
+                        $"Military logistics provision reservation diverged for {pair.Key}.");
+                }
+            }
+
+            var escortKeys = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsEscorts.Count; i++)
+            {
+                var escort = MilitaryLogisticsEscorts[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics escort cannot be null.");
+                var hasLeg = legsById.TryGetValue(
+                    escort.LogisticsLegId, out var leg);
+                var hasJourney = journeys.TryGetValue(
+                    escort.JourneyId, out var journey);
+                var validStatus = hasLeg &&
+                    escort.Status == MilitaryLogisticsEscortStatus.Planned &&
+                    leg.Status == MilitaryLogisticsLegStatus.Planned &&
+                    string.IsNullOrEmpty(escort.JourneyId) &&
+                    escort.StartedDay == -1 && escort.ArrivedDay == -1 ||
+                    hasLeg &&
+                    escort.Status == MilitaryLogisticsEscortStatus.InTransit &&
+                    leg.Status == MilitaryLogisticsLegStatus.InTransit &&
+                    hasJourney &&
+                    journey.PersonId == escort.PersonId &&
+                    journey.RouteId == leg.RouteId &&
+                    journey.DestinationLocationId == leg.DestinationLocationId &&
+                    escort.StartedDay >= 0 && escort.ArrivedDay == -1 ||
+                    hasLeg &&
+                    escort.Status == MilitaryLogisticsEscortStatus.Arrived &&
+                    leg.Status != MilitaryLogisticsLegStatus.Planned &&
+                    !hasJourney && escort.StartedDay >= 0 &&
+                    escort.ArrivedDay >= escort.StartedDay &&
+                    escort.ArrivedDay <= AbsoluteDay;
+                if (!hasLeg ||
+                    !orders.ContainsKey(escort.LogisticsOrderId) ||
+                    leg.LogisticsOrderId != escort.LogisticsOrderId ||
+                    leg.Sequence != escort.LegSequence ||
+                    !personIds.Contains(escort.PersonId) ||
+                    !escortKeys.Add(
+                        $"{escort.LogisticsLegId}#{escort.PersonId}") ||
+                    escort.EscortPowerAtDeparture < 0 ||
+                    !validStatus)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics escort {escort.Id}.");
+                }
+            }
+
+            var incidentsById = new Dictionary<string,
+                MilitaryLogisticsIncidentState>(StringComparer.Ordinal);
+            var incidentCustodyByOrder = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var incidentRecoveredByOrder = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var incidentCustodyByLeg = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var incidentRecoveredByLeg = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsIncidents.Count; i++)
+            {
+                var incident = MilitaryLogisticsIncidents[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics incident cannot be null.");
+                _ = new StableId(incident.IncidentTypeId);
+                _ = new StableId(incident.OutcomeId);
+                var hasOrder = orders.TryGetValue(
+                    incident.LogisticsOrderId, out var order);
+                var hasLeg = legsById.TryGetValue(
+                    incident.LogisticsLegId, out var leg);
+                var validType = incident.IncidentTypeId ==
+                    MilitaryLogisticsIncidentTypeIds.BanditAttack;
+                var validOutcome = incident.OutcomeId ==
+                    MilitaryLogisticsIncidentOutcomeIds.Avoided ||
+                    incident.OutcomeId ==
+                    MilitaryLogisticsIncidentOutcomeIds.Repelled ||
+                    incident.OutcomeId ==
+                    MilitaryLogisticsIncidentOutcomeIds.CargoSeized;
+                var seizedOutcome = incident.OutcomeId ==
+                    MilitaryLogisticsIncidentOutcomeIds.CargoSeized;
+                var attackOccurred = incident.AttackRollBasisPoints <
+                    incident.AttackChanceBasisPoints;
+                var validResolution =
+                    incident.OutcomeId ==
+                        MilitaryLogisticsIncidentOutcomeIds.Avoided &&
+                    !attackOccurred ||
+                    incident.OutcomeId ==
+                        MilitaryLogisticsIncidentOutcomeIds.Repelled &&
+                    attackOccurred &&
+                    incident.EscortPower >= incident.ThreatPower ||
+                    seizedOutcome && attackOccurred &&
+                    incident.EscortPower < incident.ThreatPower;
+                if (!hasOrder || !hasLeg || !validType || !validOutcome ||
+                    !validResolution ||
+                    leg.LogisticsOrderId != order.Id ||
+                    incident.RouteId != leg.RouteId ||
+                    incident.ThreatOrganizationId !=
+                        leg.ThreatOrganizationId ||
+                    !organizationIds.Contains(
+                        incident.ThreatOrganizationId) ||
+                    incident.Day < order.CreatedDay ||
+                    incident.Day > AbsoluteDay ||
+                    incident.AttackChanceBasisPoints < 0 ||
+                    incident.AttackChanceBasisPoints > 10_000 ||
+                    incident.AttackRollBasisPoints < 0 ||
+                    incident.AttackRollBasisPoints >= 10_000 ||
+                    incident.EscortPower < 0 || incident.ThreatPower < 0 ||
+                    incident.SeizedCargoQuantity < 0 ||
+                    incident.RecoveredCargoQuantity < 0 ||
+                    incident.RecoveredCargoQuantity >
+                        incident.SeizedCargoQuantity ||
+                    seizedOutcome != (incident.SeizedCargoQuantity > 0) ||
+                    string.IsNullOrWhiteSpace(incident.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics incident {incident.Id}.");
+                }
+
+                incidentsById.Add(incident.Id, incident);
+                var custody = incident.SeizedCargoQuantity -
+                    incident.RecoveredCargoQuantity;
+                AddLong(incidentCustodyByOrder, order.Id, custody);
+                AddLong(
+                    incidentRecoveredByOrder,
+                    order.Id,
+                    incident.RecoveredCargoQuantity);
+                AddLong(incidentCustodyByLeg, leg.Id, custody);
+                AddLong(
+                    incidentRecoveredByLeg,
+                    leg.Id,
+                    incident.RecoveredCargoQuantity);
+            }
+
+            foreach (var pair in orders)
+            {
+                incidentCustodyByOrder.TryGetValue(
+                    pair.Key, out var custody);
+                incidentRecoveredByOrder.TryGetValue(
+                    pair.Key, out var recovered);
+                if (custody != pair.Value.HostileLossQuantity ||
+                    recovered != pair.Value.RecoveredCargoQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Hostile cargo custody diverged for {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in legsById)
+            {
+                incidentCustodyByLeg.TryGetValue(
+                    pair.Key, out var custody);
+                incidentRecoveredByLeg.TryGetValue(
+                    pair.Key, out var recovered);
+                if (custody != pair.Value.HostileLossQuantity ||
+                    recovered != pair.Value.RecoveredCargoQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Hostile leg custody diverged for {pair.Key}.");
+                }
+            }
+
+            var serviceById = new Dictionary<string, MilitaryServiceState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryServices.Count; i++)
+            {
+                serviceById.Add(MilitaryServices[i].Id, MilitaryServices[i]);
+            }
+            var recoveryClashByIncident = new HashSet<string>(
+                StringComparer.Ordinal);
+            var initialClashByIncident = new HashSet<string>(
+                StringComparer.Ordinal);
+            var clashRecoveredByIncident = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsClashes.Count; i++)
+            {
+                var clash = MilitaryLogisticsClashes[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics clash cannot be null.");
+                _ = new StableId(clash.TypeId);
+                _ = new StableId(clash.OutcomeId);
+                if (!incidentsById.TryGetValue(
+                        clash.IncidentId, out var incident) ||
+                    !orders.TryGetValue(
+                        clash.LogisticsOrderId, out var order) ||
+                    !legsById.TryGetValue(
+                        clash.LogisticsLegId, out var leg) ||
+                    incident.LogisticsOrderId != order.Id ||
+                    incident.LogisticsLegId != leg.Id ||
+                    !organizationIds.Contains(
+                        clash.DefenderOrganizationId) ||
+                    clash.Day < incident.Day || clash.Day > AbsoluteDay ||
+                    clash.DefenderPersonIds == null ||
+                    clash.DefenderPersonIds.Count == 0 ||
+                    clash.DefenderPersonIds.Count > 20 ||
+                    clash.DefenderPower < 0 || clash.ThreatPower <= 0 ||
+                    clash.CargoRecoveredQuantity < 0 ||
+                    clash.Injuries == null ||
+                    string.IsNullOrWhiteSpace(clash.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics clash {clash.Id}.");
+                }
+
+                var isInitial = clash.TypeId ==
+                    MilitaryLogisticsClashTypeIds.InitialDefense;
+                var isRecovery = clash.TypeId ==
+                    MilitaryLogisticsClashTypeIds.RecoveryAttempt;
+                var validInitial = isInitial &&
+                    initialClashByIncident.Add(incident.Id) &&
+                    string.IsNullOrEmpty(clash.IssuerPersonId) &&
+                    clash.DefenderOrganizationId ==
+                        order.CarrierOrganizationId &&
+                    clash.DefenderPower == incident.EscortPower &&
+                    clash.ThreatPower == incident.ThreatPower &&
+                    clash.CargoRecoveredQuantity == 0 &&
+                    (clash.OutcomeId ==
+                        MilitaryLogisticsClashOutcomeIds.DefendersHeld &&
+                     incident.OutcomeId ==
+                        MilitaryLogisticsIncidentOutcomeIds.Repelled ||
+                     clash.OutcomeId ==
+                        MilitaryLogisticsClashOutcomeIds
+                            .AttackersSeizedCargo &&
+                     incident.OutcomeId ==
+                        MilitaryLogisticsIncidentOutcomeIds.CargoSeized);
+                var validRecovery = isRecovery &&
+                    recoveryClashByIncident.Add(incident.Id) &&
+                    personIds.Contains(clash.IssuerPersonId) &&
+                    incident.OutcomeId ==
+                        MilitaryLogisticsIncidentOutcomeIds.CargoSeized &&
+                    clash.DefenderOrganizationId ==
+                        FindArmy(Armies, order.TargetArmyId).OrganizationId &&
+                    (clash.OutcomeId ==
+                        MilitaryLogisticsClashOutcomeIds.CargoRecovered &&
+                     clash.CargoRecoveredQuantity > 0 ||
+                     clash.OutcomeId ==
+                        MilitaryLogisticsClashOutcomeIds.RecoveryFailed &&
+                     clash.CargoRecoveredQuantity == 0);
+                if (!validInitial && !validRecovery)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics clash resolution {clash.Id}.");
+                }
+
+                var clashPeople = new HashSet<string>(StringComparer.Ordinal);
+                for (var participantIndex = 0;
+                     participantIndex < clash.DefenderPersonIds.Count;
+                     participantIndex++)
+                {
+                    var personId = clash.DefenderPersonIds[participantIndex];
+                    _ = new StableId(personId);
+                    if (!personIds.Contains(personId) ||
+                        !clashPeople.Add(personId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid clash participant in {clash.Id}.");
+                    }
+                }
+
+                var injuredPeople = new HashSet<string>(StringComparer.Ordinal);
+                for (var injuryIndex = 0;
+                     injuryIndex < clash.Injuries.Count;
+                     injuryIndex++)
+                {
+                    var injury = clash.Injuries[injuryIndex];
+                    var validService =
+                        string.IsNullOrEmpty(injury.MilitaryServiceId) ||
+                        serviceById.TryGetValue(
+                            injury.MilitaryServiceId, out var service) &&
+                        service.PersonId == injury.PersonId;
+                    if (!clashPeople.Contains(injury.PersonId) ||
+                        !injuredPeople.Add(injury.PersonId) ||
+                        injury.HealthBeforeBasisPoints <=
+                            injury.HealthAfterBasisPoints ||
+                        injury.HealthBeforeBasisPoints > 10_000 ||
+                        injury.HealthAfterBasisPoints < 1 ||
+                        !validService)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid clash injury in {clash.Id}.");
+                    }
+                }
+
+                AddLong(
+                    clashRecoveredByIncident,
+                    incident.Id,
+                    clash.CargoRecoveredQuantity);
+            }
+
+            foreach (var pair in incidentsById)
+            {
+                clashRecoveredByIncident.TryGetValue(
+                    pair.Key, out var recovered);
+                if (recovered != pair.Value.RecoveredCargoQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Recovered clash custody diverged for {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in transportLoads)
+            {
+                if (containers.TryGetValue(pair.Key, out var container) &&
+                    pair.Value > container.CapacityWeight)
+                {
+                    throw new InvalidOperationException(
+                        $"Tracked freight exceeds container capacity for {pair.Key}.");
+                }
+            }
+
+            var aggregates = new Dictionary<string, LogisticsLedgerBalance>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryLogisticsLedgerEntries.Count; i++)
+            {
+                var entry = MilitaryLogisticsLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A military logistics ledger entry cannot be null.");
+                if (!orders.TryGetValue(
+                        entry.LogisticsOrderId, out var order) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryLogisticsLedgerType), entry.Type) ||
+                    entry.Day < order.CreatedDay || entry.Day > AbsoluteDay ||
+                    !personIds.Contains(entry.ActorPersonId) ||
+                    string.IsNullOrWhiteSpace(entry.Summary))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military logistics ledger entry {entry.Id}.");
+                }
+
+                if (!aggregates.TryGetValue(
+                        order.Id, out var aggregate))
+                {
+                    aggregate = new LogisticsLedgerBalance();
+                    aggregates.Add(order.Id, aggregate);
+                }
+
+                aggregate.Apply(entry);
+            }
+
+            foreach (var pair in orders)
+            {
+                if (!aggregates.TryGetValue(
+                        pair.Key, out var balance) ||
+                    balance.DispatchCount != 1 ||
+                    balance.DeliveryCount == 0 &&
+                    (pair.Value.DeliveredCargoQuantity > 0 ||
+                     pair.Value.Status ==
+                        MilitaryLogisticsStatus.Delivered) ||
+                    balance.CargoDispatched !=
+                        pair.Value.DispatchedCargoQuantity ||
+                    balance.CargoRemaining != pair.Value.RemainingCargoQuantity ||
+                    balance.CargoDelivered != pair.Value.DeliveredCargoQuantity ||
+                    balance.NaturalLoss != pair.Value.NaturalLossQuantity ||
+                    balance.HostileLoss != pair.Value.HostileLossQuantity ||
+                    balance.RecoveredCargo !=
+                        pair.Value.RecoveredCargoQuantity ||
+                    balance.CargoConsumed !=
+                        pair.Value.CargoConsumedAsProvisionsQuantity ||
+                    balance.ProvisionsLoaded !=
+                        pair.Value.ConvoyProvisionsLoaded ||
+                    balance.ProvisionsRemaining !=
+                        pair.Value.ConvoyProvisionsRemaining ||
+                    balance.ProvisionsConsumed !=
+                        pair.Value.ConvoyProvisionsConsumed ||
+                    balance.BuyerMoney != -pair.Value.TotalPaid ||
+                    balance.SourceMoney != pair.Value.TotalPaid ||
+                    balance.PublicOrder != pair.Value.OriginPublicOrderDelta)
+                {
+                    throw new InvalidOperationException(
+                        $"Unbalanced military logistics ledger for {pair.Key}.");
+                }
+            }
         }
 
         private void ValidateMilitaryProcurement(
@@ -2739,6 +4619,296 @@ namespace Mandate.Domain
             }
         }
 
+        private void ValidatePersistentWorldExecution()
+        {
+            var commands =
+                new Dictionary<string, PersistentWorldCommandState>(
+                    StringComparer.Ordinal);
+            var results =
+                new Dictionary<string, WorldCommandBatchResultState>(
+                    StringComparer.Ordinal);
+            var events = new Dictionary<string, WorldEventOutboxState>(
+                StringComparer.Ordinal);
+            var attemptsByCommand = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var lastResultByCommand =
+                new Dictionary<string, WorldCommandBatchResultState>(
+                    StringComparer.Ordinal);
+            var successByCommand = new Dictionary<
+                string, WorldCommandBatchResultState>(StringComparer.Ordinal);
+            var successfulTransactionIds = new HashSet<string>(
+                StringComparer.Ordinal);
+            var eventReferences = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+
+            for (var i = 0; i < PersistentWorldCommands.Count; i++)
+            {
+                var command = PersistentWorldCommands[i] ??
+                    throw new InvalidOperationException(
+                        "A persistent world command cannot be null.");
+                _ = new StableId(command.Id);
+                _ = new StableId(command.CommandTypeId);
+                _ = new StableId(command.IssuerId);
+                if (!Enum.IsDefined(
+                        typeof(PersistentWorldCommandStatus), command.Status) ||
+                    command.CreatedDay < 0 ||
+                    command.CreatedDay > AbsoluteDay ||
+                    command.CreatedSegment > (byte)DaySegment.Night ||
+                    command.DueDay < 0 ||
+                    command.DueSegment > (byte)DaySegment.Night ||
+                    command.AttemptCount < 0 ||
+                    command.Arguments == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid persistent world command {command.Id}.");
+                }
+                string previousKey = null;
+                for (var argumentIndex = 0;
+                     argumentIndex < command.Arguments.Count;
+                     argumentIndex++)
+                {
+                    var argument = command.Arguments[argumentIndex] ??
+                        throw new InvalidOperationException(
+                            $"Command {command.Id} has a null argument.");
+                    _ = new StableId(argument.Key);
+                    if (argument.Value == null ||
+                        previousKey != null && string.CompareOrdinal(
+                            previousKey, argument.Key) >= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid argument order on command {command.Id}.");
+                    }
+                    previousKey = argument.Key;
+                }
+                commands.Add(command.Id, command);
+            }
+
+            for (var i = 0; i < WorldEventOutbox.Count; i++)
+            {
+                var worldEvent = WorldEventOutbox[i] ??
+                    throw new InvalidOperationException(
+                        "A world event outbox entry cannot be null.");
+                _ = new StableId(worldEvent.Id);
+                _ = new StableId(worldEvent.EventTypeId);
+                _ = new StableId(worldEvent.SourceTransactionId);
+                if (!Enum.IsDefined(
+                        typeof(WorldEventDispatchStatus),
+                        worldEvent.DispatchStatus) ||
+                    worldEvent.Day < 0 || worldEvent.Day > AbsoluteDay ||
+                    worldEvent.Segment > (byte)DaySegment.Night ||
+                    worldEvent.DeliveredHandlerIds == null ||
+                    worldEvent.DispatchStatus ==
+                        WorldEventDispatchStatus.Pending &&
+                        worldEvent.DispatchedDay != -1 ||
+                    worldEvent.DispatchStatus ==
+                        WorldEventDispatchStatus.Dispatched &&
+                        (worldEvent.DispatchedDay < worldEvent.Day ||
+                         worldEvent.DispatchedDay > AbsoluteDay ||
+                         worldEvent.DispatchedSegment >
+                            (byte)DaySegment.Night))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid world event outbox entry {worldEvent.Id}.");
+                }
+                string previousHandlerId = null;
+                for (var handlerIndex = 0;
+                     handlerIndex < worldEvent.DeliveredHandlerIds.Count;
+                     handlerIndex++)
+                {
+                    var handlerId = worldEvent.DeliveredHandlerIds[handlerIndex];
+                    _ = new StableId(handlerId);
+                    if (previousHandlerId != null && string.CompareOrdinal(
+                        previousHandlerId, handlerId) >= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid handler acknowledgements on event {worldEvent.Id}.");
+                    }
+                    previousHandlerId = handlerId;
+                }
+                events.Add(worldEvent.Id, worldEvent);
+            }
+
+            for (var i = 0; i < WorldCommandBatchResults.Count; i++)
+            {
+                var result = WorldCommandBatchResults[i] ??
+                    throw new InvalidOperationException(
+                        "A world command batch result cannot be null.");
+                _ = new StableId(result.Id);
+                if (!Enum.IsDefined(
+                        typeof(WorldCommandBatchOutcome), result.Outcome) ||
+                    result.Day < 0 || result.Day > AbsoluteDay ||
+                    result.Segment > (byte)DaySegment.Night ||
+                    result.CommandIds == null ||
+                    result.CommandIds.Count == 0 ||
+                    result.Transactions == null ||
+                    result.PublishedEventIds == null ||
+                    result.Outcome == WorldCommandBatchOutcome.Succeeded &&
+                        !string.IsNullOrEmpty(result.FailureCode) ||
+                    result.Outcome == WorldCommandBatchOutcome.Rejected &&
+                        string.IsNullOrEmpty(result.FailureCode) ||
+                    result.Outcome == WorldCommandBatchOutcome.Rejected &&
+                        result.PublishedEventIds.Count != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid world command batch result {result.Id}.");
+                }
+                if (!string.IsNullOrEmpty(result.FailureCode))
+                {
+                    _ = new StableId(result.FailureCode);
+                }
+
+                string previousCommandId = null;
+                for (var commandIndex = 0;
+                     commandIndex < result.CommandIds.Count;
+                     commandIndex++)
+                {
+                    var commandId = result.CommandIds[commandIndex];
+                    if (!commands.ContainsKey(commandId) ||
+                        previousCommandId != null && string.CompareOrdinal(
+                            previousCommandId, commandId) >= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid command reference on result {result.Id}.");
+                    }
+                    previousCommandId = commandId;
+                    attemptsByCommand.TryGetValue(commandId, out var attempts);
+                    attemptsByCommand[commandId] = attempts + 1;
+                    if (!lastResultByCommand.TryGetValue(
+                            commandId, out var previousResult) ||
+                        CompareBatchResults(result, previousResult) > 0)
+                    {
+                        lastResultByCommand[commandId] = result;
+                    }
+                    if (result.Outcome == WorldCommandBatchOutcome.Succeeded &&
+                        successByCommand.ContainsKey(commandId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Command {commandId} succeeded more than once.");
+                    }
+                    if (result.Outcome == WorldCommandBatchOutcome.Succeeded)
+                    {
+                        successByCommand.Add(commandId, result);
+                    }
+                }
+
+                WorldTransactionExecutionState previousTransaction = null;
+                var transactionIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var transactionIndex = 0;
+                     transactionIndex < result.Transactions.Count;
+                     transactionIndex++)
+                {
+                    var transaction = result.Transactions[transactionIndex] ??
+                        throw new InvalidOperationException(
+                            $"Result {result.Id} has a null transaction.");
+                    _ = new StableId(transaction.TransactionId);
+                    _ = new StableId(transaction.TransactionKindId);
+                    if (!transactionIds.Add(transaction.TransactionId) ||
+                        previousTransaction != null &&
+                        CompareTransactionExecutions(
+                            previousTransaction, transaction) >= 0 ||
+                        result.Outcome ==
+                            WorldCommandBatchOutcome.Succeeded &&
+                            !successfulTransactionIds.Add(
+                                transaction.TransactionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid transaction summary on result {result.Id}.");
+                    }
+                    previousTransaction = transaction;
+                }
+
+                string previousEventId = null;
+                for (var eventIndex = 0;
+                     eventIndex < result.PublishedEventIds.Count;
+                     eventIndex++)
+                {
+                    var eventId = result.PublishedEventIds[eventIndex];
+                    if (!events.ContainsKey(eventId) ||
+                        previousEventId != null && string.CompareOrdinal(
+                            previousEventId, eventId) >= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid event reference on result {result.Id}.");
+                    }
+                    previousEventId = eventId;
+                    eventReferences.TryGetValue(eventId, out var references);
+                    eventReferences[eventId] = references + 1;
+                }
+                results.Add(result.Id, result);
+            }
+
+            for (var i = 0; i < PersistentWorldCommands.Count; i++)
+            {
+                var command = PersistentWorldCommands[i];
+                attemptsByCommand.TryGetValue(command.Id, out var attempts);
+                lastResultByCommand.TryGetValue(command.Id, out var lastResult);
+                successByCommand.TryGetValue(command.Id, out var successResult);
+                if (command.AttemptCount != attempts ||
+                    command.LastAttemptResultId !=
+                        (lastResult?.Id ?? string.Empty) ||
+                    command.Status == PersistentWorldCommandStatus.Pending &&
+                        (command.CompletedDay != -1 ||
+                         !string.IsNullOrEmpty(command.CompletionResultId) ||
+                         successResult != null) ||
+                    command.Status == PersistentWorldCommandStatus.Completed &&
+                        (command.CompletedDay < command.CreatedDay ||
+                         command.CompletedDay > AbsoluteDay ||
+                         command.CompletedSegment >
+                            (byte)DaySegment.Night ||
+                         successResult == null ||
+                         command.CompletionResultId != successResult.Id ||
+                         command.LastAttemptResultId != successResult.Id) ||
+                    command.Status == PersistentWorldCommandStatus.Cancelled &&
+                        (command.CompletedDay < command.CreatedDay ||
+                         command.CompletedDay > AbsoluteDay ||
+                         !string.IsNullOrEmpty(command.CompletionResultId) ||
+                         successResult != null))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid persistent command lifecycle {command.Id}.");
+                }
+            }
+
+            for (var i = 0; i < WorldEventOutbox.Count; i++)
+            {
+                var worldEvent = WorldEventOutbox[i];
+                eventReferences.TryGetValue(worldEvent.Id, out var references);
+                if (references != 1 ||
+                    !successfulTransactionIds.Contains(
+                        worldEvent.SourceTransactionId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid outbox source for event {worldEvent.Id}.");
+                }
+            }
+        }
+
+        private static int CompareBatchResults(
+            WorldCommandBatchResultState left,
+            WorldCommandBatchResultState right)
+        {
+            var day = left.Day.CompareTo(right.Day);
+            if (day != 0)
+            {
+                return day;
+            }
+            var segment = left.Segment.CompareTo(right.Segment);
+            return segment != 0
+                ? segment
+                : string.CompareOrdinal(left.Id, right.Id);
+        }
+
+        private static int CompareTransactionExecutions(
+            WorldTransactionExecutionState left,
+            WorldTransactionExecutionState right)
+        {
+            var priority = left.Priority.CompareTo(right.Priority);
+            return priority != 0
+                ? priority
+                : string.CompareOrdinal(
+                    left.TransactionId, right.TransactionId);
+        }
+
         private static void ValidateUniqueIds<T>(
             IList<T> items,
             Func<T, string> selectId,
@@ -2797,6 +4967,18 @@ namespace Mandate.Domain
             }
 
             throw new InvalidOperationException($"Missing route {routeId}.");
+        }
+
+        private static bool RouteConnects(
+            RouteState route,
+            string originLocationId,
+            string destinationLocationId)
+        {
+            return route.FromLocationId == originLocationId &&
+                   route.ToLocationId == destinationLocationId ||
+                   route.Bidirectional &&
+                   route.ToLocationId == originLocationId &&
+                   route.FromLocationId == destinationLocationId;
         }
 
         private static void ValidateRelationshipValue(
@@ -2906,6 +5088,18 @@ namespace Mandate.Domain
                         $"Invalid village {village.Id}.");
                 }
 
+                if (FoodInventoryAuthorityMode ==
+                        FoodInventoryAuthorityMode.FormalProductBatches
+                    ? village.PublicGranaryGrain != 0 ||
+                      string.IsNullOrEmpty(
+                          village.PublicGranaryInventoryContainerId)
+                    : !string.IsNullOrEmpty(
+                        village.PublicGranaryInventoryContainerId))
+                {
+                    throw new InvalidOperationException(
+                        $"Village {village.Id} disagrees with food inventory authority.");
+                }
+
                 if (village.HouseholdCount != village.HouseholdIds.Count)
                 {
                     throw new InvalidOperationException(
@@ -3009,6 +5203,10 @@ namespace Mandate.Domain
             HashSet<string> organizationIds)
         {
             var governanceIds = new HashSet<string>(StringComparer.Ordinal);
+            var formalMarketOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var formalMarketOrders =
+                new Dictionary<string, FormalMarketOrderState>(
+                    StringComparer.Ordinal);
             var governedLocations = new HashSet<string>(StringComparer.Ordinal);
             var governmentOrganizations = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < CountyGovernances.Count; i++)
@@ -3055,6 +5253,18 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid county governance {governance.Id}.");
+                }
+
+                if (FoodInventoryAuthorityMode ==
+                        FoodInventoryAuthorityMode.FormalProductBatches
+                    ? governance.CountyGranaryGrain != 0 ||
+                      string.IsNullOrEmpty(
+                          governance.GranaryInventoryContainerId)
+                    : !string.IsNullOrEmpty(
+                        governance.GranaryInventoryContainerId))
+                {
+                    throw new InvalidOperationException(
+                        $"County governance {governance.Id} disagrees with food inventory authority.");
                 }
 
                 OrganizationState organization = null;
@@ -3144,7 +5354,14 @@ namespace Mandate.Domain
                     !VillageExists(entry.VillageId) ||
                     !Enum.IsDefined(typeof(CountyFiscalEntryType), entry.Type) ||
                     entry.Amount < 0 ||
-                    entry.FamilyMoneyDelta + entry.GovernmentMoneyDelta != 0 ||
+                    entry.Type !=
+                            CountyFiscalEntryType.GrainExternalFreightEscrow &&
+                        entry.FamilyMoneyDelta +
+                            entry.GovernmentMoneyDelta != 0 ||
+                    entry.Type ==
+                            CountyFiscalEntryType.GrainExternalFreightEscrow &&
+                        (entry.FamilyMoneyDelta != 0 ||
+                         entry.GovernmentMoneyDelta >= 0) ||
                     entry.VillageGrainDelta + entry.CountyGrainDelta != 0)
                 {
                     throw new InvalidOperationException(
@@ -3451,11 +5668,29 @@ namespace Mandate.Domain
             var processingOrders = new Dictionary<string, ProcessingWorkOrderState>(
                 StringComparer.Ordinal);
             var processingOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var agricultureOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var agricultureOrders =
+                new Dictionary<string, AgricultureWorkOrderState>(
+                    StringComparer.Ordinal);
             var resourceExtractionOrderIds = new HashSet<string>(
                 StringComparer.Ordinal);
             var procurementOrderIds = new HashSet<string>(StringComparer.Ordinal);
+            var logisticsOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var repairOrderIds = new HashSet<string>(StringComparer.Ordinal);
             var transactionIds = new HashSet<string>(StringComparer.Ordinal);
+            var transactions =
+                new Dictionary<string, InventoryTransactionState>(
+                    StringComparer.Ordinal);
+            var formalMarketOrderIds = new HashSet<string>(
+                StringComparer.Ordinal);
+            var formalMarketOrders =
+                new Dictionary<string, FormalMarketOrderState>(
+                    StringComparer.Ordinal);
+            var civilianFreights =
+                new Dictionary<string, CivilianFreightState>(
+                    StringComparer.Ordinal);
+            var villageIds = new HashSet<string>(StringComparer.Ordinal);
+            var governanceIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Families.Count; i++)
             {
                 familyIds.Add(Families[i].Id);
@@ -3464,6 +5699,29 @@ namespace Mandate.Domain
             for (var i = 0; i < Organizations.Count; i++)
             {
                 organizationIds.Add(Organizations[i].Id);
+            }
+
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                villageIds.Add(Villages[i].Id);
+            }
+
+            for (var i = 0; i < CountyGovernances.Count; i++)
+            {
+                governanceIds.Add(CountyGovernances[i].Id);
+            }
+
+            for (var i = 0; i < FormalMarketOrders.Count; i++)
+            {
+                formalMarketOrderIds.Add(FormalMarketOrders[i].Id);
+                formalMarketOrders.Add(
+                    FormalMarketOrders[i].Id, FormalMarketOrders[i]);
+            }
+
+            for (var i = 0; i < CivilianFreights.Count; i++)
+            {
+                civilianFreights.Add(
+                    CivilianFreights[i].Id, CivilianFreights[i]);
             }
 
             for (var i = 0; i < VillageFacilities.Count; i++)
@@ -3476,6 +5734,13 @@ namespace Mandate.Domain
                 processingOrderIds.Add(ProcessingWorkOrders[i].Id);
             }
 
+            for (var i = 0; i < AgricultureWorkOrders.Count; i++)
+            {
+                agricultureOrderIds.Add(AgricultureWorkOrders[i].Id);
+                agricultureOrders.Add(
+                    AgricultureWorkOrders[i].Id, AgricultureWorkOrders[i]);
+            }
+
             for (var i = 0; i < ResourceExtractionOrders.Count; i++)
             {
                 resourceExtractionOrderIds.Add(ResourceExtractionOrders[i].Id);
@@ -3484,11 +5749,19 @@ namespace Mandate.Domain
             for (var i = 0; i < InventoryTransactions.Count; i++)
             {
                 transactionIds.Add(InventoryTransactions[i].Id);
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
             }
 
             for (var i = 0; i < MilitaryProcurementOrders.Count; i++)
             {
                 procurementOrderIds.Add(MilitaryProcurementOrders[i].Id);
+            }
+
+            for (var i = 0; i < MilitaryLogisticsOrders.Count; i++)
+            {
+                logisticsOrderIds.Add(MilitaryLogisticsOrders[i].Id);
             }
 
             for (var i = 0; i < MilitaryEquipmentRepairOrders.Count; i++)
@@ -3518,6 +5791,39 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid inventory container {container.Id}.");
+                }
+            }
+
+            if (FoodInventoryAuthorityMode ==
+                FoodInventoryAuthorityMode.FormalProductBatches)
+            {
+                for (var i = 0; i < Villages.Count; i++)
+                {
+                    var village = Villages[i];
+                    if (!containers.TryGetValue(
+                            village.PublicGranaryInventoryContainerId,
+                            out var container) ||
+                        container.LocationId != village.LocationId ||
+                        string.IsNullOrEmpty(container.OwnerOrganizationId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Village {village.Id} has an invalid formal granary container.");
+                    }
+                }
+
+                for (var i = 0; i < CountyGovernances.Count; i++)
+                {
+                    var governance = CountyGovernances[i];
+                    if (!containers.TryGetValue(
+                            governance.GranaryInventoryContainerId,
+                            out var container) ||
+                        container.LocationId != governance.CountyLocationId ||
+                        container.OwnerOrganizationId !=
+                            governance.GovernmentOrganizationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"County governance {governance.Id} has an invalid formal granary container.");
+                    }
                 }
             }
 
@@ -3617,6 +5923,16 @@ namespace Mandate.Domain
                     !string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
                     string.IsNullOrEmpty(batch.StorageFacilityId) &&
                     !string.IsNullOrEmpty(batch.InventoryContainerId);
+                var familyContainerStored =
+                    !string.IsNullOrEmpty(batch.OwnerFamilyId) &&
+                    string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+                    string.IsNullOrEmpty(batch.StorageFacilityId) &&
+                    !string.IsNullOrEmpty(batch.InventoryContainerId);
+                var organizationContainerStored =
+                    string.IsNullOrEmpty(batch.OwnerFamilyId) &&
+                    !string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+                    string.IsNullOrEmpty(batch.StorageFacilityId) &&
+                    !string.IsNullOrEmpty(batch.InventoryContainerId);
                 var validFamilyStorage = familyStored &&
                     familyIds.Contains(batch.OwnerFamilyId) &&
                     facilities.TryGetValue(
@@ -3627,11 +5943,56 @@ namespace Mandate.Domain
                     containers.TryGetValue(
                         batch.InventoryContainerId, out var container) &&
                     container.OwnerOrganizationId == batch.OwnerOrganizationId;
-                if (!validFamilyStorage && !validOrganizationStorage ||
+                var validCivilianFreightStorage = false;
+                var validPublicReliefFreightStorage = false;
+                InventoryContainerState freightContainer = null;
+                InventoryTransactionState sourceTransaction = null;
+                CivilianFreightState civilianFreight = null;
+                if (familyContainerStored &&
+                    containers.TryGetValue(
+                        batch.InventoryContainerId, out freightContainer) &&
+                    transactions.TryGetValue(
+                        batch.SourceTransactionId,
+                        out sourceTransaction) &&
+                    sourceTransaction.Type ==
+                        InventoryTransactionType.CivilianFreightDispatched &&
+                    civilianFreights.TryGetValue(
+                        sourceTransaction.SourceCivilianFreightId ??
+                            string.Empty,
+                        out civilianFreight))
+                {
+                    validCivilianFreightStorage =
+                        civilianFreight.BuyerFamilyId == batch.OwnerFamilyId &&
+                        civilianFreight.TransportInventoryContainerId ==
+                            freightContainer.Id;
+                }
+                else if (organizationContainerStored &&
+                    containers.TryGetValue(
+                        batch.InventoryContainerId, out freightContainer) &&
+                    transactions.TryGetValue(
+                        batch.SourceTransactionId,
+                        out sourceTransaction) &&
+                    sourceTransaction.Type ==
+                        InventoryTransactionType.CivilianFreightDispatched &&
+                    civilianFreights.TryGetValue(
+                        sourceTransaction.SourceCivilianFreightId ??
+                            string.Empty,
+                        out civilianFreight))
+                {
+                    validPublicReliefFreightStorage =
+                        civilianFreight.BuyerOrganizationId ==
+                            batch.OwnerOrganizationId &&
+                        civilianFreight.TransportInventoryContainerId ==
+                            freightContainer.Id;
+                }
+                if (!validFamilyStorage && !validOrganizationStorage &&
+                    !validCivilianFreightStorage &&
+                    !validPublicReliefFreightStorage ||
                     !locationIds.Contains(batch.OriginLocationId) ||
                     !transactionIds.Contains(batch.SourceTransactionId) ||
                     !string.IsNullOrEmpty(batch.SourceWorkOrderId) &&
                     !processingOrderIds.Contains(batch.SourceWorkOrderId) &&
+                    !agricultureOrderIds.Contains(batch.SourceWorkOrderId) &&
                     !resourceExtractionOrderIds.Contains(
                         batch.SourceWorkOrderId) ||
                     batch.ProducedDay < 0 || batch.ProducedDay > AbsoluteDay ||
@@ -4061,7 +6422,8 @@ namespace Mandate.Domain
                     !string.IsNullOrEmpty(transaction.ActorPersonId) &&
                     !personIds.Contains(transaction.ActorPersonId) ||
                     !string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
-                    !processingOrders.ContainsKey(transaction.SourceWorkOrderId) ||
+                    !processingOrders.ContainsKey(transaction.SourceWorkOrderId) &&
+                    !agricultureOrderIds.Contains(transaction.SourceWorkOrderId) ||
                     !string.IsNullOrEmpty(
                         transaction.SourceMilitaryProcurementId) &&
                     !procurementOrderIds.Contains(
@@ -4074,6 +6436,24 @@ namespace Mandate.Domain
                         transaction.SourceResourceExtractionOrderId) &&
                     !resourceExtractionOrderIds.Contains(
                         transaction.SourceResourceExtractionOrderId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceMilitaryLogisticsOrderId) &&
+                    !logisticsOrderIds.Contains(
+                        transaction.SourceMilitaryLogisticsOrderId) ||
+                    !string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    !villageIds.Contains(transaction.SourceVillageId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId) &&
+                    !governanceIds.Contains(
+                        transaction.SourceCountyGovernanceId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceFormalMarketOrderId) &&
+                    !formalMarketOrderIds.Contains(
+                        transaction.SourceFormalMarketOrderId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceCivilianFreightId) &&
+                    !civilianFreights.ContainsKey(
+                        transaction.SourceCivilianFreightId) ||
                     transaction.Lines == null || transaction.Lines.Count == 0)
                 {
                     throw new InvalidOperationException(
@@ -4085,6 +6465,18 @@ namespace Mandate.Domain
                     transaction.Type == InventoryTransactionType.Reserved ||
                     transaction.Type == InventoryTransactionType.ReservationReleased ||
                     transaction.Type == InventoryTransactionType.RecipeSettled;
+                var hasProcessingOrder =
+                    !string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    processingOrders.ContainsKey(transaction.SourceWorkOrderId);
+                var hasAgricultureOrder =
+                    !string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    agricultureOrderIds.Contains(transaction.SourceWorkOrderId);
+                var foodHarvest = transaction.Type ==
+                    InventoryTransactionType.FoodHarvested;
+                var validAgricultureInventory =
+                    (transaction.Type ==
+                         InventoryTransactionType.LegacyBalanceConverted ||
+                     foodHarvest) && hasAgricultureOrder;
                 var requiresProcurement = transaction.Type ==
                     InventoryTransactionType.MilitaryProcurementDispatched;
                 var requiresRepair =
@@ -4094,8 +6486,122 @@ namespace Mandate.Domain
                         InventoryTransactionType.EquipmentRepairSettled;
                 var requiresResourceExtraction = transaction.Type ==
                     InventoryTransactionType.ResourceExtractionSettled;
-                if (requiresOrder !=
-                    !string.IsNullOrEmpty(transaction.SourceWorkOrderId) ||
+                var requiresMilitaryLogistics = transaction.Type ==
+                        InventoryTransactionType.MilitaryLogisticsDispatched ||
+                    transaction.Type == InventoryTransactionType
+                        .MilitaryLogisticsHandoffReserved ||
+                    transaction.Type == InventoryTransactionType
+                        .MilitaryLogisticsHandoffLoaded;
+                var formalization = transaction.Type ==
+                    InventoryTransactionType.LegacyFoodStockFormalized;
+                var foodTax = transaction.Type ==
+                    InventoryTransactionType.FoodTaxTransferred;
+                var villageRelief = transaction.Type ==
+                    InventoryTransactionType.FoodVillageReliefTransferred;
+                var countyRelief = transaction.Type ==
+                    InventoryTransactionType.FoodCountyReliefTransferred;
+                var taxRemittance = transaction.Type ==
+                    InventoryTransactionType.FoodTaxRemitted;
+                var foodTransfer = foodTax || villageRelief ||
+                    countyRelief || taxRemittance;
+                var foodRuntime = foodHarvest || foodTransfer;
+                var marketReserved = transaction.Type ==
+                    InventoryTransactionType.FoodMarketReserved;
+                var marketReleased = transaction.Type ==
+                    InventoryTransactionType.FoodMarketReservationReleased;
+                var marketTransferred = transaction.Type ==
+                    InventoryTransactionType.FoodMarketTransferred;
+                var publicReliefProcurement = transaction.Type ==
+                    InventoryTransactionType
+                        .FoodPublicReliefProcurementTransferred;
+                var marketInventory = marketReserved || marketReleased ||
+                    marketTransferred || publicReliefProcurement;
+                var civilianDispatch = transaction.Type ==
+                    InventoryTransactionType.CivilianFreightDispatched;
+                var civilianLoss = transaction.Type ==
+                    InventoryTransactionType.CivilianFreightNaturalLoss;
+                var civilianDelivery = transaction.Type ==
+                    InventoryTransactionType.CivilianFreightDelivered;
+                var civilianInventory = civilianDispatch || civilianLoss ||
+                    civilianDelivery;
+                CivilianFreightState civilianFreight = null;
+                var hasCivilianFreight = !string.IsNullOrEmpty(
+                        transaction.SourceCivilianFreightId) &&
+                    civilianFreights.TryGetValue(
+                        transaction.SourceCivilianFreightId,
+                        out civilianFreight);
+                FormalMarketOrderState formalMarketOrder = null;
+                var hasFormalMarketOrder =
+                    !string.IsNullOrEmpty(
+                        transaction.SourceFormalMarketOrderId) &&
+                    formalMarketOrders.TryGetValue(
+                        transaction.SourceFormalMarketOrderId,
+                        out formalMarketOrder);
+                var familyFormalization = formalization &&
+                    transaction.LegacyFamilyGrainDelta < 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta == 0 &&
+                    transaction.LegacyCountyGranaryDelta == 0 &&
+                    string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId);
+                var villageFormalization = formalization &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta < 0 &&
+                    transaction.LegacyCountyGranaryDelta == 0 &&
+                    !string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId);
+                var countyFormalization = formalization &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta == 0 &&
+                    transaction.LegacyCountyGranaryDelta < 0 &&
+                    string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    !string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId);
+                var validFoodRuntimeProvenance =
+                    foodHarvest && hasAgricultureOrder &&
+                    !string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId) ||
+                    (foodTax || villageRelief) &&
+                    !string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId) ||
+                    (countyRelief || taxRemittance) &&
+                    !string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    !string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId);
+                var validMarketProvenance = marketInventory &&
+                    hasFormalMarketOrder &&
+                    formalMarketOrder.Side == FormalMarketOrderSide.Sell &&
+                    transaction.SourceCountyGovernanceId ==
+                        formalMarketOrder.CountyGovernanceId &&
+                    string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyFamilySeedGrainDelta == 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta == 0 &&
+                    transaction.LegacyCountyGranaryDelta == 0;
+                var validCivilianProvenance = civilianInventory &&
+                    hasCivilianFreight &&
+                    string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyFamilySeedGrainDelta == 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta == 0 &&
+                    transaction.LegacyCountyGranaryDelta == 0 &&
+                    (civilianDispatch &&
+                         transaction.SourceFormalMarketOrderId ==
+                            civilianFreight.SellOrderId &&
+                         transaction.SourceCountyGovernanceId ==
+                            civilianFreight.OriginCountyGovernanceId ||
+                     !civilianDispatch &&
+                         string.IsNullOrEmpty(
+                             transaction.SourceFormalMarketOrderId) &&
+                         string.IsNullOrEmpty(
+                             transaction.SourceCountyGovernanceId));
+                if (requiresOrder != hasProcessingOrder ||
+                    hasAgricultureOrder && !validAgricultureInventory ||
                     requiresProcurement !=
                     !string.IsNullOrEmpty(
                         transaction.SourceMilitaryProcurementId) ||
@@ -4105,18 +6611,66 @@ namespace Mandate.Domain
                     requiresResourceExtraction !=
                     !string.IsNullOrEmpty(
                         transaction.SourceResourceExtractionOrderId) ||
+                    requiresMilitaryLogistics !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceMilitaryLogisticsOrderId) ||
                     transaction.Type ==
                         InventoryTransactionType.LegacyBalanceConverted &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
                     transaction.LegacyFamilySeedGrainDelta == 0 ||
                     transaction.Type == InventoryTransactionType.OpeningBalance &&
                     (transaction.LegacyFamilyGrainDelta != 0 ||
-                     transaction.LegacyFamilySeedGrainDelta != 0))
+                     transaction.LegacyFamilySeedGrainDelta != 0) ||
+                    formalization &&
+                    (!familyFormalization &&
+                     !villageFormalization &&
+                     !countyFormalization ||
+                     transaction.LegacyFamilySeedGrainDelta != 0) ||
+                    foodRuntime &&
+                    (!validFoodRuntimeProvenance ||
+                     transaction.LegacyFamilyGrainDelta != 0 ||
+                     transaction.LegacyFamilySeedGrainDelta != 0 ||
+                     transaction.LegacyVillagePublicGranaryDelta != 0 ||
+                     transaction.LegacyCountyGranaryDelta != 0) ||
+                    marketInventory && !validMarketProvenance ||
+                    civilianInventory && !validCivilianProvenance ||
+                    !marketInventory && !civilianDispatch &&
+                    !string.IsNullOrEmpty(
+                        transaction.SourceFormalMarketOrderId) ||
+                    !civilianInventory &&
+                    !string.IsNullOrEmpty(
+                        transaction.SourceCivilianFreightId) ||
+                    !formalization && !foodRuntime && !marketInventory &&
+                    !civilianInventory &&
+                    (transaction.LegacyVillagePublicGranaryDelta != 0 ||
+                     transaction.LegacyCountyGranaryDelta != 0 ||
+                     !string.IsNullOrEmpty(transaction.SourceVillageId) ||
+                     !string.IsNullOrEmpty(
+                         transaction.SourceCountyGovernanceId)))
                 {
                     throw new InvalidOperationException(
                         $"Inventory transaction {transaction.Id} has invalid provenance.");
                 }
 
+                long formalizationQuantity = 0;
+                var formalizationFamilyId = string.Empty;
+                long transferWeightDelta = 0;
+                var transferProductDeltas = new Dictionary<string, long>(
+                    StringComparer.Ordinal);
+                var hasTransferSource = false;
+                var hasTransferDestination = false;
+                var runtimeVillage = foodRuntime
+                    ? FindVillageById(Villages, transaction.SourceVillageId)
+                    : null;
+                var runtimeCounty = countyRelief || taxRemittance ||
+                    publicReliefProcurement
+                    ? FindCountyGovernanceById(
+                        CountyGovernances,
+                        transaction.SourceCountyGovernanceId)
+                    : null;
+                agricultureOrders.TryGetValue(
+                    transaction.SourceWorkOrderId ?? string.Empty,
+                    out var harvestOrder);
                 for (var lineIndex = 0;
                      lineIndex < transaction.Lines.Count;
                      lineIndex++)
@@ -4129,10 +6683,315 @@ namespace Mandate.Domain
                         line.StorageFacilityId != batch.StorageFacilityId ||
                         line.InventoryContainerId != batch.InventoryContainerId ||
                         line.UnitId != batch.UnitId ||
+                        line.QuantityDelta > 0 &&
+                        batch.SourceTransactionId != transaction.Id ||
                         line.QuantityDelta == 0 && line.ReservedQuantityDelta == 0)
                     {
                         throw new InvalidOperationException(
                             $"Invalid line on inventory transaction {transaction.Id}.");
+                    }
+
+                    if (formalization)
+                    {
+                        if (line.QuantityDelta <= 0 ||
+                            line.ReservedQuantityDelta != 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Formalization transaction {transaction.Id} must only create stock.");
+                        }
+
+                        formalizationQuantity = checked(
+                            formalizationQuantity + line.QuantityDelta);
+                        if (familyFormalization)
+                        {
+                            if (string.IsNullOrEmpty(line.OwnerFamilyId) ||
+                                !string.IsNullOrEmpty(
+                                    line.OwnerOrganizationId) ||
+                                formalizationFamilyId.Length != 0 &&
+                                formalizationFamilyId != line.OwnerFamilyId)
+                            {
+                                throw new InvalidOperationException(
+                                    $"Family formalization {transaction.Id} changes inventory owner.");
+                            }
+
+                            formalizationFamilyId = line.OwnerFamilyId;
+                        }
+                        else if (villageFormalization)
+                        {
+                            var village = FindVillageById(
+                                Villages, transaction.SourceVillageId);
+                            if (line.InventoryContainerId !=
+                                village.PublicGranaryInventoryContainerId)
+                            {
+                                throw new InvalidOperationException(
+                                    $"Village formalization {transaction.Id} targets the wrong granary.");
+                            }
+                        }
+                        else
+                        {
+                            var governance = FindCountyGovernanceById(
+                                CountyGovernances,
+                                transaction.SourceCountyGovernanceId);
+                            if (line.InventoryContainerId !=
+                                governance.GranaryInventoryContainerId)
+                            {
+                                throw new InvalidOperationException(
+                                    $"County formalization {transaction.Id} targets the wrong granary.");
+                            }
+                        }
+                    }
+
+                    if (foodHarvest)
+                    {
+                        if (line.QuantityDelta <= 0 ||
+                            line.ReservedQuantityDelta != 0 ||
+                            harvestOrder == null ||
+                            transaction.SourceVillageId != harvestOrder.VillageId ||
+                            line.OwnerFamilyId != harvestOrder.FamilyId ||
+                            line.StorageFacilityId !=
+                                harvestOrder.StorageFacilityId ||
+                            !string.IsNullOrEmpty(line.InventoryContainerId) ||
+                            batch.SourceWorkOrderId != harvestOrder.Id ||
+                            line.ProductDefinitionId !=
+                                harvestOrder.HarvestProductDefinitionId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Food harvest transaction {transaction.Id} has an invalid destination.");
+                        }
+                    }
+
+                    if (foodTransfer)
+                    {
+                        if (line.ReservedQuantityDelta != 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Food transfer {transaction.Id} cannot change reservations.");
+                        }
+
+                        var isSource = line.QuantityDelta < 0;
+                        var isDestination = line.QuantityDelta > 0;
+                        var villageContainerId = runtimeVillage
+                            .PublicGranaryInventoryContainerId;
+                        var countyContainerId = runtimeCounty == null
+                            ? string.Empty
+                            : runtimeCounty.GranaryInventoryContainerId;
+                        var validLine =
+                            foodTax &&
+                            (isSource &&
+                                 !string.IsNullOrEmpty(line.OwnerFamilyId) &&
+                                 !string.IsNullOrEmpty(line.StorageFacilityId) ||
+                             isDestination &&
+                                 line.InventoryContainerId == villageContainerId) ||
+                            villageRelief &&
+                            (isSource &&
+                                 line.InventoryContainerId == villageContainerId ||
+                             isDestination &&
+                                 !string.IsNullOrEmpty(line.OwnerFamilyId) &&
+                                 !string.IsNullOrEmpty(line.StorageFacilityId)) ||
+                            countyRelief &&
+                            (isSource &&
+                                 line.InventoryContainerId == countyContainerId ||
+                             isDestination &&
+                                 line.InventoryContainerId == villageContainerId) ||
+                            taxRemittance &&
+                            (isSource &&
+                                 line.InventoryContainerId == villageContainerId ||
+                             isDestination &&
+                                 line.InventoryContainerId == countyContainerId);
+                        if (!validLine)
+                        {
+                            throw new InvalidOperationException(
+                                $"Food transfer {transaction.Id} crosses an invalid ownership boundary.");
+                        }
+
+                        hasTransferSource |= isSource;
+                        hasTransferDestination |= isDestination;
+                        AddDelta(
+                            transferProductDeltas,
+                            line.ProductDefinitionId,
+                            line.QuantityDelta);
+                        transferWeightDelta = checked(
+                            transferWeightDelta +
+                            line.QuantityDelta * batch.UnitWeight);
+                    }
+
+                    if (marketReserved || marketReleased)
+                    {
+                        var validReservationLine =
+                            line.QuantityDelta == 0 &&
+                            (marketReserved &&
+                                 line.ReservedQuantityDelta > 0 ||
+                             marketReleased &&
+                                 line.ReservedQuantityDelta < 0) &&
+                            line.OwnerFamilyId ==
+                                formalMarketOrder.OwnerFamilyId &&
+                            line.StorageFacilityId ==
+                                formalMarketOrder.StorageFacilityId &&
+                            line.ProductDefinitionId ==
+                                formalMarketOrder.ProductDefinitionId &&
+                            string.IsNullOrEmpty(line.InventoryContainerId);
+                        if (!validReservationLine)
+                        {
+                            throw new InvalidOperationException(
+                                $"Formal market reservation transaction {transaction.Id} is invalid.");
+                        }
+                    }
+
+                    if (marketTransferred)
+                    {
+                        var isSource = line.QuantityDelta < 0;
+                        var isDestination = line.QuantityDelta > 0;
+                        var validMarketLine =
+                            line.ProductDefinitionId ==
+                                formalMarketOrder.ProductDefinitionId &&
+                            (isSource &&
+                                 line.OwnerFamilyId ==
+                                     formalMarketOrder.OwnerFamilyId &&
+                                 line.StorageFacilityId ==
+                                     formalMarketOrder.StorageFacilityId &&
+                                 line.ReservedQuantityDelta ==
+                                     line.QuantityDelta ||
+                             isDestination &&
+                                 !string.IsNullOrEmpty(line.OwnerFamilyId) &&
+                                 line.OwnerFamilyId !=
+                                     formalMarketOrder.OwnerFamilyId &&
+                                 !string.IsNullOrEmpty(
+                                     line.StorageFacilityId) &&
+                                 line.ReservedQuantityDelta == 0);
+                        if (!validMarketLine)
+                        {
+                            throw new InvalidOperationException(
+                                $"Formal market delivery {transaction.Id} crosses an invalid ownership boundary.");
+                        }
+
+                        hasTransferSource |= isSource;
+                        hasTransferDestination |= isDestination;
+                        AddDelta(
+                            transferProductDeltas,
+                            line.ProductDefinitionId,
+                            line.QuantityDelta);
+                        transferWeightDelta = checked(
+                            transferWeightDelta +
+                            line.QuantityDelta * batch.UnitWeight);
+                    }
+
+                    if (publicReliefProcurement)
+                    {
+                        var isSource = line.QuantityDelta < 0;
+                        var isDestination = line.QuantityDelta > 0;
+                        var validProcurementLine =
+                            line.ProductDefinitionId ==
+                                formalMarketOrder.ProductDefinitionId &&
+                            (isSource &&
+                                 line.OwnerFamilyId ==
+                                     formalMarketOrder.OwnerFamilyId &&
+                                 line.StorageFacilityId ==
+                                     formalMarketOrder.StorageFacilityId &&
+                                 string.IsNullOrEmpty(
+                                     line.InventoryContainerId) &&
+                                 line.ReservedQuantityDelta ==
+                                     line.QuantityDelta ||
+                             isDestination &&
+                                 string.IsNullOrEmpty(line.OwnerFamilyId) &&
+                                 line.OwnerOrganizationId ==
+                                     runtimeCounty.GovernmentOrganizationId &&
+                                 string.IsNullOrEmpty(
+                                     line.StorageFacilityId) &&
+                                 line.InventoryContainerId ==
+                                     runtimeCounty
+                                         .GranaryInventoryContainerId &&
+                                 line.ReservedQuantityDelta == 0);
+                        if (!validProcurementLine)
+                        {
+                            throw new InvalidOperationException(
+                                $"Public relief procurement delivery {transaction.Id} crosses an invalid ownership boundary.");
+                        }
+
+                        hasTransferSource |= isSource;
+                        hasTransferDestination |= isDestination;
+                        AddDelta(
+                            transferProductDeltas,
+                            line.ProductDefinitionId,
+                            line.QuantityDelta);
+                        transferWeightDelta = checked(
+                            transferWeightDelta +
+                            line.QuantityDelta * batch.UnitWeight);
+                    }
+
+                    if (civilianInventory)
+                    {
+                        var isSource = line.QuantityDelta < 0;
+                        var isDestination = line.QuantityDelta > 0;
+                        var publicReliefFreight =
+                            !string.IsNullOrEmpty(
+                                civilianFreight.BuyerOrganizationId);
+                        var validCargoOwner = publicReliefFreight
+                            ? string.IsNullOrEmpty(line.OwnerFamilyId) &&
+                              line.OwnerOrganizationId ==
+                                  civilianFreight.BuyerOrganizationId
+                            : line.OwnerFamilyId ==
+                                  civilianFreight.BuyerFamilyId &&
+                              string.IsNullOrEmpty(
+                                  line.OwnerOrganizationId);
+                        var validCivilianLine =
+                            civilianDispatch &&
+                            (isSource &&
+                                 line.OwnerFamilyId ==
+                                     civilianFreight.SellerFamilyId &&
+                                 line.StorageFacilityId ==
+                                     civilianFreight.SellerStorageFacilityId &&
+                                 line.ReservedQuantityDelta ==
+                                     line.QuantityDelta ||
+                             isDestination &&
+                                 validCargoOwner &&
+                                 line.InventoryContainerId ==
+                                     civilianFreight
+                                         .TransportInventoryContainerId &&
+                                 line.ReservedQuantityDelta == 0) ||
+                            civilianLoss && isSource &&
+                                validCargoOwner &&
+                                line.InventoryContainerId ==
+                                    civilianFreight
+                                        .TransportInventoryContainerId &&
+                                line.ReservedQuantityDelta == 0 ||
+                            civilianDelivery &&
+                            (isSource &&
+                                 validCargoOwner &&
+                                 line.InventoryContainerId ==
+                                     civilianFreight
+                                         .TransportInventoryContainerId &&
+                                 line.ReservedQuantityDelta == 0 ||
+                             isDestination &&
+                                 (publicReliefFreight
+                                    ? validCargoOwner &&
+                                      line.InventoryContainerId ==
+                                          civilianFreight
+                                              .DestinationInventoryContainerId
+                                    : validCargoOwner &&
+                                      line.StorageFacilityId ==
+                                          civilianFreight
+                                              .BuyerStorageFacilityId) &&
+                                 line.ReservedQuantityDelta == 0);
+                        if (!validCivilianLine ||
+                            line.ProductDefinitionId !=
+                                civilianFreight.ProductDefinitionId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Civilian freight inventory line on {transaction.Id} is invalid.");
+                        }
+
+                        if (!civilianLoss)
+                        {
+                            hasTransferSource |= isSource;
+                            hasTransferDestination |= isDestination;
+                            AddDelta(
+                                transferProductDeltas,
+                                line.ProductDefinitionId,
+                                line.QuantityDelta);
+                            transferWeightDelta = checked(
+                                transferWeightDelta +
+                                line.QuantityDelta * batch.UnitWeight);
+                        }
                     }
 
                     AddDelta(quantityDeltas, line.BatchId, line.QuantityDelta);
@@ -4140,6 +6999,38 @@ namespace Mandate.Domain
                         reservationDeltas,
                         line.BatchId,
                         line.ReservedQuantityDelta);
+                }
+
+                if (formalization && formalizationQuantity != checked(-(
+                        transaction.LegacyFamilyGrainDelta +
+                        transaction.LegacyVillagePublicGranaryDelta +
+                        transaction.LegacyCountyGranaryDelta)))
+                {
+                    throw new InvalidOperationException(
+                        $"Formalization transaction {transaction.Id} is not conservative.");
+                }
+
+                if ((foodTransfer || marketTransferred ||
+                     publicReliefProcurement || civilianDispatch ||
+                     civilianDelivery) &&
+                    (!hasTransferSource || !hasTransferDestination ||
+                     transferWeightDelta != 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Food transfer {transaction.Id} is not physically conservative.");
+                }
+                if (foodTransfer || marketTransferred ||
+                    publicReliefProcurement || civilianDispatch ||
+                    civilianDelivery)
+                {
+                    foreach (var pair in transferProductDeltas)
+                    {
+                        if (pair.Value != 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Food transfer {transaction.Id} changes product identity.");
+                        }
+                    }
                 }
             }
 
@@ -4207,6 +7098,1647 @@ namespace Mandate.Domain
                         $"Tracked batches exceed container capacity for {container.Id}.");
                 }
             }
+
+        }
+
+        private void ValidateCivilianFreightPlanning(
+            HashSet<string> personIds,
+            IDictionary<string, FamilyState> families,
+            IDictionary<string, InventoryContainerState> containers,
+            IDictionary<string, RouteState> routes,
+            IDictionary<string, FormalMarketOrderState> orders,
+            IDictionary<string, CivilianFreightState> freights)
+        {
+            var demands = new Dictionary<string, CivilianFreightDemandState>(
+                StringComparer.Ordinal);
+            var registrations =
+                new Dictionary<string, CivilianCarrierRegistrationState>(
+                    StringComparer.Ordinal);
+            var offers = new Dictionary<string, CivilianCarrierOfferState>(
+                StringComparer.Ordinal);
+            var activeOrderDemands = new HashSet<string>(
+                StringComparer.Ordinal);
+            var activeCarrierPeople = new HashSet<string>(
+                StringComparer.Ordinal);
+            var activeCarrierContainers = new HashSet<string>(
+                StringComparer.Ordinal);
+
+            for (var i = 0; i < CivilianFreightDemands.Count; i++)
+            {
+                demands.Add(CivilianFreightDemands[i].Id,
+                    CivilianFreightDemands[i]);
+            }
+            for (var i = 0; i < CivilianCarrierRegistrations.Count; i++)
+            {
+                registrations.Add(CivilianCarrierRegistrations[i].Id,
+                    CivilianCarrierRegistrations[i]);
+            }
+            for (var i = 0; i < CivilianCarrierOffers.Count; i++)
+            {
+                offers.Add(CivilianCarrierOffers[i].Id,
+                    CivilianCarrierOffers[i]);
+            }
+
+            for (var i = 0; i < CivilianCarrierRegistrations.Count; i++)
+            {
+                var registration = CivilianCarrierRegistrations[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian carrier registration cannot be null.");
+                var carrier = FindPerson(
+                    People, registration.CarrierPersonId);
+                var knownRoutes = new HashSet<string>(StringComparer.Ordinal);
+                if (carrier == null ||
+                    !personIds.Contains(registration.CarrierPersonId) ||
+                    !families.TryGetValue(
+                        registration.CarrierFamilyId,
+                        out var carrierFamily) ||
+                    !containers.TryGetValue(
+                        registration.TransportInventoryContainerId,
+                        out var container) ||
+                    carrier.FamilyId != carrierFamily.Id ||
+                    container.OwnerFamilyId != carrierFamily.Id ||
+                    !string.IsNullOrEmpty(container.OwnerOrganizationId) ||
+                    container.CarrierPersonId != carrier.Id ||
+                    registration.BaseFee < 0 ||
+                    registration.FeePerKilometer < 0 ||
+                    registration.FeePerHundredUnits < 0 ||
+                    registration.MaximumDistanceKilometers <= 0 ||
+                    string.IsNullOrWhiteSpace(registration.RoutePolicyId) ||
+                    registration.RegisteredDay < 0 ||
+                    registration.RegisteredDay > AbsoluteDay ||
+                    registration.KnownRouteIds == null ||
+                    registration.KnownRouteIds.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian carrier registration {registration.Id}.");
+                }
+                for (var routeIndex = 0;
+                     routeIndex < registration.KnownRouteIds.Count;
+                     routeIndex++)
+                {
+                    var routeId = registration.KnownRouteIds[routeIndex];
+                    if (!routes.ContainsKey(routeId) ||
+                        !knownRoutes.Add(routeId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid known route in carrier registration {registration.Id}.");
+                    }
+                }
+                if (registration.Active &&
+                    (!activeCarrierPeople.Add(registration.CarrierPersonId) ||
+                     !activeCarrierContainers.Add(
+                        registration.TransportInventoryContainerId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate active civilian carrier registration {registration.Id}.");
+                }
+            }
+
+            for (var i = 0; i < CivilianFreightDemands.Count; i++)
+            {
+                var demand = CivilianFreightDemands[i];
+                var hasBuy = orders.TryGetValue(demand.BuyOrderId, out var buy);
+                var hasSell = orders.TryGetValue(demand.SellOrderId, out var sell);
+                FamilyState buyerFamily = null;
+                FamilyState sellerFamily = null;
+                var hasBuyerFamily = hasBuy && families.TryGetValue(
+                    buy.OwnerFamilyId, out buyerFamily);
+                var hasSellerFamily = hasSell && families.TryGetValue(
+                    sell.OwnerFamilyId, out sellerFamily);
+                var active = demand.Status == CivilianFreightDemandStatus.Active;
+                var dispatched = demand.Status ==
+                    CivilianFreightDemandStatus.Dispatched;
+                if (!Enum.IsDefined(
+                        typeof(CivilianFreightDemandStatus), demand.Status) ||
+                    !hasBuy || !hasSell || !hasBuyerFamily ||
+                    !hasSellerFamily ||
+                    buy.Side != FormalMarketOrderSide.Buy ||
+                    sell.Side != FormalMarketOrderSide.Sell ||
+                    buy.CountyGovernanceId == sell.CountyGovernanceId ||
+                    buy.ProductDefinitionId != sell.ProductDefinitionId ||
+                    sell.UnitPrice > buy.UnitPrice ||
+                    demand.OriginCountyGovernanceId != sell.CountyGovernanceId ||
+                    demand.DestinationCountyGovernanceId !=
+                        buy.CountyGovernanceId ||
+                    demand.ProductDefinitionId != buy.ProductDefinitionId ||
+                    demand.OriginLocationId != sellerFamily.LocationId ||
+                    demand.DestinationLocationId != buyerFamily.LocationId ||
+                    demand.Quantity <= 0 ||
+                    demand.Quantity > buy.OriginalQuantity ||
+                    demand.Quantity > sell.OriginalQuantity ||
+                    demand.MaximumFreightFee < 0 ||
+                    string.IsNullOrWhiteSpace(demand.RoutePolicyId) ||
+                    demand.CreatedDay < 0 ||
+                    demand.ExpiryDay < demand.CreatedDay ||
+                    demand.CreatedDay > AbsoluteDay ||
+                    active &&
+                        (demand.ClosedDay != -1 ||
+                         !string.IsNullOrEmpty(demand.AcceptedOfferId) ||
+                         !string.IsNullOrEmpty(demand.CivilianFreightId) ||
+                         buy.Status != FormalMarketOrderStatus.Active ||
+                         sell.Status != FormalMarketOrderStatus.Active ||
+                         demand.Quantity > buy.RemainingQuantity ||
+                         demand.Quantity > sell.RemainingQuantity) ||
+                    dispatched &&
+                        (demand.ClosedDay < demand.CreatedDay ||
+                         !offers.TryGetValue(
+                            demand.AcceptedOfferId, out var acceptedOffer) ||
+                         !freights.TryGetValue(
+                            demand.CivilianFreightId, out var freight) ||
+                         acceptedOffer.Status !=
+                            CivilianCarrierOfferStatus.Accepted ||
+                         acceptedOffer.DemandId != demand.Id ||
+                         acceptedOffer.CivilianFreightId != freight.Id ||
+                         freight.DemandId != demand.Id ||
+                         freight.CarrierOfferId != acceptedOffer.Id) ||
+                    !active && !dispatched &&
+                        (demand.ClosedDay < demand.CreatedDay ||
+                         !string.IsNullOrEmpty(demand.AcceptedOfferId) ||
+                         !string.IsNullOrEmpty(demand.CivilianFreightId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian freight demand {demand.Id}.");
+                }
+                if (active &&
+                    (!activeOrderDemands.Add(demand.BuyOrderId) ||
+                     !activeOrderDemands.Add(demand.SellOrderId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Civilian freight demand {demand.Id} reuses an active order.");
+                }
+            }
+
+            for (var i = 0; i < CivilianCarrierOffers.Count; i++)
+            {
+                var offer = CivilianCarrierOffers[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian carrier offer cannot be null.");
+                var hasDemand = demands.TryGetValue(
+                    offer.DemandId, out var demand);
+                var hasRegistration = registrations.TryGetValue(
+                    offer.CarrierRegistrationId, out var registration);
+                var totalDistance = 0;
+                var minimumSecurity = 0;
+                var routePlanValid = hasDemand && TryBuildCivilianRoutePlan(
+                    routes,
+                    offer.PlannedRouteIds,
+                    demand.OriginLocationId,
+                    demand.DestinationLocationId,
+                    out _,
+                    out _,
+                    out totalDistance,
+                    out minimumSecurity);
+                var knownRoutes = hasRegistration
+                    ? new HashSet<string>(
+                        registration.KnownRouteIds, StringComparer.Ordinal)
+                    : new HashSet<string>(StringComparer.Ordinal);
+                var allKnown = routePlanValid;
+                if (routePlanValid)
+                {
+                    for (var routeIndex = 0;
+                         routeIndex < offer.PlannedRouteIds.Count;
+                         routeIndex++)
+                    {
+                        allKnown &= knownRoutes.Contains(
+                            offer.PlannedRouteIds[routeIndex]);
+                    }
+                }
+                long expectedFee = -1;
+                if (hasDemand && hasRegistration)
+                {
+                    expectedFee = checked(
+                        registration.BaseFee +
+                        registration.FeePerKilometer * totalDistance +
+                        registration.FeePerHundredUnits *
+                            ((demand.Quantity + 99) / 100));
+                }
+                var active = offer.Status == CivilianCarrierOfferStatus.Active;
+                var accepted = offer.Status ==
+                    CivilianCarrierOfferStatus.Accepted;
+                if (!Enum.IsDefined(
+                        typeof(CivilianCarrierOfferStatus), offer.Status) ||
+                    !hasDemand || !hasRegistration || !routePlanValid ||
+                    !allKnown ||
+                    offer.CarrierPersonId != registration.CarrierPersonId ||
+                    offer.CarrierFamilyId != registration.CarrierFamilyId ||
+                    offer.TransportInventoryContainerId !=
+                        registration.TransportInventoryContainerId ||
+                    offer.RoutePolicyId != demand.RoutePolicyId ||
+                    registration.RoutePolicyId != demand.RoutePolicyId ||
+                    offer.TotalDistanceKilometers != totalDistance ||
+                    offer.MinimumSecurityBasisPoints != minimumSecurity ||
+                    totalDistance > registration.MaximumDistanceKilometers ||
+                    offer.QuotedFreightFee != expectedFee ||
+                    offer.QuotedFreightFee > demand.MaximumFreightFee ||
+                    offer.CreatedDay < demand.CreatedDay ||
+                    offer.CreatedDay > AbsoluteDay ||
+                    active &&
+                        (!registration.Active ||
+                         demand.Status != CivilianFreightDemandStatus.Active ||
+                         offer.ClosedDay != -1 ||
+                         !string.IsNullOrEmpty(offer.CivilianFreightId)) ||
+                    accepted &&
+                        (demand.Status !=
+                            CivilianFreightDemandStatus.Dispatched ||
+                         demand.AcceptedOfferId != offer.Id ||
+                         demand.CivilianFreightId !=
+                            offer.CivilianFreightId ||
+                         offer.ClosedDay < offer.CreatedDay) ||
+                    !active && !accepted &&
+                        (offer.ClosedDay < offer.CreatedDay ||
+                         !string.IsNullOrEmpty(offer.CivilianFreightId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian carrier offer {offer.Id}.");
+                }
+            }
+
+            for (var i = 0; i < CivilianFreights.Count; i++)
+            {
+                var freight = CivilianFreights[i];
+                var hasPlanningLink = !string.IsNullOrEmpty(freight.DemandId) ||
+                    !string.IsNullOrEmpty(freight.CarrierOfferId);
+                if (hasPlanningLink &&
+                    (!demands.TryGetValue(freight.DemandId, out var demand) ||
+                     !offers.TryGetValue(
+                        freight.CarrierOfferId, out var offer) ||
+                     demand.Status != CivilianFreightDemandStatus.Dispatched ||
+                     offer.Status != CivilianCarrierOfferStatus.Accepted ||
+                     demand.CivilianFreightId != freight.Id ||
+                     offer.CivilianFreightId != freight.Id) ||
+                    !hasPlanningLink &&
+                        (!string.IsNullOrEmpty(freight.DemandId) ||
+                         !string.IsNullOrEmpty(freight.CarrierOfferId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian freight planning link {freight.Id}.");
+                }
+            }
+        }
+
+        private static bool TryBuildCivilianRoutePlan(
+            IDictionary<string, RouteState> routes,
+            IList<string> routeIds,
+            string originLocationId,
+            string destinationLocationId,
+            out List<string> legOrigins,
+            out List<string> legDestinations,
+            out int totalDistance,
+            out int minimumSecurity)
+        {
+            legOrigins = new List<string>();
+            legDestinations = new List<string>();
+            totalDistance = 0;
+            minimumSecurity = 10_000;
+            if (routeIds == null || routeIds.Count == 0 ||
+                string.IsNullOrEmpty(originLocationId) ||
+                string.IsNullOrEmpty(destinationLocationId))
+            {
+                return false;
+            }
+
+            var current = originLocationId;
+            var visited = new HashSet<string>(StringComparer.Ordinal)
+            {
+                current
+            };
+            long distance = 0;
+            for (var i = 0; i < routeIds.Count; i++)
+            {
+                if (!routes.TryGetValue(routeIds[i], out var route))
+                {
+                    return false;
+                }
+                string next;
+                if (route.FromLocationId == current)
+                {
+                    next = route.ToLocationId;
+                }
+                else if (route.Bidirectional &&
+                    route.ToLocationId == current)
+                {
+                    next = route.FromLocationId;
+                }
+                else
+                {
+                    return false;
+                }
+                if (!visited.Add(next))
+                {
+                    return false;
+                }
+                legOrigins.Add(current);
+                legDestinations.Add(next);
+                distance += route.DistanceKilometers;
+                if (distance > int.MaxValue)
+                {
+                    return false;
+                }
+                minimumSecurity = Math.Min(
+                    minimumSecurity, route.SecurityBasisPoints);
+                current = next;
+            }
+            totalDistance = (int)distance;
+            return current == destinationLocationId;
+        }
+
+        private void ValidateFormalMarket(HashSet<string> locationIds)
+        {
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            var governances = new Dictionary<string, CountyGovernanceState>(
+                StringComparer.Ordinal);
+            var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            var commands =
+                new Dictionary<string, PersistentWorldCommandState>(
+                    StringComparer.Ordinal);
+            var outbox = new Dictionary<string, WorldEventOutboxState>(
+                StringComparer.Ordinal);
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            var transactions =
+                new Dictionary<string, InventoryTransactionState>(
+                    StringComparer.Ordinal);
+            var transactionSequenceById = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var orders = new Dictionary<string, FormalMarketOrderState>(
+                StringComparer.Ordinal);
+            var tradedQuantityByOrder = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var settledMoneyByOrder = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var reservedQuantityByBatch = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var tradedQuantityByMarket = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var turnoverByMarket = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var lastTradeDayByMarket = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var lastTradePriceByMarket = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var lastTradeTransactionSequenceByMarket =
+                new Dictionary<string, int>(
+                StringComparer.Ordinal);
+
+            for (var i = 0; i < Families.Count; i++)
+            {
+                families.Add(Families[i].Id, Families[i]);
+            }
+
+            for (var i = 0; i < CountyGovernances.Count; i++)
+            {
+                governances.Add(CountyGovernances[i].Id, CountyGovernances[i]);
+            }
+
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+            }
+
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            }
+
+            for (var i = 0; i < PersistentWorldCommands.Count; i++)
+            {
+                commands.Add(
+                    PersistentWorldCommands[i].Id,
+                    PersistentWorldCommands[i]);
+            }
+
+            for (var i = 0; i < WorldEventOutbox.Count; i++)
+            {
+                outbox.Add(WorldEventOutbox[i].Id, WorldEventOutbox[i]);
+            }
+
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+            }
+
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            }
+
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+                transactionSequenceById.Add(
+                    InventoryTransactions[i].Id, i);
+            }
+
+            for (var i = 0; i < FormalMarketOrders.Count; i++)
+            {
+                var order = FormalMarketOrders[i] ??
+                    throw new InvalidOperationException(
+                        "A formal market order cannot be null.");
+                orders.Add(order.Id, order);
+                ValidateContentReference(
+                    order.ProductDefinitionId,
+                    "formal market product",
+                    order.Id);
+
+                var hasGovernance = governances.TryGetValue(
+                    order.CountyGovernanceId, out var governance);
+                var hasFamily = families.ContainsKey(order.OwnerFamilyId);
+                var hasFacility = facilities.TryGetValue(
+                    order.StorageFacilityId, out var facility);
+                var active = order.Status == FormalMarketOrderStatus.Active;
+                var filled = order.Status == FormalMarketOrderStatus.Filled;
+                var closed = order.Status == FormalMarketOrderStatus.Cancelled ||
+                    order.Status == FormalMarketOrderStatus.Expired;
+                if (!Enum.IsDefined(
+                        typeof(FormalMarketOrderSide), order.Side) ||
+                    !Enum.IsDefined(
+                        typeof(FormalMarketOrderStatus), order.Status) ||
+                    !hasGovernance || !hasFamily || !hasFacility ||
+                    !locationIds.Contains(governance.CountyLocationId) ||
+                    !FamilyBelongsToCounty(
+                        order.OwnerFamilyId, governance.CountyLocationId) ||
+                    facility.Kind != VillageFacilityKind.HouseholdGranary ||
+                    facility.OwnerFamilyId != order.OwnerFamilyId ||
+                    order.CreatedDay < 0 || order.CreatedDay > AbsoluteDay ||
+                    order.ExpiryDay < order.CreatedDay ||
+                    order.OriginalQuantity <= 0 ||
+                    order.RemainingQuantity < 0 ||
+                    order.RemainingQuantity > order.OriginalQuantity ||
+                    order.FilledQuantity !=
+                        order.OriginalQuantity - order.RemainingQuantity ||
+                    order.UnitPrice <= 0 ||
+                    order.MinimumQualityBasisPoints < 0 ||
+                    order.MinimumQualityBasisPoints > 10_000 ||
+                    order.EscrowMoney < 0 || order.SettledMoney < 0 ||
+                    active && (order.RemainingQuantity <= 0 ||
+                               order.ClosedDay != -1 ||
+                               !string.IsNullOrEmpty(order.CloseReason)) ||
+                    filled && (order.RemainingQuantity != 0 ||
+                               order.ClosedDay < order.CreatedDay) ||
+                    closed && (order.ClosedDay < order.CreatedDay ||
+                               string.IsNullOrEmpty(order.CloseReason)) ||
+                    !active && order.ClosedDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid formal market order {order.Id}.");
+                }
+
+                if (order.Side == FormalMarketOrderSide.Buy)
+                {
+                    if (order.BatchReservations.Count != 0 ||
+                        active && order.EscrowMoney < checked(
+                            order.RemainingQuantity * order.UnitPrice) ||
+                        !active && order.EscrowMoney != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid formal market buy escrow {order.Id}.");
+                    }
+
+                    continue;
+                }
+
+                if (order.EscrowMoney != 0 ||
+                    order.BatchReservations.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid formal market sell reservation {order.Id}.");
+                }
+
+                long originalReserved = 0;
+                long remainingReserved = 0;
+                var reservationBatchIds = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var reservationIndex = 0;
+                     reservationIndex < order.BatchReservations.Count;
+                     reservationIndex++)
+                {
+                    var reservation = order.BatchReservations[reservationIndex];
+                    if (reservation == null ||
+                        !reservationBatchIds.Add(reservation.BatchId) ||
+                        !batches.TryGetValue(
+                            reservation.BatchId, out var batch) ||
+                        reservation.OriginalQuantity <= 0 ||
+                        reservation.RemainingQuantity < 0 ||
+                        reservation.RemainingQuantity >
+                            reservation.OriginalQuantity ||
+                        batch.OwnerFamilyId != order.OwnerFamilyId ||
+                        batch.StorageFacilityId != order.StorageFacilityId ||
+                        batch.ProductDefinitionId !=
+                            order.ProductDefinitionId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid batch reservation on formal market order {order.Id}.");
+                    }
+
+                    originalReserved = checked(
+                        originalReserved + reservation.OriginalQuantity);
+                    remainingReserved = checked(
+                        remainingReserved + reservation.RemainingQuantity);
+                    if (active)
+                    {
+                        AddDelta(
+                            reservedQuantityByBatch,
+                            reservation.BatchId,
+                            reservation.RemainingQuantity);
+                    }
+                }
+
+                if (originalReserved != order.OriginalQuantity ||
+                    active && remainingReserved != order.RemainingQuantity ||
+                    !active && remainingReserved != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Formal market reservation total mismatch on {order.Id}.");
+                }
+            }
+
+            for (var i = 0; i < FormalMarketTrades.Count; i++)
+            {
+                var trade = FormalMarketTrades[i] ??
+                    throw new InvalidOperationException(
+                        "A formal market trade cannot be null.");
+                var hasBuy = orders.TryGetValue(
+                    trade.BuyOrderId, out var buy);
+                var hasSell = orders.TryGetValue(
+                    trade.SellOrderId, out var sell);
+                var hasTransaction = transactions.TryGetValue(
+                    trade.InventoryTransactionId, out var transaction);
+                var crossCounty = !string.IsNullOrEmpty(
+                    trade.CivilianFreightId);
+                if (!hasBuy || !hasSell || !hasTransaction ||
+                    trade.Day < 0 || trade.Day > AbsoluteDay ||
+                    buy.Side != FormalMarketOrderSide.Buy ||
+                    sell.Side != FormalMarketOrderSide.Sell ||
+                    trade.CountyGovernanceId != sell.CountyGovernanceId ||
+                    trade.DestinationCountyGovernanceId !=
+                        buy.CountyGovernanceId ||
+                    !governances.ContainsKey(
+                        trade.DestinationCountyGovernanceId) ||
+                    crossCounty !=
+                        (buy.CountyGovernanceId != sell.CountyGovernanceId) ||
+                    trade.BuyerFamilyId != buy.OwnerFamilyId ||
+                    trade.SellerFamilyId != sell.OwnerFamilyId ||
+                    trade.BuyerFamilyId == trade.SellerFamilyId ||
+                    trade.ProductDefinitionId != buy.ProductDefinitionId ||
+                    trade.ProductDefinitionId != sell.ProductDefinitionId ||
+                    trade.Quantity <= 0 || trade.UnitPrice <= 0 ||
+                    trade.UnitPrice > buy.UnitPrice ||
+                    trade.UnitPrice != sell.UnitPrice ||
+                    trade.MoneyTransferred != checked(
+                        trade.Quantity * trade.UnitPrice) ||
+                    trade.SellerProceeds != trade.MoneyTransferred ||
+                    !crossCounty && transaction.Type !=
+                        InventoryTransactionType.FoodMarketTransferred ||
+                    crossCounty && transaction.Type !=
+                        InventoryTransactionType.CivilianFreightDispatched ||
+                    transaction.SourceFormalMarketOrderId != sell.Id ||
+                    crossCounty &&
+                        transaction.SourceCivilianFreightId !=
+                            trade.CivilianFreightId ||
+                    !crossCounty &&
+                        !string.IsNullOrEmpty(
+                            transaction.SourceCivilianFreightId) ||
+                    transaction.Day != trade.Day)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid formal market trade {trade.Id}.");
+                }
+
+                long sourceQuantity = 0;
+                long destinationQuantity = 0;
+                for (var lineIndex = 0;
+                     lineIndex < transaction.Lines.Count;
+                     lineIndex++)
+                {
+                    var line = transaction.Lines[lineIndex];
+                    if (line.QuantityDelta < 0 &&
+                        line.OwnerFamilyId == sell.OwnerFamilyId)
+                    {
+                        sourceQuantity = checked(
+                            sourceQuantity - line.QuantityDelta);
+                    }
+                    else if (line.QuantityDelta > 0 &&
+                             line.OwnerFamilyId == buy.OwnerFamilyId)
+                    {
+                        destinationQuantity = checked(
+                            destinationQuantity + line.QuantityDelta);
+                    }
+                }
+
+                if (sourceQuantity != trade.Quantity ||
+                    destinationQuantity != trade.Quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Formal market trade {trade.Id} does not match its inventory delivery.");
+                }
+
+                AddDelta(tradedQuantityByOrder, buy.Id, trade.Quantity);
+                AddDelta(tradedQuantityByOrder, sell.Id, trade.Quantity);
+                AddDelta(settledMoneyByOrder, buy.Id, trade.MoneyTransferred);
+                AddDelta(settledMoneyByOrder, sell.Id, trade.MoneyTransferred);
+                var marketKey = FormalMarketKey(
+                    trade.CountyGovernanceId,
+                    trade.ProductDefinitionId);
+                AddDelta(
+                    tradedQuantityByMarket, marketKey, trade.Quantity);
+                AddDelta(
+                    turnoverByMarket, marketKey, trade.MoneyTransferred);
+                var transactionSequence =
+                    transactionSequenceById[trade.InventoryTransactionId];
+                if (!lastTradeTransactionSequenceByMarket.TryGetValue(
+                        marketKey, out var lastTradeSequence) ||
+                    transactionSequence > lastTradeSequence)
+                {
+                    lastTradeDayByMarket[marketKey] = trade.Day;
+                    lastTradePriceByMarket[marketKey] = trade.UnitPrice;
+                    lastTradeTransactionSequenceByMarket[marketKey] =
+                        transactionSequence;
+                }
+            }
+
+
+            for (var i = 0; i < PublicReliefProcurementTrades.Count; i++)
+            {
+                var trade = PublicReliefProcurementTrades[i] ??
+                    throw new InvalidOperationException(
+                        "A public relief procurement trade cannot be null.");
+                var hasGovernance = governances.TryGetValue(
+                    trade.CountyGovernanceId, out var governance);
+                var hasSourceGovernance = governances.TryGetValue(
+                    trade.SourceCountyGovernanceId,
+                    out var sourceGovernance);
+                var hasSeller = families.TryGetValue(
+                    trade.SellerFamilyId, out var seller);
+                var hasOrder = orders.TryGetValue(
+                    trade.SellOrderId, out var sell);
+                var hasOrganization = organizations.TryGetValue(
+                    trade.BuyerOrganizationId, out var government);
+                var hasContainer = containers.TryGetValue(
+                    trade.DestinationInventoryContainerId,
+                    out var destination);
+                var hasTransaction = transactions.TryGetValue(
+                    trade.InventoryTransactionId, out var transaction);
+                var hasCommand = commands.TryGetValue(
+                    trade.SourceCommandId, out var command);
+                var hasEvent = outbox.TryGetValue(
+                    trade.SourceShortfallEventId, out var sourceEvent);
+                var external = !string.IsNullOrEmpty(
+                    trade.CivilianFreightId);
+                var supplemental = external &&
+                    trade.IsSupplementalPublicReliefProcurement;
+                var hasRecoveryLink = false;
+                if (!string.IsNullOrEmpty(
+                        trade.PublicReliefRecoveryId))
+                {
+                    for (var recoveryIndex = 0;
+                         recoveryIndex < PublicReliefRecoveries.Count;
+                         recoveryIndex++)
+                    {
+                        if (PublicReliefRecoveries[recoveryIndex].Id ==
+                            trade.PublicReliefRecoveryId)
+                        {
+                            hasRecoveryLink = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasGovernance || !hasSourceGovernance ||
+                    !hasSeller || !hasOrder ||
+                    !hasOrganization || !hasContainer || !hasTransaction ||
+                    !hasCommand || !hasEvent ||
+                    trade.Day < 0 || trade.Day > AbsoluteDay ||
+                    government.Type != OrganizationType.Government ||
+                    government.Id != governance.GovernmentOrganizationId ||
+                    destination.Id !=
+                        governance.GranaryInventoryContainerId ||
+                    destination.OwnerOrganizationId != government.Id ||
+                    sell.Side != FormalMarketOrderSide.Sell ||
+                    sell.CountyGovernanceId != sourceGovernance.Id ||
+                    external != (sourceGovernance.Id != governance.Id) ||
+                    sell.OwnerFamilyId != seller.Id ||
+                    sell.ProductDefinitionId != trade.ProductDefinitionId ||
+                    trade.Quantity <= 0 || trade.UnitPrice <= 0 ||
+                    trade.UnitPrice != sell.UnitPrice ||
+                    trade.MoneyTransferred != checked(
+                        trade.Quantity * trade.UnitPrice) ||
+                    command.CommandTypeId != (supplemental
+                        ? PublicReliefProcurementContractIds
+                            .ArrivalRecoveryCommandTypeId
+                        : external
+                            ? PublicReliefProcurementContractIds
+                                .ExternalProcurementCommandTypeId
+                            : PublicReliefProcurementContractIds
+                                .CommandTypeId) ||
+                    command.Status != PersistentWorldCommandStatus.Completed ||
+                    sourceEvent.EventTypeId != (external
+                        ? PublicReliefProcurementContractIds
+                            .ExternalSourcingRequiredEventTypeId
+                        : PublicReliefProcurementContractIds
+                            .ShortfallEventTypeId) ||
+                    (!supplemental &&
+                        sourceEvent.Day != checked(trade.Day - 1) ||
+                     supplemental && sourceEvent.Day >= trade.Day) ||
+                    sourceEvent.SourceTransactionId != (external
+                        ? string.Format(
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            "public_relief.procurement_transaction.{0:D10}.{1}",
+                            sourceEvent.Day,
+                            governance.Id)
+                        : string.Format(
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            "formal_public_food.monthly_transaction.{0:D10}.{1}",
+                            sourceEvent.Day,
+                            governance.Id)) ||
+                    transaction.Type != (external
+                        ? InventoryTransactionType.CivilianFreightDispatched
+                        : InventoryTransactionType
+                            .FoodPublicReliefProcurementTransferred) ||
+                    transaction.SourceFormalMarketOrderId != sell.Id ||
+                    transaction.SourceCountyGovernanceId !=
+                        sourceGovernance.Id ||
+                    external && transaction.SourceCivilianFreightId !=
+                        trade.CivilianFreightId ||
+                    !external &&
+                        !string.IsNullOrEmpty(
+                            transaction.SourceCivilianFreightId) ||
+                    trade.FreightFee < 0 ||
+                    !external && trade.FreightFee != 0 ||
+                    supplemental != hasRecoveryLink ||
+                    !supplemental && !string.IsNullOrEmpty(
+                        trade.PublicReliefRecoveryId) ||
+                    transaction.Day != trade.Day)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid public relief procurement trade {trade.Id}.");
+                }
+
+                long sourceQuantity = 0;
+                long destinationQuantity = 0;
+                for (var lineIndex = 0;
+                     lineIndex < transaction.Lines.Count;
+                     lineIndex++)
+                {
+                    var line = transaction.Lines[lineIndex];
+                    if (line.QuantityDelta < 0 &&
+                        line.OwnerFamilyId == seller.Id)
+                    {
+                        sourceQuantity = checked(
+                            sourceQuantity - line.QuantityDelta);
+                    }
+                    else if (line.QuantityDelta > 0 &&
+                             line.OwnerOrganizationId == government.Id &&
+                             (external ||
+                              line.InventoryContainerId == destination.Id))
+                    {
+                        destinationQuantity = checked(
+                            destinationQuantity + line.QuantityDelta);
+                    }
+                }
+                if (sourceQuantity != trade.Quantity ||
+                    destinationQuantity != trade.Quantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Public relief procurement trade {trade.Id} does not match its inventory delivery.");
+                }
+
+                AddDelta(
+                    tradedQuantityByOrder, sell.Id, trade.Quantity);
+                AddDelta(
+                    settledMoneyByOrder, sell.Id, trade.MoneyTransferred);
+                var marketKey = FormalMarketKey(
+                    trade.SourceCountyGovernanceId,
+                    trade.ProductDefinitionId);
+                AddDelta(
+                    tradedQuantityByMarket, marketKey, trade.Quantity);
+                AddDelta(
+                    turnoverByMarket, marketKey, trade.MoneyTransferred);
+                var transactionSequence =
+                    transactionSequenceById[trade.InventoryTransactionId];
+                if (!lastTradeTransactionSequenceByMarket.TryGetValue(
+                        marketKey, out var lastTradeSequence) ||
+                    transactionSequence > lastTradeSequence)
+                {
+                    lastTradeDayByMarket[marketKey] = trade.Day;
+                    lastTradePriceByMarket[marketKey] = trade.UnitPrice;
+                    lastTradeTransactionSequenceByMarket[marketKey] =
+                        transactionSequence;
+                }
+            }
+
+            foreach (var pair in orders)
+            {
+                tradedQuantityByOrder.TryGetValue(pair.Key, out var quantity);
+                settledMoneyByOrder.TryGetValue(pair.Key, out var money);
+                if (quantity != pair.Value.FilledQuantity ||
+                    money != pair.Value.SettledMoney)
+                {
+                    throw new InvalidOperationException(
+                        $"Formal market settlement total mismatch on {pair.Key}.");
+                }
+            }
+
+            foreach (var pair in reservedQuantityByBatch)
+            {
+                if (!batches.TryGetValue(pair.Key, out var batch) ||
+                    pair.Value > batch.ReservedQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Formal market reservations exceed batch {pair.Key}.");
+                }
+            }
+
+            var marketKeys = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < FormalMarketPrices.Count; i++)
+            {
+                var price = FormalMarketPrices[i] ??
+                    throw new InvalidOperationException(
+                        "A formal market price cannot be null.");
+                ValidateContentReference(
+                    price.ProductDefinitionId,
+                    "formal market price product",
+                    price.Id);
+                var marketKey = FormalMarketKey(
+                    price.CountyGovernanceId,
+                    price.ProductDefinitionId);
+                tradedQuantityByMarket.TryGetValue(
+                    marketKey, out var tradedQuantity);
+                turnoverByMarket.TryGetValue(marketKey, out var turnover);
+                lastTradeDayByMarket.TryGetValue(
+                    marketKey, out var lastTradeDay);
+                lastTradePriceByMarket.TryGetValue(
+                    marketKey, out var lastTradePrice);
+                var hasLastTrade =
+                    lastTradeTransactionSequenceByMarket.ContainsKey(
+                        marketKey);
+                if (!governances.ContainsKey(price.CountyGovernanceId) ||
+                    !marketKeys.Add(marketKey) ||
+                    price.EquilibriumUnitPrice <= 0 ||
+                    price.LastTradeUnitPrice <= 0 ||
+                    price.LastTradeDay < -1 ||
+                    price.LastTradeDay > AbsoluteDay ||
+                    price.CumulativeTradedQuantity != tradedQuantity ||
+                    price.CumulativeTurnover != turnover ||
+                    !hasLastTrade && price.LastTradeDay != -1 ||
+                    hasLastTrade &&
+                    (price.LastTradeDay != lastTradeDay ||
+                     price.LastTradeUnitPrice != lastTradePrice))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid formal market price {price.Id}.");
+                }
+            }
+
+            foreach (var pair in tradedQuantityByMarket)
+            {
+                if (pair.Value > 0 && !marketKeys.Contains(pair.Key))
+                {
+                    throw new InvalidOperationException(
+                        $"Formal market {pair.Key} lacks a price record.");
+                }
+            }
+        }
+
+        private void ValidateCivilianFreight(
+            HashSet<string> personIds,
+            HashSet<string> locationIds)
+        {
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            var governances = new Dictionary<string, CountyGovernanceState>(
+                StringComparer.Ordinal);
+            var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            var routes = new Dictionary<string, RouteState>(
+                StringComparer.Ordinal);
+            var journeys = new Dictionary<string, JourneyState>(
+                StringComparer.Ordinal);
+            var transactions =
+                new Dictionary<string, InventoryTransactionState>(
+                    StringComparer.Ordinal);
+            var orders = new Dictionary<string, FormalMarketOrderState>(
+                StringComparer.Ordinal);
+            var trades = new Dictionary<string, FormalMarketTradeState>(
+                StringComparer.Ordinal);
+            var publicTrades =
+                new Dictionary<string, PublicReliefProcurementTradeState>(
+                    StringComparer.Ordinal);
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            var freights = new Dictionary<string, CivilianFreightState>(
+                StringComparer.Ordinal);
+            var dispatchedByFreight = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var dispatchedMoneyByFreight = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var lostByFreight = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var deliveredByFreight = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var feePaidByFreight = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+
+            for (var i = 0; i < Families.Count; i++)
+            {
+                families.Add(Families[i].Id, Families[i]);
+            }
+            for (var i = 0; i < CountyGovernances.Count; i++)
+            {
+                governances.Add(CountyGovernances[i].Id, CountyGovernances[i]);
+            }
+            for (var i = 0; i < VillageFacilities.Count; i++)
+            {
+                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+            }
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            }
+            for (var i = 0; i < Routes.Count; i++)
+            {
+                routes.Add(Routes[i].Id, Routes[i]);
+            }
+            for (var i = 0; i < Journeys.Count; i++)
+            {
+                journeys.Add(Journeys[i].Id, Journeys[i]);
+            }
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+            }
+            for (var i = 0; i < FormalMarketOrders.Count; i++)
+            {
+                orders.Add(FormalMarketOrders[i].Id, FormalMarketOrders[i]);
+            }
+            for (var i = 0; i < FormalMarketTrades.Count; i++)
+            {
+                trades.Add(FormalMarketTrades[i].Id, FormalMarketTrades[i]);
+            }
+            for (var i = 0; i < PublicReliefProcurementTrades.Count; i++)
+            {
+                publicTrades.Add(
+                    PublicReliefProcurementTrades[i].Id,
+                    PublicReliefProcurementTrades[i]);
+            }
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+            }
+            for (var i = 0; i < CivilianFreights.Count; i++)
+            {
+                freights.Add(CivilianFreights[i].Id, CivilianFreights[i]);
+            }
+
+            for (var i = 0; i < CivilianFreightLedgerEntries.Count; i++)
+            {
+                var entry = CivilianFreightLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian freight ledger entry cannot be null.");
+                InventoryTransactionState transaction = null;
+                var hasTransaction = !string.IsNullOrEmpty(
+                        entry.InventoryTransactionId) &&
+                    transactions.TryGetValue(
+                        entry.InventoryTransactionId, out transaction);
+                var inventoryType = entry.Type ==
+                        CivilianFreightLedgerType.Dispatched ||
+                    entry.Type == CivilianFreightLedgerType.NaturalLoss ||
+                    entry.Type == CivilianFreightLedgerType.Delivered;
+                long transactionSourceQuantity = 0;
+                if (hasTransaction)
+                {
+                    for (var lineIndex = 0;
+                         lineIndex < transaction.Lines.Count;
+                         lineIndex++)
+                    {
+                        if (transaction.Lines[lineIndex].QuantityDelta < 0)
+                        {
+                            transactionSourceQuantity = checked(
+                                transactionSourceQuantity -
+                                transaction.Lines[lineIndex].QuantityDelta);
+                        }
+                    }
+                }
+                if (!freights.ContainsKey(entry.CivilianFreightId) ||
+                    !Enum.IsDefined(
+                        typeof(CivilianFreightLedgerType), entry.Type) ||
+                    entry.Day < 0 || entry.Day > AbsoluteDay ||
+                    !personIds.Contains(entry.ActorPersonId) ||
+                    entry.Quantity < 0 || entry.Money < 0 ||
+                    inventoryType != hasTransaction ||
+                    inventoryType &&
+                        transactionSourceQuantity != entry.Quantity ||
+                    hasTransaction &&
+                        transaction.SourceCivilianFreightId !=
+                            entry.CivilianFreightId ||
+                    entry.Type == CivilianFreightLedgerType.Dispatched &&
+                        (entry.Quantity <= 0 || entry.Money <= 0 ||
+                         transaction.Type != InventoryTransactionType
+                             .CivilianFreightDispatched) ||
+                    entry.Type == CivilianFreightLedgerType.NaturalLoss &&
+                        (entry.Quantity <= 0 || entry.Money != 0 ||
+                         transaction.Type != InventoryTransactionType
+                             .CivilianFreightNaturalLoss) ||
+                    entry.Type == CivilianFreightLedgerType.Delivered &&
+                        (entry.Quantity <= 0 || entry.Money != 0 ||
+                         transaction.Type != InventoryTransactionType
+                             .CivilianFreightDelivered) ||
+                    entry.Type == CivilianFreightLedgerType.FreightFeePaid &&
+                        (entry.Quantity != 0 || entry.Money < 0 ||
+                         !string.IsNullOrEmpty(entry.InventoryTransactionId)))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian freight ledger entry {entry.Id}.");
+                }
+
+                switch (entry.Type)
+                {
+                    case CivilianFreightLedgerType.Dispatched:
+                        AddDelta(
+                            dispatchedByFreight,
+                            entry.CivilianFreightId,
+                            entry.Quantity);
+                        AddDelta(
+                            dispatchedMoneyByFreight,
+                            entry.CivilianFreightId,
+                            entry.Money);
+                        break;
+                    case CivilianFreightLedgerType.NaturalLoss:
+                        AddDelta(
+                            lostByFreight,
+                            entry.CivilianFreightId,
+                            entry.Quantity);
+                        break;
+                    case CivilianFreightLedgerType.Delivered:
+                        AddDelta(
+                            deliveredByFreight,
+                            entry.CivilianFreightId,
+                            entry.Quantity);
+                        break;
+                    case CivilianFreightLedgerType.FreightFeePaid:
+                        AddDelta(
+                            feePaidByFreight,
+                            entry.CivilianFreightId,
+                            entry.Money);
+                        break;
+                }
+            }
+
+            for (var i = 0; i < CivilianFreights.Count; i++)
+            {
+                var freight = CivilianFreights[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian freight cannot be null.");
+                var hasBuy = orders.TryGetValue(freight.BuyOrderId, out var buy);
+                var hasSell = orders.TryGetValue(
+                    freight.SellOrderId, out var sell);
+                var hasTrade = trades.TryGetValue(
+                    freight.FormalMarketTradeId, out var trade);
+                var hasPublicTrade = publicTrades.TryGetValue(
+                    freight.PublicReliefProcurementTradeId ?? string.Empty,
+                    out var publicTrade);
+                var publicRelief = hasPublicTrade;
+                var hasOrigin = governances.TryGetValue(
+                    freight.OriginCountyGovernanceId, out var origin);
+                var hasDestination = governances.TryGetValue(
+                    freight.DestinationCountyGovernanceId,
+                    out var destination);
+                var hasCarrierFamily = families.TryGetValue(
+                    freight.CarrierFamilyId, out var carrierFamily);
+                var hasBuyerFamily = families.TryGetValue(
+                    freight.BuyerFamilyId, out var buyerFamily);
+                var hasBuyerOrganization = organizations.TryGetValue(
+                    freight.BuyerOrganizationId ?? string.Empty,
+                    out var buyerOrganization);
+                var hasSellerFamily = families.TryGetValue(
+                    freight.SellerFamilyId, out var sellerFamily);
+                var hasBuyerStorage = facilities.TryGetValue(
+                    freight.BuyerStorageFacilityId, out var buyerStorage);
+                var hasSellerStorage = facilities.TryGetValue(
+                    freight.SellerStorageFacilityId, out var sellerStorage);
+                var hasContainer = containers.TryGetValue(
+                    freight.TransportInventoryContainerId, out var container);
+                var hasRoute = routes.TryGetValue(freight.RouteId, out var route);
+                var hasDispatch = transactions.TryGetValue(
+                    freight.DispatchInventoryTransactionId,
+                    out var dispatch);
+                var hasJourney = journeys.TryGetValue(
+                    freight.JourneyId, out var journey);
+                var carrier = FindPerson(People, freight.CarrierPersonId);
+                var validRoutePlan = TryBuildCivilianRoutePlan(
+                    routes,
+                    freight.PlannedRouteIds,
+                    freight.OriginLocationId,
+                    freight.DestinationLocationId,
+                    out var legOrigins,
+                    out var legDestinations,
+                    out _,
+                    out _);
+                var validCurrentRoute = validRoutePlan &&
+                    freight.CurrentRouteIndex >= 0 &&
+                    freight.CurrentRouteIndex < freight.PlannedRouteIds.Count &&
+                    freight.RouteId ==
+                        freight.PlannedRouteIds[freight.CurrentRouteIndex];
+                var currentLegOrigin = validCurrentRoute
+                    ? legOrigins[freight.CurrentRouteIndex]
+                    : string.Empty;
+                var currentLegDestination = validCurrentRoute
+                    ? legDestinations[freight.CurrentRouteIndex]
+                    : string.Empty;
+                dispatchedByFreight.TryGetValue(
+                    freight.Id, out var dispatchedQuantity);
+                dispatchedMoneyByFreight.TryGetValue(
+                    freight.Id, out var dispatchedMoney);
+                lostByFreight.TryGetValue(freight.Id, out var lostQuantity);
+                deliveredByFreight.TryGetValue(
+                    freight.Id, out var deliveredQuantity);
+                feePaidByFreight.TryGetValue(freight.Id, out var feePaid);
+                long currentCargo = 0;
+                for (var batchIndex = 0;
+                     batchIndex < ProductBatches.Count;
+                     batchIndex++)
+                {
+                    var batch = ProductBatches[batchIndex];
+                    if (batch.SourceTransactionId ==
+                            freight.DispatchInventoryTransactionId &&
+                        (publicRelief
+                            ? batch.OwnerOrganizationId ==
+                                freight.BuyerOrganizationId &&
+                              string.IsNullOrEmpty(batch.OwnerFamilyId)
+                            : batch.OwnerFamilyId == freight.BuyerFamilyId &&
+                              string.IsNullOrEmpty(
+                                  batch.OwnerOrganizationId)) &&
+                        batch.InventoryContainerId ==
+                            freight.TransportInventoryContainerId)
+                    {
+                        currentCargo = checked(
+                            currentCargo + batch.Quantity);
+                    }
+                }
+
+                var validFamilyBuyer = !publicRelief && hasBuy && hasTrade &&
+                    hasBuyerFamily && hasBuyerStorage &&
+                    string.IsNullOrEmpty(freight.BuyerOrganizationId) &&
+                    string.IsNullOrEmpty(
+                        freight.DestinationInventoryContainerId) &&
+                    string.IsNullOrEmpty(
+                        freight.SourcePublicReliefEventId) &&
+                    string.IsNullOrEmpty(
+                        freight.SourcePublicReliefCommandId) &&
+                    string.IsNullOrEmpty(
+                        freight.PublicReliefRecoveryId) &&
+                    !freight.IsSupplementalPublicReliefFreight &&
+                    FamilyBelongsToCounty(
+                        freight.BuyerFamilyId,
+                        destination.CountyLocationId) &&
+                    buyerFamily.LocationId == freight.DestinationLocationId &&
+                    buyerStorage.Kind ==
+                        VillageFacilityKind.HouseholdGranary &&
+                    buyerStorage.OwnerFamilyId == freight.BuyerFamilyId &&
+                    buy.OwnerFamilyId == freight.BuyerFamilyId &&
+                    buy.StorageFacilityId ==
+                        freight.BuyerStorageFacilityId &&
+                    trade.CivilianFreightId == freight.Id &&
+                    trade.BuyOrderId == buy.Id &&
+                    trade.SellOrderId == sell.Id &&
+                    trade.BuyerFamilyId == freight.BuyerFamilyId &&
+                    trade.SellerFamilyId == freight.SellerFamilyId &&
+                    trade.CountyGovernanceId ==
+                        freight.OriginCountyGovernanceId &&
+                    trade.DestinationCountyGovernanceId ==
+                        freight.DestinationCountyGovernanceId &&
+                    trade.InventoryTransactionId ==
+                        freight.DispatchInventoryTransactionId &&
+                    trade.Quantity == freight.DispatchedQuantity &&
+                    trade.UnitPrice == freight.GoodsUnitPrice &&
+                    trade.SellerProceeds ==
+                        freight.GoodsMoneyTransferred &&
+                    freight.ProductDefinitionId == buy.ProductDefinitionId;
+                var validPublicBuyer = publicRelief && !hasBuy && !hasTrade &&
+                    hasBuyerOrganization && !hasBuyerFamily &&
+                    !hasBuyerStorage &&
+                    buyerOrganization.Type == OrganizationType.Government &&
+                    destination.GovernmentOrganizationId ==
+                        buyerOrganization.Id &&
+                    freight.DestinationInventoryContainerId ==
+                        destination.GranaryInventoryContainerId &&
+                    containers.TryGetValue(
+                        freight.DestinationInventoryContainerId,
+                        out var reliefDestination) &&
+                    reliefDestination.OwnerOrganizationId ==
+                        buyerOrganization.Id &&
+                    string.IsNullOrEmpty(freight.BuyerFamilyId) &&
+                    string.IsNullOrEmpty(freight.BuyerStorageFacilityId) &&
+                    publicTrade.CivilianFreightId == freight.Id &&
+                    publicTrade.SellOrderId == sell.Id &&
+                    publicTrade.BuyerOrganizationId ==
+                        freight.BuyerOrganizationId &&
+                    publicTrade.SellerFamilyId == freight.SellerFamilyId &&
+                    publicTrade.SourceCountyGovernanceId ==
+                        freight.OriginCountyGovernanceId &&
+                    publicTrade.CountyGovernanceId ==
+                        freight.DestinationCountyGovernanceId &&
+                    publicTrade.DestinationInventoryContainerId ==
+                        freight.DestinationInventoryContainerId &&
+                    publicTrade.SourceShortfallEventId ==
+                        freight.SourcePublicReliefEventId &&
+                    publicTrade.SourceCommandId ==
+                        freight.SourcePublicReliefCommandId &&
+                    publicTrade.InventoryTransactionId ==
+                        freight.DispatchInventoryTransactionId &&
+                    publicTrade.Quantity == freight.DispatchedQuantity &&
+                    publicTrade.UnitPrice == freight.GoodsUnitPrice &&
+                    publicTrade.MoneyTransferred ==
+                        freight.GoodsMoneyTransferred &&
+                    publicTrade.FreightFee == freight.FreightFee;
+
+                validPublicBuyer = validPublicBuyer &&
+                    publicTrade.PublicReliefRecoveryId ==
+                        (freight.PublicReliefRecoveryId ?? string.Empty) &&
+                    publicTrade.IsSupplementalPublicReliefProcurement ==
+                        freight.IsSupplementalPublicReliefFreight &&
+                    (freight.IsSupplementalPublicReliefFreight
+                        ? !string.IsNullOrEmpty(
+                            freight.PublicReliefRecoveryId)
+                        : string.IsNullOrEmpty(
+                            freight.PublicReliefRecoveryId));
+
+                if (!Enum.IsDefined(
+                        typeof(CivilianFreightStatus), freight.Status) ||
+                    !hasSell || !hasOrigin ||
+                    !hasDestination || !hasCarrierFamily ||
+                    !hasSellerFamily || !hasSellerStorage || !hasContainer ||
+                    !hasRoute || !hasDispatch || carrier == null ||
+                    !validFamilyBuyer && !validPublicBuyer ||
+                    !locationIds.Contains(freight.OriginLocationId) ||
+                    !locationIds.Contains(freight.DestinationLocationId) ||
+                    freight.OriginCountyGovernanceId ==
+                        freight.DestinationCountyGovernanceId ||
+                    origin.CountyLocationId == destination.CountyLocationId ||
+                    !FamilyBelongsToCounty(
+                        freight.SellerFamilyId, origin.CountyLocationId) ||
+                    sellerFamily.LocationId != freight.OriginLocationId ||
+                    sellerStorage.Kind !=
+                        VillageFacilityKind.HouseholdGranary ||
+                    sellerStorage.OwnerFamilyId != freight.SellerFamilyId ||
+                    sell.OwnerFamilyId != freight.SellerFamilyId ||
+                    sell.StorageFacilityId !=
+                        freight.SellerStorageFacilityId ||
+                    carrier.FamilyId != carrierFamily.Id ||
+                    container.CarrierPersonId != carrier.Id ||
+                    container.OwnerFamilyId != carrierFamily.Id ||
+                    !validCurrentRoute || !hasRoute ||
+                    dispatch.Type !=
+                        InventoryTransactionType.CivilianFreightDispatched ||
+                    dispatch.SourceCivilianFreightId != freight.Id ||
+                    dispatch.SourceFormalMarketOrderId != sell.Id ||
+                    freight.ProductDefinitionId != sell.ProductDefinitionId ||
+                    freight.DispatchedQuantity <= 0 ||
+                    freight.RemainingCargoQuantity < 0 ||
+                    freight.DeliveredQuantity < 0 ||
+                    freight.NaturalLossQuantity < 0 ||
+                    freight.DispatchedQuantity != checked(
+                        freight.RemainingCargoQuantity +
+                        freight.DeliveredQuantity +
+                        freight.NaturalLossQuantity) ||
+                    currentCargo != freight.RemainingCargoQuantity ||
+                    freight.GoodsUnitPrice <= 0 ||
+                    freight.GoodsMoneyTransferred != checked(
+                        freight.DispatchedQuantity *
+                        freight.GoodsUnitPrice) ||
+                    freight.FreightFee < 0 ||
+                    freight.FreightFeeEscrow < 0 ||
+                    freight.FreightFeePaid < 0 ||
+                    freight.FreightFee != checked(
+                        freight.FreightFeeEscrow +
+                        freight.FreightFeePaid) ||
+                    freight.ProductPerishabilityBasisPoints < 0 ||
+                    freight.ProductPerishabilityBasisPoints > 10_000 ||
+                    freight.FoodSpoilageSensitivityBasisPoints < 0 ||
+                    freight.FoodSpoilageSensitivityBasisPoints > 10_000 ||
+                    freight.CargoUnitWeight <= 0 ||
+                    freight.CreatedDay < 0 ||
+                    freight.DispatchedDay != freight.CreatedDay ||
+                    freight.LastLossDay < freight.DispatchedDay ||
+                    freight.LastLossDay > AbsoluteDay ||
+                    dispatchedQuantity != freight.DispatchedQuantity ||
+                    dispatchedMoney != freight.GoodsMoneyTransferred ||
+                    lostQuantity != freight.NaturalLossQuantity ||
+                    deliveredQuantity != freight.DeliveredQuantity ||
+                    feePaid != freight.FreightFeePaid ||
+                    freight.Status == CivilianFreightStatus.InTransit &&
+                        (!hasJourney ||
+                         journey.PersonId != freight.CarrierPersonId ||
+                         journey.RouteId != freight.RouteId ||
+                         journey.OriginLocationId != currentLegOrigin ||
+                         journey.DestinationLocationId !=
+                            currentLegDestination ||
+                         freight.ArrivedDay != -1 ||
+                         freight.CompletedDay != -1) ||
+                    freight.Status ==
+                        CivilianFreightStatus.AwaitingNextLeg &&
+                        (hasJourney ||
+                         freight.CurrentRouteIndex >=
+                            freight.PlannedRouteIds.Count - 1 ||
+                         carrier.LocationId != currentLegDestination ||
+                         container.LocationId != currentLegDestination ||
+                         freight.ArrivedDay != -1 ||
+                         freight.CompletedDay != -1) ||
+                    freight.Status == CivilianFreightStatus.AwaitingReceipt &&
+                        (hasJourney ||
+                         freight.CurrentRouteIndex !=
+                            freight.PlannedRouteIds.Count - 1 ||
+                         freight.ArrivedDay <
+                            freight.DispatchedDay ||
+                         freight.CompletedDay != -1 ||
+                         carrier.LocationId !=
+                            freight.DestinationLocationId ||
+                         container.LocationId !=
+                            freight.DestinationLocationId) ||
+                    freight.Status == CivilianFreightStatus.Completed &&
+                        (hasJourney ||
+                         freight.CurrentRouteIndex !=
+                            freight.PlannedRouteIds.Count - 1 ||
+                         freight.RemainingCargoQuantity != 0 ||
+                         freight.ArrivedDay < freight.DispatchedDay ||
+                         freight.CompletedDay < freight.ArrivedDay ||
+                         freight.FreightFeeEscrow != 0 ||
+                         freight.FreightFeePaid != freight.FreightFee ||
+                         carrier.LocationId !=
+                            freight.DestinationLocationId ||
+                         container.LocationId !=
+                            freight.DestinationLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian freight {freight.Id}.");
+                }
+            }
+
+            ValidateCivilianFreightPlanning(
+                personIds,
+                families,
+                containers,
+                routes,
+                orders,
+                freights);
+        }
+
+        private void ValidatePublicReliefRecovery()
+        {
+            var governances = new Dictionary<string, CountyGovernanceState>(
+                StringComparer.Ordinal);
+            var villages = new Dictionary<string, VillageState>(
+                StringComparer.Ordinal);
+            var freights = new Dictionary<string, CivilianFreightState>(
+                StringComparer.Ordinal);
+            var trades = new Dictionary<
+                string, PublicReliefProcurementTradeState>(
+                StringComparer.Ordinal);
+            var events = new Dictionary<string, WorldEventOutboxState>(
+                StringComparer.Ordinal);
+            var transactions = new Dictionary<
+                string, InventoryTransactionState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < CountyGovernances.Count; i++)
+                governances.Add(CountyGovernances[i].Id, CountyGovernances[i]);
+            for (var i = 0; i < Villages.Count; i++)
+                villages.Add(Villages[i].Id, Villages[i]);
+            for (var i = 0; i < CivilianFreights.Count; i++)
+                freights.Add(CivilianFreights[i].Id, CivilianFreights[i]);
+            for (var i = 0; i < PublicReliefProcurementTrades.Count; i++)
+                trades.Add(
+                    PublicReliefProcurementTrades[i].Id,
+                    PublicReliefProcurementTrades[i]);
+            for (var i = 0; i < WorldEventOutbox.Count; i++)
+                events.Add(WorldEventOutbox[i].Id, WorldEventOutbox[i]);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(
+                    InventoryTransactions[i].Id, InventoryTransactions[i]);
+
+            var reportedFreights = new HashSet<string>(
+                StringComparer.Ordinal);
+            var reportIds = new HashSet<string>(StringComparer.Ordinal);
+            var recoveryTransactionIds = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < PublicReliefRecoveries.Count; i++)
+            {
+                var recovery = PublicReliefRecoveries[i] ??
+                    throw new InvalidOperationException(
+                        "A public relief recovery cannot be null.");
+                _ = new StableId(recovery.Id);
+                if (!Enum.IsDefined(
+                        typeof(PublicReliefRecoveryStatus), recovery.Status) ||
+                    !governances.TryGetValue(
+                        recovery.CountyGovernanceId, out var governance) ||
+                    !events.TryGetValue(
+                        recovery.SourceShortfallEventId,
+                        out var shortfallEvent) ||
+                    !events.TryGetValue(
+                        recovery.SourceExternalSourcingEventId,
+                        out var externalEvent) ||
+                    shortfallEvent.EventTypeId !=
+                        "mandate.event.formal_public_food.county_relief_shortfall_detected" ||
+                    externalEvent.EventTypeId !=
+                        PublicReliefProcurementContractIds
+                            .ExternalSourcingRequiredEventTypeId ||
+                    shortfallEvent.Day != recovery.SourceShortfallDay ||
+                    externalEvent.Day != recovery.SourceShortfallDay + 1 ||
+                    recovery.ExternalShortfallQuantity <= 0 ||
+                    recovery.TotalDispatchedQuantity < 0 ||
+                    recovery.TotalNaturalLossQuantity < 0 ||
+                    recovery.TotalDeliveredQuantity < 0 ||
+                    recovery.TotalRecoveredQuantity < 0 ||
+                    recovery.RemainingQuantity < 0 ||
+                    recovery.RemainingQuantity !=
+                        recovery.ExternalShortfallQuantity -
+                        recovery.TotalRecoveredQuantity ||
+                    recovery.TotalRecoveredQuantity >
+                        recovery.TotalDeliveredQuantity ||
+                    recovery.LastRecoveryDay < recovery.SourceShortfallDay ||
+                    recovery.LastRecoveryDay > AbsoluteDay ||
+                    recovery.SupplementalAttemptCount < 0 ||
+                    recovery.SupplementalAttemptCount > 1 ||
+                    recovery.SupplementalAttemptCount == 0 &&
+                        (recovery.SupplementalRequestedQuantity != 0 ||
+                         !string.IsNullOrEmpty(
+                            recovery.SupplementalFreightId)) ||
+                    recovery.SupplementalAttemptCount == 1 &&
+                        recovery.SupplementalRequestedQuantity <= 0 ||
+                    recovery.Status == PublicReliefRecoveryStatus.Fulfilled &&
+                        recovery.RemainingQuantity != 0 ||
+                    recovery.Status != PublicReliefRecoveryStatus.Fulfilled &&
+                        recovery.RemainingQuantity == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid public relief recovery {recovery.Id}.");
+                }
+
+                long required = 0;
+                long recovered = 0;
+                var recoveryVillages = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var villageIndex = 0;
+                     villageIndex < recovery.VillageRecoveries.Count;
+                     villageIndex++)
+                {
+                    var item = recovery.VillageRecoveries[villageIndex] ??
+                        throw new InvalidOperationException(
+                            "A village relief recovery cannot be null.");
+                    if (!recoveryVillages.Add(item.VillageId) ||
+                        !villages.TryGetValue(
+                            item.VillageId, out var village) ||
+                        village.ParentLocationId !=
+                            governance.CountyLocationId ||
+                        item.RequiredQuantity <= 0 ||
+                        item.RecoveredQuantity < 0 ||
+                        item.RecoveredQuantity > item.RequiredQuantity ||
+                        item.RemainingQuantity !=
+                            item.RequiredQuantity - item.RecoveredQuantity)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid village recovery in {recovery.Id}.");
+                    }
+                    required = checked(required + item.RequiredQuantity);
+                    recovered = checked(
+                        recovered + item.RecoveredQuantity);
+                    for (var transactionIndex = 0;
+                         transactionIndex <
+                            item.InventoryTransactionIds.Count;
+                         transactionIndex++)
+                    {
+                        var transactionId =
+                            item.InventoryTransactionIds[transactionIndex];
+                        if (!recoveryTransactionIds.Add(transactionId) ||
+                            !transactions.TryGetValue(
+                                transactionId, out var transaction) ||
+                            transaction.Type != InventoryTransactionType
+                                .FoodCountyReliefTransferred ||
+                            transaction.SourceVillageId != item.VillageId ||
+                            transaction.SourceCountyGovernanceId !=
+                                recovery.CountyGovernanceId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Invalid recovery inventory transaction {transactionId}.");
+                        }
+                    }
+                }
+
+                long dispatched = 0;
+                long lost = 0;
+                long delivered = 0;
+                long reportRecovered = 0;
+                for (var reportIndex = 0;
+                     reportIndex < recovery.FreightReports.Count;
+                     reportIndex++)
+                {
+                    var report = recovery.FreightReports[reportIndex] ??
+                        throw new InvalidOperationException(
+                            "A public relief freight report cannot be null.");
+                    if (!reportIds.Add(report.Id) ||
+                        !reportedFreights.Add(report.CivilianFreightId) ||
+                        !freights.TryGetValue(
+                            report.CivilianFreightId, out var freight) ||
+                        !trades.ContainsKey(
+                            report.PublicReliefProcurementTradeId) ||
+                        freight.Status != CivilianFreightStatus.Completed ||
+                        freight.DestinationCountyGovernanceId !=
+                            recovery.CountyGovernanceId ||
+                        freight.PublicReliefProcurementTradeId !=
+                            report.PublicReliefProcurementTradeId ||
+                        report.IsSupplemental !=
+                            freight.IsSupplementalPublicReliefFreight ||
+                        report.IsSupplemental &&
+                            freight.PublicReliefRecoveryId != recovery.Id ||
+                        report.DispatchedQuantity !=
+                            freight.DispatchedQuantity ||
+                        report.NaturalLossQuantity !=
+                            freight.NaturalLossQuantity ||
+                        report.DeliveredQuantity !=
+                            freight.DeliveredQuantity ||
+                        report.DispatchedQuantity !=
+                            report.NaturalLossQuantity +
+                            report.DeliveredQuantity ||
+                        report.RecoveryDistributedQuantity < 0 ||
+                        report.RecoveryDistributedQuantity >
+                            report.DeliveredQuantity ||
+                        report.DispatchedDay != freight.DispatchedDay ||
+                        report.ArrivedDay != freight.ArrivedDay ||
+                        report.CompletedDay != freight.CompletedDay ||
+                        report.ReconciledDay < report.CompletedDay ||
+                        report.ReconciledDay > AbsoluteDay ||
+                        report.TransitDays != Math.Max(
+                            0,
+                            report.CompletedDay - report.DispatchedDay) ||
+                        report.ReceiptWaitingDays !=
+                            (report.ArrivedDay < 0
+                                ? 0
+                                : Math.Max(
+                                    0,
+                                    report.CompletedDay - report.ArrivedDay)) ||
+                        report.ExceptionCode == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid public relief freight report {report.Id}.");
+                    }
+                    dispatched = checked(
+                        dispatched + report.DispatchedQuantity);
+                    lost = checked(lost + report.NaturalLossQuantity);
+                    delivered = checked(
+                        delivered + report.DeliveredQuantity);
+                    reportRecovered = checked(
+                        reportRecovered +
+                        report.RecoveryDistributedQuantity);
+                }
+
+                if (required != recovery.ExternalShortfallQuantity ||
+                    recovered != recovery.TotalRecoveredQuantity ||
+                    reportRecovered != recovery.TotalRecoveredQuantity ||
+                    dispatched != recovery.TotalDispatchedQuantity ||
+                    lost != recovery.TotalNaturalLossQuantity ||
+                    delivered != recovery.TotalDeliveredQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Public relief recovery totals do not close for {recovery.Id}.");
+                }
+
+                if (!string.IsNullOrEmpty(recovery.SupplementalFreightId))
+                {
+                    if (!freights.TryGetValue(
+                            recovery.SupplementalFreightId,
+                            out var supplemental) ||
+                        !supplemental.IsSupplementalPublicReliefFreight ||
+                        supplemental.PublicReliefRecoveryId != recovery.Id ||
+                        recovery.SupplementalAttemptCount != 1)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid supplemental freight link for {recovery.Id}.");
+                    }
+                }
+                if (recovery.Status ==
+                        PublicReliefRecoveryStatus.SupplementalInTransit &&
+                    string.IsNullOrEmpty(recovery.SupplementalFreightId))
+                {
+                    throw new InvalidOperationException(
+                        $"Recovery {recovery.Id} lacks its supplemental freight.");
+                }
+            }
+        }
+
+        private static string FormalMarketKey(
+            string governanceId,
+            string productDefinitionId)
+        {
+            return governanceId + "@" + productDefinitionId;
         }
 
         private void ValidateResourceExtraction(
@@ -4907,6 +9439,37 @@ namespace Mandate.Domain
             throw new InvalidOperationException($"Missing person {personId}.");
         }
 
+        private static VillageState FindVillageById(
+            IList<VillageState> villages,
+            string villageId)
+        {
+            for (var i = 0; i < villages.Count; i++)
+            {
+                if (villages[i].Id == villageId)
+                {
+                    return villages[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing village {villageId}.");
+        }
+
+        private static CountyGovernanceState FindCountyGovernanceById(
+            IList<CountyGovernanceState> governances,
+            string governanceId)
+        {
+            for (var i = 0; i < governances.Count; i++)
+            {
+                if (governances[i].Id == governanceId)
+                {
+                    return governances[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing county governance {governanceId}.");
+        }
+
         private static ArmyState FindArmy(
             IList<ArmyState> armies,
             string armyId)
@@ -4920,6 +9483,73 @@ namespace Mandate.Domain
             }
 
             throw new InvalidOperationException($"Missing army {armyId}.");
+        }
+
+        private static void AddLong(
+            IDictionary<string, long> values,
+            string key,
+            long delta)
+        {
+            values.TryGetValue(key, out var current);
+            values[key] = checked(current + delta);
+        }
+
+        private sealed class LogisticsLedgerBalance
+        {
+            public int DispatchCount;
+            public int DeliveryCount;
+            public int CargoDispatched;
+            public int CargoRemaining;
+            public int CargoDelivered;
+            public int NaturalLoss;
+            public int HostileLoss;
+            public int RecoveredCargo;
+            public int CargoConsumed;
+            public int ProvisionsLoaded;
+            public int ProvisionsRemaining;
+            public int ProvisionsConsumed;
+            public long BuyerMoney;
+            public long SourceMoney;
+            public int PublicOrder;
+
+            public void Apply(MilitaryLogisticsLedgerEntryState entry)
+            {
+                if (entry.Type == MilitaryLogisticsLedgerType.Dispatch)
+                {
+                    DispatchCount++;
+                }
+
+                if (entry.Type == MilitaryLogisticsLedgerType.Delivery)
+                {
+                    DeliveryCount++;
+                }
+
+                CargoDispatched = checked(
+                    CargoDispatched + entry.CargoDispatchedDelta);
+                CargoRemaining = checked(
+                    CargoRemaining + entry.CargoRemainingDelta);
+                CargoDelivered = checked(
+                    CargoDelivered + entry.CargoDeliveredDelta);
+                NaturalLoss = checked(
+                    NaturalLoss + entry.CargoNaturalLossDelta);
+                HostileLoss = checked(
+                    HostileLoss + entry.CargoHostileLossDelta);
+                RecoveredCargo = checked(
+                    RecoveredCargo + entry.CargoRecoveredDelta);
+                CargoConsumed = checked(
+                    CargoConsumed + entry.CargoConsumedAsProvisionsDelta);
+                ProvisionsLoaded = checked(
+                    ProvisionsLoaded + entry.ConvoyProvisionsLoadedDelta);
+                ProvisionsRemaining = checked(
+                    ProvisionsRemaining +
+                    entry.ConvoyProvisionsRemainingDelta);
+                ProvisionsConsumed = checked(
+                    ProvisionsConsumed + entry.ConvoyProvisionsConsumedDelta);
+                BuyerMoney = checked(BuyerMoney + entry.BuyerMoneyDelta);
+                SourceMoney = checked(SourceMoney + entry.SourceMoneyDelta);
+                PublicOrder = checked(
+                    PublicOrder + entry.OriginPublicOrderDelta);
+            }
         }
     }
 }

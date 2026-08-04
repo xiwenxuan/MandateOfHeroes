@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,10 +11,19 @@ internal static class CoreTestRunner
 
     private static int Main(string[] args)
     {
+        if (args.Length == 0)
+        {
+            Console.WriteLine(
+                "Usage: CoreTestRunner <root> [binary-directory] " +
+                "[substring-filter|exact:name1;name2|--list]");
+            return 2;
+        }
+
         root = args[0];
         binaryDirectory = args.Length > 1
             ? args[1]
             : Path.Combine(root, "Temp", "bin", "Debug");
+        var filter = args.Length > 2 ? args[2] : string.Empty;
         AppDomain.CurrentDomain.AssemblyResolve += Resolve;
         Load("Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll");
         Load("Library/PackageCache/com.unity.nuget.newtonsoft-json@3.2.1/Runtime/Newtonsoft.Json.dll");
@@ -23,13 +33,52 @@ internal static class CoreTestRunner
         var assembly = LoadBinary("Mandate.Domain.Tests.dll");
         var type = assembly.GetType("Mandate.Tests.WorldKernelTests", true);
         var instance = Activator.CreateInstance(type);
+        var methods = type
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .Where(method => method.GetCustomAttributes(false).Any(
+                item => item.GetType().FullName ==
+                    "NUnit.Framework.TestAttribute"))
+            .OrderBy(method => method.Name, StringComparer.Ordinal)
+            .ToArray();
+
+        if (string.Equals(filter, "--list", StringComparison.Ordinal))
+        {
+            foreach (var method in methods)
+            {
+                Console.WriteLine("TEST " + method.Name);
+            }
+
+            Console.WriteLine("RESULT listed=" + methods.Length);
+            return methods.Length == 0 ? 2 : 0;
+        }
+
+        HashSet<string> exactNames = null;
+        if (filter.StartsWith("exact:", StringComparison.OrdinalIgnoreCase))
+        {
+            exactNames = new HashSet<string>(
+                filter.Substring("exact:".Length)
+                    .Split(new[] { ';' },
+                        StringSplitOptions.RemoveEmptyEntries),
+                StringComparer.Ordinal);
+            if (exactNames.Count == 0)
+            {
+                Console.WriteLine("No exact core-test names were supplied.");
+                return 2;
+            }
+        }
+
         var passed = 0;
         var failed = 0;
 
-        foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+        foreach (var method in methods)
         {
-            if (!method.GetCustomAttributes(false).Any(
-                    item => item.GetType().FullName == "NUnit.Framework.TestAttribute"))
+            if (exactNames != null && !exactNames.Contains(method.Name))
+            {
+                continue;
+            }
+            if (exactNames == null && !string.IsNullOrEmpty(filter) &&
+                method.Name.IndexOf(
+                    filter, StringComparison.OrdinalIgnoreCase) < 0)
             {
                 continue;
             }
@@ -47,6 +96,31 @@ internal static class CoreTestRunner
                     "FAIL " + method.Name + ": " +
                     (exception.InnerException ?? exception).Message);
             }
+        }
+
+        var selected = passed + failed;
+        if (selected == 0)
+        {
+            Console.WriteLine("RESULT passed=0 failed=0");
+            Console.WriteLine("No core tests matched the requested filter.");
+            return 2;
+        }
+        if (exactNames != null && selected != exactNames.Count)
+        {
+            var discoveredNames = new HashSet<string>(
+                methods.Select(method => method.Name),
+                StringComparer.Ordinal);
+            foreach (var missing in exactNames
+                .Where(name => !discoveredNames.Contains(name))
+                .OrderBy(name => name, StringComparer.Ordinal))
+            {
+                Console.WriteLine("MISSING " + missing);
+            }
+
+            Console.WriteLine(
+                "Exact core-test coverage mismatch: requested=" +
+                exactNames.Count + " selected=" + selected);
+            return 2;
         }
 
         Console.WriteLine("RESULT passed=" + passed + " failed=" + failed);

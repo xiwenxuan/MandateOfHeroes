@@ -1,0 +1,16 @@
+{
+  "schema_version": "mandate.food-product-provenance-profile.v1",
+  "id": "population.food_product_provenance.wheat_and_dry_ration.v1",
+  "source_layer": "gameplay_completion",
+  "description": "Technical multi-product provenance scenario. Opening wheat-grain and dry-ration shares are gameplay test inputs, not a historical food-structure claim.",
+  "products": [
+    {
+      "product_definition_id": "product.wheat_grain",
+      "opening_share_basis_points": 8000
+    },
+    {
+      "product_definition_id": "product.dry_ration",
+      "opening_share_basis_points": 2000
+    }
+  ]
+}

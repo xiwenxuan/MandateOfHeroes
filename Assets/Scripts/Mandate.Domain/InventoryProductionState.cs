@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace Mandate.Domain
 {
+    public enum FoodInventoryAuthorityMode : byte
+    {
+        LegacyScalar,
+        FormalProductBatches
+    }
+
     public enum InventoryTransactionType : byte
     {
         LegacyBalanceConverted,
@@ -13,7 +19,24 @@ namespace Mandate.Domain
         MilitaryProcurementDispatched,
         EquipmentRepairReserved,
         EquipmentRepairSettled,
-        ResourceExtractionSettled
+        ResourceExtractionSettled,
+        MilitaryLogisticsDispatched,
+        MilitaryLogisticsHandoffReserved,
+        MilitaryLogisticsHandoffLoaded,
+        FoodConsumed,
+        LegacyFoodStockFormalized,
+        FoodHarvested,
+        FoodTaxTransferred,
+        FoodVillageReliefTransferred,
+        FoodCountyReliefTransferred,
+        FoodTaxRemitted,
+        FoodMarketReserved,
+        FoodMarketReservationReleased,
+        FoodMarketTransferred,
+        CivilianFreightDispatched,
+        CivilianFreightNaturalLoss,
+        CivilianFreightDelivered,
+        FoodPublicReliefProcurementTransferred
     }
 
     [Serializable]
@@ -100,8 +123,15 @@ namespace Mandate.Domain
         public string SourceMilitaryProcurementId;
         public string SourceEquipmentRepairOrderId;
         public string SourceResourceExtractionOrderId;
+        public string SourceMilitaryLogisticsOrderId;
+        public string SourceVillageId;
+        public string SourceCountyGovernanceId;
+        public string SourceFormalMarketOrderId;
+        public string SourceCivilianFreightId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;
+        public long LegacyVillagePublicGranaryDelta;
+        public long LegacyCountyGranaryDelta;
         public long FacilityInventoryDelta;
         public string Summary;
         public List<InventoryTransactionLineState> Lines =

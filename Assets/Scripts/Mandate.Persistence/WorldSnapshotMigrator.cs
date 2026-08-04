@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mandate.Domain;
 
 namespace Mandate.Persistence
@@ -78,6 +79,60 @@ namespace Mandate.Persistence
                         break;
                     case 17:
                         MigrateVersionSeventeenToEighteen(world, content);
+                        break;
+                    case 18:
+                        MigrateVersionEighteenToNineteen(world);
+                        break;
+                    case 19:
+                        MigrateVersionNineteenToTwenty(world);
+                        break;
+                    case 20:
+                        MigrateVersionTwentyToTwentyOne(world);
+                        break;
+                    case 21:
+                        MigrateVersionTwentyOneToTwentyTwo(world);
+                        break;
+                    case 22:
+                        MigrateVersionTwentyTwoToTwentyThree(world);
+                        break;
+                    case 23:
+                        MigrateVersionTwentyThreeToTwentyFour(world);
+                        break;
+                    case 24:
+                        MigrateVersionTwentyFourToTwentyFive(world);
+                        break;
+                    case 25:
+                        MigrateVersionTwentyFiveToTwentySix(world);
+                        break;
+                    case 26:
+                        MigrateVersionTwentySixToTwentySeven(world);
+                        break;
+                    case 27:
+                        MigrateVersionTwentySevenToTwentyEight(world);
+                        break;
+                    case 28:
+                        MigrateVersionTwentyEightToTwentyNine(world);
+                        break;
+                    case 29:
+                        MigrateVersionTwentyNineToThirty(world);
+                        break;
+                    case 30:
+                        MigrateVersionThirtyToThirtyOne(world);
+                        break;
+                    case 31:
+                        MigrateVersionThirtyOneToThirtyTwo(world);
+                        break;
+                    case 32:
+                        MigrateVersionThirtyTwoToThirtyThree(world);
+                        break;
+                    case 33:
+                        MigrateVersionThirtyThreeToThirtyFour(world);
+                        break;
+                    case 34:
+                        MigrateVersionThirtyFourToThirtyFive(world);
+                        break;
+                    case 35:
+                        MigrateVersionThirtyFiveToThirtySix(world);
                         break;
                     default:
                         throw new InvalidOperationException(
@@ -463,6 +518,658 @@ namespace Mandate.Persistence
             world.ProductionContentManifest =
                 productionContent.CreateManifest();
             world.SchemaVersion = 18;
+        }
+
+        private static void MigrateVersionEighteenToNineteen(
+            WorldState world)
+        {
+            world.MilitaryLogisticsOrders =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsOrderState>();
+            world.MilitaryLogisticsLedgerEntries =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsLedgerEntryState>();
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i]
+                    .SourceMilitaryLogisticsOrderId = string.Empty;
+            }
+
+            for (var i = 0; i < world.MilitarySupplies.Count; i++)
+            {
+                world.MilitarySupplies[i].SourceLogisticsOrderId =
+                    string.Empty;
+            }
+
+            world.SchemaVersion = 19;
+        }
+
+        private static void MigrateVersionNineteenToTwenty(
+            WorldState world)
+        {
+            world.MilitaryLogisticsLegs =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsLegState>();
+            for (var i = 0; i < world.MilitaryLogisticsOrders.Count; i++)
+            {
+                var order = world.MilitaryLogisticsOrders[i];
+                order.FinalDestinationLocationId =
+                    order.DestinationLocationId;
+                order.CurrentLegSequence = 0;
+                order.PlannedLegCount = 0;
+                order.AutoDeliverAtFinal = true;
+            }
+
+            world.SchemaVersion = 20;
+        }
+
+        private static void MigrateVersionTwentyToTwentyOne(
+            WorldState world)
+        {
+            world.MilitaryLogisticsEscorts =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsEscortState>();
+            world.MilitaryLogisticsIncidents =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsIncidentState>();
+            for (var i = 0; i < world.MilitaryLogisticsOrders.Count; i++)
+            {
+                world.MilitaryLogisticsOrders[i].HostileLossQuantity = 0;
+            }
+
+            for (var i = 0; i < world.MilitaryLogisticsLegs.Count; i++)
+            {
+                var leg = world.MilitaryLogisticsLegs[i];
+                leg.HostileLossQuantity = 0;
+                leg.RiskPolicyId = MilitaryLogisticsRiskPolicyIds.None;
+                leg.ThreatOrganizationId = string.Empty;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsLedgerEntries.Count;
+                 i++)
+            {
+                world.MilitaryLogisticsLedgerEntries[i]
+                    .CargoHostileLossDelta = 0;
+            }
+
+            world.SchemaVersion = 21;
+        }
+
+        private static void MigrateVersionTwentyOneToTwentyTwo(
+            WorldState world)
+        {
+            world.MilitaryLogisticsClashes =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsClashState>();
+            for (var i = 0; i < world.MilitaryLogisticsOrders.Count; i++)
+            {
+                world.MilitaryLogisticsOrders[i].RecoveredCargoQuantity = 0;
+            }
+
+            for (var i = 0; i < world.MilitaryLogisticsLegs.Count; i++)
+            {
+                world.MilitaryLogisticsLegs[i].RecoveredCargoQuantity = 0;
+            }
+
+            for (var i = 0; i < world.MilitaryLogisticsIncidents.Count; i++)
+            {
+                world.MilitaryLogisticsIncidents[i]
+                    .RecoveredCargoQuantity = 0;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsLedgerEntries.Count;
+                 i++)
+            {
+                world.MilitaryLogisticsLedgerEntries[i]
+                    .CargoRecoveredDelta = 0;
+            }
+
+            world.SchemaVersion = 22;
+        }
+
+        private static void MigrateVersionTwentyTwoToTwentyThree(
+            WorldState world)
+        {
+            world.MilitaryLogisticsDelegationGoals =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsDelegationGoalState>();
+            world.MilitaryLogisticsDelegationOffers =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsDelegationOfferState>();
+            world.MilitaryLogisticsDelegationReports =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsDelegationReportState>();
+            world.SchemaVersion = 23;
+        }
+
+        private static void MigrateVersionTwentyThreeToTwentyFour(
+            WorldState world)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = world.MilitaryLogisticsDelegationGoals[i];
+                var scheduledDay = goal.LastEvaluatedDay >= 0
+                    ? checked(goal.LastEvaluatedDay +
+                        goal.ReportIntervalDays)
+                    : checked(goal.CreatedDay + goal.ReportIntervalDays);
+                goal.NextEvaluationDay = Math.Min(
+                    goal.DeadlineDay, scheduledDay);
+                goal.FulfilledDay = -1;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                var offer = world.MilitaryLogisticsDelegationOffers[i];
+                var goal = FindDelegationGoal(world, offer.GoalId);
+                offer.ValidUntilDay = goal.DeadlineDay;
+                offer.ClosedDay = offer.Status ==
+                    MilitaryLogisticsDelegationOfferStatus.Withdrawn
+                        ? offer.SubmittedDay
+                        : -1;
+            }
+
+            world.SchemaVersion = 24;
+        }
+
+        private static MilitaryLogisticsDelegationGoalState
+            FindDelegationGoal(WorldState world, string goalId)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                if (world.MilitaryLogisticsDelegationGoals[i].Id == goalId)
+                {
+                    return world.MilitaryLogisticsDelegationGoals[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing military logistics delegation goal {goalId} " +
+                "during world migration.");
+        }
+
+        private static void MigrateVersionTwentyFourToTwentyFive(
+            WorldState world)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = world.MilitaryLogisticsDelegationGoals[i];
+                goal.ParentGoalId = string.Empty;
+                goal.DelegationDepth = 0;
+                goal.AssigneePersonId = goal.IssuerPersonId;
+                goal.DelegatedByPersonId = string.Empty;
+                goal.AssigneeAuthorityAtDelegation =
+                    MilitaryAuthorityLevel.Army;
+                goal.ChildGoalIds = new System.Collections.Generic.List<string>();
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationReports.Count;
+                 i++)
+            {
+                world.MilitaryLogisticsDelegationReports[i].RelatedGoalId =
+                    string.Empty;
+            }
+
+            world.SchemaVersion = 25;
+        }
+
+        private static void MigrateVersionTwentyFiveToTwentySix(
+            WorldState world)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = world.MilitaryLogisticsDelegationGoals[i];
+                goal.UnassignedCargoQuantity = 0;
+                goal.AvailableBudgetReserve = 0;
+                goal.CancelledDay = -1;
+                goal.CancelledByPersonId = string.Empty;
+                goal.CancellationReasonId = string.Empty;
+                goal.ReplacesGoalId = string.Empty;
+                goal.ReplacementGoalIds =
+                    new System.Collections.Generic.List<string>();
+                if (goal.Status ==
+                    MilitaryLogisticsDelegationStatus.Cancelled)
+                {
+                    goal.CancelledDay = goal.CreatedDay;
+                    goal.CancelledByPersonId = goal.IssuerPersonId;
+                    goal.CancellationReasonId =
+                        MilitaryLogisticsCancellationReasonIds
+                            .MigratedUnspecified;
+                }
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var parent = world.MilitaryLogisticsDelegationGoals[i];
+                if (parent.ChildGoalIds.Count == 0)
+                {
+                    continue;
+                }
+
+                long assignedQuantity = 0;
+                long assignedBudget = 0;
+                for (var childIndex = 0;
+                     childIndex < parent.ChildGoalIds.Count;
+                     childIndex++)
+                {
+                    var child = FindDelegationGoal(
+                        world, parent.ChildGoalIds[childIndex]);
+                    if (child.Status ==
+                        MilitaryLogisticsDelegationStatus.Cancelled)
+                    {
+                        continue;
+                    }
+                    assignedQuantity = checked(
+                        assignedQuantity + child.RequestedCargoQuantity);
+                    assignedBudget = checked(
+                        assignedBudget + child.BudgetLimit);
+                }
+
+                parent.UnassignedCargoQuantity = checked(
+                    parent.RequestedCargoQuantity -
+                    (int)assignedQuantity);
+                parent.AvailableBudgetReserve = checked(
+                    parent.BudgetLimit - assignedBudget);
+                if (parent.UnassignedCargoQuantity > 0 &&
+                    parent.Status ==
+                        MilitaryLogisticsDelegationStatus.Delegated)
+                {
+                    parent.Status =
+                        MilitaryLogisticsDelegationStatus.NeedsAttention;
+                }
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                var offer = world.MilitaryLogisticsDelegationOffers[i];
+                var goal = FindDelegationGoal(world, offer.GoalId);
+                if (goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Cancelled &&
+                    offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Active)
+                {
+                    offer.Status =
+                        MilitaryLogisticsDelegationOfferStatus.GoalCancelled;
+                    offer.ClosedDay = Math.Max(
+                        offer.SubmittedDay, goal.CancelledDay);
+                }
+            }
+
+            world.SchemaVersion = 26;
+        }
+
+        private static void MigrateVersionTwentySixToTwentySeven(
+            WorldState world)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = world.MilitaryLogisticsDelegationGoals[i];
+                goal.FulfillmentPolicyId =
+                    MilitaryLogisticsDelegationFulfillmentPolicyIds
+                        .FullReceiptRequired;
+                goal.ReceivedCargoQuantity = 0;
+                goal.OutstandingCargoQuantity =
+                    goal.RequestedCargoQuantity;
+                goal.CompletedLogisticsOrderIds =
+                    new System.Collections.Generic.List<string>();
+
+                if (goal.Status !=
+                    MilitaryLogisticsDelegationStatus.Fulfilled)
+                {
+                    continue;
+                }
+
+                goal.FulfillmentPolicyId =
+                    MilitaryLogisticsDelegationFulfillmentPolicyIds
+                        .LegacyOrderCompletion;
+                goal.OutstandingCargoQuantity = 0;
+                if (goal.ChildGoalIds.Count != 0 ||
+                    string.IsNullOrEmpty(goal.LogisticsOrderId))
+                {
+                    continue;
+                }
+
+                var order = FindLogisticsOrder(
+                    world, goal.LogisticsOrderId);
+                goal.ReceivedCargoQuantity =
+                    order.DeliveredCargoQuantity;
+                goal.CompletedLogisticsOrderIds.Add(order.Id);
+                if (!string.IsNullOrEmpty(goal.SelectedOfferId))
+                {
+                    var offer = FindDelegationOffer(
+                        world, goal.SelectedOfferId);
+                    offer.Status =
+                        MilitaryLogisticsDelegationOfferStatus.Completed;
+                    offer.ClosedDay = Math.Max(
+                        offer.SubmittedDay, order.DeliveredDay);
+                    offer.LogisticsOrderId = order.Id;
+                }
+                goal.SelectedOfferId = string.Empty;
+                goal.LogisticsOrderId = string.Empty;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                var offer = world.MilitaryLogisticsDelegationOffers[i];
+                if (offer.Status ==
+                    MilitaryLogisticsDelegationOfferStatus.Completed)
+                {
+                    continue;
+                }
+
+                offer.LogisticsOrderId = string.Empty;
+                var goal = FindDelegationGoal(world, offer.GoalId);
+                if (offer.Status ==
+                        MilitaryLogisticsDelegationOfferStatus.Selected &&
+                    goal.Status ==
+                        MilitaryLogisticsDelegationStatus.Dispatched)
+                {
+                    offer.LogisticsOrderId = goal.LogisticsOrderId;
+                }
+            }
+
+            for (var depth =
+                     MilitaryLogisticsDelegationContract
+                         .MaximumDelegationDepth;
+                 depth >= 0;
+                 depth--)
+            {
+                for (var i = 0;
+                     i < world.MilitaryLogisticsDelegationGoals.Count;
+                     i++)
+                {
+                    var parent =
+                        world.MilitaryLogisticsDelegationGoals[i];
+                    if (parent.DelegationDepth != depth ||
+                        parent.ChildGoalIds.Count == 0 ||
+                        parent.Status !=
+                            MilitaryLogisticsDelegationStatus.Fulfilled)
+                    {
+                        continue;
+                    }
+
+                    var received = 0;
+                    for (var childIndex = 0;
+                         childIndex < parent.ChildGoalIds.Count;
+                         childIndex++)
+                    {
+                        var child = FindDelegationGoal(
+                            world, parent.ChildGoalIds[childIndex]);
+                        if (child.Status !=
+                            MilitaryLogisticsDelegationStatus.Cancelled)
+                        {
+                            received = checked(
+                                received + child.ReceivedCargoQuantity);
+                        }
+                    }
+                    parent.ReceivedCargoQuantity = received;
+                }
+            }
+
+            world.SchemaVersion = 27;
+        }
+
+        private static void MigrateVersionTwentySevenToTwentyEight(
+            WorldState world)
+        {
+            world.MilitaryLogisticsLiabilitySettlements =
+                new System.Collections.Generic.List<
+                    MilitaryLogisticsLiabilitySettlementState>();
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationGoals.Count;
+                 i++)
+            {
+                var goal = world.MilitaryLogisticsDelegationGoals[i];
+                goal.ReplacementProcurementPolicyId =
+                    MilitaryLogisticsReplacementProcurementPolicyIds
+                        .LegacyUnrestricted;
+                goal.AuthorizedReplacementQuantity = 0;
+                goal.ConsumedReplacementAuthorizationQuantity = 0;
+                goal.LastReplacementAuthorizedDay = -1;
+                goal.LastReplacementAuthorizedByPersonId = string.Empty;
+                goal.LastReplacementAuthorizationReasonId = string.Empty;
+                goal.CompensationReceived = 0;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                world.MilitaryLogisticsDelegationOffers[i]
+                    .LiabilityPolicyId =
+                    MilitaryLogisticsLiabilityPolicyIds
+                        .LegacyNoRetroactiveSettlement;
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryLogisticsOrders.Count;
+                 i++)
+            {
+                world.MilitaryLogisticsOrders[i].LiabilityPolicyId =
+                    MilitaryLogisticsLiabilityPolicyIds
+                        .LegacyNoRetroactiveSettlement;
+            }
+
+            world.SchemaVersion = 28;
+        }
+
+        private static void MigrateVersionTwentyEightToTwentyNine(
+            WorldState world)
+        {
+            world.FoodInventoryAuthorityMode =
+                FoodInventoryAuthorityMode.LegacyScalar;
+            for (var i = 0; i < world.Villages.Count; i++)
+            {
+                world.Villages[i].PublicGranaryInventoryContainerId =
+                    string.Empty;
+            }
+
+            for (var i = 0; i < world.CountyGovernances.Count; i++)
+            {
+                world.CountyGovernances[i].GranaryInventoryContainerId =
+                    string.Empty;
+            }
+
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                var transaction = world.InventoryTransactions[i];
+                transaction.SourceVillageId ??= string.Empty;
+                transaction.SourceCountyGovernanceId ??= string.Empty;
+            }
+
+            world.SchemaVersion = 29;
+        }
+
+        private static void MigrateVersionTwentyNineToThirty(
+            WorldState world)
+        {
+            world.FormalMarketOrders = new System.Collections.Generic.List<
+                FormalMarketOrderState>();
+            world.FormalMarketTrades = new System.Collections.Generic.List<
+                FormalMarketTradeState>();
+            world.FormalMarketPrices = new System.Collections.Generic.List<
+                FormalMarketPriceState>();
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i].SourceFormalMarketOrderId ??=
+                    string.Empty;
+            }
+            world.SchemaVersion = 30;
+        }
+
+        private static void MigrateVersionThirtyToThirtyOne(
+            WorldState world)
+        {
+            world.CivilianFreights = new System.Collections.Generic.List<
+                CivilianFreightState>();
+            world.CivilianFreightLedgerEntries =
+                new System.Collections.Generic.List<
+                    CivilianFreightLedgerEntryState>();
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i].SourceCivilianFreightId ??=
+                    string.Empty;
+            }
+            for (var i = 0; i < world.FormalMarketTrades.Count; i++)
+            {
+                var trade = world.FormalMarketTrades[i];
+                trade.DestinationCountyGovernanceId =
+                    trade.CountyGovernanceId;
+                trade.SellerProceeds = trade.MoneyTransferred;
+                trade.CivilianFreightId = string.Empty;
+            }
+            world.SchemaVersion = 31;
+        }
+
+        private static void MigrateVersionThirtyOneToThirtyTwo(
+            WorldState world)
+        {
+            world.CivilianFreightDemands =
+                new System.Collections.Generic.List<
+                    CivilianFreightDemandState>();
+            world.CivilianCarrierRegistrations =
+                new System.Collections.Generic.List<
+                    CivilianCarrierRegistrationState>();
+            world.CivilianCarrierOffers =
+                new System.Collections.Generic.List<
+                    CivilianCarrierOfferState>();
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                freight.DemandId ??= string.Empty;
+                freight.CarrierOfferId ??= string.Empty;
+                freight.PlannedRouteIds =
+                    new System.Collections.Generic.List<string>
+                    {
+                        freight.RouteId
+                    };
+                freight.CurrentRouteIndex = 0;
+            }
+            world.SchemaVersion = 32;
+        }
+
+        private static void MigrateVersionThirtyTwoToThirtyThree(
+            WorldState world)
+        {
+            world.PersistentWorldCommands =
+                new List<PersistentWorldCommandState>();
+            world.WorldCommandBatchResults =
+                new List<WorldCommandBatchResultState>();
+            world.WorldEventOutbox = new List<WorldEventOutboxState>();
+            world.SchemaVersion = 33;
+        }
+
+        private static void MigrateVersionThirtyThreeToThirtyFour(
+            WorldState world)
+        {
+            world.PublicReliefProcurementTrades =
+                new List<PublicReliefProcurementTradeState>();
+            world.SchemaVersion = 34;
+        }
+
+        private static void MigrateVersionThirtyFourToThirtyFive(
+            WorldState world)
+        {
+            world.PublicReliefProcurementTrades ??=
+                new List<PublicReliefProcurementTradeState>();
+            for (var i = 0;
+                 i < world.PublicReliefProcurementTrades.Count;
+                 i++)
+            {
+                var trade = world.PublicReliefProcurementTrades[i];
+                trade.SourceCountyGovernanceId ??=
+                    trade.CountyGovernanceId;
+                trade.CivilianFreightId ??= string.Empty;
+                trade.FreightFee = Math.Max(0, trade.FreightFee);
+            }
+            world.CivilianFreights ??= new List<CivilianFreightState>();
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                freight.BuyerOrganizationId ??= string.Empty;
+                freight.DestinationInventoryContainerId ??= string.Empty;
+                freight.PublicReliefProcurementTradeId ??= string.Empty;
+                freight.SourcePublicReliefEventId ??= string.Empty;
+                freight.SourcePublicReliefCommandId ??= string.Empty;
+            }
+            world.SchemaVersion = 35;
+        }
+
+        private static void MigrateVersionThirtyFiveToThirtySix(
+            WorldState world)
+        {
+            world.PublicReliefRecoveries =
+                new List<PublicReliefRecoveryState>();
+            world.CivilianFreights ??= new List<CivilianFreightState>();
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                world.CivilianFreights[i].PublicReliefRecoveryId ??=
+                    string.Empty;
+            }
+            world.PublicReliefProcurementTrades ??=
+                new List<PublicReliefProcurementTradeState>();
+            for (var i = 0;
+                 i < world.PublicReliefProcurementTrades.Count;
+                 i++)
+            {
+                world.PublicReliefProcurementTrades[i]
+                    .PublicReliefRecoveryId ??= string.Empty;
+            }
+            world.SchemaVersion = 36;
+        }
+
+        private static MilitaryLogisticsOrderState FindLogisticsOrder(
+            WorldState world,
+            string orderId)
+        {
+            for (var i = 0; i < world.MilitaryLogisticsOrders.Count; i++)
+            {
+                if (world.MilitaryLogisticsOrders[i].Id == orderId)
+                {
+                    return world.MilitaryLogisticsOrders[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing military logistics order {orderId} during world migration.");
+        }
+
+        private static MilitaryLogisticsDelegationOfferState
+            FindDelegationOffer(WorldState world, string offerId)
+        {
+            for (var i = 0;
+                 i < world.MilitaryLogisticsDelegationOffers.Count;
+                 i++)
+            {
+                if (world.MilitaryLogisticsDelegationOffers[i].Id == offerId)
+                {
+                    return world.MilitaryLogisticsDelegationOffers[i];
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Missing military logistics delegation offer {offerId} " +
+                "during world migration.");
         }
 
         private static void SetRepair(

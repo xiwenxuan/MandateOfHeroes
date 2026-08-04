@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -76,6 +77,7 @@ namespace Mandate.Simulation
             }
 
             var people = PeopleFor(world);
+            var completedAnyJourney = false;
             for (var i = world.Journeys.Count - 1; i >= 0; i--)
             {
                 var journey = world.Journeys[i];
@@ -99,11 +101,57 @@ namespace Mandate.Simulation
                             MilitaryProcurementStatus.AwaitingArmy;
                     }
                 }
-                world.Journeys.RemoveAt(i);
+                for (var orderIndex = 0;
+                     orderIndex < world.MilitaryLogisticsOrders.Count;
+                     orderIndex++)
+                {
+                    var order = world.MilitaryLogisticsOrders[orderIndex];
+                    if (order.JourneyId == journey.Id &&
+                        order.Status == MilitaryLogisticsStatus.InTransit)
+                    {
+                        var hasHandoff = order.PlannedLegCount > 0 &&
+                            order.CurrentLegSequence <
+                                order.PlannedLegCount - 1;
+                        order.Status = hasHandoff
+                            ? MilitaryLogisticsStatus.AwaitingHandoff
+                            : MilitaryLogisticsStatus.AwaitingArmy;
+                        for (var legIndex = 0;
+                             legIndex < world.MilitaryLogisticsLegs.Count;
+                             legIndex++)
+                        {
+                            var leg = world.MilitaryLogisticsLegs[legIndex];
+                            if (leg.LogisticsOrderId == order.Id &&
+                                leg.Sequence == order.CurrentLegSequence)
+                            {
+                                leg.Status = hasHandoff
+                                    ? MilitaryLogisticsLegStatus
+                                        .AwaitingHandoff
+                                    : MilitaryLogisticsLegStatus
+                                        .AwaitingReceipt;
+                                break;
+                            }
+                        }
+                    }
+                }
+                for (var escortIndex = 0;
+                     escortIndex < world.MilitaryLogisticsEscorts.Count;
+                     escortIndex++)
+                {
+                    var escort = world.MilitaryLogisticsEscorts[escortIndex];
+                    if (escort.JourneyId == journey.Id &&
+                        escort.Status ==
+                            MilitaryLogisticsEscortStatus.InTransit)
+                    {
+                        escort.Status =
+                            MilitaryLogisticsEscortStatus.Arrived;
+                        escort.ArrivedDay = world.AbsoluteDay;
+                    }
+                }
                 _populationLedgerSystem.MoveIndependentPerson(
                     world,
                     person,
-                    journey.DestinationLocationId);
+                    journey.DestinationLocationId,
+                    false);
                 for (var containerIndex = 0;
                      containerIndex < world.InventoryContainers.Count;
                      containerIndex++)
@@ -114,16 +162,50 @@ namespace Mandate.Simulation
                         container.LocationId = journey.DestinationLocationId;
                     }
                 }
+                for (var freightIndex = 0;
+                     freightIndex < world.CivilianFreights.Count;
+                     freightIndex++)
+                {
+                    var freight = world.CivilianFreights[freightIndex];
+                    if (freight.JourneyId == journey.Id &&
+                        freight.Status == CivilianFreightStatus.InTransit)
+                    {
+                        var hasNextLeg = freight.PlannedRouteIds != null &&
+                            freight.CurrentRouteIndex + 1 <
+                                freight.PlannedRouteIds.Count;
+                        freight.Status = hasNextLeg
+                            ? CivilianFreightStatus.AwaitingNextLeg
+                            : CivilianFreightStatus.AwaitingReceipt;
+                        if (!hasNextLeg)
+                        {
+                            freight.ArrivedDay = world.AbsoluteDay;
+                        }
+                    }
+                }
+                world.Journeys.RemoveAt(i);
+                completedAnyJourney = true;
+            }
+            if (completedAnyJourney)
+            {
+                world.Validate();
             }
         }
 
-        public void ConsumeDailyTravelProvisions(WorldState world)
+        public void ConsumeDailyTravelProvisions(
+            WorldState world,
+            ISet<string> externallyProvisionedPeople = null)
         {
             var people = PeopleFor(world);
             for (var i = 0; i < world.Journeys.Count; i++)
             {
                 var person = people.GetRequiredForUpdate(
                     world.Journeys[i].PersonId);
+                if (externallyProvisionedPeople != null &&
+                    externallyProvisionedPeople.Contains(person.Id))
+                {
+                    continue;
+                }
+
                 if (person.Provisions > 0)
                 {
                     person.Provisions--;

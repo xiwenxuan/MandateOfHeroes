@@ -110,6 +110,133 @@ namespace Mandate.Simulation
             return batch;
         }
 
+        public IReadOnlyList<ProductBatchState>
+            ConvertCompletedAgricultureHarvestToBatches(
+                WorldState world,
+                string agricultureWorkOrderId)
+        {
+            RequireWorld(world);
+            _content.ValidateManifest(world.ProductionContentManifest);
+            if (string.IsNullOrWhiteSpace(agricultureWorkOrderId))
+            {
+                throw new ArgumentException(
+                    "An agriculture work-order ID is required.",
+                    nameof(agricultureWorkOrderId));
+            }
+
+            AgricultureWorkOrderState order = null;
+            for (var i = 0; i < world.AgricultureWorkOrders.Count; i++)
+            {
+                if (world.AgricultureWorkOrders[i].Id == agricultureWorkOrderId)
+                {
+                    order = world.AgricultureWorkOrders[i];
+                    break;
+                }
+            }
+            if (order == null ||
+                order.Status != ProductionOrderStatus.Completed ||
+                order.SettledDay < 0 || order.StoredQuantity <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Only a completed agriculture order with stored output can be materialized.");
+            }
+
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                if (world.InventoryTransactions[i].SourceWorkOrderId == order.Id)
+                {
+                    throw new InvalidOperationException(
+                        $"Agriculture order {order.Id} already has an inventory bridge transaction.");
+                }
+            }
+
+            var family = FindFamily(world, order.FamilyId);
+            var storage = FindFacility(world, order.StorageFacilityId);
+            var actor = FindPerson(world, order.ManagerPersonId);
+            var grainProduct = _content.GetProduct(
+                order.HarvestProductDefinitionId);
+            var seedProduct = _content.GetProduct(order.SeedProductDefinitionId);
+            var variety = _content.GetCropVariety(
+                order.CropVarietyDefinitionId);
+            if (grainProduct.Id != CoreProductionContent.WheatGrainProductId ||
+                seedProduct.Id != CoreProductionContent.WheatSeedProductId ||
+                variety.CropDefinitionId != order.CropDefinitionId ||
+                storage.Kind != VillageFacilityKind.HouseholdGranary ||
+                storage.OwnerFamilyId != family.Id ||
+                actor.FamilyId != family.Id || !actor.IsAlive ||
+                storage.InventoryUnits != CalculatePhysicalInventoryUnits(
+                    world, storage.Id, family.Id, _content))
+            {
+                throw new InvalidOperationException(
+                    "The completed agriculture order is incompatible with the legacy inventory bridge.");
+            }
+
+            var recipe = _content.GetRecipe(order.RecipeDefinitionId);
+            if (recipe.Inputs == null || recipe.Inputs.Count != 1 ||
+                recipe.Inputs[0].ProductDefinitionId != seedProduct.Id)
+            {
+                throw new InvalidOperationException(
+                    "The agriculture recipe no longer matches the settled order.");
+            }
+
+            long seedSaved = Math.Min(
+                order.StoredQuantity / 8,
+                checked(order.LandUnits *
+                    recipe.Inputs[0].QuantityPerLandUnit));
+            long foodStored = order.StoredQuantity - seedSaved;
+            if (family.Grain < foodStored || family.SeedGrain < seedSaved)
+            {
+                throw new InvalidOperationException(
+                    "The settled harvest is no longer present in the legacy family balances.");
+            }
+
+            var transaction = NewTransaction(
+                world,
+                InventoryTransactionType.LegacyBalanceConverted,
+                actor.Id,
+                order.Id,
+                -foodStored,
+                -seedSaved,
+                0,
+                $"Materialized completed agriculture order {order.Id} as product batches.");
+            var batches = new List<ProductBatchState>(2);
+            var nextBatchIndex = world.ProductBatches.Count;
+            if (foodStored > 0)
+            {
+                var grainBatch = NewBatch(
+                    world, grainProduct, family, storage, transaction.Id,
+                    order.Id, foodStored, string.Empty, 0, 0);
+                grainBatch.Id = $"product_batch.{world.AbsoluteDay}." +
+                    $"{nextBatchIndex++:D6}";
+                batches.Add(grainBatch);
+            }
+            if (seedSaved > 0)
+            {
+                var seedBatch = NewBatch(
+                    world, seedProduct, family, storage, transaction.Id,
+                    order.Id, seedSaved, order.CropVarietyDefinitionId,
+                    8_000, 9_000);
+                seedBatch.Id = $"product_batch.{world.AbsoluteDay}." +
+                    $"{nextBatchIndex++:D6}";
+                batches.Add(seedBatch);
+            }
+            if (batches.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "The completed agriculture order has no materializable output.");
+            }
+
+            for (var i = 0; i < batches.Count; i++)
+            {
+                transaction.Lines.Add(Line(batches[i], batches[i].Quantity, 0));
+            }
+            family.Grain = checked(family.Grain - foodStored);
+            family.SeedGrain = checked(family.SeedGrain - seedSaved);
+            world.ProductBatches.AddRange(batches);
+            world.InventoryTransactions.Add(transaction);
+            return batches;
+        }
+
         public long MarketableQuantity(
             WorldState world,
             string locationId,
@@ -126,9 +253,8 @@ namespace Mandate.Simulation
             for (var i = 0; i < world.ProductBatches.Count; i++)
             {
                 var batch = world.ProductBatches[i];
-                var facility = FindFacility(world, batch.StorageFacilityId);
-                var village = FindVillage(world, facility.VillageId);
-                if (village.LocationId == locationId &&
+                var batchLocationId = FindBatchLocationId(world, batch);
+                if (batchLocationId == locationId &&
                     batch.ProductDefinitionId == productDefinitionId)
                 {
                     total = checked(total + batch.Quantity - batch.ReservedQuantity);
@@ -136,6 +262,69 @@ namespace Mandate.Simulation
             }
 
             return total;
+        }
+
+        public ProductBatchState CreateFamilyOpeningBatch(
+            WorldState world,
+            string familyId,
+            string storageFacilityId,
+            string actorPersonId,
+            string productDefinitionId,
+            long quantity,
+            string cropVarietyDefinitionId = null)
+        {
+            RequireWorld(world);
+            _content.ValidateManifest(world.ProductionContentManifest);
+            if (quantity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            var family = FindFamily(world, familyId);
+            var storage = FindFacility(world, storageFacilityId);
+            var actor = FindPerson(world, actorPersonId);
+            var product = _content.GetProduct(productDefinitionId);
+            if (storage.Kind != VillageFacilityKind.HouseholdGranary ||
+                storage.OwnerFamilyId != family.Id ||
+                actor.FamilyId != family.Id || !actor.IsAlive ||
+                storage.InventoryUnits != CalculatePhysicalInventoryUnits(
+                    world, storage.Id, family.Id, _content))
+            {
+                throw new InvalidOperationException(
+                    "Opening inventory requires a consistent family granary.");
+            }
+
+            if (!string.IsNullOrEmpty(cropVarietyDefinitionId))
+            {
+                _content.GetCropVariety(cropVarietyDefinitionId);
+            }
+
+            var transaction = NewTransaction(
+                world,
+                InventoryTransactionType.OpeningBalance,
+                actor.Id,
+                string.Empty,
+                0,
+                0,
+                checked(quantity * product.BaseWeight),
+                $"Created opening batch of {quantity} {product.Id}.");
+            var batch = NewBatch(
+                world,
+                product,
+                family,
+                storage,
+                transaction.Id,
+                string.Empty,
+                quantity,
+                cropVarietyDefinitionId,
+                0,
+                0);
+            transaction.Lines.Add(Line(batch, quantity, 0));
+            storage.InventoryUnits = checked(
+                storage.InventoryUnits + quantity * product.BaseWeight);
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(transaction);
+            return batch;
         }
 
         public static long CalculateTrackedBatchWeight(
@@ -346,6 +535,42 @@ namespace Mandate.Simulation
             }
 
             throw new InvalidOperationException($"Missing village {id}.");
+        }
+
+        internal static InventoryContainerState FindContainer(
+            WorldState world,
+            string id)
+        {
+            for (var i = 0; i < world.InventoryContainers.Count; i++)
+            {
+                if (world.InventoryContainers[i].Id == id)
+                {
+                    return world.InventoryContainers[i];
+                }
+            }
+
+            throw new InvalidOperationException($"Missing inventory container {id}.");
+        }
+
+        private static string FindBatchLocationId(
+            WorldState world,
+            ProductBatchState batch)
+        {
+            if (!string.IsNullOrEmpty(batch.StorageFacilityId))
+            {
+                return FindVillage(
+                    world,
+                    FindFacility(world, batch.StorageFacilityId).VillageId)
+                    .LocationId;
+            }
+
+            if (!string.IsNullOrEmpty(batch.InventoryContainerId))
+            {
+                return FindContainer(world, batch.InventoryContainerId).LocationId;
+            }
+
+            throw new InvalidOperationException(
+                $"Product batch {batch.Id} has no inventory location.");
         }
     }
 
