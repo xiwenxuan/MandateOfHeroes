@@ -270,6 +270,24 @@ namespace Mandate.Simulation
             for (var i = 0; i < families.Count; i++)
             {
                 var family = families[i];
+                var hasActiveOrder = false;
+                for (var orderIndex = 0;
+                     orderIndex < world.AgricultureWorkOrders.Count;
+                     orderIndex++)
+                {
+                    var order = world.AgricultureWorkOrders[orderIndex];
+                    if (order.FamilyId == family.Id &&
+                        order.Status == ProductionOrderStatus.Active)
+                    {
+                        hasActiveOrder = true;
+                        break;
+                    }
+                }
+                if (hasActiveOrder)
+                {
+                    continue;
+                }
+
                 var landUnits = Math.Min(
                     family.FarmlandUnits,
                     (int)Math.Min(

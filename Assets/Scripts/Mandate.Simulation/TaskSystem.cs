@@ -119,6 +119,25 @@ namespace Mandate.Simulation
             }
         }
 
+        public string AbandonActiveTask(WorldState world, StableId personId)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+
+            world.Validate();
+            var task = FindActiveTask(world, personId.Value);
+            if (task == null)
+            {
+                return "当前没有可以放弃的进行中任务。";
+            }
+
+            task.Status = TaskStatus.Abandoned;
+            world.Validate();
+            return $"已放弃任务：{FindDefinition(world, task.DefinitionId).DisplayName}。";
+        }
+
         private void GrantReward(
             WorldState world,
             PersonState person,

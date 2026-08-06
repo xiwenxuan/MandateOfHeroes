@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/PlayableDemo.unity
+    guid: 4f6b9c0a427d4fe09c5d7a4a62184d9e
+  - enabled: 1
     path: Assets/Scenes/SimulationDashboard.unity
     guid: c6d31ba3151247fabdb1771372716c1c
   m_BuildProfiles: []

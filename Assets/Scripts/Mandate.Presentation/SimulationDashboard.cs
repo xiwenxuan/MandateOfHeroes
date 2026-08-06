@@ -4,12 +4,16 @@ using Mandate.Domain;
 using Mandate.Persistence;
 using Mandate.Simulation;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Mandate.Presentation
 {
     public sealed class SimulationDashboard : MonoBehaviour
     {
         private const ulong DefaultSeed = 184_001UL;
+
+        [SerializeField] private bool _playerDemoMode;
+        [SerializeField] private bool _showDeveloperTools = true;
 
         private enum ScreenMode : byte
         {
@@ -22,6 +26,7 @@ namespace Mandate.Presentation
         {
             Map,
             Character,
+            Actions,
             Tasks,
             World,
             Developer
@@ -47,7 +52,16 @@ namespace Mandate.Presentation
             "军人",
             "县吏",
             "商人",
-            "医者"
+            "医者",
+            "农户",
+            "士人"
+        };
+
+        private static readonly string[] StartingBackgroundLabels =
+        {
+            "本地家户",
+            "流离家户",
+            "受助家户"
         };
 
         private readonly NewGameSetupService _newGameSetupService =
@@ -55,6 +69,7 @@ namespace Mandate.Presentation
         private WorldState _world;
         private WorldState _selectionPreview;
         private WorldSimulator _simulator;
+        private PlayerActionService _playerActionService;
         private NpcDecisionSystem _decisionSystem;
         private NpcActionResolver _actionResolver;
         private readonly NpcActionPlanner _actionPlanner = new NpcActionPlanner();
@@ -101,7 +116,10 @@ namespace Mandate.Presentation
         private string _customAge = "18";
         private int _customGender;
         private int _customIdentity;
+        private int _customBackground;
+        private int _customStartingLocation;
         private int _existingPersonIndex;
+        private string _existingPersonSearch = string.Empty;
         private int _educationDiscipline;
         private int _educationStudyDays = 10;
         private bool _educationUseTeacher = true;
@@ -125,9 +143,28 @@ namespace Mandate.Presentation
 
         private void Awake()
         {
+            EnsurePlayableSceneObjects();
             _mapArt = new ProceduralSilkMapArt();
             _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
             _message = "请选择开始新游戏，创建人物或扮演世界中的现有人物。";
+        }
+
+        private static void EnsurePlayableSceneObjects()
+        {
+            if (Camera.main == null)
+            {
+                var cameraObject = new GameObject("Main Camera");
+                cameraObject.tag = "MainCamera";
+                cameraObject.AddComponent<Camera>();
+                cameraObject.AddComponent<AudioListener>();
+            }
+
+            if (FindObjectOfType<EventSystem>() == null)
+            {
+                var eventSystem = new GameObject("EventSystem");
+                eventSystem.AddComponent<EventSystem>();
+                eventSystem.AddComponent<StandaloneInputModule>();
+            }
         }
 
         private void OnDestroy()
@@ -201,7 +238,8 @@ namespace Mandate.Presentation
             }
 
             GUI.enabled = true;
-            if (GUILayout.Button("开发者快速进入（刘备）", GUILayout.Height(36)))
+            if (_showDeveloperTools &&
+                GUILayout.Button("开发者快速进入（刘备）", GUILayout.Height(36)))
             {
                 EnterWorld(
                     _newGameSetupService.CreateExisting184World(
@@ -285,22 +323,65 @@ namespace Mandate.Presentation
                 GUILayout.Height(84));
             GUILayout.Space(8);
             GUILayout.Label(StartingIdentityDescription(_customIdentity), _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("出生背景", _sectionStyle);
+            _customBackground = GUILayout.Toolbar(
+                _customBackground,
+                StartingBackgroundLabels,
+                GUILayout.Height(34));
+            GUILayout.Label(
+                _customBackground == 1
+                    ? "流离开局资源较少并背负少量家债。"
+                    : _customBackground == 2
+                        ? "受到宗族或师友接济，开局资源较充足。"
+                        : "在本地家户中稳定起步。",
+                _normalStyle);
+
+            GUILayout.Space(12);
+            GUILayout.Label("开局地点", _sectionStyle);
+            var locationLabels = new string[_selectionPreview.Locations.Count];
+            for (var i = 0; i < _selectionPreview.Locations.Count; i++)
+            {
+                locationLabels[i] = _selectionPreview.Locations[i].DisplayName;
+            }
+            _customStartingLocation = GUILayout.SelectionGrid(
+                Mathf.Clamp(_customStartingLocation, 0, locationLabels.Length - 1),
+                locationLabels,
+                3,
+                GUILayout.Height(70));
         }
 
         private void DrawExistingCharacterSetup()
         {
             GUILayout.Label("选择要扮演的人物", _sectionStyle);
-            var labels = new string[_selectionPreview.People.Count];
-            for (var i = 0; i < _selectionPreview.People.Count; i++)
+            GUILayout.Label("搜索姓名、地点、身份或组织", _normalStyle);
+            _existingPersonSearch = GUILayout.TextField(
+                _existingPersonSearch, 32, GUILayout.Height(32));
+            var candidates = BuildExistingPlayerCandidates();
+            var labels = new string[candidates.Count];
+            for (var i = 0; i < candidates.Count; i++)
             {
-                var person = _selectionPreview.People[i];
+                var person = candidates[i];
+                var historical = person.Id.StartsWith(
+                    "person.generated.", StringComparison.Ordinal)
+                    ? "[世界人物]"
+                    : "[史料人物]";
                 labels[i] =
-                    $"{person.DisplayName}　{FindLocationName(_selectionPreview, person.LocationId)}　" +
+                    $"{historical}{person.DisplayName}　" +
+                    $"{FindLocationName(_selectionPreview, person.LocationId)}　" +
                     $"{FindIdentityName(_selectionPreview, person.Id)}";
             }
 
+            if (candidates.Count == 0)
+            {
+                GUILayout.Label("没有符合搜索条件的在世人物。", _normalStyle);
+                _existingPersonIndex = -1;
+                return;
+            }
+
             _existingPersonIndex = GUILayout.SelectionGrid(
-                _existingPersonIndex,
+                Mathf.Clamp(_existingPersonIndex, 0, candidates.Count - 1),
                 labels,
                 2,
                 GUILayout.Height(Mathf.Max(160f, labels.Length * 27f)));
@@ -308,6 +389,78 @@ namespace Mandate.Presentation
             GUILayout.Label(
                 "现有人物使用同一套人物、身份和世界规则；选择后不会获得额外的玩家专属加成。",
                 _normalStyle);
+        }
+
+        private List<PersonState> BuildExistingPlayerCandidates()
+        {
+            var candidates = new List<PersonState>();
+            var query = (_existingPersonSearch ?? string.Empty).Trim();
+            for (var i = 0; i < _selectionPreview.People.Count; i++)
+            {
+                var person = _selectionPreview.People[i];
+                if (!person.IsAlive)
+                {
+                    continue;
+                }
+
+                if (query.Length == 0 ||
+                    ContainsIgnoreCase(person.DisplayName, query) ||
+                    ContainsIgnoreCase(
+                        FindLocationName(_selectionPreview, person.LocationId),
+                        query) ||
+                    ContainsIgnoreCase(
+                        FindIdentityName(_selectionPreview, person.Id),
+                        query) ||
+                    PersonOrganizationMatches(person.Id, query))
+                {
+                    candidates.Add(person);
+                }
+            }
+            return candidates;
+        }
+
+        private bool PersonOrganizationMatches(string personId, string query)
+        {
+            for (var i = 0; i < _selectionPreview.Memberships.Count; i++)
+            {
+                var membership = _selectionPreview.Memberships[i];
+                if (membership.PersonId != personId)
+                {
+                    continue;
+                }
+                for (var organizationIndex = 0;
+                     organizationIndex < _selectionPreview.Organizations.Count;
+                     organizationIndex++)
+                {
+                    var organization =
+                        _selectionPreview.Organizations[organizationIndex];
+                    if (organization.Id == membership.OrganizationId &&
+                        ContainsIgnoreCase(organization.DisplayName, query))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static bool ContainsIgnoreCase(string value, string query)
+        {
+            return !string.IsNullOrEmpty(value) &&
+                value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private string SelectedBackgroundId()
+        {
+            switch (_customBackground)
+            {
+                case 1:
+                    return StartingBackgroundIds.DisplacedHousehold;
+                case 2:
+                    return StartingBackgroundIds.SupportedHousehold;
+                default:
+                    return StartingBackgroundIds.LocalHousehold;
+            }
         }
 
         private void TryStartSelectedGame()
@@ -328,7 +481,13 @@ namespace Mandate.Presentation
                         Gender = _customGender == 0
                             ? PersonGender.Male
                             : PersonGender.Female,
-                        Identity = (StartingIdentity)_customIdentity
+                        Identity = (StartingIdentity)_customIdentity,
+                        BackgroundId = SelectedBackgroundId(),
+                        StartingLocationId = _selectionPreview.Locations[
+                            Mathf.Clamp(
+                                _customStartingLocation,
+                                0,
+                                _selectionPreview.Locations.Count - 1)].Id
                     };
                     EnterWorld(
                         _newGameSetupService.CreateCustom184World(
@@ -337,15 +496,16 @@ namespace Mandate.Presentation
                 }
                 else
                 {
+                    var candidates = BuildExistingPlayerCandidates();
                     if (_existingPersonIndex < 0 ||
-                        _existingPersonIndex >= _selectionPreview.People.Count)
+                        _existingPersonIndex >= candidates.Count)
                     {
                         throw new InvalidOperationException("请选择一名现有人物。");
                     }
 
                     EnterWorld(
                         _newGameSetupService.CreateExisting184World(
-                            _selectionPreview.People[_existingPersonIndex].Id,
+                            candidates[_existingPersonIndex].Id,
                             DefaultSeed));
                 }
 
@@ -396,6 +556,9 @@ namespace Mandate.Presentation
                 case PlayerPanel.Character:
                     DrawPlayerCharacter();
                     break;
+                case PlayerPanel.Actions:
+                    DrawPlayerActions();
+                    break;
                 case PlayerPanel.Tasks:
                     DrawPlayerTasks();
                     break;
@@ -440,6 +603,11 @@ namespace Mandate.Presentation
                 SetPlayerPanel(PlayerPanel.Character);
             }
 
+            if (GUILayout.Button("行动", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Actions);
+            }
+
             if (GUILayout.Button("任务", GUILayout.Height(32)))
             {
                 SetPlayerPanel(PlayerPanel.Tasks);
@@ -450,7 +618,8 @@ namespace Mandate.Presentation
                 SetPlayerPanel(PlayerPanel.World);
             }
 
-            if (GUILayout.Button("开发观察台", GUILayout.Height(32)))
+            if (_showDeveloperTools &&
+                GUILayout.Button("开发观察台", GUILayout.Height(32)))
             {
                 SetPlayerPanel(PlayerPanel.Developer);
             }
@@ -460,7 +629,13 @@ namespace Mandate.Presentation
                 AdvancePlayerDays(1);
             }
 
-            if (GUILayout.Button("结算NPC", GUILayout.Height(32)))
+            if (GUILayout.Button("推进三天", GUILayout.Height(32)))
+            {
+                AdvancePlayerDays(3);
+            }
+
+            if (_showDeveloperTools &&
+                GUILayout.Button("结算NPC", GUILayout.Height(32)))
             {
                 ResolveMonthlyNpcActions();
             }
@@ -2095,6 +2270,95 @@ namespace Mandate.Presentation
             }
         }
 
+        private void DrawPlayerActions()
+        {
+            var player = FindPlayer();
+            GUILayout.Label("当前可做的事", _sectionStyle);
+            GUILayout.Label(
+                "行动来自人物当前地点、身份、组织、资产、任务和健康状态；" +
+                "灰色行动会说明缺少的前置条件。",
+                _normalStyle);
+            GUILayout.Space(8);
+
+            var actions = _playerActionService.QueryActions(
+                _world, player.Id);
+            for (var i = 0; i < actions.Count; i++)
+            {
+                var action = actions[i];
+                GUILayout.BeginVertical(GUI.skin.box);
+                GUILayout.Label(action.DisplayName, _sectionStyle);
+                GUILayout.Label(action.Description, _normalStyle);
+                if (!action.IsAvailable)
+                {
+                    GUILayout.Label(
+                        "暂不可用：" + action.UnavailableReason,
+                        _normalStyle);
+                }
+                GUI.enabled = action.IsAvailable;
+                if (GUILayout.Button("执行", GUILayout.Height(32)))
+                {
+                    try
+                    {
+                        var result = _playerActionService.Execute(
+                            _world, player.Id, action.Id);
+                        _message = PlayerActionSummary(result);
+                        _actionLog.Insert(
+                            0,
+                            $"第{_world.AbsoluteDay + 1}日　" + _message);
+                        RefreshMonthlyDecisions();
+                    }
+                    catch (Exception exception)
+                    {
+                        _message = exception.Message;
+                    }
+                }
+                GUI.enabled = true;
+                GUILayout.EndVertical();
+                GUILayout.Space(5);
+            }
+
+            GUILayout.Space(8);
+            GUILayout.Label("最近行动", _sectionStyle);
+            if (_actionLog.Count == 0)
+            {
+                GUILayout.Label("尚未执行玩家行动。", _normalStyle);
+            }
+            for (var i = 0; i < Math.Min(8, _actionLog.Count); i++)
+            {
+                GUILayout.Label(_actionLog[i], _normalStyle);
+            }
+        }
+
+        private static string PlayerActionSummary(PlayerActionResult result)
+        {
+            if (!result.Success)
+            {
+                return result.Summary;
+            }
+
+            var changes = string.Empty;
+            if (result.DaysAdvanced != 0)
+            {
+                changes += $"　耗时{result.DaysAdvanced}天";
+            }
+            if (result.MoneyChange != 0)
+            {
+                changes += $"　钱{Signed(result.MoneyChange)}";
+            }
+            if (result.ProvisionChange != 0)
+            {
+                changes += $"　口粮{Signed(result.ProvisionChange)}";
+            }
+            if (result.HealthChange != 0)
+            {
+                changes += $"　健康{Signed(result.HealthChange)}";
+            }
+            return result.Summary + changes;
+        }
+
+        private static string Signed(long value) =>
+            value > 0 ? "+" + value : value.ToString();
+
         private void DrawDeveloperDashboard()
         {
             GUILayout.Label("世界模拟观察台", _sectionStyle);
@@ -3409,6 +3673,7 @@ namespace Mandate.Presentation
         {
             _simulator = new WorldSimulator(
                 _world.MasterSeed, LoadProductionContent());
+            _playerActionService = new PlayerActionService(_simulator);
             _decisionSystem = new NpcDecisionSystem(_world.MasterSeed);
             _actionResolver = new NpcActionResolver(_world.MasterSeed);
             _battleResolver = new BattleResolver(_world.MasterSeed);
@@ -3685,6 +3950,10 @@ namespace Mandate.Presentation
                     return "从中山商行开始，拥有更多本钱和载货能力，可经营中山—涿县商路。";
                 case StartingIdentity.Physician:
                     return "从广宗救济营开始，拥有较高医术，可购买药材并救治战场伤员。";
+                case StartingIdentity.Farmer:
+                    return "从具体家户与田地开始，可安排农季、投入种子与劳力并收获产品批次。";
+                case StartingIdentity.Scholar:
+                    return "从乡学开始，可研习、整理文书并通过任务影响地方治理。";
                 default:
                     return string.Empty;
             }
