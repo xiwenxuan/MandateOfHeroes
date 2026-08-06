@@ -340,16 +340,45 @@ namespace Mandate.Presentation
 
             GUILayout.Space(12);
             GUILayout.Label("开局地点", _sectionStyle);
-            var locationLabels = new string[_selectionPreview.Locations.Count];
-            for (var i = 0; i < _selectionPreview.Locations.Count; i++)
+            var startingLocations = BuildLegalStartingLocations();
+            var locationLabels = new string[startingLocations.Count];
+            for (var i = 0; i < startingLocations.Count; i++)
             {
-                locationLabels[i] = _selectionPreview.Locations[i].DisplayName;
+                locationLabels[i] = startingLocations[i].DisplayName;
             }
             _customStartingLocation = GUILayout.SelectionGrid(
                 Mathf.Clamp(_customStartingLocation, 0, locationLabels.Length - 1),
                 locationLabels,
                 3,
                 GUILayout.Height(70));
+        }
+
+        private List<LocationState> BuildLegalStartingLocations()
+        {
+            var legalIds = _newGameSetupService.GetLegalStartingLocationIds(
+                _selectionPreview,
+                (StartingIdentity)_customIdentity);
+            var result = new List<LocationState>();
+            for (var legalIndex = 0; legalIndex < legalIds.Count; legalIndex++)
+            {
+                for (var locationIndex = 0;
+                     locationIndex < _selectionPreview.Locations.Count;
+                     locationIndex++)
+                {
+                    var location = _selectionPreview.Locations[locationIndex];
+                    if (location.Id == legalIds[legalIndex])
+                    {
+                        result.Add(location);
+                        break;
+                    }
+                }
+            }
+            if (result.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "当前身份没有合法的开局地点。");
+            }
+            return result;
         }
 
         private void DrawExistingCharacterSetup()
@@ -474,6 +503,7 @@ namespace Mandate.Presentation
                         throw new ArgumentException("年龄必须是整数。");
                     }
 
+                    var startingLocations = BuildLegalStartingLocations();
                     var request = new NewGameCharacterRequest
                     {
                         DisplayName = _customName,
@@ -483,11 +513,11 @@ namespace Mandate.Presentation
                             : PersonGender.Female,
                         Identity = (StartingIdentity)_customIdentity,
                         BackgroundId = SelectedBackgroundId(),
-                        StartingLocationId = _selectionPreview.Locations[
+                        StartingLocationId = startingLocations[
                             Mathf.Clamp(
                                 _customStartingLocation,
                                 0,
-                                _selectionPreview.Locations.Count - 1)].Id
+                                startingLocations.Count - 1)].Id
                     };
                     EnterWorld(
                         _newGameSetupService.CreateCustom184World(
@@ -3943,7 +3973,7 @@ namespace Mandate.Presentation
             switch ((StartingIdentity)identityIndex)
             {
                 case StartingIdentity.Soldier:
-                    return "从涿县加入幽州官军，拥有士卒职位，可承接军粮和征募任务。";
+                    return "从幽州援军当前集结地入伍，拥有士卒职位，可承接军粮和征募任务。";
                 case StartingIdentity.CountyClerk:
                     return "从涿县官署担任书佐，可承接户籍、治安和地方政务任务。";
                 case StartingIdentity.Merchant:

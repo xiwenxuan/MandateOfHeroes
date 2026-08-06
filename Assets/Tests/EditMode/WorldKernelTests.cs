@@ -1203,7 +1203,7 @@ namespace Mandate.Tests
             Assert.That(world.PlayerPersonId, Is.EqualTo(player.Id));
             Assert.That(player.DisplayName, Is.EqualTo("玄德"));
             Assert.That(player.BirthDay, Is.EqualTo(-22 * 360L));
-            Assert.That(player.LocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(player.LocationId, Is.EqualTo("location.zhongshan"));
             Assert.That(household, Is.Not.Null);
             Assert.That(household.MemberIds, Does.Contain(player.Id));
             Assert.That(membership.PositionId, Is.EqualTo("position.youzhou_soldier"));
@@ -1222,7 +1222,7 @@ namespace Mandate.Tests
             };
             var expectedLocations = new[]
             {
-                "location.zhuo",
+                "location.zhongshan",
                 "location.zhuo",
                 "location.zhongshan",
                 "location.guangzong"

@@ -73,8 +73,11 @@ namespace Mandate.Simulation
             var person = BuildPlayerPerson(displayName, request);
             if (!string.IsNullOrWhiteSpace(request.StartingLocationId))
             {
-                person.LocationId = RequireLocation(
-                    world, request.StartingLocationId).Id;
+                var requestedLocation = RequireLocation(
+                    world, request.StartingLocationId);
+                ValidateStartingLocation(
+                    world, request.Identity, requestedLocation.Id);
+                person.LocationId = requestedLocation.Id;
             }
             person.BirthLocationId = person.LocationId;
             ApplyStartingBackground(person, request.BackgroundId);
@@ -133,12 +136,41 @@ namespace Mandate.Simulation
                 }
 
                 world.PlayerPersonId = personId;
-                EnsureExistingPlayableContext(world, world.People[i]);
                 world.Validate();
                 return world;
             }
 
             throw new InvalidOperationException($"世界中不存在人物 {personId}。");
+        }
+
+        public IReadOnlyList<string> GetLegalStartingLocationIds(
+            WorldState world,
+            StartingIdentity identity)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+
+            var result = new List<string>();
+            if (identity == StartingIdentity.Soldier)
+            {
+                var army = world.Armies.Find(
+                    item => item.Id == "army.youzhou_reinforcement");
+                if (army == null)
+                {
+                    throw new InvalidOperationException(
+                        "幽州援军缺少可供玩家加入的军队编制。");
+                }
+                result.Add(army.LocationId);
+                return result;
+            }
+
+            for (var i = 0; i < world.Locations.Count; i++)
+            {
+                result.Add(world.Locations[i].Id);
+            }
+            return result;
         }
 
         private static PersonState BuildPlayerPerson(
@@ -407,6 +439,31 @@ namespace Mandate.Simulation
                 nameof(locationId));
         }
 
+        private static void ValidateStartingLocation(
+            WorldState world,
+            StartingIdentity identity,
+            string locationId)
+        {
+            if (identity != StartingIdentity.Soldier)
+            {
+                return;
+            }
+
+            var army = world.Armies.Find(
+                item => item.Id == "army.youzhou_reinforcement");
+            if (army == null)
+            {
+                throw new InvalidOperationException(
+                    "幽州援军缺少可供玩家加入的军队编制。");
+            }
+            if (army.LocationId != locationId)
+            {
+                throw new ArgumentException(
+                    "军人开局地点必须是所加入军队当前的真实集结地。",
+                    nameof(locationId));
+            }
+        }
+
         private static void EnsureIdentityWorldDefinitions(
             WorldState world,
             PersonState person,
@@ -470,26 +527,6 @@ namespace Mandate.Simulation
                     RequiresMembership = true,
                     IsAvailable = true
                 });
-            }
-        }
-
-        private static void EnsureExistingPlayableContext(
-            WorldState world,
-            PersonState person)
-        {
-            if (person.Id.IndexOf("farmer", StringComparison.Ordinal) < 0)
-            {
-                return;
-            }
-
-            EnsureIdentityWorldDefinitions(world, person, StartingIdentity.Farmer);
-            var family = FindFamily(world, person.FamilyId);
-            EnsureFarmerHousehold(world, person, family);
-            if (!world.Memberships.Exists(item =>
-                    item.PersonId == person.Id &&
-                    item.PositionId == "position.zhuo_farmer"))
-            {
-                AddStartingMembership(world, person, StartingIdentity.Farmer);
             }
         }
 
@@ -875,7 +912,12 @@ namespace Mandate.Simulation
                     summary = ReceiveClinicCare(world, person);
                     break;
                 case PlayerActionIds.FieldCare:
-                    summary = ReceiveFieldCare(world, person);
+                    var fieldCare = ReceiveFieldCare(world, person);
+                    if (!fieldCare.Success)
+                    {
+                        return Failure(actionId, fieldCare.Message);
+                    }
+                    summary = fieldCare.Message;
                     break;
                 case PlayerActionIds.HomeRest:
                     summary = RecoverAtHome(world, person);
@@ -991,15 +1033,16 @@ namespace Mandate.Simulation
             {
                 var quantity = _trading.GetQuantity(
                     world, person.Id, "commodity.cloth");
+                var buyUnavailableReason = TradeBuyUnavailableReason(
+                    world, person, 2);
                 actions.Add(Option(
                     PlayerActionIds.TradeBuy,
                     "买入2匹布帛",
                     "从当前市场以实时价格买入并装入人物货物账。",
-                    stationary && HasMarket(world, person.LocationId) &&
-                        person.Wealth >= 400,
+                    stationary && string.IsNullOrEmpty(buyUnavailableReason),
                     !stationary
                         ? "旅途中不能交易。"
-                        : "当前地点无市场，或资金不足。"));
+                        : buyUnavailableReason));
                 actions.Add(Option(
                     PlayerActionIds.TradeSell,
                     "卖出随身布帛",
@@ -1074,6 +1117,7 @@ namespace Mandate.Simulation
             }
 
             if (world.AbsoluteDay >= 10 &&
+                CanWitnessTaipingRumor(person) &&
                 !HasChoice(world, person.Id, "taiping"))
             {
                 actions.Add(Option(
@@ -1089,6 +1133,12 @@ namespace Mandate.Simulation
                     stationary,
                     "旅途中无法处理这条本地传闻。"));
             }
+        }
+
+        private static bool CanWitnessTaipingRumor(PersonState person)
+        {
+            return person.LocationId == "location.guangzong" ||
+                person.LocationId == "location.xiaquyang";
         }
 
         private static void AddCareActions(
@@ -1115,13 +1165,14 @@ namespace Mandate.Simulation
                 "需要本地医馆、至少1份药材和足够药费。"));
 
             var service = FindMilitaryService(world, person.Id);
+            var fieldCareUnavailableReason = FieldCareUnavailableReason(
+                world, person, service, stationary);
             actions.Add(Option(
                 PlayerActionIds.FieldCare,
                 "接受随军治疗",
                 "由同地军医使用军中药材治疗伤兵。",
-                stationary && service != null &&
-                    service.Status == MilitaryServiceStatus.Wounded,
-                "只有随军伤员且军队停止行军时可接受治疗。"));
+                string.IsNullOrEmpty(fieldCareUnavailableReason),
+                fieldCareUnavailableReason));
 
             var family = FindFamily(world, person.FamilyId, false);
             actions.Add(Option(
@@ -1132,6 +1183,140 @@ namespace Mandate.Simulation
                     family.LocationId == person.LocationId &&
                     person.Provisions >= 2,
                 "必须回到家庭所在地并准备2份口粮。"));
+        }
+
+        private static string FieldCareUnavailableReason(
+            WorldState world,
+            PersonState person,
+            MilitaryServiceState service,
+            bool stationary)
+        {
+            if (!stationary)
+            {
+                return "旅途中不能接受集中随军治疗。";
+            }
+            if (service == null ||
+                service.Status != MilitaryServiceStatus.Wounded)
+            {
+                return "只有登记在册的随军伤员可以接受治疗。";
+            }
+
+            var army = FindArmy(world, service.ArmyId);
+            if (FindArmyMarch(world, army.Id) != null)
+            {
+                return "军队行军期间不能组织集中治疗。";
+            }
+            var physician = FindFieldCarePhysician(
+                world, army, person.Id);
+            if (physician == null)
+            {
+                return "军中当前没有同地且具备治疗能力的医者。";
+            }
+            if (!HasAvailablePersonalMedicine(world, physician.Id))
+            {
+                return "军医当前没有可用于治疗的药材。";
+            }
+            return string.Empty;
+        }
+
+        private static PersonState FindFieldCarePhysician(
+            WorldState world,
+            ArmyState army,
+            string patientPersonId)
+        {
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                var candidate = world.People[i];
+                if (candidate.Id != patientPersonId &&
+                    candidate.IsAlive &&
+                    candidate.LocationId == army.LocationId &&
+                    FindJourney(world, candidate.Id) == null &&
+                    Math.Max(
+                        candidate.MedicalSkillBasisPoints,
+                        candidate.ProfessionalSkills.Medicine) >= 2_500)
+                {
+                    return candidate;
+                }
+            }
+            return null;
+        }
+
+        private static bool HasAvailablePersonalMedicine(
+            WorldState world,
+            string personId)
+        {
+            for (var i = 0; i < world.Inventories.Count; i++)
+            {
+                var inventory = world.Inventories[i];
+                if (inventory.OwnerPersonId == personId &&
+                    inventory.CommodityId == "commodity.herbs" &&
+                    inventory.Quantity > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static string TradeBuyUnavailableReason(
+            WorldState world,
+            PersonState person,
+            int quantity)
+        {
+            if (!HasMarket(world, person.LocationId))
+            {
+                return "当前地点没有可以交易的市场。";
+            }
+            var listing = FindListing(
+                world, person.LocationId, "commodity.cloth");
+            if (listing == null || listing.Stock < quantity)
+            {
+                return "当前市场的布帛存货不足。";
+            }
+            var cost = checked((long)listing.Price * quantity);
+            if (person.Wealth < cost)
+            {
+                return "需要" + cost + "钱，当前资金不足。";
+            }
+
+            var commodity = world.Commodities.Find(item =>
+                item.Id == "commodity.cloth");
+            if (commodity == null)
+            {
+                return "布帛商品定义缺失。";
+            }
+            var currentWeight = CurrentCargoWeight(world, person.Id);
+            var addedWeight = checked((long)commodity.UnitWeight * quantity);
+            if (currentWeight + addedWeight > person.CargoCapacity)
+            {
+                return "随身货物将超过人物载货上限。";
+            }
+            return string.Empty;
+        }
+
+        private static long CurrentCargoWeight(
+            WorldState world,
+            string personId)
+        {
+            long total = 0;
+            for (var inventoryIndex = 0;
+                 inventoryIndex < world.Inventories.Count;
+                 inventoryIndex++)
+            {
+                var inventory = world.Inventories[inventoryIndex];
+                if (inventory.OwnerPersonId != personId)
+                {
+                    continue;
+                }
+                var commodity = world.Commodities.Find(item =>
+                    item.Id == inventory.CommodityId);
+                if (commodity != null)
+                {
+                    total = checked(
+                        total + (long)commodity.UnitWeight * inventory.Quantity);
+                }
+            }
+            return total;
         }
 
         private string AcceptFirstTask(WorldState world, PersonState person)
@@ -1436,35 +1621,34 @@ namespace Mandate.Simulation
                 "健康恢复" + recovered + "。";
         }
 
-        private string ReceiveFieldCare(WorldState world, PersonState person)
+        private MedicalTreatmentResult ReceiveFieldCare(
+            WorldState world,
+            PersonState person)
         {
             var service = FindMilitaryService(world, person.Id);
-            var army = FindArmy(world, service.ArmyId);
-            PersonState physician = null;
-            for (var i = 0; i < world.People.Count; i++)
+            if (service == null)
             {
-                var candidate = world.People[i];
-                if (candidate.IsAlive && candidate.LocationId == army.LocationId &&
-                    Math.Max(
-                        candidate.MedicalSkillBasisPoints,
-                        candidate.ProfessionalSkills.Medicine) >= 2_500)
-                {
-                    physician = candidate;
-                    break;
-                }
+                return new MedicalTreatmentResult(
+                    false, 0, 0, 0, "当前人物没有可以治疗的服役记录。");
             }
+            var army = FindArmy(world, service.ArmyId);
+            var physician = FindFieldCarePhysician(world, army, person.Id);
             if (physician == null)
             {
-                return "军中当前没有具备治疗能力且同地的医者。";
+                return new MedicalTreatmentResult(
+                    false, 0, 0, 0, "军中当前没有具备治疗能力且同地的医者。");
             }
             var treatment = new MedicalSystem(world.MasterSeed)
-                .TreatArmyWounded(
+                .TreatArmyWoundedPerson(
                     world,
                     new StableId(physician.Id),
                     new StableId(army.Id),
-                    Math.Max(1, army.WoundedTroops));
-            _simulator.AdvanceDays(world, 1);
-            return treatment.Message;
+                    new StableId(person.Id));
+            if (treatment.Success)
+            {
+                _simulator.AdvanceDays(world, 1);
+            }
+            return treatment;
         }
 
         private string RecoverAtHome(WorldState world, PersonState person)

@@ -48,6 +48,35 @@ namespace Mandate.Simulation
             StableId armyId,
             int requestedPatients)
         {
+            return TreatArmyWoundedInternal(
+                world,
+                physicianId,
+                armyId,
+                requestedPatients,
+                string.Empty);
+        }
+
+        public MedicalTreatmentResult TreatArmyWoundedPerson(
+            WorldState world,
+            StableId physicianId,
+            StableId armyId,
+            StableId patientPersonId)
+        {
+            return TreatArmyWoundedInternal(
+                world,
+                physicianId,
+                armyId,
+                1,
+                patientPersonId.Value);
+        }
+
+        private MedicalTreatmentResult TreatArmyWoundedInternal(
+            WorldState world,
+            StableId physicianId,
+            StableId armyId,
+            int requestedPatients,
+            string prioritizedPatientPersonId)
+        {
             if (world == null)
             {
                 throw new ArgumentNullException(nameof(world));
@@ -81,6 +110,23 @@ namespace Mandate.Simulation
             if (army.WoundedTroops <= 0)
             {
                 return Failure("该军队目前没有待救治伤兵。");
+            }
+
+            MilitaryServiceState prioritizedService = null;
+            if (!string.IsNullOrEmpty(prioritizedPatientPersonId))
+            {
+                if (!world.MilitaryServiceInitialized)
+                {
+                    return Failure("指定人物治疗需要正式服役记录。");
+                }
+                prioritizedService = world.MilitaryServices.Find(item =>
+                    item.PersonId == prioritizedPatientPersonId &&
+                    item.ArmyId == army.Id &&
+                    item.Status == MilitaryServiceStatus.Wounded);
+                if (prioritizedService == null)
+                {
+                    return Failure("指定人物不是该军队中可治疗的伤员。");
+                }
             }
 
             var herbs = FindInventory(
@@ -117,12 +163,29 @@ namespace Mandate.Simulation
                 world.Inventories.Remove(herbs);
             }
 
-            recovered = new MilitaryServiceSystem().RecoverWounded(
-                world,
-                armyId,
-                recovered,
-                sequence,
-                PeopleFor(world));
+            if (prioritizedService == null)
+            {
+                recovered = new MilitaryServiceSystem().RecoverWounded(
+                    world,
+                    armyId,
+                    recovered,
+                    sequence,
+                    PeopleFor(world));
+            }
+            else
+            {
+                prioritizedService.Status = MilitaryServiceStatus.Active;
+                prioritizedService.LastStatusChangeDay = world.AbsoluteDay;
+                var patient = PeopleFor(world).GetRequiredForUpdate(
+                    prioritizedService.PersonId);
+                patient.HealthBasisPoints = Math.Max(
+                    patient.HealthBasisPoints,
+                    6_000);
+                new MilitaryServiceSystem().SynchronizeArmyCaches(
+                    world,
+                    army.Id);
+                recovered = 1;
+            }
             if (army.Troops > army.MaximumTroops)
             {
                 throw new InvalidOperationException(
