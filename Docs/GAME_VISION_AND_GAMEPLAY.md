@@ -1,5 +1,16 @@
 # 《群雄志：仕途》核心思路与玩法设计
 
+## Document Governance
+
+- Purpose：定义游戏长期愿景、统一世界、身份人生、历史参与和多代家族方向。
+- Authority：L0 PROJECT CONSTITUTION。
+- Covers：游戏为何存在、玩家体验与不可轻易改变的总体原则。
+- DoesNotCover：具体系统实现状态、历史证据或任务验收。
+- Supersedes：早期分散愿景摘要。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`、`GAME_SYSTEMS_MASTER_AND_STATUS.md`。
+- Status：CANONICAL。
+
 ## 1. 游戏愿景
 
 这是一款以东汉末至三国时代为核心背景的开放式家族人生模拟战略游戏。135—260年是主要可选

@@ -195,6 +195,19 @@ collects the accumulated M23-P5 through M25-P14 working tree into a remote integ
 core-test discovery, source and binary fingerprints, bounded group execution and aggregate coverage evidence.
 It does not authorize a schema upgrade or implementation of M25-P15 storage spoilage.
 
+### Current predevelopment knowledge-base consolidation contract
+
+For any new cross-system design, historical-world development, family-spatial development or large implementation
+task, start from `Docs/KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`, then use the Canonical Domain Map to read
+the matching L1 specification and the current status document before consulting L3 research or L4 task history.
+Read `Docs/TASK_HAN_PREDEVELOPMENT_KNOWLEDGE_BASE_CONSOLIDATION_V1.md` for the consolidation boundary and
+`Docs/HISTORICAL_WORLD_REFERENCE/FAMILY_SPATIAL_CONSOLIDATION_V1/README.md` for the queryable 133-settlement,
+250-county, Clan/Branch and Scenario family-spatial reference. A task or acceptance report never overrides an L1
+specification; `UNKNOWN` evidence must not be silently converted to `NONE`, and reference candidates must not be
+materialized as Facilities, assets, FamilyOrganizations or FamilyCenters. The next historical implementation gate
+is a Development Readiness Review for 184 Luoyang; only after it passes should work route to
+`LUOYANG-184-HISTORICAL-PERSON-FAMILY-INTEGRATION-V1`.
+
 ## Core reading order
 
 For cross-system design or planning, use the order established by the master document:

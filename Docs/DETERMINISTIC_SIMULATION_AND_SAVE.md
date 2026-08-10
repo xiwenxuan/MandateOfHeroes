@@ -1,5 +1,16 @@
 # 确定性世界模拟与跨代存档方案
 
+## Document Governance
+
+- Purpose：定义稳定随机、存档合同、顺序迁移、往返与跨代不变量。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：确定性与持久化原则。
+- DoesNotCover：各Domain具体玩法或当前实现状态。
+- Supersedes：早期非正式存档设想。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`GAME_SYSTEMS_MASTER_AND_STATUS.md`、`DATA_AND_CONTENT_FOUNDATION.md`。
+- Status：CANONICAL。
+
 ## 1. 目标
 
 本游戏需要连续模拟135年开始、260年以后仍可发展的世界。玩家可能经历本人、子女、

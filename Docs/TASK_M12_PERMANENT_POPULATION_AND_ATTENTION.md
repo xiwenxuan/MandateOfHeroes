@@ -1,5 +1,16 @@
 # M12 任务书：永久人口、分级模拟与关注演出
 
+## Document Governance
+
+- Purpose：冻结永久人物、冷热分层、关注、存储与人口规模不可违反的合同。
+- Authority：L1 CANONICAL SYSTEM SPEC（虽保留Task名称）。
+- Covers：Permanent Person与人口/家户/关注硬边界。
+- DoesNotCover：具体历史人口分布或全部运行时性能证明。
+- Supersedes：可删除/合并/重随机普通NPC的早期设想。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`GAME_SYSTEMS_MASTER_AND_STATUS.md`、`HISTORICAL_POPULATION_135_260.md`。
+- Status：FROZEN。
+
 ## 一、任务定位
 
 本任务把“活着的三国地图”和“可理解的人际、组织网络”落实为人口底座。

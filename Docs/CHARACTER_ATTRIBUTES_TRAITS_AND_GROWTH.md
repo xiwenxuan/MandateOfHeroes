@@ -1,5 +1,16 @@
 # 《群雄志：仕途》人物多属性、词条与家族培养设计
 
+## Document Governance
+
+- Purpose：定义人物属性、能力、技能、词条、教育、成长和家族培养。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：人物与培养系统规则。
+- DoesNotCover：Clan/Branch/Household/FamilyOrganization/FamilyCenter产权和空间结构。
+- Supersedes：早期人物能力讨论摘要。
+- SupersededBy：无；Family实体关系以`FAMILY_ORGANIZATION_REFERENCE_V1/README.md`为准。
+- RelatedCanonicalDocs：`GAME_SYSTEMS_MASTER_AND_STATUS.md`、`TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md`。
+- Status：CANONICAL。
+
 ## 1. 文档定位
 
 本文统一记录人物能力、专业成长、词条、社会评价和家族培养的长期设计。

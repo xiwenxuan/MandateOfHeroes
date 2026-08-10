@@ -1,5 +1,16 @@
 # 地图美术与开放资源计划
 
+## Document Governance
+
+- Purpose：定义地图美术原创方向、视角需求和开放资源选择边界。
+- Authority：L1 CURRENT DESIGN SPEC。
+- Covers：地图美术与资源策略。
+- DoesNotCover：统一Cell世界事实、历史地理数据或素材许可证最终审计。
+- Supersedes：早期地图视觉讨论摘要。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`WORLD_SIMULATION_FOUNDATION.md`、`LEGAL_AND_ASSETS.md`。
+- Status：CURRENT。
+
 ## 原创方向
 
 项目地图采用“东汉军府舆图＋绢本设色＋封泥军棋”的原创方向。

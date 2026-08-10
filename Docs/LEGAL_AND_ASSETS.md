@@ -1,5 +1,16 @@
 # 法律与素材原则
 
+## Document Governance
+
+- Purpose：定义外部代码、数据、素材、许可证和原创表达边界。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：许可证、来源、第三方内容和禁止复制。
+- DoesNotCover：具体美术风格实现或历史资料真伪。
+- Supersedes：早期零散素材建议。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`MAP_ART_RESOURCE_PLAN.md`、`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`。
+- Status：CANONICAL。
+
 本项目只借鉴“宏观战略与个人角色扮演结合”这一玩法方向，不复制商业游戏的受保护表达。
 
 禁止加入：
@@ -27,4 +38,3 @@
 - 在项目中的文件位置
 
 OpenGameArt、itch.io 和 Freesound 上的资源许可证并不统一，不能仅因为“免费下载”就加入仓库。
-

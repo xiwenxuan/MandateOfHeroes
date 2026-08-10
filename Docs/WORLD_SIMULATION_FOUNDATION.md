@@ -1,5 +1,16 @@
 # 《群雄志：仕途》世界模拟、人口经济与地方战争总设计
 
+## Document Governance
+
+- Purpose：定义统一世界账、地图、人口、经济、治理与地方战争回写规则。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：跨系统世界事实与守恒。
+- DoesNotCover：当前完成度、具体历史城市数据或FamilyCenter专项规则。
+- Supersedes：早期分散世界模拟摘要。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`GAME_VISION_AND_GAMEPLAY.md`、`GAME_SYSTEMS_MASTER_AND_STATUS.md`、`UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md`。
+- Status：CANONICAL。
+
 ## 1. 文档定位
 
 本文统一归纳项目关于以下系统的长期设计：

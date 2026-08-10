@@ -1,5 +1,16 @@
 # 人物志沙盒AI方案
 
+## Document Governance
+
+- Purpose：定义有限知识、动机、调度、行动与世界后果的沙盒NPC AI方向。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：通用NPC决策与模拟边界。
+- DoesNotCover：政治职位权限、具体FamilyCenter管理或当前实现完成度。
+- Supersedes：早期“沙盒AI”讨论摘要。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`WORLD_SIMULATION_FOUNDATION.md`、`UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md`、`TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md`。
+- Status：CANONICAL。
+
 ## 1. 定位
 
 本系统借鉴《鬼谷八荒》以性格、关系和定期自主行动塑造NPC生活的优点，但服务于本项目的

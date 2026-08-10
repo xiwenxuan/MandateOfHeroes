@@ -1,0 +1,40 @@
+{
+  "family_counts": {
+    "important_clans": 39,
+    "important_branches": 15,
+    "core_with_presence": 7,
+    "places_with_branch_or_clan": 36,
+    "places_with_residence": 1,
+    "places_with_estate": 8,
+    "places_with_assets": 1,
+    "organization_candidates": 52,
+    "primary_candidates": 8,
+    "local_candidates": 12,
+    "scenario_snapshots": 570,
+    "conflicts": 51
+  },
+  "document_count": 967,
+  "authority_counts": {
+    "REPO_HARD_RULE": 1,
+    "L3": 738,
+    "L1": 16,
+    "L4": 194,
+    "L2": 17,
+    "L0": 1
+  },
+  "status_counts": {
+    "FROZEN": 6,
+    "CURRENT": 35,
+    "CANONICAL": 10,
+    "PARTIALLY_SUPERSEDED": 1,
+    "ARCHIVED": 2,
+    "RESEARCH_REFERENCE": 13,
+    "HISTORICAL_REFERENCE": 869,
+    "IMPLEMENTED_REFERENCE": 31
+  },
+  "document_conflicts": 12,
+  "implementation_gaps": 12,
+  "research_gaps": 12,
+  "broken_links": 0,
+  "canonical_broken_links": 0
+}

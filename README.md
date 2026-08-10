@@ -20,6 +20,11 @@
 
 ### 核心设计文档
 
+新 AI 会话先阅读
+[项目知识库入口](Docs/KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md)，再按其中的
+Canonical Domain Map、规则入口与任务路由加载本次任务所需资料。任务书和验收报告只证明其
+明确覆盖的历史范围，不能覆盖领域 L1 正式规范。
+
 按以下顺序阅读：
 
 1. [核心玩法与游戏愿景](Docs/GAME_VISION_AND_GAMEPLAY.md)
@@ -49,6 +54,8 @@
 - [地图美术资源方案](Docs/MAP_ART_RESOURCE_PLAN.md)
 - [历史事件与人物资料](Docs/HISTORICAL_EVENTS_182_190.md)
 - [首批历史人物](Docs/HISTORICAL_CHARACTERS_FIRST_50.md)
+- [全国家族空间合并资料 V1](Docs/HISTORICAL_WORLD_REFERENCE/FAMILY_SPATIAL_CONSOLIDATION_V1/README.md)
+- [项目知识库、文档治理与城市开发清单](Docs/KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md)
 - [许可证与素材规则](Docs/LEGAL_AND_ASSETS.md)
 
 `Docs/TASK_M1_*.md` 至 `Docs/TASK_M16_*.md` 是里程碑任务书、设计整合和实现记录；

@@ -1,5 +1,16 @@
 # 《群雄志：仕途》统一战斗、军团与战争权限系统设计
 
+## Document Governance
+
+- Purpose：定义个人战、军队、兵种、装备、阵法、军团、战争权限和世界回写。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：军事与战斗系统规则。
+- DoesNotCover：当前实现状态、历史战役数据或政治职位总规则。
+- Supersedes：早期分散战斗方案。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md`、`GAME_SYSTEMS_MASTER_AND_STATUS.md`。
+- Status：CANONICAL。
+
 ## 1. 文档定位
 
 本文归纳个人战斗、人物属性、装备生产、兵种编成、阵法战法、计谋情报、军团战争、职业参与、身份权限和战争后果的统一设计。

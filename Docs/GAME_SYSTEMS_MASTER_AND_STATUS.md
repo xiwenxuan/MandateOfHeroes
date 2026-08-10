@@ -1,5 +1,16 @@
 # 游戏系统总纲、当前状态与生产科研设计
 
+## Document Governance
+
+- Purpose：统一报告各系统当前状态、跨系统关系、技术债与全局建设顺序。
+- Authority：L2 CURRENT SYSTEM STATUS。
+- Covers：已有原型/底座/已定方案/待研究的当前判定。
+- DoesNotCover：替代各领域L1规范或把设计目标证明为实现。
+- Supersedes：早期Development Plan的当前顺序职责。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`及Domain Map列出的L1。
+- Status：CURRENT。
+
 ## 0. 总索引与阅读顺序
 
 本文是当前游戏系统思路的主索引，同时保留生产、建设与科研的正式专项规则。
@@ -10,6 +21,7 @@
 
 | 文档 | 定位 |
 |---|---|
+| [`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`](KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md) | 项目文档Authority/Status、Canonical Domain Map、决策、冲突、缺口与城市开发Manifest的统一查询入口；不替代各领域L1正文 |
 | [`GAME_VISION_AND_GAMEPLAY.md`](GAME_VISION_AND_GAMEPLAY.md) | 游戏愿景、身份道路、一局结构、历史参与、家族与结局 |
 | [`WORLD_SIMULATION_FOUNDATION.md`](WORLD_SIMULATION_FOUNDATION.md) | 地图、人口、设施、产业、市场、财政、战争后果与世界守恒 |
 | [`GAME_SYSTEMS_MASTER_AND_STATUS.md`](GAME_SYSTEMS_MASTER_AND_STATUS.md) | 当前系统总索引，以及生产、建设、科研的统一规则 |
@@ -17,6 +29,8 @@
 | [`CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`](CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md) | 人物禀赋、能力、性格、志向、词条、教育和家族培养 |
 | [`UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md`](UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md) | 个人战、军队、装备、兵种、阵法、权限、战役和世界回写 |
 | [`TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md`](TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md) | 全员永久身份、分级模拟、关注演出和超大人口压力验证 |
+| [`TASK_HAN_PREDEVELOPMENT_KNOWLEDGE_BASE_CONSOLIDATION_V1.md`](TASK_HAN_PREDEVELOPMENT_KNOWLEDGE_BASE_CONSOLIDATION_V1.md) | 大规模开发前的全国家族空间资料合并、全项目文档治理、Canonical入口与八城开发Manifest任务合同 |
+| [`HISTORICAL_WORLD_REFERENCE/FAMILY_SPATIAL_CONSOLIDATION_V1/README.md`](HISTORICAL_WORLD_REFERENCE/FAMILY_SPATIAL_CONSOLIDATION_V1/README.md) | 133核心聚落、250重点县、39 Clan、15 Branch与13剧本的可查询空间参考入口；未知证据保持UNKNOWN |
 | [`HISTORICAL_POPULATION_135_260.md`](HISTORICAL_POPULATION_135_260.md) | 135—260逐年人口、史料锚点、人口缩尺和空间分布方法 |
 | [`TASK_M16_LIVING_WORLD_MAP_INFORMATION_AND_DELEGATION_DESIGN.md`](TASK_M16_LIVING_WORLD_MAP_INFORMATION_AND_DELEGATION_DESIGN.md) | 一体化世界地图、有限认知、信息资产、资源创世和全层级委任的设计整合记录 |
 | [`TASK_M23_P0_MILITARY_PROCUREMENT_TRANSPORT_AND_ARMORY_RECEIPT.md`](TASK_M23_P0_MILITARY_PROCUREMENT_TRANSPORT_AND_ARMORY_RECEIPT.md) | V14军械产品、组织商队库存、采购付款、真实运输和军械库入库闭环 |
@@ -131,6 +145,7 @@
 | 系统 | 当前状态 | 核心内容 |
 |---|---|---|
 | 时间与历法 | 已有底座 | 日、旬、月、季、年和多频率结算 |
+| 项目知识库与文档治理 | 已有治理底座（V1） | 已建立Authority L0—L4、Status、Canonical Domain Map、文档Registry、重大决策、开放问题、冲突、实现/研究缺口与八个P0城市Development Manifest；新开发必须从`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`进入，但Registry分类不替代领域正文，未知和冲突不得静默裁决 |
 | 地图与地点 | 已有原型 | 已验证天下、州郡、县乡、地点、道路、河流和身份视角；连续比例尺和完整专题视图仍为已定方案 |
 | 世界创世与资源配置 | 已定方案 | 史料锚点、合理推定、地质生态生成、资源丰度、世界种子和来源审计 |
 | 认知地图与专题视图 | 已定方案 | 个人/组织知识、比例尺聚合、建设/资源/战争等视图和信息防泄露 |
@@ -537,6 +552,11 @@ M23-P11完成V25同军队有边界的逐级委任：根目标可按稳定受任�
 资金不足形成可显式追缴欠款；只有实际收到的赔偿恢复目标净预算。敌方仍保管截获物资时默认
 暂停补购，有军权原签发人保存原因并显式授权后才可消费定量授权发运，自动日程只报告待授权
 异常而不中断世界推进。V27存档不追溯赔偿或授权。跨政权/州郡法定授权树和AI自主拆解仍未实现。
+2026-08-11 起，历史世界深化、家族空间合并和项目知识库治理已经形成开发前资料底座；下一项
+历史世界工作必须先做 **184 洛阳 Development Readiness Review**，审查通过后才进入
+`LUOYANG-184-HISTORICAL-PERSON-FAMILY-INTEGRATION-V1`，不得继续扩大资料框架或把Reference直接
+物化为运行时事实。
+
 后续全局顺序为：
 
 1. 以已完成的M25-P0统一执行内核、M25-P1正式食品合同、M25-P2库存权威/守恒转换、M25-P3

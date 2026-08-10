@@ -1,5 +1,16 @@
 # 数据与内容底座
 
+## Document Governance
+
+- Purpose：定义稳定ID、历史/重建/模型来源、内容数据与运行时状态分离。
+- Authority：L1 CANONICAL SYSTEM SPEC（部分章节已被替代）。
+- Covers：数据来源、内容合同、校验与兼容原则。
+- DoesNotCover：当前Family/Clan/Branch/Household/FamilyOrganization/FamilyCenter结构。
+- Supersedes：早期零散数据约定。
+- SupersededBy：Family结构部分由`FAMILY_ORGANIZATION_REFERENCE_V1/01_FamilyOrganization_Clan_Branch_Household_Center关系规范_V1.md`替代。
+- RelatedCanonicalDocs：`DETERMINISTIC_SIMULATION_AND_SAVE.md`、`KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md`。
+- Status：PARTIALLY_SUPERSEDED。
+
 ## 1. 目标
 
 所有人物、家族、地点、身份、组织、任务和事件均采用数据驱动。游戏代码负责解释规则，

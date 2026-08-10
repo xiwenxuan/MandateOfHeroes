@@ -1,5 +1,16 @@
 # 数据驱动生产、农业、产业与成长详细设计
 
+## Document Governance
+
+- Purpose：定义数据驱动作物、产品、配方、工单、产业、建设与成长规则。
+- Authority：L1 CANONICAL SYSTEM SPEC。
+- Covers：生产、农业、产业、库存、配方和科研/技能对生产的影响。
+- DoesNotCover：当前实现完成度或FamilyCenter组织结构。
+- Supersedes：旧`PRODUCTION_CONSTRUCTION_AND_RESEARCH.md`职责。
+- SupersededBy：无。
+- RelatedCanonicalDocs：`GAME_SYSTEMS_MASTER_AND_STATUS.md`、`WORLD_SIMULATION_FOUNDATION.md`。
+- Status：CANONICAL。
+
 ## 1. 文档定位与状态
 
 本文是生产、农业、产品、配方、地方经济、职业成长和分层委任之间的专项详细设计。
