@@ -1,0 +1,80 @@
+{
+  "schema": "mandate.luoyang-184-force-initialization.v1",
+  "forces": [
+    {
+      "force_id": "force.han.luoyang_garrison",
+      "display_name": "何进京师防务",
+      "commander_person_id": "P0035",
+      "polity_id": "organization.han_court",
+      "status": "Active",
+      "initial_location_id": "location.luoyang.urban",
+      "destination_location_id": "cell.luoyang.walled",
+      "member_count": 12000,
+      "first_member_ordinal": 3,
+      "last_member_ordinal": 188026,
+      "member_selection": "Exact person records with force_index; ordinal range is an index hint, not an aggregate substitute.",
+      "strength_basis": "Historical command anchor + C-level conservative initialization; not a claimed historical headcount.",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "force_id": "force.han.luzhi_north",
+      "display_name": "卢植讨黄巾军",
+      "commander_person_id": "P0032",
+      "polity_id": "organization.han_court",
+      "status": "Staging",
+      "initial_location_id": "location.luoyang.urban",
+      "destination_location_id": "cell.route.luoyang_julu",
+      "member_count": 8000,
+      "first_member_ordinal": 230000,
+      "last_member_ordinal": 254002,
+      "member_selection": "Exact person records with force_index; ordinal range is an index hint, not an aggregate substitute.",
+      "strength_basis": "Historical command anchor + C-level conservative initialization; not a claimed historical headcount.",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "force_id": "force.han.huangfu_yingchuan",
+      "display_name": "皇甫嵩讨黄巾军",
+      "commander_person_id": "P0033",
+      "polity_id": "organization.han_court",
+      "status": "Staging",
+      "initial_location_id": "location.luoyang.urban",
+      "destination_location_id": "cell.route.luoyang_yingchuan",
+      "member_count": 5000,
+      "first_member_ordinal": 230001,
+      "last_member_ordinal": 259001,
+      "member_selection": "Exact person records with force_index; ordinal range is an index hint, not an aggregate substitute.",
+      "strength_basis": "Historical command anchor + C-level conservative initialization; not a claimed historical headcount.",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "force_id": "force.han.zhujun_yingchuan",
+      "display_name": "朱儁讨黄巾军",
+      "commander_person_id": "P0034",
+      "polity_id": "organization.han_court",
+      "status": "Staging",
+      "initial_location_id": "location.luoyang.urban",
+      "destination_location_id": "cell.route.luoyang_yingchuan",
+      "member_count": 5000,
+      "first_member_ordinal": 230002,
+      "last_member_ordinal": 264000,
+      "member_selection": "Exact person records with force_index; ordinal range is an index hint, not an aggregate substitute.",
+      "strength_basis": "Historical command anchor + C-level conservative initialization; not a claimed historical headcount.",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "force_id": "force.han.caocao_reinforcement",
+      "display_name": "曹操颍川增援军",
+      "commander_person_id": "P0108",
+      "polity_id": "organization.han_court",
+      "status": "Staging",
+      "initial_location_id": "location.luoyang.urban",
+      "destination_location_id": "cell.route.luoyang_yingchuan",
+      "member_count": 4000,
+      "first_member_ordinal": 230003,
+      "last_member_ordinal": 268566,
+      "member_selection": "Exact person records with force_index; ordinal range is an index hint, not an aggregate substitute.",
+      "strength_basis": "Historical command anchor + C-level conservative initialization; not a claimed historical headcount.",
+      "data_origin": "HistoricalReconstruction"
+    }
+  ]
+}

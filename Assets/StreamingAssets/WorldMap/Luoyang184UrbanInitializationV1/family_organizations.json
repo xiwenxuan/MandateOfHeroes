@@ -1,0 +1,251 @@
+{
+  "schema": "mandate.luoyang-184-family-organizations.v1",
+  "organizations": [
+    {
+      "family_organization_id": "family_organization.luoyang.184.f088",
+      "source_family_id": "F088",
+      "family_name": "汉室主脉",
+      "head_person_id": "P0037",
+      "member_count": 20,
+      "member_ordinal_ranges": [
+        {
+          "start": 182000,
+          "count": 8
+        },
+        {
+          "start": 182009,
+          "count": 12
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0037",
+        "P0038",
+        "P0039",
+        "P0040",
+        "P0047",
+        "P0048",
+        "P0049",
+        "P0050",
+        "P0932",
+        "P0933"
+      ],
+      "family_assets": 100000,
+      "family_cells": [],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f088",
+      "family_treasury": 50000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "B",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f036",
+      "source_family_id": "F036",
+      "family_name": "南阳何氏",
+      "head_person_id": "P0035",
+      "member_count": 250,
+      "member_ordinal_ranges": [
+        {
+          "start": 3,
+          "count": 250
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0035",
+        "P0036",
+        "P0054",
+        "P0495",
+        "P0714",
+        "P0934"
+      ],
+      "family_assets": 150000,
+      "family_cells": [
+        4114712,
+        4114713
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f036",
+      "family_treasury": 75000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "B",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f077",
+      "source_family_id": "F077",
+      "family_name": "弘农杨氏",
+      "head_person_id": "P0010",
+      "member_count": 300,
+      "member_ordinal_ranges": [
+        {
+          "start": 0,
+          "count": 1
+        },
+        {
+          "start": 256,
+          "count": 299
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0010"
+      ],
+      "family_assets": 200000,
+      "family_cells": [
+        4114713,
+        4114720
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f077",
+      "family_treasury": 100000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "B",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f092",
+      "source_family_id": "F092",
+      "family_name": "汝南袁氏",
+      "head_person_id": "P0013",
+      "member_count": 350,
+      "member_ordinal_ranges": [
+        {
+          "start": 1,
+          "count": 1
+        },
+        {
+          "start": 556,
+          "count": 349
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0013"
+      ],
+      "family_assets": 250000,
+      "family_cells": [
+        4114720,
+        4114721,
+        4114722
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f092",
+      "family_treasury": 125000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "B",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f081",
+      "source_family_id": "F081",
+      "family_name": "扶风马氏",
+      "head_person_id": "P0014",
+      "member_count": 250,
+      "member_ordinal_ranges": [
+        {
+          "start": 2,
+          "count": 1
+        },
+        {
+          "start": 908,
+          "count": 249
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0014"
+      ],
+      "family_assets": 300000,
+      "family_cells": [
+        4114722,
+        4114723
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f081",
+      "family_treasury": 150000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "C",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f571",
+      "source_family_id": "F571",
+      "family_name": "董氏（灵帝外戚）",
+      "head_person_id": "person.luoyang.184.urban.001164",
+      "member_count": 100,
+      "member_ordinal_ranges": [
+        {
+          "start": 1163,
+          "count": 100
+        }
+      ],
+      "historical_member_person_ids": [],
+      "family_assets": 350000,
+      "family_cells": [
+        4114723,
+        4134609
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f571",
+      "family_treasury": 175000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "C",
+      "data_origin": "HistoricalReconstruction"
+    },
+    {
+      "family_organization_id": "family_organization.luoyang.184.f572",
+      "source_family_id": "F572",
+      "family_name": "董氏（灵帝母族）",
+      "head_person_id": "P0929",
+      "member_count": 130,
+      "member_ordinal_ranges": [
+        {
+          "start": 1268,
+          "count": 129
+        },
+        {
+          "start": 182008,
+          "count": 1
+        }
+      ],
+      "historical_member_person_ids": [
+        "P0929"
+      ],
+      "family_assets": 400000,
+      "family_cells": [
+        4134609
+      ],
+      "family_facility_ids": [],
+      "family_inventory_container_id": "inventory.family.f572",
+      "family_treasury": 200000,
+      "family_roles": [
+        "role.family_head",
+        "role.family_steward",
+        "role.family_member"
+      ],
+      "confidence": "B/C",
+      "data_origin": "HistoricalReconstruction"
+    }
+  ]
+}

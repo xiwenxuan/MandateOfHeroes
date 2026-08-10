@@ -1,0 +1,194 @@
+{
+  "schema": "mandate.luoyang-184-scenario-events.v1",
+  "events": [
+    {
+      "event_id": "event.184.yellow_turban.secret_network",
+      "order": 10,
+      "label": "黄巾秘密网络",
+      "status": "Active",
+      "actors": [
+        "P0054",
+        "P0932",
+        "P0933"
+      ],
+      "actions": [
+        {
+          "type_id": "person.set_activity",
+          "person_id": "P0054",
+          "value": "activity.conspiracy"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.tangzhou.denunciation",
+      "order": 20,
+      "label": "唐周告发",
+      "status": "Pending",
+      "actors": [
+        "P0934",
+        "P0054"
+      ],
+      "actions": [
+        {
+          "type_id": "person.set_activity",
+          "person_id": "P0934",
+          "value": "activity.denunciation"
+        },
+        {
+          "type_id": "person.set_activity",
+          "person_id": "P0054",
+          "value": "activity.detained"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.yellow_turban.early_rising",
+      "order": 30,
+      "label": "黄巾提前起事",
+      "status": "Pending",
+      "actors": [
+        "P0053"
+      ],
+      "actions": [
+        {
+          "type_id": "city.add_military_supply_pressure",
+          "value": 1200
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.luoyang.martial_law",
+      "order": 40,
+      "label": "京师戒严",
+      "status": "Pending",
+      "actors": [
+        "P0038",
+        "P0035"
+      ],
+      "actions": [
+        {
+          "type_id": "force.activate",
+          "force_id": "force.han.luoyang_garrison"
+        },
+        {
+          "type_id": "city.add_transport_pressure",
+          "value": 600
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.hejin.capital_defense",
+      "order": 50,
+      "label": "何进镇守京师",
+      "status": "Pending",
+      "actors": [
+        "P0035"
+      ],
+      "actions": [
+        {
+          "type_id": "person.set_activity",
+          "person_id": "P0035",
+          "value": "activity.military.capital_defense"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.luzhi.departure",
+      "order": 60,
+      "label": "卢植出征",
+      "status": "Pending",
+      "actors": [
+        "P0032"
+      ],
+      "actions": [
+        {
+          "type_id": "force.deploy",
+          "force_id": "force.han.luzhi_north"
+        },
+        {
+          "type_id": "person.pause_work",
+          "scope_force_id": "force.han.luzhi_north"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.huangfu.departure",
+      "order": 70,
+      "label": "皇甫嵩出征",
+      "status": "Pending",
+      "actors": [
+        "P0033"
+      ],
+      "actions": [
+        {
+          "type_id": "force.deploy",
+          "force_id": "force.han.huangfu_yingchuan"
+        },
+        {
+          "type_id": "person.pause_work",
+          "scope_force_id": "force.han.huangfu_yingchuan"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.zhujun.departure",
+      "order": 80,
+      "label": "朱儁出征",
+      "status": "Pending",
+      "actors": [
+        "P0034"
+      ],
+      "actions": [
+        {
+          "type_id": "force.deploy",
+          "force_id": "force.han.zhujun_yingchuan"
+        },
+        {
+          "type_id": "person.pause_work",
+          "scope_force_id": "force.han.zhujun_yingchuan"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.caocao.reinforcement",
+      "order": 90,
+      "label": "曹操年内赴前线",
+      "status": "Pending",
+      "actors": [
+        "P0108"
+      ],
+      "actions": [
+        {
+          "type_id": "force.deploy",
+          "force_id": "force.han.caocao_reinforcement"
+        },
+        {
+          "type_id": "person.pause_work",
+          "scope_force_id": "force.han.caocao_reinforcement"
+        }
+      ]
+    },
+    {
+      "event_id": "event.184.zuofeng.mission",
+      "order": 100,
+      "label": "左丰赴卢植军",
+      "status": "Pending",
+      "actors": [
+        "P0931",
+        "P0032"
+      ],
+      "actions": [
+        {
+          "type_id": "person.set_location",
+          "person_id": "P0931",
+          "value": "cell.route.luoyang_julu"
+        },
+        {
+          "type_id": "person.set_activity",
+          "person_id": "P0931",
+          "value": "activity.military_inspection"
+        }
+      ]
+    }
+  ]
+}

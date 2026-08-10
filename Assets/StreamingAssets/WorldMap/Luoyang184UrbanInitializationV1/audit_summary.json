@@ -1,0 +1,107 @@
+{
+  "schema": "mandate.luoyang-184-urban-initialization-audit.v1",
+  "status": "PASSED",
+  "population": {
+    "total_urban_population": 270000,
+    "walled_city_population": 200000,
+    "area_counts": {
+      "area.luoyang.walled_civil": 182000,
+      "area.luoyang.palace_complex": 18000,
+      "area.luoyang.southern_ritual_education": 30000,
+      "area.luoyang.attached_near_suburb": 40000
+    },
+    "age_counts": {
+      "age.0_13": 75600,
+      "age.14_19": 32400,
+      "age.20_59": 140400,
+      "age.60_69": 16200,
+      "age.70_plus": 5400
+    },
+    "male": 137700,
+    "female": 132300,
+    "data_origin_counts": {
+      "Historical": 25,
+      "GeneratedHistoricalPopulation": 269975
+    }
+  },
+  "housing": {
+    "total_residential_capacity": 270000,
+    "housed_population": 270000,
+    "unhoused_population": 0,
+    "general_residence_population": 234601,
+    "special_residence_population": 1399,
+    "barracks_resident_population": 34000,
+    "residence_status_counts": {
+      "Unhoused": 0,
+      "Housed": 236000,
+      "TemporaryLodging": 22000,
+      "InstitutionalHousing": 12000
+    }
+  },
+  "employment": {
+    "working_age_population": 189000,
+    "available_labor": 165982,
+    "employed_population": 154962,
+    "unemployed_population": 11020,
+    "students": 23000,
+    "job_slots": 160000,
+    "unfilled_jobs": 5038,
+    "skill_mismatch": 1200
+  },
+  "facilities": {
+    "audited": 1230,
+    "urban_active": 742,
+    "removed_test_facilities": 6,
+    "converted_facilities": 46,
+    "vacant_urban_cells": 99,
+    "water_demand_litres_per_day": 2160000,
+    "water_capacity_litres_per_day": 2850000,
+    "water_gap_litres_per_day": 690000,
+    "annual_food_demand_kg": 64800000,
+    "required_food_storage_kg_120_days": 21304110,
+    "storage_capacity_kg": 30000000
+  },
+  "households": {
+    "count": 53992
+  },
+  "family_organizations": {
+    "count": 7,
+    "member_count": 1400
+  },
+  "forces": {
+    "force.han.luoyang_garrison": 12000,
+    "force.han.luzhi_north": 8000,
+    "force.han.huangfu_yingchuan": 5000,
+    "force.han.zhujun_yingchuan": 5000,
+    "force.han.caocao_reinforcement": 4000
+  },
+  "performance": {
+    "generation_ms": 1923.024,
+    "person_binary_bytes": 21600032,
+    "estimated_400k_person_binary_bytes": 32000032,
+    "maximum_visual_actor_count": 256,
+    "chunk_person_count": 4096,
+    "unity_daily_audit_tick_ms": 165.965,
+    "unity_monthly_household_tick_ms": 11.213,
+    "serialized_270k_person_bytes": 21600032,
+    "estimated_400k_person_bytes": 32000032,
+    "formal_700k_generation_enabled": false
+  },
+  "historical_profile_exclusion": {
+    "formal_profile_id": "population_profile.luoyang.184.urban_recommended",
+    "engineering_profile_20542_loaded": false,
+    "stress_profiles_loaded": false
+  },
+  "independent_validation": {
+    "validated_at_is_metadata_only": true,
+    "package_file_hashes_checked": 10,
+    "person_records_checked": 270000,
+    "household_records_checked": 53992,
+    "facility_records_checked": 1230,
+    "event_definitions_checked": 10,
+    "person_scan_ms_python_mmap": 246.345,
+    "household_scan_ms_python_mmap": 14.868,
+    "unity_editmode": "tmp/unity-validation/unity-EditMode-20260810-074009-971.summary.json",
+    "unity_playmode": "tmp/unity-validation/unity-PlayMode-20260810-074043-647.summary.json"
+  }
+}

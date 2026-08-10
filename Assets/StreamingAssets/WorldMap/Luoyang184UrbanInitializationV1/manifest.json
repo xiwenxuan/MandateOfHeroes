@@ -1,0 +1,104 @@
+{
+  "schema": "mandate.luoyang-184-urban-initialization.v1",
+  "format_version": 1,
+  "scenario_id": "scenario.han.184.yellow_turban",
+  "scenario_year": 184,
+  "world_id": "HanWorldV1",
+  "city_id": "location.capital.luoyang",
+  "data_origin": "HistoricalReconstruction",
+  "population_profile_id": "population_profile.luoyang.184.urban_recommended",
+  "walled_city_population": 200000,
+  "urban_area_population": 270000,
+  "metropolitan_plan_population": 400000,
+  "supply_region_plan_population": 700000,
+  "person_record_size": 80,
+  "person_count": 270000,
+  "household_record_size": 32,
+  "household_count": 53992,
+  "historical_person_count": 25,
+  "external_historical_anchor_count": 3,
+  "facility_count": 1230,
+  "family_organization_count": 7,
+  "force_count": 5,
+  "event_count": 10,
+  "generated_at_is_metadata_only": true,
+  "source_hashes": [
+    {
+      "path": "source://03_184洛阳人口空间分布模型.xlsx",
+      "filename": "03_184洛阳人口空间分布模型.xlsx",
+      "sha256": "8c20634f36fda3a6da02e36a3f8ab66be31b408f237ecb5fb74e7a8c4f94c4c3"
+    },
+    {
+      "path": "source://04_184洛阳社会结构与职业模型.xlsx",
+      "filename": "04_184洛阳社会结构与职业模型.xlsx",
+      "sha256": "a091bc9184632887b1dbd9438e53f26b343915001b77792f55bc97da623bd51b"
+    },
+    {
+      "path": "source://05_184洛阳历史人物与家族锚点.xlsx",
+      "filename": "05_184洛阳历史人物与家族锚点.xlsx",
+      "sha256": "3692831ba1761e2ebdeb797f4c7c7eaaaa05b3fd38df7ea624a168cebdb9afda"
+    },
+    {
+      "path": "source://01_140-264历史人物与时间轴母库_V5.xlsx",
+      "filename": "01_140-264历史人物与时间轴母库_V5.xlsx",
+      "sha256": "23e20f8e6e33c18584632becbbbd58eefb51f066c19e22adca4386831d335ae3"
+    },
+    {
+      "path": "source://05_184黄巾起义世界切片_V1.xlsx",
+      "filename": "05_184黄巾起义世界切片_V1.xlsx",
+      "sha256": "98c5cc8c6c5a690c6186901a6445cfc512587827ab201f4977e749d4648b4a72"
+    }
+  ],
+  "files": [
+    {
+      "path": "persons.bin",
+      "bytes": 21600032,
+      "sha256": "a2f1ebeb359f2e23dfa7fec2d4d155acd642804a16117ce4091a5cef6ebbe7c3"
+    },
+    {
+      "path": "households.bin",
+      "bytes": 1727776,
+      "sha256": "aae4c75d9dfbc7fa7ab0d7b454d625fd4fe3c9252fb17238c65db846a281730c"
+    },
+    {
+      "path": "catalogs.json",
+      "bytes": 72654,
+      "sha256": "31901a0a45a8fff51e2e1ac036d824ffd1acb8f32755b7bee2bf76031c712129"
+    },
+    {
+      "path": "historical_persons.json",
+      "bytes": 9748,
+      "sha256": "2ef828f3d434144d72026642e0e5bd593a35c888f0112e8805b92d83d9774ef7"
+    },
+    {
+      "path": "external_historical_anchors.json",
+      "bytes": 2976,
+      "sha256": "ad05fe2d691d0e43111aa0acceb6ac14836352b125f0c433038db64d5dd9c5e4"
+    },
+    {
+      "path": "facilities.json",
+      "bytes": 4440063,
+      "sha256": "843421a0f3b589207eae4673d4161791a2801b23972c906446f96999d3ed39f9"
+    },
+    {
+      "path": "family_organizations.json",
+      "bytes": 6571,
+      "sha256": "035974a5aab96762740d05c39d908f0989c0da2caf997e37832dcfb6ae6eb217"
+    },
+    {
+      "path": "forces.json",
+      "bytes": 3862,
+      "sha256": "1b65d56f88d27578fec6607053e1dbb74e80e671617347778eaefe69ff60bd7d"
+    },
+    {
+      "path": "scenario_events.json",
+      "bytes": 4579,
+      "sha256": "be5efb3e39b98011ab8de9a12d55b0d5ee0931477644a23bf5134f5d31b23af6"
+    },
+    {
+      "path": "audit_summary.json",
+      "bytes": 3431,
+      "sha256": "5b9782cfcfb969c8c9ed5bbe6198eda863173a7b96bcd38e66cacac839d9c249"
+    }
+  ]
+}
