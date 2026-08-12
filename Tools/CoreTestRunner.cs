@@ -11,6 +11,19 @@ internal static class CoreTestRunner
 
     private static int Main(string[] args)
     {
+        try
+        {
+            return Run(args);
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine("FATAL CoreTestRunner: " + exception);
+            return 3;
+        }
+    }
+
+    private static int Run(string[] args)
+    {
         if (args.Length == 0)
         {
             Console.WriteLine(

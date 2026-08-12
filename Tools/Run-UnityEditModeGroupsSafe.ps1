@@ -3,9 +3,9 @@ param(
     [Parameter(Mandatory = $true)]
     [ValidatePattern('^[A-Za-z0-9._-]+$')]
     [string]$RunId,
-    [ValidateRange(1, 16)]
+    [ValidateRange(1, 32)]
     [int]$GroupCount = 12,
-    [ValidateRange(1, 16)]
+    [ValidateRange(1, 32)]
     [int]$GroupIndex = 1,
     [ValidateRange(30, 300)]
     [int]$TimeoutSeconds = 240,

@@ -11,6 +11,31 @@
 [Ee]xportedObj/
 [Cc]rash_Reports/
 tmp/
+outputs/
+
+# Reproducible local evidence, previews and Python/Node caches
+**/__pycache__/
+*.py[cod]
+**/.cache/
+**/cache/
+**/artifact_tool_sidecars/
+**/*.inspect.ndjson
+**/previews/
+**/workbook_previews/
+**/renders/
+
+# Large reproducible V72 arena/training evidence. Keep aggregate reports,
+# versioned model weights and schemas; regenerate raw rows through the tests.
+Docs/HISTORICAL_WORLD_REFERENCE/WORLD_INTELLIGENT_DECISION_POLICY_AND_SIMULATION_ARENA_V1/ARENA/*.jsonl
+Docs/HISTORICAL_WORLD_REFERENCE/WORLD_INTELLIGENT_DECISION_POLICY_AND_SIMULATION_ARENA_V1/ARENA/arena_metrics.csv
+Docs/HISTORICAL_WORLD_REFERENCE/WORLD_INTELLIGENT_DECISION_POLICY_AND_SIMULATION_ARENA_V1/MODEL/training_dataset.jsonl
+
+# Reproducible map-pipeline caches and large intermediate GIS files
+MapPipeline/.python/
+MapPipeline/.cache/
+MapPipeline/sources/cache/
+MapData/**/working/
+MapData/**/candidates/raw/
 
 # Unity generated project files
 *.csproj
@@ -54,4 +79,3 @@ Desktop.ini
 *.pfx
 *.pem
 *.key
-

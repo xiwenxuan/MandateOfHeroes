@@ -49,10 +49,10 @@ execute each group as a separate bounded invocation, and aggregate only after al
 ```powershell
 $runId = "manual-20260805"
 powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
-  -RunId $runId -GroupCount 12 -PrepareOnly -TimeoutSeconds 240
+  -RunId $runId -GroupCount 12 -PrepareOnly -TimeoutSeconds 300
 1..12 | ForEach-Object {
   powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
-    -RunId $runId -GroupCount 12 -GroupIndex $_ -TimeoutSeconds 240
+    -RunId $runId -GroupCount 12 -GroupIndex $_ -TimeoutSeconds 300
 }
 powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-CoreTestGroupsSafe.ps1 `
   -RunId $runId -GroupCount 12 -AggregateOnly
@@ -64,10 +64,10 @@ binaries, missing groups, missing tests, unexpected tests and duplicates. For Co
 group per bounded external call and retain the per-group logs and JSON. A complete core claim requires the final
 aggregate `total=N passed=N failed=0`; a filtered runner result is only targeted evidence.
 
-The 2026-08-05 M25-P14 integration baseline discovered 332 core tests. Twelve groups (28 tests in groups 1-8
-and 27 tests in groups 9-12) passed 332/332. The slowest group took approximately 112.56 seconds, below the
-240-second group timeout. Its aggregate is under
-`tmp/core-test-groups/m25p14-integration-20260805/aggregate.json`.
+The 2026-08-05 M25-P21 baseline discovered 364 core tests. Twelve groups passed 364/364 (31 tests in groups
+1-4 and 30 tests in groups 5-12). The slowest group took approximately 155.4 seconds, so current complete core
+groups retain the project-wide 300-second hard limit. Its final aggregate is under
+`tmp/core-test-groups/m25p21-final4-20260805/aggregate.json`.
 
 `verify-project.ps1 -CoreTestFilter <substring-or-exact-filter>` is the bounded targeted-core option. Exact
 multi-test filters use `exact:name1;name2`. Omitting the filter retains the legacy all-in-one core behavior and
@@ -123,20 +123,27 @@ execute each group as a separate external invocation:
 
 ```powershell
 $runId = "manual-20260805"
-1..12 | ForEach-Object {
+1..24 | ForEach-Object {
   powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityEditModeGroupsSafe.ps1 `
-    -RunId $runId -GroupCount 12 -GroupIndex $_ -UseGraphics -TimeoutSeconds 240
+    -RunId $runId -GroupCount 24 -GroupIndex $_ -UseGraphics -TimeoutSeconds 300
 }
 powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityEditModeGroupsSafe.ps1 `
-  -RunId $runId -GroupCount 12 -AggregateOnly
+  -RunId $runId -GroupCount 24 -AggregateOnly
 ```
 
 For Codex-controlled work, do not put all groups into one unbounded foreground call. Run one group per bounded
 external invocation, preserve its PID/log/XML, and aggregate only after every group has completed. The manifest
 uses a source fingerprint and exact test-name sets, so stale or mixed group results cannot satisfy aggregation.
-The current 333-test baseline is 12 groups (28 tests in groups 1-9 and 27 tests in groups 10-12); the
-2026-08-05 aggregate passed all 333 tests. Group 9 took 217.002 seconds, so do not reduce the group count
-or increase the 240-second timeout without a separate evidence-backed decision.
+The group runner accepts 1-32 groups. Increase the group count instead of the timeout when suite growth or a
+particular distribution places a group near the absolute 300-second limit. The M25-P21 baseline passed 365/365
+in 16 groups, but groups 14 and 15 took approximately 289 and 291 seconds. M25-P22 therefore uses 24 groups
+after the enlarged 370-test suite caused a 16-group distribution to exceed the same limit. Retain the
+300-second hard limit and never extend it without explicit user approval.
+
+The 2026-08-05 M25-P28 core baseline discovered and passed 401/401 tests in 32 groups. In that distribution,
+group 24 took about 141 seconds and group 27 about 185 seconds; keep these long-running groups in separate
+external invocations. The aggregate evidence is
+`tmp/core-test-groups/m25p28-final-20260805/aggregate.json`.
 
 `verify-project.ps1 -UnityTestFilter <exact-name>` is an explicit smoke option. Omitting the filter preserves
 the existing complete-test behavior; never present a filtered verification as the complete EditMode suite.
