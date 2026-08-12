@@ -8,6 +8,11 @@ namespace Mandate.Simulation
     {
         public List<HistoricalAnchorRuntimeState> ResolveEligibleEvents(WorldState world)
         {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+
             var resolved = new List<HistoricalAnchorRuntimeState>();
             var definitions = new List<HistoricalEventDefinitionState>(
                 world.HistoricalEventDefinitions);
@@ -21,10 +26,18 @@ namespace Mandate.Simulation
             {
                 var definition = definitions[i];
                 var anchor = FindOrCreateAnchor(world, definition.Id);
-                if (anchor.Status == HistoricalAnchorStatus.Resolved ||
-                    anchor.Status == HistoricalAnchorStatus.Prevented ||
-                    anchor.Status == HistoricalAnchorStatus.Transformed)
+                if (IsTerminal(anchor.Status))
                 {
+                    continue;
+                }
+
+                anchor.LastEvaluatedDay = world.AbsoluteDay;
+                anchor.EvaluationCount = checked(anchor.EvaluationCount + 1);
+
+                if (definition.RequiresStructuredPreconditions ||
+                    definition.OutcomeRules.Count > 0)
+                {
+                    ResolveStructured(world, definition, anchor, resolved);
                     continue;
                 }
 
@@ -56,6 +69,183 @@ namespace Mandate.Simulation
             }
 
             return resolved;
+        }
+
+        private static void ResolveStructured(
+            WorldState world,
+            HistoricalEventDefinitionState definition,
+            HistoricalAnchorRuntimeState anchor,
+            List<HistoricalAnchorRuntimeState> resolved)
+        {
+            if (world.AbsoluteDay < definition.EarliestDay)
+            {
+                anchor.Status = HistoricalAnchorStatus.Watching;
+                return;
+            }
+
+            if (!PrerequisiteResolved(world, definition.PrerequisiteEventId))
+            {
+                anchor.Status = HistoricalAnchorStatus.Delayed;
+                anchor.OutcomeKind = HistoricalEventOutcomeKind.Delayed;
+                anchor.ActualOutcome = "prerequisite_not_resolved";
+                return;
+            }
+
+            var rules = new List<HistoricalEventOutcomeRuleState>(
+                definition.OutcomeRules);
+            rules.Sort((left, right) =>
+            {
+                var byPriority = right.Priority.CompareTo(left.Priority);
+                return byPriority != 0
+                    ? byPriority
+                    : string.CompareOrdinal(left.Id, right.Id);
+            });
+
+            HistoricalEventOutcomeRuleState selected = null;
+            var failed = new List<string>();
+            for (var ruleIndex = 0; ruleIndex < rules.Count; ruleIndex++)
+            {
+                var rule = rules[ruleIndex];
+                if (!HasNonTimeCondition(rule))
+                {
+                    failed.Add(rule.Id + ":year_only_rule_forbidden");
+                    continue;
+                }
+
+                var evaluation = HistoricalEventPreconditionEvaluator.Evaluate(
+                    world, rule.Preconditions);
+                if (evaluation.Satisfied)
+                {
+                    selected = rule;
+                    break;
+                }
+
+                failed.AddRange(evaluation.FailedConditionIds);
+            }
+
+            anchor.FailedConditionIds = failed;
+            if (selected == null)
+            {
+                if (world.AbsoluteDay <= definition.LatestDay)
+                {
+                    anchor.Status = HistoricalAnchorStatus.Delayed;
+                    anchor.OutcomeKind = HistoricalEventOutcomeKind.Delayed;
+                    anchor.ActualOutcome = "conditions_not_yet_satisfied";
+                }
+                else
+                {
+                    anchor.Status = HistoricalAnchorStatus.Expired;
+                    anchor.OutcomeKind = HistoricalEventOutcomeKind.Prevented;
+                    anchor.ActualOutcome = "event_window_expired";
+                    anchor.ResolvedDay = world.AbsoluteDay;
+                    resolved.Add(anchor);
+                }
+                return;
+            }
+
+            if (selected.Outcome == HistoricalEventOutcomeKind.Delayed)
+            {
+                anchor.Status = HistoricalAnchorStatus.Delayed;
+                anchor.OutcomeKind = HistoricalEventOutcomeKind.Delayed;
+                anchor.OutcomeRuleId = selected.Id;
+                anchor.ActualOutcome = selected.Summary;
+                return;
+            }
+
+            anchor.Status = HistoricalAnchorStatus.Ready;
+            anchor.Status = HistoricalAnchorStatus.Triggered;
+            anchor.Status = HistoricalAnchorStatus.Resolving;
+            HistoricalChangePackageExecutor.Apply(
+                world,
+                definition.ChangePackageVersion,
+                selected.ChangePackage,
+                anchor);
+            anchor.Status = ToTerminalStatus(selected.Outcome);
+            anchor.OutcomeKind = selected.Outcome;
+            anchor.OutcomeRuleId = selected.Id;
+            anchor.ActualOutcome = selected.Summary;
+            anchor.ResolvedDay = world.AbsoluteDay;
+            anchor.AppliedOffscreen = IsOffscreen(world, selected);
+            if (!string.IsNullOrEmpty(definition.PrerequisiteEventId) &&
+                !anchor.CausalEventIds.Contains(definition.PrerequisiteEventId))
+            {
+                anchor.CausalEventIds.Add(definition.PrerequisiteEventId);
+            }
+            resolved.Add(anchor);
+        }
+
+        private static bool HasNonTimeCondition(
+            HistoricalEventOutcomeRuleState rule)
+        {
+            if (rule == null || rule.Preconditions == null)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < rule.Preconditions.Count; i++)
+            {
+                if (rule.Preconditions[i].ConditionTypeId !=
+                    HistoricalConditionTypeIds.WorldDayAtLeast)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool IsTerminal(HistoricalAnchorStatus status) =>
+            status == HistoricalAnchorStatus.Resolved ||
+            status == HistoricalAnchorStatus.Prevented ||
+            status == HistoricalAnchorStatus.Transformed ||
+            status == HistoricalAnchorStatus.CompletedCanonical ||
+            status == HistoricalAnchorStatus.Variant ||
+            status == HistoricalAnchorStatus.Expired;
+
+        private static HistoricalAnchorStatus ToTerminalStatus(
+            HistoricalEventOutcomeKind outcome)
+        {
+            switch (outcome)
+            {
+                case HistoricalEventOutcomeKind.Canonical:
+                    return HistoricalAnchorStatus.CompletedCanonical;
+                case HistoricalEventOutcomeKind.Variant:
+                    return HistoricalAnchorStatus.Variant;
+                case HistoricalEventOutcomeKind.Transformed:
+                    return HistoricalAnchorStatus.Transformed;
+                case HistoricalEventOutcomeKind.Prevented:
+                    return HistoricalAnchorStatus.Prevented;
+                default:
+                    throw new InvalidOperationException(
+                        "A delayed outcome cannot be terminal.");
+            }
+        }
+
+        private static bool IsOffscreen(
+            WorldState world,
+            HistoricalEventOutcomeRuleState rule)
+        {
+            if (string.IsNullOrEmpty(world.PlayerPersonId))
+            {
+                return true;
+            }
+
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            if (player == null)
+            {
+                return true;
+            }
+
+            for (var i = 0; i < rule.Preconditions.Count; i++)
+            {
+                var condition = rule.Preconditions[i];
+                if (condition.ConditionTypeId ==
+                        HistoricalConditionTypeIds.PersonAtLocation &&
+                    condition.StringValue == player.LocationId)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private static void ApplyEffects(

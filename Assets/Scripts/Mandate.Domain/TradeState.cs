@@ -7,6 +7,7 @@ namespace Mandate.Domain
     {
         public string Id;
         public string DisplayName;
+        public string ProductDefinitionId;
         public int BasePrice;
         public int UnitWeight = 1;
     }

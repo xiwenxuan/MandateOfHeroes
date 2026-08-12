@@ -1,0 +1,20 @@
+{
+  "schema": "mandate.luoyang-184-metropolitan-commute-migration.v1",
+  "daily_local_commute": {
+    "maximum_same_settlement_distance_m": 6000,
+    "resolution": "DerivedFromPersonResidenceAndWorkFacility",
+    "changes_world_location": false
+  },
+  "cross_settlement_travel": {
+    "requires_route": true,
+    "requires_elapsed_time": true,
+    "requires_supply_consumption": true
+  },
+  "migration_interfaces": [
+    "UrbanToNearSuburb",
+    "NearSuburbToUrban",
+    "VillageToSuburb",
+    "SuburbToVillage"
+  ],
+  "pending_moves": []
+}

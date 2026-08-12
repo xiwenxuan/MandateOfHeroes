@@ -1034,6 +1034,9 @@ namespace Mandate.Simulation
         private readonly ProcessingProductionSystem _processingSystem;
         private readonly UpstreamResourceProductionSystem
             _upstreamResourceSystem;
+        private readonly HerbalMedicineSupplySystem _herbalMedicineSupplySystem;
+        private readonly MilitaryFieldHospitalSystem
+            _militaryFieldHospitalSystem;
         private readonly MilitaryProcurementSystem _militaryProcurementSystem;
         private readonly MilitaryLogisticsSystem _militaryLogisticsSystem;
         private readonly MilitaryLogisticsDelegationSystem
@@ -1049,6 +1052,12 @@ namespace Mandate.Simulation
             _publicReliefExternalProcurementCommandScheduler;
         private readonly PublicReliefArrivalRecoveryCommandScheduler
             _publicReliefArrivalRecoveryCommandScheduler;
+        private readonly HouseholdReliefPickupCommandScheduler
+            _householdReliefPickupCommandScheduler;
+        private readonly HouseholdReliefConsumptionCommandScheduler
+            _householdReliefConsumptionCommandScheduler;
+        private readonly FoodStorageLossCommandScheduler
+            _foodStorageLossCommandScheduler;
         private readonly WorldSystemScheduler _scheduler =
             new WorldSystemScheduler();
         private readonly WorldCommandRuntime _commandRuntime;
@@ -1099,12 +1108,34 @@ namespace Mandate.Simulation
                         masterSeed,
                         productionContent ??
                             ProductionContentRegistry.CreateCore()));
+            _householdReliefPickupCommandScheduler =
+                new HouseholdReliefPickupCommandScheduler(
+                    new HouseholdReliefPickupSystem(
+                        productionContent ??
+                            ProductionContentRegistry.CreateCore(),
+                        personRepository));
+            _householdReliefConsumptionCommandScheduler =
+                new HouseholdReliefConsumptionCommandScheduler(
+                    new HouseholdReliefConsumptionSystem(
+                        productionContent ??
+                            ProductionContentRegistry.CreateCore(),
+                        personRepository));
+            _foodStorageLossCommandScheduler =
+                new FoodStorageLossCommandScheduler(
+                    new FoodStorageLossSystem(
+                        productionContent ??
+                            ProductionContentRegistry.CreateCore()));
             _researchSystem = new ResearchSystem(productionContent);
             _processingSystem = new ProcessingProductionSystem(
                 productionContent, personRepository);
             _upstreamResourceSystem =
                 new UpstreamResourceProductionSystem(
                     productionContent, personRepository);
+            _herbalMedicineSupplySystem = new HerbalMedicineSupplySystem(
+                productionContent, personRepository);
+            _militaryFieldHospitalSystem = new MilitaryFieldHospitalSystem(
+                personRepository,
+                productionContent ?? ProductionContentRegistry.CreateCore());
             _militaryProcurementSystem =
                 new MilitaryProcurementSystem(personRepository);
             _militaryLogisticsSystem = new MilitaryLogisticsSystem(
@@ -1236,6 +1267,49 @@ namespace Mandate.Simulation
             {
                 _commandRuntime.RegisterEventHandler(
                     _publicReliefArrivalRecoveryCommandScheduler
+                        .CreateProjectionHandler());
+            }
+            if (!_commandRuntime.HasHandler(
+                    HouseholdReliefPickupCommandScheduler.CommandTypeId))
+            {
+                _commandRuntime.RegisterHandler(
+                    _householdReliefPickupCommandScheduler
+                        .CreateCommandHandler());
+            }
+            if (!_commandRuntime.HasEventHandler(
+                    HouseholdReliefPickupCommandScheduler
+                        .ProjectionHandlerId))
+            {
+                _commandRuntime.RegisterEventHandler(
+                    _householdReliefPickupCommandScheduler
+                        .CreateProjectionHandler());
+            }
+            if (!_commandRuntime.HasHandler(
+                    HouseholdReliefConsumptionCommandScheduler.CommandTypeId))
+            {
+                _commandRuntime.RegisterHandler(
+                    _householdReliefConsumptionCommandScheduler
+                        .CreateCommandHandler());
+            }
+            if (!_commandRuntime.HasEventHandler(
+                    HouseholdReliefConsumptionCommandScheduler
+                        .ProjectionHandlerId))
+            {
+                _commandRuntime.RegisterEventHandler(
+                    _householdReliefConsumptionCommandScheduler
+                        .CreateProjectionHandler());
+            }
+            if (!_commandRuntime.HasHandler(
+                    FoodStorageLossCommandScheduler.CommandTypeId))
+            {
+                _commandRuntime.RegisterHandler(
+                    _foodStorageLossCommandScheduler.CreateCommandHandler());
+            }
+            if (!_commandRuntime.HasEventHandler(
+                    FoodStorageLossCommandScheduler.ProjectionHandlerId))
+            {
+                _commandRuntime.RegisterEventHandler(
+                    _foodStorageLossCommandScheduler
                         .CreateProjectionHandler());
             }
             RegisterScheduledSystems();
@@ -1380,6 +1454,28 @@ namespace Mandate.Simulation
                     _commandRuntime.ProcessDue(context.World);
                 });
             Register(
+                "mandate.runtime.segment.household_relief_pickup",
+                WorldSystemPhase.SegmentArrival,
+                WorldSystemCadence.EverySegment,
+                50,
+                context =>
+                {
+                    _householdReliefPickupCommandScheduler
+                        .EnsureDueCommands(context.World, _commandRuntime);
+                    _commandRuntime.ProcessDue(context.World);
+                });
+            Register(
+                "mandate.runtime.segment.household_relief_consumption",
+                WorldSystemPhase.SegmentArrival,
+                WorldSystemCadence.EverySegment,
+                60,
+                context =>
+                {
+                    _householdReliefConsumptionCommandScheduler
+                        .EnsureDueCommands(context.World, _commandRuntime);
+                    _commandRuntime.ProcessDue(context.World);
+                });
+            Register(
                 "mandate.runtime.daily.command",
                 WorldSystemPhase.DailyCommand,
                 WorldSystemCadence.NewDay,
@@ -1466,6 +1562,21 @@ namespace Mandate.Simulation
                 40,
                 context => _processingSystem.ResolveDueOrders(context.World));
             Register(
+                "mandate.runtime.daily.herbal_medicine_supply",
+                WorldSystemPhase.DailySimulation,
+                WorldSystemCadence.NewDay,
+                45,
+                context =>
+                    _herbalMedicineSupplySystem.ResolveDaily(context.World));
+            Register(
+                "mandate.runtime.daily.field_hospital_maintenance",
+                WorldSystemPhase.DailySimulation,
+                WorldSystemCadence.NewDay,
+                47,
+                context =>
+                    _militaryFieldHospitalSystem.AssessMaintenanceDue(
+                        context.World));
+            Register(
                 "mandate.runtime.daily.military_repair",
                 WorldSystemPhase.DailySimulation,
                 WorldSystemCadence.NewDay,
@@ -1479,6 +1590,44 @@ namespace Mandate.Simulation
                 context =>
                 {
                     _formalHouseholdFoodMonthlyCommandScheduler
+                        .EnsureDueCommands(context.World, _commandRuntime);
+                    _commandRuntime.ProcessDue(context.World);
+                });
+            Register(
+                "mandate.runtime.daily.food_storage_loss",
+                WorldSystemPhase.DailySimulation,
+                WorldSystemCadence.NewDay,
+                57,
+                context =>
+                {
+                    if (context.World.FoodInventoryAuthorityMode ==
+                        FoodInventoryAuthorityMode.FormalProductBatches)
+                    {
+                        _foodStorageLossCommandScheduler.EnsureDueCommands(
+                            context.World,
+                            _commandRuntime);
+                        _commandRuntime.ProcessDue(context.World);
+                    }
+                });
+            Register(
+                "mandate.runtime.daily.household_relief_pickup",
+                WorldSystemPhase.DailySimulation,
+                WorldSystemCadence.NewDay,
+                56,
+                context =>
+                {
+                    _householdReliefPickupCommandScheduler
+                        .EnsureDueCommands(context.World, _commandRuntime);
+                    _commandRuntime.ProcessDue(context.World);
+                });
+            Register(
+                "mandate.runtime.daily.household_relief_consumption",
+                WorldSystemPhase.DailySimulation,
+                WorldSystemCadence.NewDay,
+                58,
+                context =>
+                {
+                    _householdReliefConsumptionCommandScheduler
                         .EnsureDueCommands(context.World, _commandRuntime);
                     _commandRuntime.ProcessDue(context.World);
                 });

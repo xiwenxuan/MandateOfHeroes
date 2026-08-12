@@ -38,6 +38,15 @@ namespace Mandate.Simulation
     {
         public const string CustomPlayerPersonId = "person.player";
 
+        private readonly MerchantHouseholdContentRegistry _merchantContent;
+
+        public NewGameSetupService(
+            MerchantHouseholdContentRegistry merchantContent = null)
+        {
+            _merchantContent = merchantContent ??
+                MerchantHouseholdContentRegistry.CreateCore();
+        }
+
         public WorldState CreateCustom184World(
             NewGameCharacterRequest request,
             ulong masterSeed = 184_001UL)
@@ -112,6 +121,13 @@ namespace Mandate.Simulation
                 EnlistPlayerInPrototypeArmy(world, person);
             }
             world.PlayerPersonId = person.Id;
+            if (request.Identity == StartingIdentity.Merchant)
+            {
+                MerchantHouseholdGameplayService.Initialize(
+                    world,
+                    person.Id,
+                    _merchantContent);
+            }
             world.Validate();
             return world;
         }
@@ -699,6 +715,26 @@ namespace Mandate.Simulation
         public const string ClinicCare = "player_action.care.clinic";
         public const string FieldCare = "player_action.care.field";
         public const string HomeRest = "player_action.care.home";
+        public const string MerchantUseOwnCapital =
+            "player_action.m26p1.capital.own";
+        public const string MerchantTakeGuildAdvance =
+            "player_action.m26p1.capital.guild";
+        public const string MerchantBuyJourneyCargo =
+            "player_action.m26p1.cargo.buy";
+        public const string MerchantStartJourney =
+            "player_action.m26p1.journey.start";
+        public const string MerchantEventHelp =
+            "player_action.m26p1.event.help";
+        public const string MerchantEventGuard =
+            "player_action.m26p1.event.guard";
+        public const string MerchantEventRefuse =
+            "player_action.m26p1.event.refuse";
+        public const string MerchantDeliverCargo =
+            "player_action.m26p1.cargo.deliver";
+        public const string MerchantRepayFamilyDebt =
+            "player_action.m26p1.family.repay";
+        public const string MerchantInvestCart =
+            "player_action.m26p1.family.cart";
     }
 
     public sealed class PlayerActionOption
@@ -708,6 +744,12 @@ namespace Mandate.Simulation
         public string Description;
         public bool IsAvailable;
         public string UnavailableReason;
+        public string Motivation;
+        public string ExpectedOutcome;
+        public string Cost;
+        public string KnownRisk;
+        public string PresentationCue;
+        public string UnlockHint;
     }
 
     public sealed class PlayerActionResult
@@ -720,6 +762,9 @@ namespace Mandate.Simulation
         public int ProvisionChange;
         public int HealthChange;
         public string WorldEventId;
+        public string ResultId;
+        public string PresentationCue;
+        public string Detail;
     }
 
     public sealed class PlayerActionService
@@ -731,12 +776,23 @@ namespace Mandate.Simulation
         private readonly TradingSystem _trading = new TradingSystem();
         private readonly EducationSystem _education = new EducationSystem();
         private readonly ArmySystem _armies = new ArmySystem();
+        private readonly MerchantHouseholdGameplayService _merchantHousehold;
 
-        public PlayerActionService(WorldSimulator simulator)
+        public PlayerActionService(
+            WorldSimulator simulator,
+            MerchantHouseholdContentRegistry merchantContent = null)
         {
             _simulator = simulator ??
                 throw new ArgumentNullException(nameof(simulator));
+            _merchantHousehold = new MerchantHouseholdGameplayService(
+                _simulator,
+                merchantContent);
         }
+
+        public MerchantHouseholdGoalView InspectMerchantGoal(
+            WorldState world,
+            string personId) =>
+            _merchantHousehold.Inspect(world, personId);
 
         public IReadOnlyList<PlayerActionOption> QueryActions(
             WorldState world,
@@ -761,15 +817,20 @@ namespace Mandate.Simulation
             }
 
             var journey = FindJourney(world, person.Id);
+            var pendingMerchantEvent =
+                _merchantHousehold.HasPendingTravelEvent(world, person.Id);
             actions.Add(Option(
                 PlayerActionIds.Rest,
                 journey == null ? "休息一天" : "旅途中推进一天",
                 journey == null
                     ? "消耗一天时间，世界与NPC同步推进。"
                     : "继续当前旅程一天，沿途消耗与世界事件照常结算。",
-                true,
-                string.Empty));
+                !pendingMerchantEvent,
+                pendingMerchantEvent
+                    ? "请先处理眼前的途中事件。"
+                    : string.Empty));
 
+            _merchantHousehold.AddActions(world, person, actions);
             AddTaskActions(world, person, actions, journey == null);
             AddConstructionAction(world, person, actions, journey == null);
             AddIdentityActions(world, person, actions, journey == null);
@@ -800,6 +861,11 @@ namespace Mandate.Simulation
             if (!selected.IsAvailable)
             {
                 return Failure(actionId, selected.UnavailableReason);
+            }
+
+            if (_merchantHousehold.Handles(actionId))
+            {
+                return _merchantHousehold.Execute(world, personId, actionId);
             }
 
             var person = FindPerson(world, personId);
@@ -937,7 +1003,12 @@ namespace Mandate.Simulation
                 MoneyChange = person.Wealth - openingMoney,
                 ProvisionChange = person.Provisions - openingProvisions,
                 HealthChange = person.HealthBasisPoints - openingHealth,
-                WorldEventId = eventId
+                WorldEventId = eventId,
+                ResultId = string.IsNullOrEmpty(eventId)
+                    ? "result." + actionId + "." + openingDay
+                    : eventId,
+                PresentationCue = "action.default",
+                Detail = summary
             };
         }
 
@@ -961,6 +1032,17 @@ namespace Mandate.Simulation
                     stationary
                         ? "当前没有符合身份与地点条件的任务。"
                         : "旅途中不能接受本地任务。"));
+                return;
+            }
+
+            var activeDefinition = world.TaskDefinitions.Find(item =>
+                item.Id == active.DefinitionId);
+            if (activeDefinition != null &&
+                activeDefinition.Kind == TaskKind.GuidedObjective)
+            {
+                // Guided objectives expose their own contextual actions. The
+                // generic work/abandon buttons would either do nothing or
+                // bypass the authored consequence chain.
                 return;
             }
 
@@ -1206,15 +1288,14 @@ namespace Mandate.Simulation
             {
                 return "军队行军期间不能组织集中治疗。";
             }
-            var physician = FindFieldCarePhysician(
-                world, army, person.Id);
-            if (physician == null)
+            if (FindFieldCarePhysician(world, army, person.Id) == null)
             {
                 return "军中当前没有同地且具备治疗能力的医者。";
             }
-            if (!HasAvailablePersonalMedicine(world, physician.Id))
+            if (world.MilitaryMedicalInitialized &&
+                !HasAvailableArmyMedicine(world, army))
             {
-                return "军医当前没有可用于治疗的药材。";
+                return "军中当前没有可用且未预留的药材。";
             }
             return string.Empty;
         }
@@ -1241,16 +1322,19 @@ namespace Mandate.Simulation
             return null;
         }
 
-        private static bool HasAvailablePersonalMedicine(
+        private static bool HasAvailableArmyMedicine(
             WorldState world,
-            string personId)
+            ArmyState army)
         {
-            for (var i = 0; i < world.Inventories.Count; i++)
+            for (var i = 0; i < world.ProductBatches.Count; i++)
             {
-                var inventory = world.Inventories[i];
-                if (inventory.OwnerPersonId == personId &&
-                    inventory.CommodityId == "commodity.herbs" &&
-                    inventory.Quantity > 0)
+                var batch = world.ProductBatches[i];
+                if (batch.InventoryContainerId ==
+                        army.MedicalInventoryContainerId &&
+                    batch.OwnerOrganizationId == army.OrganizationId &&
+                    batch.ProductDefinitionId == CoreProductionContent
+                        .HerbalMedicineMaterialProductId &&
+                    batch.Quantity > batch.ReservedQuantity)
                 {
                     return true;
                 }
@@ -1676,7 +1760,13 @@ namespace Mandate.Simulation
                 DisplayName = name,
                 Description = description,
                 IsAvailable = available,
-                UnavailableReason = reason ?? string.Empty
+                UnavailableReason = reason ?? string.Empty,
+                Motivation = description ?? string.Empty,
+                ExpectedOutcome = description ?? string.Empty,
+                Cost = "行动会按说明消耗时间或资源。",
+                KnownRisk = "结果由当前世界事实与行动规则结算。",
+                PresentationCue = "action.default",
+                UnlockHint = reason ?? string.Empty
             };
         }
 
@@ -1687,7 +1777,10 @@ namespace Mandate.Simulation
                 Success = false,
                 ActionId = id,
                 Summary = summary ?? string.Empty,
-                WorldEventId = string.Empty
+                WorldEventId = string.Empty,
+                ResultId = string.Empty,
+                PresentationCue = string.Empty,
+                Detail = "行动未提交，世界状态没有变化。"
             };
         }
 

@@ -245,6 +245,95 @@ namespace Mandate.Simulation
             return order;
         }
 
+        public ResourceExtractionOrderState CreateFamilyOrder(
+            WorldState world,
+            string resourceBodyId,
+            string familyId,
+            string storageFacilityId,
+            string managerPersonId,
+            IEnumerable<string> workerPersonIds,
+            ProductionControlMode controlMode,
+            long quantity)
+        {
+            ProductInventorySystem.RequireWorld(world);
+            world.Validate();
+            _content.ValidateManifest(world.ProductionContentManifest);
+            if (quantity <= 0 ||
+                !Enum.IsDefined(typeof(ProductionControlMode), controlMode))
+            {
+                throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            var resource = FindResourceBody(world, resourceBodyId);
+            var family = ProductInventorySystem.FindFamily(world, familyId);
+            var storage = ProductInventorySystem.FindFacility(
+                world, storageFacilityId);
+            var village = ProductInventorySystem.FindVillage(
+                world, storage.VillageId);
+            var manager = FindPerson(world, managerPersonId);
+            var workers = ValidateAndSortFamilyWorkers(
+                world, workerPersonIds, family.Id, village.LocationId);
+            if (resource.RemainingQuantity - resource.ReservedQuantity < quantity ||
+                resource.LocationId != village.LocationId ||
+                storage.OwnerFamilyId != family.Id ||
+                manager.FamilyId != family.Id || !manager.IsAlive ||
+                manager.LocationId != village.LocationId ||
+                storage.CapabilityTags == null ||
+                !storage.CapabilityTags.Contains(
+                    resource.RequiredFacilityTag) ||
+                ActiveFamilyOrdersAtFacility(world, storage.Id) >= 1)
+            {
+                throw new InvalidOperationException(
+                    "Family resource extraction requires available reserves and a compatible, co-located family facility.");
+            }
+
+            long effectiveLabor = 0;
+            for (var i = 0; i < workers.Count; i++)
+            {
+                effectiveLabor = checked(effectiveLabor +
+                    FindPerson(world, workers[i]).LaborCapacityBasisPoints);
+            }
+
+            var laborDemand = checked(
+                quantity * resource.ExtractionDifficultyBasisPoints);
+            var duration = Math.Max(
+                1,
+                checked((laborDemand + effectiveLabor - 1) / effectiveLabor));
+            var order = new ResourceExtractionOrderState
+            {
+                Id = $"resource_extraction.{world.AbsoluteDay}." +
+                     $"{world.ResourceExtractionOrders.Count:D6}",
+                ResourceBodyId = resource.Id,
+                OwnerFamilyId = family.Id,
+                StorageFacilityId = storage.Id,
+                ManagerPersonId = manager.Id,
+                WorkerPersonIds = workers,
+                ControlMode = controlMode,
+                Status = ProductionOrderStatus.Active,
+                CreatedDay = world.AbsoluteDay,
+                FinishDay = checked(world.AbsoluteDay + duration),
+                RequestedQuantity = quantity
+            };
+            resource.ReservedQuantity = checked(
+                resource.ReservedQuantity + quantity);
+            world.ResourceExtractionOrders.Add(order);
+            world.ResourceExtractionLedgerEntries.Add(new
+                ResourceExtractionLedgerEntryState
+                {
+                    Id = $"resource_extraction_ledger.{world.AbsoluteDay}." +
+                         $"{world.ResourceExtractionLedgerEntries.Count:D6}",
+                    Day = world.AbsoluteDay,
+                    Type = ResourceExtractionLedgerEntryType.Reserved,
+                    ResourceBodyId = resource.Id,
+                    ResourceExtractionOrderId = order.Id,
+                    ActorPersonId = manager.Id,
+                    ReservedQuantityDelta = quantity,
+                    Summary = $"Reserved {quantity} units from {resource.Id}."
+                });
+            world.Validate();
+            return order;
+        }
+
         public void ResolveDueOrders(WorldState world)
         {
             ProductInventorySystem.RequireWorld(world);
@@ -272,10 +361,6 @@ namespace Mandate.Simulation
             ResourceExtractionOrderState order)
         {
             var resource = FindResourceBody(world, order.ResourceBodyId);
-            var site = ProcessingProductionSystem.FindProductionSite(
-                world, order.ProductionSiteId);
-            var container = ProcessingProductionSystem.FindContainer(
-                world, order.InventoryContainerId);
             var product = _content.GetProduct(
                 resource.OutputProductDefinitionId);
             if (resource.RemainingQuantity < order.RequestedQuantity ||
@@ -295,16 +380,51 @@ namespace Mandate.Simulation
                 0,
                 $"Settled resource extraction {order.Id}.");
             transaction.SourceResourceExtractionOrderId = order.Id;
-            var quality = checked(resource.QualityBasisPoints *
-                site.ConditionBasisPoints / 10_000);
-            var batch = ProductInventorySystem.NewOrganizationBatch(
-                world,
-                product,
-                container,
-                transaction.Id,
-                order.Id,
-                order.RequestedQuantity,
-                quality);
+            ProductBatchState batch;
+            if (!string.IsNullOrEmpty(order.OwnerFamilyId))
+            {
+                var family = ProductInventorySystem.FindFamily(
+                    world, order.OwnerFamilyId);
+                var storage = ProductInventorySystem.FindFacility(
+                    world, order.StorageFacilityId);
+                var quality = checked(resource.QualityBasisPoints *
+                    storage.ConditionBasisPoints / 10_000);
+                batch = ProductInventorySystem.NewBatch(
+                    world,
+                    product,
+                    family,
+                    storage,
+                    transaction.Id,
+                    order.Id,
+                    order.RequestedQuantity,
+                    string.Empty,
+                    0,
+                    0);
+                batch.QualityBasisPoints = quality;
+                batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                    product, quality);
+                storage.InventoryUnits = checked(
+                    storage.InventoryUnits + batch.Quantity * batch.UnitWeight);
+                transaction.FacilityInventoryDelta = checked(
+                    batch.Quantity * batch.UnitWeight);
+            }
+            else
+            {
+                var site = ProcessingProductionSystem.FindProductionSite(
+                    world, order.ProductionSiteId);
+                var container = ProcessingProductionSystem.FindContainer(
+                    world, order.InventoryContainerId);
+                var quality = checked(resource.QualityBasisPoints *
+                    site.ConditionBasisPoints / 10_000);
+                batch = ProductInventorySystem.NewOrganizationBatch(
+                    world,
+                    product,
+                    container,
+                    transaction.Id,
+                    order.Id,
+                    order.RequestedQuantity,
+                    quality);
+            }
             transaction.Lines.Add(ProductInventorySystem.Line(
                 batch, batch.Quantity, 0));
 
@@ -339,6 +459,33 @@ namespace Mandate.Simulation
             WorldState world,
             ResourceExtractionOrderState order)
         {
+            if (!string.IsNullOrEmpty(order.OwnerFamilyId))
+            {
+                var storage = ProductInventorySystem.FindFacility(
+                    world, order.StorageFacilityId);
+                var village = ProductInventorySystem.FindVillage(
+                    world, storage.VillageId);
+                for (var i = 0; i < order.WorkerPersonIds.Count; i++)
+                {
+                    var worker = FindPerson(world, order.WorkerPersonIds[i]);
+                    if (!worker.IsAlive ||
+                        worker.FamilyId != order.OwnerFamilyId ||
+                        worker.LocationId != village.LocationId)
+                    {
+                        return false;
+                    }
+                }
+
+                var familyResource = FindResourceBody(
+                    world, order.ResourceBodyId);
+                var familyOutputWeight = checked(order.RequestedQuantity *
+                    _content.GetProduct(
+                        familyResource.OutputProductDefinitionId)
+                        .BaseWeight);
+                return storage.InventoryUnits + familyOutputWeight <=
+                    storage.Capacity;
+            }
+
             var site = ProcessingProductionSystem.FindProductionSite(
                 world, order.ProductionSiteId);
             var container = ProcessingProductionSystem.FindContainer(
@@ -415,6 +562,49 @@ namespace Mandate.Simulation
             return workers;
         }
 
+        private List<string> ValidateAndSortFamilyWorkers(
+            WorldState world,
+            IEnumerable<string> workerPersonIds,
+            string familyId,
+            string locationId)
+        {
+            if (workerPersonIds == null)
+            {
+                throw new ArgumentNullException(nameof(workerPersonIds));
+            }
+
+            var workers = new List<string>(workerPersonIds);
+            workers.Sort(StringComparer.Ordinal);
+            if (workers.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "Family resource extraction needs at least one real worker.");
+            }
+
+            string previous = null;
+            for (var i = 0; i < workers.Count; i++)
+            {
+                if (string.IsNullOrEmpty(workers[i]) || workers[i] == previous)
+                {
+                    throw new InvalidOperationException(
+                        "Family resource workers must be unique stable people.");
+                }
+
+                var worker = FindPerson(world, workers[i]);
+                if (!worker.IsAlive || worker.FamilyId != familyId ||
+                    worker.LocationId != locationId ||
+                    worker.LaborCapacityBasisPoints <= 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Worker {worker.Id} cannot join family resource extraction.");
+                }
+
+                previous = workers[i];
+            }
+
+            return workers;
+        }
+
         private PersonState FindPerson(WorldState world, string id)
         {
             return _personRepository == null
@@ -443,6 +633,25 @@ namespace Mandate.Simulation
             for (var i = 0; i < world.ResourceExtractionOrders.Count; i++)
             {
                 if (world.ResourceExtractionOrders[i].ProductionSiteId == siteId &&
+                    world.ResourceExtractionOrders[i].Status ==
+                        ProductionOrderStatus.Active)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static int ActiveFamilyOrdersAtFacility(
+            WorldState world,
+            string storageFacilityId)
+        {
+            var count = 0;
+            for (var i = 0; i < world.ResourceExtractionOrders.Count; i++)
+            {
+                if (world.ResourceExtractionOrders[i].StorageFacilityId ==
+                        storageFacilityId &&
                     world.ResourceExtractionOrders[i].Status ==
                         ProductionOrderStatus.Active)
                 {

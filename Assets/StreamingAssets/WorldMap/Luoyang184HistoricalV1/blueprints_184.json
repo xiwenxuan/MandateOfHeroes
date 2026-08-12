@@ -1,0 +1,102 @@
+{
+  "schema": "mandate.facility-blueprint.v1",
+  "blueprints": [
+    {
+      "blueprint_id": "blueprint.fortification.han_city_gate_segment.v1",
+      "display_name": "汉代城门与城垣段",
+      "orientation": "North",
+      "cell_count": 5,
+      "cells": [
+        {
+          "relative_x": 0,
+          "relative_y": 0,
+          "facility_definition_id": "facility.fortification.city_gate",
+          "orientation": "North",
+          "required_road_connection_ids": [
+            "road.connection.gate_axis"
+          ],
+          "module_ids": [
+            "module.gatehouse"
+          ],
+          "construction_stage": "Survey",
+          "build_order": 1,
+          "metadata": {
+            "prototype": "luoyang_184"
+          }
+        },
+        {
+          "relative_x": -1,
+          "relative_y": 0,
+          "facility_definition_id": "facility.fortification.city_wall",
+          "orientation": "North",
+          "required_road_connection_ids": [],
+          "module_ids": [],
+          "construction_stage": "Foundation",
+          "build_order": 2,
+          "metadata": {
+            "prototype": "luoyang_184"
+          }
+        },
+        {
+          "relative_x": 1,
+          "relative_y": 0,
+          "facility_definition_id": "facility.fortification.city_wall",
+          "orientation": "North",
+          "required_road_connection_ids": [],
+          "module_ids": [],
+          "construction_stage": "Structure",
+          "build_order": 3,
+          "metadata": {
+            "prototype": "luoyang_184"
+          }
+        },
+        {
+          "relative_x": 0,
+          "relative_y": -1,
+          "facility_definition_id": "facility.public.road",
+          "orientation": "North",
+          "required_road_connection_ids": [
+            "road.connection.gate_axis"
+          ],
+          "module_ids": [],
+          "construction_stage": "Services",
+          "build_order": 4,
+          "metadata": {
+            "prototype": "luoyang_184"
+          }
+        },
+        {
+          "relative_x": 0,
+          "relative_y": 1,
+          "facility_definition_id": "facility.public.road",
+          "orientation": "North",
+          "required_road_connection_ids": [
+            "road.connection.gate_axis"
+          ],
+          "module_ids": [],
+          "construction_stage": "Commissioning",
+          "build_order": 5,
+          "metadata": {
+            "prototype": "luoyang_184"
+          }
+        }
+      ],
+      "construction_stages": [
+        "Survey",
+        "Foundation",
+        "Structure",
+        "Services",
+        "Commissioning"
+      ],
+      "shared_placement_modes": [
+        "Player",
+        "HistoricalGeneration",
+        "AI"
+      ],
+      "metadata": {
+        "instant_construction": "false",
+        "one_base_facility_per_cell": "true"
+      }
+    }
+  ]
+}

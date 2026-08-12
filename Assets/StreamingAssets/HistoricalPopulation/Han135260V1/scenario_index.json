@@ -1,0 +1,109 @@
+{
+  "schema": "mandate.scenario-population-snapshot-index.v1",
+  "scenarios": [
+    {
+      "scenario_id": "S01_140",
+      "year": 140,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_140.json",
+      "source_year_sha256": "777ec99f6e581f8987dcdd64da40e2c81af0c0ccff989777f07fe28ffbd2ed98",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S02_184",
+      "year": 184,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_184.json",
+      "source_year_sha256": "ecc070bdd9f47d02e81d88523b19c165bec728d02c4a84001b6973a7b45f1e2d",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S03_189",
+      "year": 189,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_189.json",
+      "source_year_sha256": "48d5c7f58bafe1596e3c23f192854525c8af6ed20cf6e11d75162f8917a033cb",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S04_194",
+      "year": 194,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_194.json",
+      "source_year_sha256": "394578fe4797877da48fde70f032a14a015afeb9d99244c29a17b012b9c5e675",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S05_200",
+      "year": 200,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_200.json",
+      "source_year_sha256": "0808758063217f4ae5d131561881cbb64d116377fb6046591e64ebd3c0e7f809",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S06_207",
+      "year": 207,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_207.json",
+      "source_year_sha256": "2296e5e9f3bdc1eaefb5bd193afba94d69ba1b79e21f9d56aa3e1c8043a27ab1",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S07_214",
+      "year": 214,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_214.json",
+      "source_year_sha256": "22b4b1716eb87a0bd83cbef4ab87f8143f93e4d274589e9d7e96b90b1e5e8d17",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S08_219",
+      "year": 219,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_219.json",
+      "source_year_sha256": "330a635d88531eb0b8bf1b173ae419c66c0fd3a06e6bc6aa1c7a3c73002e4f9b",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S09_223",
+      "year": 223,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_223.json",
+      "source_year_sha256": "ba14919eea88e2a7b73ab2177bb2fb0f441933e971d4a3819cd0dc9194c67879",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S10_227",
+      "year": 227,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_227.json",
+      "source_year_sha256": "8842dab593f4f3ec6398a16f2dce242c905cb5789a4ce72b7b3db6a802c24f22",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S11_234",
+      "year": 234,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_234.json",
+      "source_year_sha256": "1419de2c0508a7bfd3e447a7290cd08f3e81f337bdc2d8551b361e343a6da6da",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S12_249",
+      "year": 249,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_249.json",
+      "source_year_sha256": "eb84cc6e19237c538609f7b90e86b32b7db0923e84284155fe0fac5d14008a63",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    },
+    {
+      "scenario_id": "S13_260",
+      "year": 260,
+      "snapshot_moment": "YEAR_START",
+      "source_year_file": "../years/year_260.json",
+      "source_year_sha256": "5e06197ad9b644753b6820c2b2eced722711b2da3be1fa1991753955a45a9676",
+      "derivation": "direct_reference_to_annual_population_timeline"
+    }
+  ]
+}

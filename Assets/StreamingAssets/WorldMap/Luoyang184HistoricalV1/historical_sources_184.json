@@ -1,0 +1,41 @@
+{
+  "schema": "mandate.historical-source-catalog.v1",
+  "scenario_year": 184,
+  "sources": [
+    {
+      "id": "source.cssn.han_wei_luoyang_evolution",
+      "url": "https://www.cssn.cn/lsx/lsx_kgx/202210/t20221024_5552600.shtml",
+      "kind": "modern_archaeological_synthesis"
+    },
+    {
+      "id": "source.pku.han_luoyang_ritual_axis",
+      "url": "https://ir.pku.edu.cn/handle/20.500.11897/676372",
+      "kind": "academic_thesis"
+    },
+    {
+      "id": "source.cass.luoyang_southern_ritual_archaeology",
+      "url": "https://www.pishu.com.cn/skwx_ps/ps/literature?ID=8644335&SiteID=14",
+      "kind": "archaeological_report_catalog"
+    },
+    {
+      "id": "source.houhanshu.baiguan_gate_commandants",
+      "url": "https://www.shidianguji.com/mid-page/7620933339273183283",
+      "kind": "transmitted_primary_text"
+    },
+    {
+      "id": "source.ncha.han_wei_luoyang_site_plan",
+      "url": "https://www.ncha.gov.cn/art/2021/11/18/art_2318_45063.html",
+      "kind": "heritage_authority"
+    }
+  ],
+  "known_conflicts": [
+    {
+      "topic": "north_gate_east_west_order",
+      "resolution": "retain both names; mark precise orientation Approximate"
+    },
+    {
+      "topic": "market_names_and_exact_positions",
+      "resolution": "Jinshi/Nanshi reconstructed; Mashi GameplayReconstruction"
+    }
+  ]
+}

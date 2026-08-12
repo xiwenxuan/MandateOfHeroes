@@ -43,6 +43,34 @@ namespace Mandate.Simulation
             PublicGranaryGrain >= 0;
     }
 
+    public sealed class FormalHouseholdFoodShortfallResult
+    {
+        public string FamilyId;
+        public long RequiredNutritionBasisUnits;
+        public long ProvidedNutritionBasisUnits;
+        public long MissingNutritionBasisUnits;
+        public readonly List<FormalHouseholdFoodAffectedPersonResult>
+            AffectedPeople =
+                new List<FormalHouseholdFoodAffectedPersonResult>();
+    }
+
+    public sealed class FormalHouseholdFoodAffectedPersonResult
+    {
+        public string PersonId;
+        public bool RequiresCaregiverDelivery;
+        public long RequiredNutritionBasisUnits;
+        public long AllocatedNutritionBasisUnits;
+        public int AppliedHealthDamageBasisPoints;
+        public int AppliedLivelihoodPressureBasisPoints;
+    }
+
+    public sealed class FormalHouseholdFoodPersonSettlementResult
+    {
+        public string PersonId;
+        public long RequiredNutritionBasisUnits;
+        public long MissingNutritionBasisUnits;
+    }
+
     public sealed class FormalHouseholdFoodSettlementResult
     {
         public string VillageId;
@@ -51,6 +79,11 @@ namespace Mandate.Simulation
         public long ProvidedNutritionBasisUnits;
         public long ConsumedPhysicalQuantity;
         public readonly List<string> ShortfallFamilyIds = new List<string>();
+        public readonly List<FormalHouseholdFoodShortfallResult> Shortfalls =
+            new List<FormalHouseholdFoodShortfallResult>();
+        public readonly List<FormalHouseholdFoodPersonSettlementResult>
+            PersonSettlements =
+                new List<FormalHouseholdFoodPersonSettlementResult>();
 
         public bool HasShortfall => ShortfallFamilyIds.Count > 0;
     }
@@ -64,6 +97,7 @@ namespace Mandate.Simulation
         private readonly AgricultureProductionSystem _agricultureProduction;
         private readonly ProductionContentRegistry _productionContent;
         private readonly FoodInventorySystem _foodInventory;
+        private readonly CivilianMedicalSystem _civilianMedical;
         private WorldState _fallbackWorld;
         private IPersonRepository _fallbackPeople;
 
@@ -78,6 +112,8 @@ namespace Mandate.Simulation
             _productionContent = productionContent ??
                 ProductionContentRegistry.CreateCore();
             _foodInventory = new FoodInventorySystem(_productionContent);
+            _civilianMedical = new CivilianMedicalSystem(
+                _productionContent, people);
             _agricultureProduction =
                 new AgricultureProductionSystem(
                     masterSeed, _productionContent, people);
@@ -443,7 +479,7 @@ namespace Mandate.Simulation
                 ResolveFood(world, village, families);
             }
             ResolveTools(world, village, families);
-            ResolveMedicalCare(world, village);
+            ResolveMedicalCare(world, village, families);
 
             if (monthInYear == 9)
             {
@@ -637,6 +673,7 @@ namespace Mandate.Simulation
                 result.HouseholdsProcessed++;
                 var required = 0;
                 var residents = new List<PersonState>();
+                var residentNutritionNeeds = new List<long>();
                 for (var memberIndex = 0;
                      memberIndex < family.MemberIds.Count;
                      memberIndex++)
@@ -653,7 +690,10 @@ namespace Mandate.Simulation
                     residents.Add(person);
                     var age = Math.Max(
                         0, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
-                    required += age < 15 || age > 60 ? 2 : 3;
+                    var requiredUnits = age < 15 || age > 60 ? 2 : 3;
+                    required += requiredUnits;
+                    residentNutritionNeeds.Add(
+                        checked((long)requiredUnits * 10_000L));
                 }
 
                 if (required == 0)
@@ -740,6 +780,18 @@ namespace Mandate.Simulation
 
                 if (consumed.Fulfilled)
                 {
+                    for (var residentIndex = 0;
+                         residentIndex < residents.Count;
+                         residentIndex++)
+                    {
+                        result.PersonSettlements.Add(
+                            new FormalHouseholdFoodPersonSettlementResult
+                            {
+                                PersonId = residents[residentIndex].Id,
+                                RequiredNutritionBasisUnits =
+                                    residentNutritionNeeds[residentIndex]
+                            });
+                    }
                     continue;
                 }
 
@@ -748,6 +800,16 @@ namespace Mandate.Simulation
                     requiredNutrition -
                     consumed.ProvidedNutritionBasisUnits);
                 result.ShortfallFamilyIds.Add(family.Id);
+                var shortfallResult =
+                    new FormalHouseholdFoodShortfallResult
+                {
+                    FamilyId = family.Id,
+                    RequiredNutritionBasisUnits = requiredNutrition,
+                    ProvidedNutritionBasisUnits =
+                        consumed.ProvidedNutritionBasisUnits,
+                    MissingNutritionBasisUnits = missingNutrition
+                };
+                result.Shortfalls.Add(shortfallResult);
                 var damage = (int)Math.Max(
                     100L,
                     missingNutrition * 1_000L /
@@ -758,15 +820,89 @@ namespace Mandate.Simulation
                 {
                     var resident = people.GetRequiredForUpdate(
                         residents[residentIndex].Id);
+                    var openingHealth = resident.HealthBasisPoints;
+                    var openingLivelihood = resident.Needs.Livelihood;
                     resident.HealthBasisPoints = Math.Max(
                         0, resident.HealthBasisPoints - damage);
                     resident.Needs.Livelihood = Math.Min(
                         10_000, resident.Needs.Livelihood + 1_000);
+                    shortfallResult.AffectedPeople.Add(
+                        new FormalHouseholdFoodAffectedPersonResult
+                        {
+                            PersonId = resident.Id,
+                            RequiresCaregiverDelivery =
+                                RequiresCaregiverDelivery(world, resident),
+                            RequiredNutritionBasisUnits =
+                                residentNutritionNeeds[residentIndex],
+                            AppliedHealthDamageBasisPoints =
+                                openingHealth - resident.HealthBasisPoints,
+                            AppliedLivelihoodPressureBasisPoints =
+                                resident.Needs.Livelihood - openingLivelihood
+                        });
+                }
+                AllocateFormalShortfallNutrition(
+                    shortfallResult,
+                    missingNutrition,
+                    requiredNutrition);
+                for (var affectedIndex = 0;
+                     affectedIndex < shortfallResult.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    var affected = shortfallResult.AffectedPeople[affectedIndex];
+                    result.PersonSettlements.Add(
+                        new FormalHouseholdFoodPersonSettlementResult
+                        {
+                            PersonId = affected.PersonId,
+                            RequiredNutritionBasisUnits =
+                                affected.RequiredNutritionBasisUnits,
+                            MissingNutritionBasisUnits =
+                                affected.AllocatedNutritionBasisUnits
+                        });
                 }
             }
 
             result.ShortfallFamilyIds.Sort(StringComparer.Ordinal);
+            new LongTermNutritionSystem(people).RecordMonthlySettlement(
+                world, world.AbsoluteDay, result.PersonSettlements);
             return result;
+        }
+
+        private static bool RequiresCaregiverDelivery(
+            WorldState world,
+            PersonState person)
+        {
+            var ageYears = Math.Max(
+                0L, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
+            return ageYears < 15L || ageYears > 60L ||
+                person.HealthBasisPoints < 5_000;
+        }
+
+        private static void AllocateFormalShortfallNutrition(
+            FormalHouseholdFoodShortfallResult shortfall,
+            long missingNutritionBasisUnits,
+            long requiredNutritionBasisUnits)
+        {
+            var ordered = new List<FormalHouseholdFoodAffectedPersonResult>(
+                shortfall.AffectedPeople);
+            ordered.Sort((left, right) =>
+                string.CompareOrdinal(left.PersonId, right.PersonId));
+            long allocated = 0;
+            for (var i = 0; i < ordered.Count; i++)
+            {
+                ordered[i].AllocatedNutritionBasisUnits = (long)decimal.Floor(
+                    (decimal)missingNutritionBasisUnits *
+                    ordered[i].RequiredNutritionBasisUnits /
+                    requiredNutritionBasisUnits);
+                allocated = checked(
+                    allocated + ordered[i].AllocatedNutritionBasisUnits);
+            }
+            var remainder = checked(
+                missingNutritionBasisUnits - allocated);
+            for (var i = 0; remainder > 0; i++)
+            {
+                ordered[i % ordered.Count].AllocatedNutritionBasisUnits++;
+                remainder--;
+            }
         }
 
         private static void ResolvePlanting(
@@ -943,48 +1079,165 @@ namespace Mandate.Simulation
 
         private void ResolveMedicalCare(
             WorldState world,
-            VillageState village)
+            VillageState village,
+            List<FamilyState> families)
         {
             var clinic = FindFacility(world, village.Id, VillageFacilityKind.Clinic);
             if (!FacilityOperational(world, village, VillageFacilityKind.Clinic) ||
-                clinic.InventoryUnits <= 0)
+                clinic.Capacity <= 0)
             {
                 return;
             }
 
             var people = PeopleFor(world);
-            var patients = new List<PersonState>();
-            var knownPeople = people.GetKnownPeople();
-            for (var i = 0; i < knownPeople.Count; i++)
+            var residentIds = new HashSet<string>(StringComparer.Ordinal);
+            var physicians = new List<PersonState>();
+            for (var familyIndex = 0; familyIndex < families.Count; familyIndex++)
             {
-                var person = knownPeople[i];
-                if (person.IsAlive && person.LocationId == village.LocationId &&
-                    person.HealthBasisPoints < 9_500)
+                var family = families[familyIndex];
+                for (var memberIndex = 0;
+                     memberIndex < family.MemberIds.Count;
+                     memberIndex++)
                 {
-                    patients.Add(person);
+                    var person = people.GetRequired(family.MemberIds[memberIndex]);
+                    residentIds.Add(person.Id);
+                    if (person.IsAlive &&
+                        person.LocationId == village.LocationId &&
+                        person.VillageOccupation == VillageOccupation.Physician &&
+                        person.LocalDuty == LocalDutyKind.None &&
+                        Math.Max(
+                            person.MedicalSkillBasisPoints,
+                            person.ProfessionalSkills?.Medicine ?? 0) >=
+                            CivilianMedicalRules
+                                .MinimumPhysicianSkillBasisPoints)
+                    {
+                        physicians.Add(person);
+                    }
                 }
             }
-
-            patients.Sort((left, right) =>
+            _civilianMedical.ReconcileCasesForResidents(world, residentIds);
+            if (physicians.Count == 0)
             {
-                var health = left.HealthBasisPoints.CompareTo(right.HealthBasisPoints);
-                return health != 0
-                    ? health
+                return;
+            }
+            physicians.Sort((left, right) =>
+            {
+                var leftSkill = Math.Max(
+                    left.MedicalSkillBasisPoints,
+                    left.ProfessionalSkills?.Medicine ?? 0);
+                var rightSkill = Math.Max(
+                    right.MedicalSkillBasisPoints,
+                    right.ProfessionalSkills?.Medicine ?? 0);
+                var skill = rightSkill.CompareTo(leftSkill);
+                return skill != 0
+                    ? skill
                     : string.CompareOrdinal(left.Id, right.Id);
             });
-            var treated = Math.Min(clinic.Capacity, patients.Count);
-            treated = (int)Math.Min(treated, clinic.InventoryUnits);
-            for (var i = 0; i < treated; i++)
+            var physician = physicians[0];
+
+            var episodes = new List<NutritionConditionEpisodeState>();
+            for (var i = 0; i < world.NutritionConditionEpisodes.Count; i++)
             {
-                var patient = people.GetRequiredForUpdate(patients[i].Id);
-                var recovery = Math.Min(200, 10_000 - patient.HealthBasisPoints);
-                patient.HealthBasisPoints += recovery;
-                clinic.InventoryUnits--;
-                AddLedger(
-                    world, village, VillageLedgerEntryType.MedicalCare,
-                    patient.FamilyId, patient.Id, 0, 0, recovery,
-                    $"{patient.DisplayName}接受村中医护，恢复{recovery}健康。");
+                var episode = world.NutritionConditionEpisodes[i];
+                var existingCase = _civilianMedical.FindCaseForEpisode(
+                    world, episode.Id);
+                if (episode.EndDay == -1 &&
+                    residentIds.Contains(episode.PersonId) &&
+                    (existingCase == null ||
+                     existingCase.Status == CivilianMedicalCaseStatus.Active))
+                {
+                    episodes.Add(episode);
+                }
             }
+            episodes.Sort((left, right) =>
+            {
+                var risk = right.PeakDiseaseRiskBasisPoints.CompareTo(
+                    left.PeakDiseaseRiskBasisPoints);
+                if (risk != 0)
+                {
+                    return risk;
+                }
+                var day = left.StartDay.CompareTo(right.StartDay);
+                return day != 0
+                    ? day
+                    : string.CompareOrdinal(left.Id, right.Id);
+            });
+
+            var appointments = Math.Min(clinic.Capacity, episodes.Count);
+            for (var i = 0; i < appointments; i++)
+            {
+                var patient = people.GetRequired(episodes[i].PersonId);
+                var authorizer = SelectMedicalAuthorizer(
+                    world, patient, people);
+                if (authorizer == null)
+                {
+                    continue;
+                }
+                var diagnosis = _civilianMedical.DiagnoseNutritionCondition(
+                    world, episodes[i].Id, physician.Id, authorizer.Id);
+                if (!diagnosis.Success)
+                {
+                    continue;
+                }
+                var treatment = _civilianMedical.TreatNutritionCondition(
+                    world,
+                    diagnosis.MedicalCaseId,
+                    physician.Id,
+                    authorizer.Id,
+                    clinic.Id);
+                if (treatment.Success)
+                {
+                    AddLedger(
+                        world, village, VillageLedgerEntryType.MedicalCare,
+                        patient.FamilyId, patient.Id, 0, 0,
+                        treatment.RecoveredHealthBasisPoints,
+                        $"{patient.DisplayName}接受正式营养性疾病诊疗，恢复" +
+                        $"{treatment.RecoveredHealthBasisPoints}健康。");
+                }
+            }
+        }
+
+        private static PersonState SelectMedicalAuthorizer(
+            WorldState world,
+            PersonState patient,
+            IPersonRepository people)
+        {
+            if ((world.AbsoluteDay - patient.BirthDay) / DaysPerYear >=
+                CivilianMedicalRules.AdultAgeYears)
+            {
+                return patient;
+            }
+            FamilyState family = null;
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                if (world.Families[i].Id == patient.FamilyId)
+                {
+                    family = world.Families[i];
+                    break;
+                }
+            }
+            if (family == null)
+            {
+                return null;
+            }
+            PersonState selected = null;
+            for (var i = 0; i < family.MemberIds.Count; i++)
+            {
+                var candidate = people.GetRequired(family.MemberIds[i]);
+                if (!candidate.IsAlive ||
+                    candidate.LocationId != patient.LocationId ||
+                    (world.AbsoluteDay - candidate.BirthDay) / DaysPerYear <
+                        CivilianMedicalRules.AdultAgeYears)
+                {
+                    continue;
+                }
+                if (selected == null ||
+                    string.CompareOrdinal(candidate.Id, selected.Id) < 0)
+                {
+                    selected = candidate;
+                }
+            }
+            return selected;
         }
 
         private void ResolveCorvee(
@@ -1637,8 +1890,16 @@ namespace Mandate.Simulation
                     _expectedDay);
                 if (result.HasShortfall)
                 {
+                    var shortfallEventId = MonthlyShortfallEventId(
+                        _expectedDay, _villageId);
+                    HouseholdReliefPickupSystem.RecordMonthlyShortfalls(
+                        world,
+                        shortfallEventId,
+                        _expectedDay,
+                        _villageId,
+                        result.Shortfalls);
                     events.Add(new WorldRuntimeEvent(
-                        MonthlyShortfallEventId(_expectedDay, _villageId),
+                        shortfallEventId,
                         ShortfallEventTypeId,
                         Id,
                         world.AbsoluteDay,

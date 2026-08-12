@@ -25,6 +25,7 @@ namespace Mandate.Domain
         public string OrganizationId;
         public string CommanderPersonId;
         public string LocationId;
+        public string MedicalInventoryContainerId;
         public int Troops;
         public int WoundedTroops;
         public int MaximumTroops;

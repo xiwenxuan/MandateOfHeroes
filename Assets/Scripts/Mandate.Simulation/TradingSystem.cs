@@ -59,25 +59,39 @@ namespace Mandate.Simulation
                 return Failure("货物超过人物的载货上限。");
             }
 
-            var stack = FindInventory(world, person.Id, commodity.Id);
-            if (stack == null)
+            if (TryGetFormalProductId(commodity, out var productId) &&
+                !string.IsNullOrEmpty(person.FamilyId))
             {
-                stack = new InventoryStackState
-                {
-                    Id = $"inventory.{person.Id}.{commodity.Id}",
-                    OwnerPersonId = person.Id,
-                    CommodityId = commodity.Id,
-                    Quantity = quantity,
-                    AverageUnitCost = listing.Price
-                };
-                world.Inventories.Add(stack);
+                AddFormalCargo(
+                    world,
+                    person,
+                    productId,
+                    quantity,
+                    listing.Price);
             }
             else
             {
-                var totalCost =
-                    (long)stack.AverageUnitCost * stack.Quantity + cost;
-                stack.Quantity = checked(stack.Quantity + quantity);
-                stack.AverageUnitCost = checked((int)(totalCost / stack.Quantity));
+                var stack = FindInventory(world, person.Id, commodity.Id);
+                if (stack == null)
+                {
+                    stack = new InventoryStackState
+                    {
+                        Id = $"inventory.{person.Id}.{commodity.Id}",
+                        OwnerPersonId = person.Id,
+                        CommodityId = commodity.Id,
+                        Quantity = quantity,
+                        AverageUnitCost = listing.Price
+                    };
+                    world.Inventories.Add(stack);
+                }
+                else
+                {
+                    var totalCost =
+                        (long)stack.AverageUnitCost * stack.Quantity + cost;
+                    stack.Quantity = checked(stack.Quantity + quantity);
+                    stack.AverageUnitCost = checked(
+                        (int)(totalCost / stack.Quantity));
+                }
             }
 
             var unitPrice = listing.Price;
@@ -112,21 +126,43 @@ namespace Mandate.Simulation
             var commodity = FindCommodity(world, commodityId.Value);
             var listing = FindListing(world, person.LocationId, commodityId.Value);
             var stack = FindInventory(world, person.Id, commodity.Id);
-            if (stack == null || stack.Quantity < quantity)
+            var formalQuantity = GetFormalQuantity(
+                world, person, commodity.Id);
+            var legacyQuantity = stack == null ? 0 : stack.Quantity;
+            if (formalQuantity + legacyQuantity < quantity)
             {
                 return Failure("携带货物不足，无法卖出。");
             }
 
             var unitPrice = listing.Price;
             var revenue = checked((long)unitPrice * quantity);
+            var averageUnitCost = stack != null && stack.Quantity > 0
+                ? stack.AverageUnitCost
+                : FindLastPurchaseUnitPrice(
+                    world, person.Id, commodity.Id, unitPrice);
             var profit = checked(
-                (long)(unitPrice - stack.AverageUnitCost) * quantity);
+                (long)(unitPrice - averageUnitCost) * quantity);
             person.Wealth = checked(person.Wealth + revenue);
             listing.Stock = checked(listing.Stock + quantity);
-            stack.Quantity -= quantity;
-            if (stack.Quantity == 0)
+            var formalSold = Math.Min(formalQuantity, quantity);
+            if (formalSold > 0)
             {
-                world.Inventories.Remove(stack);
+                ConsumeFormalCargo(
+                    world,
+                    person,
+                    commodity.Id,
+                    formalSold,
+                    InventoryTransactionType.MerchantMarketSold,
+                    "Sold merchant cargo into the local market.");
+            }
+            var legacySold = quantity - formalSold;
+            if (legacySold > 0)
+            {
+                stack.Quantity -= legacySold;
+                if (stack.Quantity == 0)
+                {
+                    world.Inventories.Remove(stack);
+                }
             }
 
             ApplyImmediatePriceImpact(listing, quantity, false);
@@ -147,8 +183,69 @@ namespace Mandate.Simulation
             string personId,
             string commodityId)
         {
+            var person = FindPerson(world, personId);
             var stack = FindInventory(world, personId, commodityId);
-            return stack == null ? 0 : stack.Quantity;
+            return checked(
+                (stack == null ? 0 : stack.Quantity) +
+                GetFormalQuantity(world, person, commodityId));
+        }
+
+        public long GetCargoWeight(WorldState world, string personId)
+        {
+            return CalculateCargoWeight(world, personId);
+        }
+
+        public bool LoseCargo(
+            WorldState world,
+            string personId,
+            string commodityId,
+            int quantity)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            if (quantity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            var person = FindPerson(world, personId);
+            if (GetQuantity(world, personId, commodityId) < quantity)
+            {
+                return false;
+            }
+            var formalQuantity = GetFormalQuantity(
+                world, person, commodityId);
+            var formalLoss = Math.Min(formalQuantity, quantity);
+            if (formalLoss > 0)
+            {
+                ConsumeFormalCargo(
+                    world,
+                    person,
+                    commodityId,
+                    formalLoss,
+                    InventoryTransactionType.MerchantCargoDamaged,
+                    "Merchant cargo was lost or damaged during travel.");
+            }
+
+            var remaining = quantity - formalLoss;
+            if (remaining > 0)
+            {
+                var stack = FindInventory(world, personId, commodityId);
+                if (stack == null || stack.Quantity < remaining)
+                {
+                    return false;
+                }
+                stack.Quantity -= remaining;
+                if (stack.Quantity == 0)
+                {
+                    world.Inventories.Remove(stack);
+                }
+            }
+
+            world.Validate();
+            return true;
         }
 
         private static TradeResult ValidateCommon(
@@ -242,7 +339,240 @@ namespace Mandate.Simulation
                     weight + (long)stack.Quantity * commodity.UnitWeight);
             }
 
+            for (var containerIndex = 0;
+                 containerIndex < world.InventoryContainers.Count;
+                 containerIndex++)
+            {
+                var container = world.InventoryContainers[containerIndex];
+                if (container.CarrierPersonId != personId ||
+                    container.KindId !=
+                        "inventory_container.merchant_caravan")
+                {
+                    continue;
+                }
+                for (var batchIndex = 0;
+                     batchIndex < world.ProductBatches.Count;
+                     batchIndex++)
+                {
+                    var batch = world.ProductBatches[batchIndex];
+                    if (batch.InventoryContainerId == container.Id)
+                    {
+                        weight = checked(
+                            weight + batch.Quantity * batch.UnitWeight);
+                    }
+                }
+            }
+
             return weight;
+        }
+
+        private static void AddFormalCargo(
+            WorldState world,
+            PersonState person,
+            string productDefinitionId,
+            int quantity,
+            int unitPrice)
+        {
+            var content = ProductionContentRegistry.CreateCore();
+            content.ValidateManifest(world.ProductionContentManifest);
+            var product = content.GetProduct(productDefinitionId);
+            var family = ProductInventorySystem.FindFamily(
+                world, person.FamilyId);
+            var container = EnsureMerchantContainer(world, person);
+            var transaction = ProductInventorySystem.NewTransaction(
+                world,
+                InventoryTransactionType.MerchantMarketPurchased,
+                person.Id,
+                string.Empty,
+                0,
+                0,
+                0,
+                $"Purchased {quantity} {product.Id} at {unitPrice} per unit.");
+            var batch = ProductInventorySystem.NewFamilyContainerBatch(
+                world,
+                product,
+                family,
+                container,
+                transaction.Id,
+                string.Empty,
+                quantity,
+                8_000);
+            transaction.Lines.Add(ProductInventorySystem.Line(
+                batch, quantity, 0));
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(transaction);
+        }
+
+        private static void ConsumeFormalCargo(
+            WorldState world,
+            PersonState person,
+            string commodityId,
+            int quantity,
+            InventoryTransactionType type,
+            string summary)
+        {
+            var commodity = FindCommodity(world, commodityId);
+            if (!TryGetFormalProductId(commodity, out var productId))
+            {
+                throw new InvalidOperationException(
+                    "The commodity has no formal product mapping.");
+            }
+
+            var batches = FindFormalCargoBatches(world, person, productId);
+            var transaction = ProductInventorySystem.NewTransaction(
+                world,
+                type,
+                person.Id,
+                string.Empty,
+                0,
+                0,
+                0,
+                summary);
+            long remaining = quantity;
+            for (var i = 0; i < batches.Count && remaining > 0; i++)
+            {
+                var consumed = Math.Min(remaining, batches[i].Quantity);
+                batches[i].Quantity -= consumed;
+                transaction.Lines.Add(ProductInventorySystem.Line(
+                    batches[i], -consumed, 0));
+                remaining -= consumed;
+            }
+            if (remaining != 0)
+            {
+                throw new InvalidOperationException(
+                    "Formal merchant cargo changed before settlement.");
+            }
+            world.InventoryTransactions.Add(transaction);
+        }
+
+        private static InventoryContainerState EnsureMerchantContainer(
+            WorldState world,
+            PersonState person)
+        {
+            for (var i = 0; i < world.InventoryContainers.Count; i++)
+            {
+                var existing = world.InventoryContainers[i];
+                if (existing.CarrierPersonId == person.Id &&
+                    existing.OwnerFamilyId == person.FamilyId &&
+                    existing.KindId == "inventory_container.merchant_caravan")
+                {
+                    existing.LocationId = person.LocationId;
+                    existing.CapacityWeight = Math.Max(
+                        existing.CapacityWeight, person.CargoCapacity);
+                    return existing;
+                }
+            }
+
+            var container = new InventoryContainerState
+            {
+                Id = "inventory_container.merchant_caravan." + person.Id,
+                KindId = "inventory_container.merchant_caravan",
+                OwnerFamilyId = person.FamilyId,
+                CarrierPersonId = person.Id,
+                LocationId = person.LocationId,
+                CapacityWeight = Math.Max(1, person.CargoCapacity),
+                FoodStorageEnvironmentId =
+                    "storage.environment.generic_sheltered",
+                FoodStorageProtectionBasisPoints = 2_000
+            };
+            world.InventoryContainers.Add(container);
+            return container;
+        }
+
+        private static int GetFormalQuantity(
+            WorldState world,
+            PersonState person,
+            string commodityId)
+        {
+            if (string.IsNullOrEmpty(person.FamilyId) ||
+                !TryGetFormalProductId(
+                    FindCommodity(world, commodityId), out var productId))
+            {
+                return 0;
+            }
+
+            long quantity = 0;
+            var batches = FindFormalCargoBatches(world, person, productId);
+            for (var i = 0; i < batches.Count; i++)
+            {
+                quantity = checked(quantity + batches[i].Quantity);
+            }
+            return checked((int)quantity);
+        }
+
+        private static System.Collections.Generic.List<ProductBatchState>
+            FindFormalCargoBatches(
+                WorldState world,
+                PersonState person,
+                string productId)
+        {
+            var containerIds = new System.Collections.Generic.HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < world.InventoryContainers.Count; i++)
+            {
+                var container = world.InventoryContainers[i];
+                if (container.CarrierPersonId == person.Id &&
+                    container.OwnerFamilyId == person.FamilyId &&
+                    container.KindId ==
+                        "inventory_container.merchant_caravan")
+                {
+                    containerIds.Add(container.Id);
+                }
+            }
+
+            var result = new System.Collections.Generic.List<ProductBatchState>();
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch.OwnerFamilyId == person.FamilyId &&
+                    batch.ProductDefinitionId == productId &&
+                    batch.Quantity > 0 &&
+                    containerIds.Contains(batch.InventoryContainerId))
+                {
+                    result.Add(batch);
+                }
+            }
+            result.Sort((left, right) =>
+            {
+                var day = left.ProducedDay.CompareTo(right.ProducedDay);
+                return day != 0
+                    ? day
+                    : string.CompareOrdinal(left.Id, right.Id);
+            });
+            return result;
+        }
+
+        private static int FindLastPurchaseUnitPrice(
+            WorldState world,
+            string personId,
+            string commodityId,
+            int fallback)
+        {
+            for (var i = world.TradeRecords.Count - 1; i >= 0; i--)
+            {
+                var record = world.TradeRecords[i];
+                if (record.PersonId == personId &&
+                    record.CommodityId == commodityId &&
+                    record.IsPurchase)
+                {
+                    return record.UnitPrice;
+                }
+            }
+            return fallback;
+        }
+
+        private static bool TryGetFormalProductId(
+            CommodityState commodity,
+            out string productId)
+        {
+            if (commodity != null &&
+                !string.IsNullOrEmpty(commodity.ProductDefinitionId))
+            {
+                productId = commodity.ProductDefinitionId;
+                return true;
+            }
+            productId = string.Empty;
+            return false;
         }
 
         private static InventoryStackState FindInventory(

@@ -101,6 +101,8 @@ namespace Mandate.Simulation
             CharacterAbilityBootstrap.InitializeWorld(world);
             ApplyOccupationalSkills(world);
             AddFacilities(world, village);
+            AddClinicMedicineStock(world, village);
+            HerbalMedicineSupplySystem.InitializePrototype(world, village);
             AddCountyGovernance(world, village);
             VillageLifeSystem.RefreshCaches(world, village);
             for (var i = 0; i < village.HouseholdIds.Count; i++)
@@ -366,7 +368,11 @@ namespace Mandate.Simulation
                                 family.Grain + family.SeedGrain +
                                 family.FarmlandUnits * 30L))),
                     ConditionBasisPoints = 8_000,
-                    InventoryUnits = family.Grain + family.SeedGrain
+                    InventoryUnits = family.Grain + family.SeedGrain,
+                    CapabilityTags = new List<string>
+                    {
+                        VillageFacilityTags.HouseholdGranary
+                    }
                 });
             }
         }
@@ -403,6 +409,11 @@ namespace Mandate.Simulation
                 NextSettlementDay = 30
             };
             world.CountyGovernances.Add(governance);
+            village.HouseholdReliefPriorityPolicyId =
+                HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability;
+            village.HouseholdReliefAuthorizationPolicyId =
+                HouseholdReliefAuthorizationPolicyIds.CountyGovernmentLeader;
+            village.HouseholdReliefAuthorityOrganizationId = organization.Id;
 
             var wealthyFamilies = new List<FamilyState>(world.Families);
             wealthyFamilies.Sort((left, right) =>
@@ -445,6 +456,38 @@ namespace Mandate.Simulation
             });
         }
 
+        private static void AddClinicMedicineStock(
+            WorldState world,
+            VillageState village)
+        {
+            var clinic = world.VillageFacilities.Find(item =>
+                item.VillageId == village.Id &&
+                item.Kind == VillageFacilityKind.Clinic);
+            var physician = FindPerson(world, clinic.ManagerPersonId);
+            var quantity = clinic.InventoryUnits;
+            var container = new InventoryContainerState
+            {
+                Id = $"inventory.{village.Id}.clinic",
+                KindId = "inventory.village_clinic",
+                OwnerFamilyId = physician.FamilyId,
+                LocationId = village.LocationId,
+                CapacityWeight = Math.Max(1, quantity),
+                FoodStorageEnvironmentId =
+                    "storage.environment.generic_sheltered",
+                FoodStorageProtectionBasisPoints = 4_000
+            };
+            world.InventoryContainers.Add(container);
+            clinic.InventoryUnits = 0;
+            new ProductInventorySystem().CreateFamilyContainerOpeningBatch(
+                world,
+                physician.FamilyId,
+                container.Id,
+                physician.Id,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                quantity,
+                8_000);
+        }
+
         private static void AddFacility(
             WorldState world,
             VillageState village,
@@ -464,7 +507,11 @@ namespace Mandate.Simulation
                 ManagerPersonId = manager.Id,
                 Capacity = capacity,
                 ConditionBasisPoints = condition,
-                InventoryUnits = inventory
+                InventoryUnits = inventory,
+                CapabilityTags = new List<string>
+                {
+                    VillageFacilityTags.FromKind(kind)
+                }
             });
         }
 

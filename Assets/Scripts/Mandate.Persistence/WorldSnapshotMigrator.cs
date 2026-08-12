@@ -134,6 +134,114 @@ namespace Mandate.Persistence
                     case 35:
                         MigrateVersionThirtyFiveToThirtySix(world);
                         break;
+                    case 36:
+                        MigrateVersionThirtySixToThirtySeven(world, content);
+                        break;
+                    case 37:
+                        MigrateVersionThirtySevenToThirtyEight(world);
+                        break;
+                    case 38:
+                        MigrateVersionThirtyEightToThirtyNine(world);
+                        break;
+                    case 39:
+                        MigrateVersionThirtyNineToForty(world);
+                        break;
+                    case 40:
+                        MigrateVersionFortyToFortyOne(world);
+                        break;
+                    case 41:
+                        MigrateVersionFortyOneToFortyTwo(world);
+                        break;
+                    case 42:
+                        MigrateVersionFortyTwoToFortyThree(world);
+                        break;
+                    case 43:
+                        MigrateVersionFortyThreeToFortyFour(world, content);
+                        break;
+                    case 44:
+                        MigrateVersionFortyFourToFortyFive(world, content);
+                        break;
+                    case 45:
+                        MigrateVersionFortyFiveToFortySix(world);
+                        break;
+                    case 46:
+                        MigrateVersionFortySixToFortySeven(world);
+                        break;
+                    case 47:
+                        MigrateVersionFortySevenToFortyEight(world);
+                        break;
+                    case 48:
+                        MigrateVersionFortyEightToFortyNine(world);
+                        break;
+                    case 49:
+                        MigrateVersionFortyNineToFifty(world);
+                        break;
+                    case 50:
+                        MigrateVersionFiftyToFiftyOne(world);
+                        break;
+                    case 51:
+                        MigrateVersionFiftyOneToFiftyTwo(world);
+                        break;
+                    case 52:
+                        MigrateVersionFiftyTwoToFiftyThree(world);
+                        break;
+                    case 53:
+                        MigrateVersionFiftyThreeToFiftyFour(world);
+                        break;
+                    case 54:
+                        MigrateVersionFiftyFourToFiftyFive(world);
+                        break;
+                    case 55:
+                        MigrateVersionFiftyFiveToFiftySix(world);
+                        break;
+                    case 56:
+                        MigrateVersionFiftySixToFiftySeven(world);
+                        break;
+                    case 57:
+                        MigrateVersionFiftySevenToFiftyEight(world);
+                        break;
+                    case 58:
+                        MigrateVersionFiftyEightToFiftyNine(world);
+                        break;
+                    case 59:
+                        MigrateVersionFiftyNineToSixty(world);
+                        break;
+                    case 60:
+                        MigrateVersionSixtyToSixtyOne(world);
+                        break;
+                    case 61:
+                        MigrateVersionSixtyOneToSixtyTwo(world);
+                        break;
+                    case 62:
+                        MigrateVersionSixtyTwoToSixtyThree(world);
+                        break;
+                    case 63:
+                        MigrateVersionSixtyThreeToSixtyFour(world);
+                        break;
+                    case 64:
+                        MigrateVersionSixtyFourToSixtyFive(world, content);
+                        break;
+                    case 65:
+                        MigrateVersionSixtyFiveToSixtySix(world);
+                        break;
+                    case 66:
+                        MigrateVersionSixtySixToSixtySeven(world);
+                        break;
+                    case 67:
+                        MigrateVersionSixtySevenToSixtyEight(world);
+                        break;
+                    case 68:
+                        MigrateVersionSixtyEightToSixtyNine(world);
+                        break;
+                    case 69:
+                        MigrateVersionSixtyNineToSeventy(world);
+                        break;
+                    case 70:
+                        MigrateVersionSeventyToSeventyOne(world);
+                        break;
+                    case 71:
+                        MigrateVersionSeventyOneToSeventyTwo(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -1136,6 +1244,989 @@ namespace Mandate.Persistence
                     .PublicReliefRecoveryId ??= string.Empty;
             }
             world.SchemaVersion = 36;
+        }
+
+        private static void MigrateVersionThirtySixToThirtySeven(
+            WorldState world,
+            ProductionContentRegistry content)
+        {
+            world.FoodStorageLosses = new List<FoodStorageLossState>();
+            for (var i = 0; i < world.VillageFacilities.Count; i++)
+            {
+                var facility = world.VillageFacilities[i];
+                facility.FoodStorageEnvironmentId =
+                    "storage.environment.household_granary";
+                facility.FoodStorageProtectionBasisPoints = 2_500;
+            }
+            for (var i = 0; i < world.InventoryContainers.Count; i++)
+            {
+                var container = world.InventoryContainers[i];
+                if (container.KindId == "inventory.village_public_granary")
+                {
+                    container.FoodStorageEnvironmentId =
+                        "storage.environment.village_public_granary";
+                    container.FoodStorageProtectionBasisPoints = 3_500;
+                }
+                else if (container.KindId == "inventory.county_granary")
+                {
+                    container.FoodStorageEnvironmentId =
+                        "storage.environment.county_granary";
+                    container.FoodStorageProtectionBasisPoints = 4_500;
+                }
+                else
+                {
+                    container.FoodStorageEnvironmentId =
+                        "storage.environment.generic_sheltered";
+                    container.FoodStorageProtectionBasisPoints = 2_000;
+                }
+            }
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                if (content.TryGetFood(
+                        world.ProductBatches[i].ProductDefinitionId,
+                        out _))
+                {
+                    world.ProductBatches[i].NextFoodStorageAssessmentDay =
+                        checked(world.AbsoluteDay + 30);
+                }
+            }
+            world.SchemaVersion = 37;
+        }
+
+        private static void MigrateVersionThirtySevenToThirtyEight(
+            WorldState world)
+        {
+            world.HouseholdReliefPickups =
+                new List<HouseholdReliefPickupState>();
+            world.SchemaVersion = 38;
+        }
+
+        private static void MigrateVersionThirtyEightToThirtyNine(
+            WorldState world)
+        {
+            world.HouseholdReliefConsumptions =
+                new List<HouseholdReliefConsumptionState>();
+            world.SchemaVersion = 39;
+        }
+
+        private static void MigrateVersionThirtyNineToForty(
+            WorldState world)
+        {
+            for (var i = 0;
+                 i < world.HouseholdReliefConsumptions.Count;
+                 i++)
+            {
+                var consumption = world.HouseholdReliefConsumptions[i];
+                consumption.AllocationPolicyId =
+                    HouseholdReliefAllocationPolicyIds
+                        .LegacyHouseholdShared;
+                consumption.PreparedNutritionBasisUnits = -1;
+                for (var affectedIndex = 0;
+                     affectedIndex < consumption.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    var affected = consumption.AffectedPeople[affectedIndex];
+                    affected.RequiredNutritionBasisUnits = -1;
+                    affected.AllocatedNutritionBasisUnits = -1;
+                    affected.ConsumedNutritionBasisUnits = -1;
+                }
+            }
+            world.SchemaVersion = 40;
+        }
+
+        private static void MigrateVersionFortyToFortyOne(
+            WorldState world)
+        {
+            for (var villageIndex = 0;
+                 villageIndex < world.Villages.Count;
+                 villageIndex++)
+            {
+                var village = world.Villages[villageIndex];
+                village.HouseholdReliefPriorityPolicyId =
+                    HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability;
+                var governance = world.CountyGovernances.Find(item =>
+                    item.CountyLocationId == village.ParentLocationId);
+                if (governance == null)
+                {
+                    village.HouseholdReliefAuthorizationPolicyId =
+                        HouseholdReliefAuthorizationPolicyIds.EmergencySystem;
+                    village.HouseholdReliefAuthorityOrganizationId = string.Empty;
+                }
+                else
+                {
+                    village.HouseholdReliefAuthorizationPolicyId =
+                        HouseholdReliefAuthorizationPolicyIds
+                            .CountyGovernmentLeader;
+                    village.HouseholdReliefAuthorityOrganizationId =
+                        governance.GovernmentOrganizationId;
+                }
+            }
+
+            for (var pickupIndex = 0;
+                 pickupIndex < world.HouseholdReliefPickups.Count;
+                 pickupIndex++)
+            {
+                var pickup = world.HouseholdReliefPickups[pickupIndex];
+                pickup.PriorityPolicyId = HouseholdReliefPriorityPolicyIds
+                    .LegacySettlementFamilyOrder;
+                pickup.AuthorizationPolicyId =
+                    HouseholdReliefAuthorizationPolicyIds.LegacySystem;
+                pickup.AuthorizingOrganizationId = string.Empty;
+                pickup.AuthorizingPersonId = string.Empty;
+                pickup.AuthorizedDay = -1;
+                pickup.ShortfallSeverityBasisPoints = -1;
+                pickup.VulnerableAffectedPersonCount = -1;
+                pickup.AffectedPersonCountAtAuthorization = -1;
+            }
+            world.SchemaVersion = 41;
+        }
+
+        private static void MigrateVersionFortyOneToFortyTwo(
+            WorldState world)
+        {
+            world.HouseholdReliefCareDeliveries =
+                new List<HouseholdReliefCareDeliveryState>();
+            for (var claimIndex = 0;
+                 claimIndex < world.HouseholdReliefConsumptions.Count;
+                 claimIndex++)
+            {
+                var claim = world.HouseholdReliefConsumptions[claimIndex];
+                claim.CareDeliveryPolicyId =
+                    HouseholdReliefCareDeliveryPolicyIds.LegacySelfService;
+                for (var affectedIndex = 0;
+                     affectedIndex < claim.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    claim.AffectedPeople[affectedIndex]
+                        .RequiresCaregiverDelivery = false;
+                }
+            }
+            for (var transactionIndex = 0;
+                 transactionIndex < world.InventoryTransactions.Count;
+                 transactionIndex++)
+            {
+                world.InventoryTransactions[transactionIndex]
+                    .HouseholdReliefRecipientPersonId = string.Empty;
+            }
+            world.SchemaVersion = 42;
+        }
+
+        private static void MigrateVersionFortyTwoToFortyThree(
+            WorldState world)
+        {
+            world.PersonNutritionProfiles =
+                new List<PersonNutritionProfileState>();
+            world.PersonNutritionLedgerEntries =
+                new List<PersonNutritionLedgerEntryState>();
+            world.NutritionConditionEpisodes =
+                new List<NutritionConditionEpisodeState>();
+            world.SchemaVersion = 43;
+        }
+
+        private static void MigrateVersionFortyThreeToFortyFour(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            world.CivilianMedicalCases =
+                new List<CivilianMedicalCaseState>();
+            world.CivilianMedicalTreatments =
+                new List<CivilianMedicalTreatmentState>();
+            world.ProductionContentManifest = productionContent.CreateManifest();
+            world.SchemaVersion = 44;
+        }
+
+        private static void MigrateVersionFortyFourToFortyFive(
+            WorldState world,
+            ProductionContentRegistry productionContent)
+        {
+            for (var i = 0; i < world.VillageFacilities.Count; i++)
+            {
+                var facility = world.VillageFacilities[i];
+                facility.CapabilityTags ??= new List<string>();
+                var canonical = VillageFacilityTags.FromKind(facility.Kind);
+                if (!facility.CapabilityTags.Contains(canonical))
+                {
+                    facility.CapabilityTags.Add(canonical);
+                }
+                facility.CapabilityTags.Sort(StringComparer.Ordinal);
+            }
+
+            for (var i = 0; i < world.ResourceExtractionOrders.Count; i++)
+            {
+                var order = world.ResourceExtractionOrders[i];
+                order.OwnerFamilyId ??= string.Empty;
+                order.StorageFacilityId ??= string.Empty;
+                order.OwnerOrganizationId ??= string.Empty;
+                order.ProductionSiteId ??= string.Empty;
+                order.InventoryContainerId ??= string.Empty;
+            }
+
+            world.ProductionContentManifest = productionContent.CreateManifest();
+            world.SchemaVersion = 45;
+        }
+
+        private static void MigrateVersionFortyFiveToFortySix(
+            WorldState world)
+        {
+            world.CivilianMedicalPrescriptions =
+                new List<CivilianMedicalPrescriptionState>();
+            world.CivilianMedicalServices =
+                new List<CivilianMedicalServiceState>();
+            world.CivilianMedicalServiceContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0; i < world.CivilianMedicalCases.Count; i++)
+            {
+                var medicalCase = world.CivilianMedicalCases[i];
+                medicalCase.PrescriptionId = string.Empty;
+                medicalCase.Status = CivilianMedicalCaseStatus.Active;
+                medicalCase.ClosedDay = -1;
+                medicalCase.ClosureReasonId = string.Empty;
+            }
+            for (var i = 0; i < world.CivilianMedicalTreatments.Count; i++)
+            {
+                var treatment = world.CivilianMedicalTreatments[i];
+                treatment.PrescriptionId = string.Empty;
+                treatment.MedicalServiceId = string.Empty;
+            }
+            world.SchemaVersion = 46;
+        }
+
+        private static void MigrateVersionFortySixToFortySeven(
+            WorldState world)
+        {
+            world.MilitaryMedicalCases =
+                new List<MilitaryMedicalCaseState>();
+            world.MilitaryMedicalServices =
+                new List<MilitaryMedicalServiceState>();
+            world.MilitaryMedicalInitialized = false;
+            world.MilitaryMedicalContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0; i < world.Armies.Count; i++)
+            {
+                world.Armies[i].MedicalInventoryContainerId = string.Empty;
+            }
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i].SourceMilitaryMedicalServiceId =
+                    string.Empty;
+            }
+            world.SchemaVersion = 47;
+        }
+
+        private static void MigrateVersionFortySevenToFortyEight(
+            WorldState world)
+        {
+            for (var i = 0; i < world.MilitaryLogisticsOrders.Count; i++)
+            {
+                world.MilitaryLogisticsOrders[i].DeliveryPolicyId =
+                    MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions;
+                world.MilitaryLogisticsOrders[i]
+                    .TargetInventoryContainerId = string.Empty;
+            }
+
+            world.SchemaVersion = 48;
+        }
+
+        private static void MigrateVersionFortyEightToFortyNine(
+            WorldState world)
+        {
+            world.MilitaryMedicalEvacuations =
+                new List<MilitaryMedicalEvacuationState>();
+            world.SchemaVersion = 49;
+        }
+
+        private static void MigrateVersionFortyNineToFifty(
+            WorldState world)
+        {
+            world.MilitaryRearMedicalSites =
+                new List<MilitaryRearMedicalSiteState>();
+            world.MilitaryRearMedicalAdmissions =
+                new List<MilitaryRearMedicalAdmissionState>();
+            world.MilitaryRearMedicalTreatments =
+                new List<MilitaryRearMedicalTreatmentState>();
+
+            for (var i = 0; i < world.MilitaryMedicalEvacuations.Count; i++)
+            {
+                var evacuation = world.MilitaryMedicalEvacuations[i];
+                evacuation.RearMedicalSiteId = string.Empty;
+                evacuation.RearMedicalAdmissionId = string.Empty;
+                evacuation.ReturnRouteId = string.Empty;
+                evacuation.ReturnDestinationLocationId = string.Empty;
+                evacuation.PatientReturnJourneyId = string.Empty;
+                evacuation.ReturnStartedDay = -1;
+                evacuation.CompletedDay = -1;
+                for (var memberIndex = 0;
+                     memberIndex < evacuation.TeamMembers.Count;
+                     memberIndex++)
+                {
+                    evacuation.TeamMembers[memberIndex].ReturnJourneyId =
+                        string.Empty;
+                }
+            }
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i]
+                    .SourceMilitaryRearMedicalTreatmentId = string.Empty;
+            }
+            world.SchemaVersion = 50;
+        }
+
+        private static void MigrateVersionFiftyToFiftyOne(
+            WorldState world)
+        {
+            world.MilitaryFieldHospitalConstructionProjects =
+                new List<MilitaryFieldHospitalConstructionProjectState>();
+            world.MilitaryFieldHospitalConstructionWork =
+                new List<MilitaryFieldHospitalConstructionWorkState>();
+            world.MilitaryFieldHospitalMaintenance =
+                new List<MilitaryFieldHospitalMaintenanceState>();
+            for (var i = 0; i < world.MilitaryRearMedicalSites.Count; i++)
+            {
+                var site = world.MilitaryRearMedicalSites[i];
+                site.SourceConstructionProjectId = string.Empty;
+                site.SupportInventoryContainerId = string.Empty;
+                site.MaintenancePolicyId = string.Empty;
+                site.LastMaintenanceDay = -1;
+                site.NextMaintenanceDay = -1;
+            }
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                var admission = world.MilitaryRearMedicalAdmissions[i];
+                admission.RequiredTreatmentStages = 1;
+                admission.CompletedTreatmentStages =
+                    string.IsNullOrEmpty(admission.TreatmentId) ? 0 : 1;
+                admission.TreatmentIds = new List<string>();
+                if (!string.IsNullOrEmpty(admission.TreatmentId))
+                {
+                    admission.TreatmentIds.Add(admission.TreatmentId);
+                }
+            }
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalTreatments.Count;
+                 i++)
+            {
+                world.MilitaryRearMedicalTreatments[i].StageIndex = 0;
+                world.MilitaryRearMedicalTreatments[i].RequiredStageCount = 1;
+            }
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i]
+                    .SourceMilitaryFieldHospitalConstructionProjectId =
+                        string.Empty;
+                world.InventoryTransactions[i]
+                    .SourceMilitaryFieldHospitalMaintenanceId = string.Empty;
+            }
+            world.SchemaVersion = 51;
+        }
+
+        private static void MigrateVersionFiftyOneToFiftyTwo(
+            WorldState world)
+        {
+            world.MilitaryInjuryEpisodes =
+                new List<MilitaryInjuryEpisodeState>();
+            world.MilitaryInjuryProfiles =
+                MilitaryInjuryProfileCatalog.CreateCore();
+            world.MilitaryInjuryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                var admission = world.MilitaryRearMedicalAdmissions[i];
+                admission.InjuryEpisodeId = string.Empty;
+                admission.TreatmentPlanProtocolIds = new List<string>();
+                MilitaryRearMedicalSiteState site = null;
+                for (var siteIndex = 0;
+                     siteIndex < world.MilitaryRearMedicalSites.Count;
+                     siteIndex++)
+                {
+                    if (world.MilitaryRearMedicalSites[siteIndex].Id ==
+                        admission.RearMedicalSiteId)
+                    {
+                        site = world.MilitaryRearMedicalSites[siteIndex];
+                        break;
+                    }
+                }
+                if (site == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Missing rear medical site {admission.RearMedicalSiteId} " +
+                        "during V51-to-V52 migration.");
+                }
+                if (site.KindId ==
+                    MilitaryRearMedicalSiteKindIds.FieldHospital)
+                {
+                    admission.TreatmentPlanProtocolIds.Add(
+                        MilitaryRearMedicalTreatmentProtocolIds
+                            .FieldStabilization);
+                    admission.TreatmentPlanProtocolIds.Add(
+                        MilitaryRearMedicalTreatmentProtocolIds.FieldRecovery);
+                }
+                else
+                {
+                    admission.TreatmentPlanProtocolIds.Add(
+                        MilitaryRearMedicalTreatmentProtocolIds
+                            .InpatientHerbalRecovery);
+                }
+                if (admission.TreatmentPlanProtocolIds.Count !=
+                    admission.RequiredTreatmentStages)
+                {
+                    throw new InvalidOperationException(
+                        $"Rear medical admission {admission.Id} has an invalid " +
+                        "V51 treatment-stage count.");
+                }
+            }
+            world.SchemaVersion = 52;
+        }
+
+        private static void MigrateVersionFiftyTwoToFiftyThree(
+            WorldState world)
+        {
+            world.MilitarySurgicalProcedures =
+                MilitarySurgicalProcedureCatalog.CreateCore();
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var coreProfiles = MilitaryInjuryProfileCatalog.CreateCore();
+            for (var i = 0; i < world.MilitaryInjuryProfiles.Count; i++)
+            {
+                var profile = world.MilitaryInjuryProfiles[i];
+                profile.SurgicalProcedureId = string.Empty;
+                for (var coreIndex = 0;
+                     coreIndex < coreProfiles.Count;
+                     coreIndex++)
+                {
+                    if (coreProfiles[coreIndex].Id == profile.Id)
+                    {
+                        profile.SurgicalProcedureId =
+                            coreProfiles[coreIndex].SurgicalProcedureId;
+                        break;
+                    }
+                }
+            }
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                world.People[i].PermanentLaborCapacityPenaltyBasisPoints = 0;
+            }
+            for (var i = 0;
+                 i < world.MilitaryMedicalEvacuations.Count;
+                 i++)
+            {
+                world.MilitaryMedicalEvacuations[i].PatientReturnPolicyId =
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .ReturnWithTeam;
+            }
+            for (var i = 0; i < world.MilitaryInjuryEpisodes.Count; i++)
+            {
+                var injury = world.MilitaryInjuryEpisodes[i];
+                injury.SurgicalProcedureId = string.Empty;
+                injury.SurgeryTreatmentId = string.Empty;
+                injury.SurgeryCompletedDay = -1;
+                injury.PermanentOutcomeId = string.Empty;
+                injury.LaborCapacityBeforeBasisPoints = -1;
+                injury.LaborCapacityAfterBasisPoints = -1;
+                injury.PermanentLaborCapacityPenaltyBasisPoints = 0;
+                injury.RequiresMedicalRetirement = false;
+            }
+            world.SchemaVersion = 53;
+        }
+
+        private static void MigrateVersionFiftyThreeToFiftyFour(
+            WorldState world)
+        {
+            world.MilitaryMedicalTransfers =
+                new List<MilitaryMedicalTransferState>();
+            world.MilitaryMedicalTransferContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryMedicalEvacuations.Count;
+                 i++)
+            {
+                var evacuation = world.MilitaryMedicalEvacuations[i];
+                evacuation.CurrentCareLocationId =
+                    evacuation.DestinationLocationId;
+            }
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                var admission = world.MilitaryRearMedicalAdmissions[i];
+                admission.MedicalTransferId = string.Empty;
+                admission.TreatmentPlanOriginSiteKindId = string.Empty;
+                for (var siteIndex = 0;
+                     siteIndex < world.MilitaryRearMedicalSites.Count;
+                     siteIndex++)
+                {
+                    if (world.MilitaryRearMedicalSites[siteIndex].Id ==
+                        admission.RearMedicalSiteId)
+                    {
+                        admission.TreatmentPlanOriginSiteKindId =
+                            world.MilitaryRearMedicalSites[siteIndex].KindId;
+                        break;
+                    }
+                }
+                if (string.IsNullOrEmpty(
+                    admission.TreatmentPlanOriginSiteKindId))
+                {
+                    throw new InvalidOperationException(
+                        $"Missing rear medical site {admission.RearMedicalSiteId} " +
+                        "during V53-to-V54 migration.");
+                }
+            }
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                world.InventoryTransactions[i].SourceMilitaryMedicalTransferId =
+                    string.Empty;
+            }
+            world.SchemaVersion = 54;
+        }
+
+        private static void MigrateVersionFiftyFourToFiftyFive(
+            WorldState world)
+        {
+            world.MilitaryWoundDeathPolicies =
+                MilitaryWoundDeathPolicyCatalog.CreateCore();
+            world.MilitaryWoundDeaths = new List<MilitaryWoundDeathState>();
+            world.MilitaryFamilyInheritances =
+                new List<MilitaryFamilyInheritanceState>();
+            world.MilitarySurvivorCompensations =
+                new List<MilitarySurvivorCompensationState>();
+            world.MilitaryWoundDeathContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            world.SchemaVersion = 55;
+        }
+
+        private static void MigrateVersionFiftyFiveToFiftySix(
+            WorldState world)
+        {
+            world.MilitaryMedicalDeathResponsibilities =
+                new List<MilitaryMedicalDeathResponsibilityState>();
+            world.MilitaryMedicalDeathResponsibilityContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            for (var i = 0; i < world.MilitaryWoundDeaths.Count; i++)
+            {
+                var death = world.MilitaryWoundDeaths[i];
+                death.DeathContextId = MilitaryWoundDeathContextIds
+                    .PostReturnMedicalRetirement;
+                death.MedicalResponsibilityId = string.Empty;
+            }
+            world.SchemaVersion = 56;
+        }
+
+        private static void MigrateVersionFiftySixToFiftySeven(
+            WorldState world)
+        {
+            world.MilitaryInpatientDeteriorationPolicies =
+                MilitaryInpatientDeteriorationPolicyCatalog.CreateCore();
+            world.MilitaryInpatientDeathClosures =
+                new List<MilitaryInpatientDeathClosureState>();
+            world.MilitaryInpatientDeathContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                world.MilitaryRearMedicalAdmissions[i]
+                    .InpatientDeathClosureId = string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryMedicalTransfers.Count; i++)
+            {
+                var transfer = world.MilitaryMedicalTransfers[i];
+                transfer.ReleasedReservedMedicineUnits = 0;
+                transfer.ReservationReleaseInventoryTransactionId =
+                    string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryWoundDeaths.Count; i++)
+            {
+                world.MilitaryWoundDeaths[i].InpatientDeathClosureId =
+                    string.Empty;
+            }
+            world.SchemaVersion = 57;
+        }
+
+        private static void MigrateVersionFiftySevenToFiftyEight(
+            WorldState world)
+        {
+            world.MilitaryMedicalTransferDeathClosures =
+                new List<MilitaryMedicalTransferDeathClosureState>();
+            world.MilitaryMedicalTransferDeathContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                world.MilitaryRearMedicalAdmissions[i]
+                    .MedicalTransferDeathClosureId = string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryMedicalTransfers.Count; i++)
+            {
+                world.MilitaryMedicalTransfers[i].DeathClosureId =
+                    string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryWoundDeaths.Count; i++)
+            {
+                world.MilitaryWoundDeaths[i]
+                    .MedicalTransferDeathClosureId = string.Empty;
+            }
+            world.SchemaVersion = 58;
+        }
+
+        private static void MigrateVersionFiftyEightToFiftyNine(
+            WorldState world)
+        {
+            var corePolicies = MilitaryWoundDeathPolicyCatalog.CreateCore();
+            for (var coreIndex = 0;
+                 coreIndex < corePolicies.Count;
+                 coreIndex++)
+            {
+                var core = corePolicies[coreIndex];
+                var exists = false;
+                for (var existingIndex = 0;
+                     existingIndex < world.MilitaryWoundDeathPolicies.Count;
+                     existingIndex++)
+                {
+                    if (world.MilitaryWoundDeathPolicies[existingIndex].Id ==
+                        core.Id)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                {
+                    world.MilitaryWoundDeathPolicies.Add(core);
+                }
+            }
+            world.MilitaryOriginalEvacuationDeteriorationPolicies =
+                MilitaryOriginalEvacuationDeteriorationPolicyCatalog
+                    .CreateCore();
+            world.MilitaryOriginalEvacuationDeathClosures =
+                new List<MilitaryOriginalEvacuationDeathClosureState>();
+            world.MilitaryOriginalEvacuationDeathContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryMedicalEvacuations.Count;
+                 i++)
+            {
+                world.MilitaryMedicalEvacuations[i]
+                    .OriginalEvacuationDeathClosureId = string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryWoundDeaths.Count; i++)
+            {
+                world.MilitaryWoundDeaths[i]
+                    .OriginalEvacuationDeathClosureId = string.Empty;
+            }
+            for (var i = 0;
+                 i < world.MilitaryMedicalDeathResponsibilities.Count;
+                 i++)
+            {
+                world.MilitaryMedicalDeathResponsibilities[i].SourceArmyId =
+                    string.Empty;
+            }
+            world.SchemaVersion = 59;
+        }
+
+        private static void MigrateVersionFiftyNineToSixty(
+            WorldState world)
+        {
+            var corePolicies = MilitaryWoundDeathPolicyCatalog.CreateCore();
+            for (var coreIndex = 0;
+                 coreIndex < corePolicies.Count;
+                 coreIndex++)
+            {
+                var core = corePolicies[coreIndex];
+                var exists = false;
+                for (var existingIndex = 0;
+                     existingIndex < world.MilitaryWoundDeathPolicies.Count;
+                     existingIndex++)
+                {
+                    if (world.MilitaryWoundDeathPolicies[existingIndex].Id ==
+                        core.Id)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                {
+                    world.MilitaryWoundDeathPolicies.Add(core);
+                }
+            }
+            world.MilitaryPatientReturnDeteriorationPolicies =
+                MilitaryPatientReturnDeteriorationPolicyCatalog.CreateCore();
+            world.MilitaryPatientReturnDeathClosures =
+                new List<MilitaryPatientReturnDeathClosureState>();
+            world.MilitaryPatientReturnDeathContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            for (var i = 0;
+                 i < world.MilitaryMedicalEvacuations.Count;
+                 i++)
+            {
+                world.MilitaryMedicalEvacuations[i]
+                    .PatientReturnDeathClosureId = string.Empty;
+            }
+            for (var i = 0;
+                 i < world.MilitaryRearMedicalAdmissions.Count;
+                 i++)
+            {
+                world.MilitaryRearMedicalAdmissions[i]
+                    .PatientReturnDeathClosureId = string.Empty;
+            }
+            for (var i = 0; i < world.MilitaryWoundDeaths.Count; i++)
+            {
+                world.MilitaryWoundDeaths[i]
+                    .PatientReturnDeathClosureId = string.Empty;
+            }
+            world.SchemaVersion = 60;
+        }
+
+        private static void MigrateVersionSixtyToSixtyOne(
+            WorldState world)
+        {
+            var woundDeathPolicies = MilitaryWoundDeathPolicyCatalog.CreateCore();
+            for (var coreIndex = 0;
+                 coreIndex < woundDeathPolicies.Count;
+                 coreIndex++)
+            {
+                var core = woundDeathPolicies[coreIndex];
+                if (!world.MilitaryWoundDeathPolicies.Exists(
+                    item => item.Id == core.Id))
+                {
+                    world.MilitaryWoundDeathPolicies.Add(core);
+                }
+            }
+
+            var deteriorationPolicies =
+                MilitaryPatientReturnDeteriorationPolicyCatalog.CreateCore();
+            for (var coreIndex = 0;
+                 coreIndex < deteriorationPolicies.Count;
+                 coreIndex++)
+            {
+                var core = deteriorationPolicies[coreIndex];
+                if (!world.MilitaryPatientReturnDeteriorationPolicies.Exists(
+                    item => item.Id == core.Id))
+                {
+                    world.MilitaryPatientReturnDeteriorationPolicies.Add(core);
+                }
+            }
+
+            for (var i = 0;
+                 i < world.MilitaryPatientReturnDeathClosures.Count;
+                 i++)
+            {
+                var closure = world.MilitaryPatientReturnDeathClosures[i];
+                closure.PatientJourneyCompletedBeforeDeath = false;
+                closure.TeamJourneySnapshotsAtDeath = new List<
+                    MilitaryPatientReturnTeamJourneySnapshotState>();
+            }
+            world.MilitaryPatientArrivalWaitingTeamDeathContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            world.SchemaVersion = 61;
+        }
+
+        private static void MigrateVersionSixtyOneToSixtyTwo(
+            WorldState world)
+        {
+            var corePolicies = MilitaryReturnTeamDeathPolicyCatalog.CreateCore();
+            for (var coreIndex = 0;
+                 coreIndex < corePolicies.Count;
+                 coreIndex++)
+            {
+                var core = corePolicies[coreIndex];
+                if (!world.MilitaryReturnTeamDeathPolicies.Exists(
+                    item => item.Id == core.Id))
+                {
+                    world.MilitaryReturnTeamDeathPolicies.Add(core);
+                }
+            }
+
+            world.MilitaryReturnTeamDeaths =
+                new List<MilitaryReturnTeamDeathState>();
+            for (var evacuationIndex = 0;
+                 evacuationIndex < world.MilitaryMedicalEvacuations.Count;
+                 evacuationIndex++)
+            {
+                var evacuation =
+                    world.MilitaryMedicalEvacuations[evacuationIndex];
+                if (evacuation.TeamMembers == null)
+                {
+                    continue;
+                }
+                for (var memberIndex = 0;
+                     memberIndex < evacuation.TeamMembers.Count;
+                     memberIndex++)
+                {
+                    evacuation.TeamMembers[memberIndex].ReturnDeathId =
+                        string.Empty;
+                }
+            }
+            for (var i = 0;
+                 i < world.MilitaryFamilyInheritances.Count;
+                 i++)
+            {
+                world.MilitaryFamilyInheritances[i].ReturnTeamDeathId =
+                    string.Empty;
+            }
+            for (var i = 0;
+                 i < world.MilitarySurvivorCompensations.Count;
+                 i++)
+            {
+                world.MilitarySurvivorCompensations[i].ReturnTeamDeathId =
+                    string.Empty;
+            }
+            world.MilitaryReturnTeamDeathContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            world.SchemaVersion = 62;
+        }
+
+        private static void MigrateVersionSixtyTwoToSixtyThree(
+            WorldState world)
+        {
+            for (var i = 0; i < world.MilitaryMedicalTransfers.Count; i++)
+            {
+                world.MilitaryMedicalTransfers[i]
+                    .CompletedTreatmentStagesAtDispatch = 0;
+            }
+            world.MilitaryPostTreatmentTransferContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            world.SchemaVersion = 63;
+        }
+
+        private static void MigrateVersionSixtyThreeToSixtyFour(
+            WorldState world)
+        {
+            for (var i = 0; i < world.MilitaryMedicalTransfers.Count; i++)
+            {
+                var transfer = world.MilitaryMedicalTransfers[i];
+                transfer.SequenceIndex = 0;
+                transfer.PreviousMedicalTransferId = string.Empty;
+                transfer.NextMedicalTransferId = string.Empty;
+            }
+            world.MilitaryRepeatedMedicalTransferContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            world.SchemaVersion = 64;
+        }
+
+        private static void MigrateVersionSixtyFourToSixtyFive(
+            WorldState world,
+            ProductionContentRegistry content)
+        {
+            for (var i = 0; i < world.Commodities.Count; i++)
+            {
+                var commodity = world.Commodities[i];
+                commodity.ProductDefinitionId = commodity.Id ==
+                    "commodity.cloth"
+                    ? CoreProductionContent.PlainClothProductId
+                    : string.Empty;
+            }
+            world.ProductionContentManifest = content.CreateManifest();
+            world.SchemaVersion = 65;
+        }
+
+        private static void MigrateVersionSixtyFiveToSixtySix(
+            WorldState world)
+        {
+            world.StrategicDelegationMandates =
+                new List<StrategicDelegationMandateState>();
+            world.StrategicDelegationCommandProposals =
+                new List<StrategicDelegationCommandProposalState>();
+            world.SchemaVersion = 66;
+        }
+
+        private static void MigrateVersionSixtySixToSixtySeven(
+            WorldState world)
+        {
+            world.TownFacilities = new List<TownFacilityState>();
+            world.MerchantBranches = new List<MerchantBranchState>();
+            world.SchemaVersion = 67;
+        }
+
+        private static void MigrateVersionSixtySevenToSixtyEight(
+            WorldState world)
+        {
+            world.TownFacilities ??= new List<TownFacilityState>();
+            for (var i = 0; i < world.TownFacilities.Count; i++)
+            {
+                var facility = world.TownFacilities[i];
+                if (facility != null && !facility.HasMapPlacement)
+                {
+                    CoreTownFacilityLayout.TryApplyZhongshan(facility);
+                }
+            }
+
+            world.SchemaVersion = 68;
+        }
+
+        private static void MigrateVersionSixtyEightToSixtyNine(
+            WorldState world)
+        {
+            world.CanonicalPlaceCrosswalks ??=
+                new List<CanonicalPlaceCrosswalkState>();
+            world.HistoricalIdentities ??= new List<HistoricalIdentityState>();
+            world.PersonLineages ??= new List<PersonLineageState>();
+            world.FamilyOrganizationProfiles ??=
+                new List<FamilyOrganizationProfileState>();
+            world.FamilyOrganizationMembers ??=
+                new List<FamilyOrganizationMemberState>();
+            world.FamilyCenters ??= new List<FamilyCenterState>();
+            world.OrganizationAssets ??= new List<OrganizationAssetState>();
+            world.CivilMilitaryOfficeDefinitions ??=
+                new List<CivilMilitaryOfficeDefinitionState>();
+            world.CivilMilitaryOfficeAssignments ??=
+                new List<CivilMilitaryOfficeAssignmentState>();
+            world.PersonPrimaryActivities ??=
+                new List<PersonPrimaryActivityState>();
+            world.HistoricalPersonFamilyIntegrations ??=
+                new List<HistoricalPersonFamilyIntegrationState>();
+            world.FacilityDefinitions ??= new List<FacilityDefinitionState>();
+            world.Facilities ??= new List<FacilityState>();
+            world.SchemaVersion = 69;
+        }
+
+        private static void MigrateVersionSixtyNineToSeventy(
+            WorldState world)
+        {
+            world.LuoyangLivingWorlds ??=
+                new List<Luoyang184LivingWorldState>();
+            world.SchemaVersion = 70;
+        }
+
+        private static void MigrateVersionSeventyToSeventyOne(
+            WorldState world)
+        {
+            world.WorldDecisionAgents ??=
+                new List<WorldDecisionAgentState>();
+            world.WorldSimulationLodStates ??=
+                new List<WorldSimulationLodState>();
+            world.SchemaVersion = 71;
+        }
+
+        private static void MigrateVersionSeventyOneToSeventyTwo(
+            WorldState world)
+        {
+            world.WorldDecisionAgents ??=
+                new List<WorldDecisionAgentState>();
+            for (var i = 0; i < world.WorldDecisionAgents.Count; i++)
+            {
+                var state = world.WorldDecisionAgents[i];
+                if (state == null)
+                {
+                    continue;
+                }
+                state.ModelId = string.IsNullOrWhiteSpace(state.ModelId)
+                    ? "none"
+                    : state.ModelId;
+                state.PolicyProfileId ??= string.Empty;
+                state.PrimaryGoalId ??= string.Empty;
+                if (state.PrimaryGoalWeightBasisPoints < 0 ||
+                    state.PrimaryGoalWeightBasisPoints > 10_000)
+                {
+                    state.PrimaryGoalWeightBasisPoints = 5_000;
+                }
+                state.Memory ??= new List<WorldDecisionMemoryEntryState>();
+            }
+            world.SchemaVersion = 72;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(

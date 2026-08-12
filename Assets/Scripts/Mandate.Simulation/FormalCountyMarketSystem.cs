@@ -507,10 +507,11 @@ namespace Mandate.Simulation
                 throw new InvalidOperationException(
                     "Formal market order parameters are invalid.");
             }
-            if (!_content.TryGetFood(productDefinitionId, out _))
+            var product = _content.GetProduct(productDefinitionId);
+            if (!product.CategoryTags.Contains("product.market"))
             {
                 throw new InvalidOperationException(
-                    $"Formal county food market does not support {productDefinitionId}.");
+                    $"Formal county market does not support {productDefinitionId}.");
             }
             var governance = FindGovernance(world, countyGovernanceId);
             var family = ProductInventorySystem.FindFamily(world, familyId);
@@ -556,11 +557,20 @@ namespace Mandate.Simulation
                 }
             }
             var governance = FindGovernance(world, countyGovernanceId);
-            var food = _content.GetFood(productDefinitionId);
             var basePrice = Math.Max(
                 1L, FindLocation(world, governance.CountyLocationId).GrainPrice);
-            var equilibrium = Math.Max(
-                1L, basePrice * food.MarketValueBasisPoints / 10_000L);
+            long equilibrium;
+            if (_content.TryGetFood(productDefinitionId, out var food))
+            {
+                equilibrium = Math.Max(
+                    1L, basePrice * food.MarketValueBasisPoints / 10_000L);
+            }
+            else
+            {
+                var product = _content.GetProduct(productDefinitionId);
+                equilibrium = Math.Max(
+                    1L, checked(basePrice * product.BaseWeight));
+            }
             var result = new FormalMarketPriceState
             {
                 Id = $"formal_market_price.{countyGovernanceId}." +

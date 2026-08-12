@@ -327,6 +327,78 @@ namespace Mandate.Simulation
             return batch;
         }
 
+        public ProductBatchState CreateFamilyContainerOpeningBatch(
+            WorldState world,
+            string familyId,
+            string inventoryContainerId,
+            string actorPersonId,
+            string productDefinitionId,
+            long quantity,
+            int qualityBasisPoints = 8_000)
+        {
+            RequireWorld(world);
+            _content.ValidateManifest(world.ProductionContentManifest);
+            if (quantity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            var family = FindFamily(world, familyId);
+            var container = FindContainer(world, inventoryContainerId);
+            var actor = FindPerson(world, actorPersonId);
+            var product = _content.GetProduct(productDefinitionId);
+            if (container.OwnerFamilyId != family.Id ||
+                !string.IsNullOrEmpty(container.OwnerOrganizationId) ||
+                !string.IsNullOrEmpty(container.CarrierPersonId) ||
+                actor.FamilyId != family.Id || !actor.IsAlive ||
+                actor.LocationId != container.LocationId ||
+                qualityBasisPoints < 0 || qualityBasisPoints > 10_000)
+            {
+                throw new InvalidOperationException(
+                    "Opening inventory requires a local family-owned container.");
+            }
+
+            long trackedWeight = 0;
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var existing = world.ProductBatches[i];
+                if (existing.InventoryContainerId == container.Id)
+                {
+                    trackedWeight = checked(
+                        trackedWeight + existing.Quantity * existing.UnitWeight);
+                }
+            }
+            var addedWeight = checked(quantity * product.BaseWeight);
+            if (checked(trackedWeight + addedWeight) > container.CapacityWeight)
+            {
+                throw new InvalidOperationException(
+                    "Opening inventory would exceed container capacity.");
+            }
+
+            var transaction = NewTransaction(
+                world,
+                InventoryTransactionType.OpeningBalance,
+                actor.Id,
+                string.Empty,
+                0,
+                0,
+                addedWeight,
+                $"Created opening batch of {quantity} {product.Id}.");
+            var batch = NewFamilyContainerBatch(
+                world,
+                product,
+                family,
+                container,
+                transaction.Id,
+                string.Empty,
+                quantity,
+                qualityBasisPoints);
+            transaction.Lines.Add(Line(batch, quantity, 0));
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(transaction);
+            return batch;
+        }
+
         public static long CalculateTrackedBatchWeight(
             WorldState world,
             string storageFacilityId,
@@ -437,7 +509,9 @@ namespace Mandate.Simulation
                 QualityBasisPoints = 8_000,
                 FreshnessBasisPoints = 10_000,
                 SeedVigorBasisPoints = seedVigor,
-                SeedPurityBasisPoints = seedPurity
+                SeedPurityBasisPoints = seedPurity,
+                NextFoodStorageAssessmentDay = checked(
+                    world.AbsoluteDay + 30)
             };
             batch.QualityDimensions = ProductQualityRules.CreateUniform(
                 product, batch.QualityBasisPoints);
@@ -468,7 +542,43 @@ namespace Mandate.Simulation
                 ProducedDay = world.AbsoluteDay,
                 Quantity = quantity,
                 QualityBasisPoints = qualityBasisPoints,
-                FreshnessBasisPoints = 10_000
+                FreshnessBasisPoints = 10_000,
+                NextFoodStorageAssessmentDay = checked(
+                    world.AbsoluteDay + 30)
+            };
+            batch.QualityDimensions = ProductQualityRules.CreateUniform(
+                product, qualityBasisPoints);
+            return batch;
+        }
+
+        internal static ProductBatchState NewFamilyContainerBatch(
+            WorldState world,
+            ProductDefinition product,
+            FamilyState family,
+            InventoryContainerState container,
+            string sourceTransactionId,
+            string sourceWorkOrderId,
+            long quantity,
+            int qualityBasisPoints)
+        {
+            var batch = new ProductBatchState
+            {
+                Id = $"product_batch.{world.AbsoluteDay}." +
+                     $"{world.ProductBatches.Count:D6}",
+                ProductDefinitionId = product.Id,
+                OwnerFamilyId = family.Id,
+                InventoryContainerId = container.Id,
+                OriginLocationId = container.LocationId,
+                SourceWorkOrderId = sourceWorkOrderId,
+                SourceTransactionId = sourceTransactionId,
+                UnitId = product.UnitId,
+                UnitWeight = product.BaseWeight,
+                ProducedDay = world.AbsoluteDay,
+                Quantity = quantity,
+                QualityBasisPoints = qualityBasisPoints,
+                FreshnessBasisPoints = 10_000,
+                NextFoodStorageAssessmentDay = checked(
+                    world.AbsoluteDay + 30)
             };
             batch.QualityDimensions = ProductQualityRules.CreateUniform(
                 product, qualityBasisPoints);
@@ -611,14 +721,15 @@ namespace Mandate.Simulation
             var storage = ProductInventorySystem.FindFacility(
                 world, storageFacilityId);
             var manager = ProductInventorySystem.FindPerson(world, managerPersonId);
+            var village = ProductInventorySystem.FindVillage(
+                world, storage.VillageId);
             if (!string.IsNullOrEmpty(recipe.CropDefinitionId) ||
                 !method.RecipeDefinitionIds.Contains(recipe.Id) ||
                 method.YieldBasisPoints != 10_000 ||
-                storage.Kind != VillageFacilityKind.HouseholdGranary ||
                 storage.OwnerFamilyId != family.Id ||
                 manager.FamilyId != family.Id || !manager.IsAlive ||
-                !recipe.FacilityTags.Contains(
-                    VillageFacilityTags.FromKind(storage.Kind)))
+                manager.LocationId != village.LocationId ||
+                !HasCompatibleFacilityTag(recipe, storage))
             {
                 throw new InvalidOperationException(
                     "Processing order references incompatible content or actors.");
@@ -1250,7 +1361,12 @@ namespace Mandate.Simulation
 
             if (string.IsNullOrEmpty(order.OwnerOrganizationId))
             {
-                return manager.FamilyId == order.OwnerFamilyId;
+                var storage = ProductInventorySystem.FindFacility(
+                    world, order.StorageFacilityId);
+                var village = ProductInventorySystem.FindVillage(
+                    world, storage.VillageId);
+                return manager.FamilyId == order.OwnerFamilyId &&
+                       manager.LocationId == village.LocationId;
             }
 
             var site = FindProductionSite(world, order.ProductionSiteId);
@@ -1267,6 +1383,23 @@ namespace Mandate.Simulation
             for (var i = 0; i < recipe.FacilityTags.Count; i++)
             {
                 if (site.FacilityTags.Contains(recipe.FacilityTags[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool HasCompatibleFacilityTag(
+            RecipeDefinition recipe,
+            VillageFacilityState facility)
+        {
+            var canonical = VillageFacilityTags.FromKind(facility.Kind);
+            for (var i = 0; i < recipe.FacilityTags.Count; i++)
+            {
+                if (recipe.FacilityTags[i] == canonical ||
+                    facility.CapabilityTags.Contains(recipe.FacilityTags[i]))
                 {
                     return true;
                 }

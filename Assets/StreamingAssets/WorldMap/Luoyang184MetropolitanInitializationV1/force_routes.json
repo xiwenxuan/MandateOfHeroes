@@ -1,0 +1,40 @@
+{
+  "schema": "mandate.luoyang-184-metropolitan-force-routes.v1",
+  "routes": [
+    {
+      "force_id": "force.han.luoyang_garrison",
+      "entry_gate_facility_id": "facility.instance.luoyang.184.gate.gumen",
+      "route_id": "route.metropolitan.settlement.gate.north",
+      "daily_supply_units": 120,
+      "movement_mode": "RealRoadTravel"
+    },
+    {
+      "force_id": "force.han.luzhi_north",
+      "entry_gate_facility_id": "facility.instance.luoyang.184.gate.zhongdongmen",
+      "route_id": "route.metropolitan.settlement.gate.east",
+      "daily_supply_units": 140,
+      "movement_mode": "RealRoadTravel"
+    },
+    {
+      "force_id": "force.han.huangfu_yingchuan",
+      "entry_gate_facility_id": "facility.instance.luoyang.184.gate.yongmen",
+      "route_id": "route.metropolitan.settlement.gate.west",
+      "daily_supply_units": 160,
+      "movement_mode": "RealRoadTravel"
+    },
+    {
+      "force_id": "force.han.zhujun_yingchuan",
+      "entry_gate_facility_id": "facility.instance.luoyang.184.gate.pingchengmen",
+      "route_id": "route.metropolitan.settlement.gate.south",
+      "daily_supply_units": 180,
+      "movement_mode": "RealRoadTravel"
+    },
+    {
+      "force_id": "force.han.caocao_reinforcement",
+      "entry_gate_facility_id": "facility.instance.luoyang.184.gate.xiaoyuanmen",
+      "route_id": "route.metropolitan.settlement.south.taixue",
+      "daily_supply_units": 200,
+      "movement_mode": "RealRoadTravel"
+    }
+  ]
+}

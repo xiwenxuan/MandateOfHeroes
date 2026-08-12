@@ -56,6 +56,11 @@ namespace Mandate.Domain
         public string DisplayName;
         public string LocationId;
         public string ParentLocationId;
+        public string HouseholdReliefPriorityPolicyId =
+            HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability;
+        public string HouseholdReliefAuthorizationPolicyId =
+            HouseholdReliefAuthorizationPolicyIds.EmergencySystem;
+        public string HouseholdReliefAuthorityOrganizationId = string.Empty;
         public List<string> HouseholdIds = new List<string>();
         public long PublicGranaryGrain;
         public string PublicGranaryInventoryContainerId;
@@ -83,6 +88,10 @@ namespace Mandate.Domain
         public int Capacity;
         public int ConditionBasisPoints = 10_000;
         public long InventoryUnits;
+        public List<string> CapabilityTags = new List<string>();
+        public string FoodStorageEnvironmentId =
+            "storage.environment.household_granary";
+        public int FoodStorageProtectionBasisPoints = 2_500;
     }
 
     [Serializable]

@@ -310,11 +310,18 @@ namespace Mandate.Simulation
                 var batch = FindBatch(world, reservation.BatchId);
                 if (batch.OwnerFamilyId != sellerFamilyId ||
                     batch.StorageFacilityId != sellerStorageFacilityId ||
-                    batch.ReservedQuantity < reservation.RemainingQuantity ||
-                    !_content.TryGetFood(batch.ProductDefinitionId, out var food))
+                    batch.ReservedQuantity < reservation.RemainingQuantity)
                 {
                     throw new InvalidOperationException(
                         $"Invalid formal market reservation for {batch.Id}.");
+                }
+
+                var product = _content.GetProduct(
+                    batch.ProductDefinitionId);
+                if (!product.CategoryTags.Contains("product.market"))
+                {
+                    throw new InvalidOperationException(
+                        $"Product {product.Id} is not enabled for formal market transfer.");
                 }
 
                 var byCapacity = (capacityWeight - plannedWeight) /
@@ -331,8 +338,12 @@ namespace Mandate.Simulation
 
                 plan.Add(new FoodTransferPlanLine(batch, take));
                 plannedQuantity = checked(plannedQuantity + take);
-                plannedNutrition = checked(
-                    plannedNutrition + take * food.NutritionBasisPoints);
+                if (_content.TryGetFood(
+                        batch.ProductDefinitionId, out var food))
+                {
+                    plannedNutrition = checked(
+                        plannedNutrition + take * food.NutritionBasisPoints);
+                }
                 plannedWeight = checked(
                     plannedWeight + take * batch.UnitWeight);
             }
@@ -357,7 +368,7 @@ namespace Mandate.Simulation
                 0,
                 0,
                 0,
-                $"Delivered {plannedQuantity} reserved food units through the formal county market.");
+                $"Delivered {plannedQuantity} reserved product units through the formal county market.");
             transaction.SourceFormalMarketOrderId = formalMarketOrderId;
             transaction.SourceCountyGovernanceId = countyGovernanceId;
             for (var i = 0; i < plan.Count; i++)
@@ -1142,6 +1153,117 @@ namespace Mandate.Simulation
             return result;
         }
 
+        public FoodConsumptionResult ConsumeHouseholdReliefFood(
+            WorldState world,
+            string familyId,
+            string storageFacilityId,
+            string actorPersonId,
+            string recipientPersonId,
+            long requiredNutritionBasisUnits,
+            ICollection<string> sourcePickupTransactionIds,
+            string sourceHouseholdReliefConsumptionId)
+        {
+            if (requiredNutritionBasisUnits <= 0 ||
+                sourcePickupTransactionIds == null ||
+                sourcePickupTransactionIds.Count == 0 ||
+                string.IsNullOrEmpty(sourceHouseholdReliefConsumptionId))
+            {
+                throw new InvalidOperationException(
+                    "Household relief consumption requires a positive, traced claim.");
+            }
+
+            var storage = ValidateFamilyGranary(
+                world, familyId, storageFacilityId, actorPersonId, true);
+            var family = ProductInventorySystem.FindFamily(world, familyId);
+            if (!string.IsNullOrEmpty(recipientPersonId) &&
+                !family.MemberIds.Contains(recipientPersonId))
+            {
+                throw new InvalidOperationException(
+                    "Household relief recipient must belong to the receiving family.");
+            }
+            var allowedSources = new HashSet<string>(
+                sourcePickupTransactionIds, StringComparer.Ordinal);
+            var candidates = new List<ProductBatchState>();
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch.OwnerFamilyId == familyId &&
+                    batch.StorageFacilityId == storageFacilityId &&
+                    batch.Quantity > batch.ReservedQuantity &&
+                    allowedSources.Contains(batch.SourceTransactionId) &&
+                    _content.TryGetFood(batch.ProductDefinitionId, out _))
+                {
+                    candidates.Add(batch);
+                }
+            }
+
+            candidates.Sort(CompareForConsumption);
+            var result = new FoodConsumptionResult
+            {
+                RequiredNutritionBasisUnits = requiredNutritionBasisUnits,
+                InventoryTransactionId = string.Empty
+            };
+            if (candidates.Count == 0)
+            {
+                return result;
+            }
+
+            var transaction = ProductInventorySystem.NewTransaction(
+                world,
+                InventoryTransactionType.FoodConsumed,
+                actorPersonId,
+                string.Empty,
+                0,
+                0,
+                0,
+                $"Consumed household relief food for {sourceHouseholdReliefConsumptionId}.");
+            transaction.SourceHouseholdReliefConsumptionId =
+                sourceHouseholdReliefConsumptionId;
+            transaction.HouseholdReliefRecipientPersonId = recipientPersonId;
+            long removedWeight = 0;
+            for (var i = 0;
+                 i < candidates.Count && !result.Fulfilled;
+                 i++)
+            {
+                var batch = candidates[i];
+                var food = _content.GetFood(batch.ProductDefinitionId);
+                var remaining = checked(
+                    requiredNutritionBasisUnits -
+                    result.ProvidedNutritionBasisUnits);
+                var available = batch.Quantity - batch.ReservedQuantity;
+                var take = Math.Min(
+                    available,
+                    DivideRoundUp(remaining, food.NutritionBasisPoints));
+                if (take <= 0)
+                {
+                    continue;
+                }
+
+                batch.Quantity = checked(batch.Quantity - take);
+                result.ConsumedPhysicalQuantity = checked(
+                    result.ConsumedPhysicalQuantity + take);
+                result.ProvidedNutritionBasisUnits = checked(
+                    result.ProvidedNutritionBasisUnits +
+                    take * food.NutritionBasisPoints);
+                removedWeight = checked(
+                    removedWeight + take * batch.UnitWeight);
+                transaction.Lines.Add(
+                    ProductInventorySystem.Line(batch, -take, 0));
+            }
+
+            if (transaction.Lines.Count == 0)
+            {
+                return result;
+            }
+
+            storage.InventoryUnits = checked(
+                storage.InventoryUnits - removedWeight);
+            transaction.FacilityInventoryDelta = -removedWeight;
+            world.InventoryTransactions.Add(transaction);
+            result.InventoryTransactionId = transaction.Id;
+            return result;
+        }
+
         private VillageFacilityState ValidateFamilyGranary(
             WorldState world,
             string familyId,
@@ -1449,7 +1571,9 @@ namespace Mandate.Simulation
                 QualityBasisPoints = source.QualityBasisPoints,
                 FreshnessBasisPoints = source.FreshnessBasisPoints,
                 SeedVigorBasisPoints = source.SeedVigorBasisPoints,
-                SeedPurityBasisPoints = source.SeedPurityBasisPoints
+                SeedPurityBasisPoints = source.SeedPurityBasisPoints,
+                NextFoodStorageAssessmentDay = checked(
+                    world.AbsoluteDay + 30)
             };
             for (var i = 0; i < source.QualityDimensions.Count; i++)
             {

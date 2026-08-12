@@ -368,6 +368,20 @@ namespace Mandate.Domain
             return _foods.TryGetValue(productDefinitionId, out definition);
         }
 
+        private void RequireMarketProduct(
+            string productDefinitionId,
+            string ownerKind,
+            string ownerId)
+        {
+            var product = GetProduct(productDefinitionId);
+            if (!product.CategoryTags.Contains("product.market"))
+            {
+                throw new ProductionContentException(
+                    $"{ownerKind} {ownerId} references non-market product " +
+                    $"{productDefinitionId}.");
+            }
+        }
+
         public IReadOnlyList<FoodDefinition> GetFoodsInStableOrder()
         {
             var result = new List<FoodDefinition>(_foods.Values);
@@ -477,6 +491,21 @@ namespace Mandate.Domain
             }
 
             ValidateManifest(world.ProductionContentManifest);
+            for (var i = 0; i < world.Commodities.Count; i++)
+            {
+                var commodity = world.Commodities[i];
+                if (string.IsNullOrEmpty(commodity.ProductDefinitionId))
+                {
+                    continue;
+                }
+                var product = GetProduct(commodity.ProductDefinitionId);
+                if (product.BaseWeight != commodity.UnitWeight)
+                {
+                    throw new ProductionContentException(
+                        $"Commodity {commodity.Id} disagrees with product " +
+                        $"{product.Id} about unit weight.");
+                }
+            }
             var agricultureOrdersById =
                 new Dictionary<string, AgricultureWorkOrderState>(
                     StringComparer.Ordinal);
@@ -624,22 +653,22 @@ namespace Mandate.Domain
             for (var i = 0; i < world.FormalMarketOrders.Count; i++)
             {
                 var order = world.FormalMarketOrders[i];
-                GetProduct(order.ProductDefinitionId);
-                GetFood(order.ProductDefinitionId);
+                RequireMarketProduct(
+                    order.ProductDefinitionId, "market order", order.Id);
             }
 
             for (var i = 0; i < world.FormalMarketTrades.Count; i++)
             {
                 var trade = world.FormalMarketTrades[i];
-                GetProduct(trade.ProductDefinitionId);
-                GetFood(trade.ProductDefinitionId);
+                RequireMarketProduct(
+                    trade.ProductDefinitionId, "market trade", trade.Id);
             }
 
             for (var i = 0; i < world.FormalMarketPrices.Count; i++)
             {
                 var price = world.FormalMarketPrices[i];
-                GetProduct(price.ProductDefinitionId);
-                GetFood(price.ProductDefinitionId);
+                RequireMarketProduct(
+                    price.ProductDefinitionId, "market price", price.Id);
             }
 
             for (var i = 0; i < world.CivilianFreights.Count; i++)
@@ -1310,6 +1339,11 @@ namespace Mandate.Domain
         public const string WheatFlourProductId = "product.wheat_flour";
         public const string WheatBranProductId = "product.wheat_bran";
         public const string DryRationProductId = "product.dry_ration";
+        public const string PlainClothProductId = "product.textile.plain_cloth";
+        public const string RawMedicinalPlantProductId =
+            "product.raw.medicinal_plants";
+        public const string HerbalMedicineMaterialProductId =
+            "product.medicine.herbal_material";
         public const string IronMaterialProductId = "product.material.iron";
         public const string TimberMaterialProductId = "product.material.timber";
         public const string LeatherMaterialProductId = "product.material.leather";
@@ -1348,6 +1382,8 @@ namespace Mandate.Domain
             "recipe.processing.hand_mill_wheat";
         public const string MakeDryRationRecipeId =
             "recipe.processing.make_dry_ration";
+        public const string DryMedicinalPlantsRecipeId =
+            "recipe.primary_processing.dry_sort_medicinal_plants";
         public const string ForgeRingSwordRecipeId =
             "recipe.manufacturing.forge_ring_sword";
         public const string MakeWoodenShieldRecipeId =
@@ -1378,6 +1414,8 @@ namespace Mandate.Domain
             "method.processing.hand_milling";
         public const string DryRationMethodId =
             "method.processing.dry_ration";
+        public const string HerbalDryingMethodId =
+            "method.primary_processing.herbal_drying_sorting";
         public const string BlacksmithingMethodId =
             "method.manufacturing.blacksmithing";
         public const string WoodworkingMethodId =
@@ -1418,6 +1456,10 @@ namespace Mandate.Domain
             "facility.resource_extraction.pasture_forage";
         public const string BarkHarvestingFacilityTag =
             "facility.resource_extraction.bark_harvesting";
+        public const string HerbGatheringFacilityTag =
+            "facility.resource_extraction.herb_gathering";
+        public const string HerbDryingFacilityTag =
+            "facility.primary_processing.herb_drying";
         public const string PastureFacilityTag = "facility.livestock.pasture";
         public const string SlaughterYardFacilityTag =
             "facility.livestock.slaughter_yard";
@@ -1434,7 +1476,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "8.0.0",
+                Version = "11.0.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1564,6 +1606,33 @@ namespace Mandate.Domain
                     "product.military_supply"
                 }
             });
+            AddOpenProduct(
+                package,
+                PlainClothProductId,
+                "素布",
+                2,
+                0,
+                "product.textile",
+                "product.market",
+                "product.household_good");
+            AddOpenProduct(
+                package,
+                RawMedicinalPlantProductId,
+                "野生药草",
+                1,
+                2_000,
+                "product.raw",
+                "product.medicine_input",
+                "product.market");
+            AddOpenProduct(
+                package,
+                HerbalMedicineMaterialProductId,
+                "草药材",
+                1,
+                1_200,
+                "product.medicine",
+                "product.medical_input",
+                "product.market");
             AddMaterialProduct(package, IronMaterialProductId, "铁料");
             AddMaterialProduct(package, TimberMaterialProductId, "木料");
             AddMaterialProduct(package, LeatherMaterialProductId, "皮革");
@@ -1699,6 +1768,24 @@ namespace Mandate.Domain
                         ProductDefinitionId = DryRationProductId,
                         QuantityPerLandUnit = 8
                     }
+                }
+            });
+            package.Recipes.Add(new RecipeDefinition
+            {
+                Id = DryMedicinalPlantsRecipeId,
+                DisplayName = "晾晒拣选药草",
+                DurationDays = 2,
+                FacilityTags = new List<string>
+                {
+                    HerbDryingFacilityTag
+                },
+                Inputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(RawMedicinalPlantProductId, 1)
+                },
+                Outputs = new List<ProductionQuantityDefinition>
+                {
+                    Quantity(HerbalMedicineMaterialProductId, 1)
                 }
             });
             AddManufacturingRecipe(
@@ -1877,6 +1964,11 @@ namespace Mandate.Domain
                 HistoricalStatus = "historical_inference"
             });
             AddManufacturingMethod(
+                package,
+                HerbalDryingMethodId,
+                "药草晾晒与拣选",
+                DryMedicinalPlantsRecipeId);
+            AddManufacturingMethod(
                 package, BlacksmithingMethodId, "锻打",
                 ForgeRingSwordRecipeId, ForgeLongSpearRecipeId);
             AddManufacturingMethod(
@@ -1949,6 +2041,11 @@ namespace Mandate.Domain
                 CoreSkillIds.Tanning,
                 "鞣革工艺",
                 "field.production.tanning");
+            AddProductionSkill(
+                package,
+                CoreSkillIds.HerbalProcessing,
+                "药草加工",
+                "field.production.herbal_processing");
             package.Knowledge.Add(new KnowledgeDefinition
             {
                 Id = CoreKnowledgeIds.SeasonalObservation,
@@ -2341,6 +2438,13 @@ namespace Mandate.Domain
                     difficulty = 8_000;
                     modifiers = QualityModifiers(
                         HygieneQualityDimensionId, 200,
+                        IntegrityQualityDimensionId, 100);
+                    break;
+                case HerbalDryingMethodId:
+                    skillId = CoreSkillIds.HerbalProcessing;
+                    difficulty = 8_000;
+                    modifiers = QualityModifiers(
+                        PurityQualityDimensionId, 200,
                         IntegrityQualityDimensionId, 100);
                     break;
                 default:

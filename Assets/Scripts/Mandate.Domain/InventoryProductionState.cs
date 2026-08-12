@@ -36,7 +36,19 @@ namespace Mandate.Domain
         CivilianFreightDispatched,
         CivilianFreightNaturalLoss,
         CivilianFreightDelivered,
-        FoodPublicReliefProcurementTransferred
+        FoodPublicReliefProcurementTransferred,
+        FoodStorageNaturalLoss,
+        MedicalTreatmentConsumed,
+        MilitaryMedicalTreatmentConsumed,
+        MilitaryLogisticsDelivered,
+        MilitaryRearMedicalTreatmentConsumed,
+        MilitaryFieldHospitalConstructionConsumed,
+        MilitaryFieldHospitalMaintenanceConsumed,
+        MilitaryMedicalTransferMedicineReserved,
+        MilitaryMedicalTransferMedicineReleased,
+        MerchantMarketPurchased,
+        MerchantCargoDamaged,
+        MerchantMarketSold
     }
 
     [Serializable]
@@ -49,6 +61,9 @@ namespace Mandate.Domain
         public string CarrierPersonId;
         public string LocationId;
         public long CapacityWeight;
+        public string FoodStorageEnvironmentId =
+            "storage.environment.generic_sheltered";
+        public int FoodStorageProtectionBasisPoints = 2_000;
     }
 
     [Serializable]
@@ -94,6 +109,7 @@ namespace Mandate.Domain
         public int FreshnessBasisPoints = 10_000;
         public int SeedVigorBasisPoints;
         public int SeedPurityBasisPoints;
+        public long NextFoodStorageAssessmentDay = 30;
         public List<ProductQualityDimensionState> QualityDimensions =
             new List<ProductQualityDimensionState>();
     }
@@ -128,6 +144,15 @@ namespace Mandate.Domain
         public string SourceCountyGovernanceId;
         public string SourceFormalMarketOrderId;
         public string SourceCivilianFreightId;
+        public string SourceFoodStorageLossId;
+        public string SourceHouseholdReliefConsumptionId;
+        public string SourceCivilianMedicalTreatmentId;
+        public string SourceMilitaryMedicalServiceId;
+        public string SourceMilitaryRearMedicalTreatmentId;
+        public string SourceMilitaryMedicalTransferId;
+        public string SourceMilitaryFieldHospitalConstructionProjectId;
+        public string SourceMilitaryFieldHospitalMaintenanceId;
+        public string HouseholdReliefRecipientPersonId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;
         public long LegacyVillagePublicGranaryDelta;
@@ -136,6 +161,29 @@ namespace Mandate.Domain
         public string Summary;
         public List<InventoryTransactionLineState> Lines =
             new List<InventoryTransactionLineState>();
+    }
+
+    [Serializable]
+    public sealed class FoodStorageLossState
+    {
+        public string Id;
+        public long Day;
+        public string BatchId;
+        public string ProductDefinitionId;
+        public string StorageFacilityId;
+        public string InventoryContainerId;
+        public string StorageEnvironmentId;
+        public int StorageProtectionBasisPoints;
+        public int FoodSpoilageSensitivityBasisPoints;
+        public int EffectiveLossBasisPoints;
+        public long QuantityBefore;
+        public long ReservedQuantity;
+        public long QuantityLost;
+        public long QuantityAfter;
+        public int FreshnessBeforeBasisPoints;
+        public int FreshnessAfterBasisPoints;
+        public string InventoryTransactionId;
+        public string Summary;
     }
 
     [Serializable]
@@ -310,8 +358,10 @@ namespace Mandate.Domain
         public string Id;
         public string ResourceBodyId;
         public string OwnerOrganizationId;
+        public string OwnerFamilyId;
         public string ProductionSiteId;
         public string InventoryContainerId;
+        public string StorageFacilityId;
         public string ManagerPersonId;
         public List<string> WorkerPersonIds = new List<string>();
         public ProductionControlMode ControlMode;

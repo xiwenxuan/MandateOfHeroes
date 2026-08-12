@@ -1,0 +1,152 @@
+{
+    "schema":  "mandate.luoyang-184-metropolitan-initialization.v1",
+    "format_version":  1,
+    "scenario_id":  "scenario.han.184.yellow_turban",
+    "scenario_year":  184,
+    "world_id":  "HanWorldV1",
+    "city_id":  "location.capital.luoyang",
+    "data_origin":  "HistoricalReconstruction",
+    "population_profile_id":  "population_profile.luoyang.184.metropolitan_recommended",
+    "base_package_relative_path":  "../Luoyang184UrbanInitializationV1",
+    "base_person_count":  270000,
+    "added_person_count":  130000,
+    "person_count":  400000,
+    "base_household_count":  53992,
+    "added_household_count":  26907,
+    "household_count":  80899,
+    "base_facility_count":  1230,
+    "added_facility_count":  854,
+    "facility_count":  2084,
+    "person_record_size":  80,
+    "household_record_size":  32,
+    "walled_city_population":  200000,
+    "urban_area_population":  270000,
+    "metropolitan_population":  400000,
+    "supply_region_plan_population":  700000,
+    "historical_person_count":  25,
+    "base_package_files":  [
+                               {
+                                   "path":  "audit_summary.json",
+                                   "bytes":  3324,
+                                   "sha256":  "c040a00869dc78bee721e77eb05dc0dfabb9fa8154ce8e3ad17fa6b056f94116"
+                               },
+                               {
+                                   "path":  "catalogs.json",
+                                   "bytes":  71301,
+                                   "sha256":  "69493f623e0a32ca9a48cc5da0e5bae902f842b789a340abfb628f9377754d00"
+                               },
+                               {
+                                   "path":  "external_historical_anchors.json",
+                                   "bytes":  2884,
+                                   "sha256":  "b00a4b6ad3e0a5a84adbd5659e40667588335651e63edc89e998ca545fe2f33e"
+                               },
+                               {
+                                   "path":  "facilities.json",
+                                   "bytes":  4328928,
+                                   "sha256":  "8e98b126cad345ef200fc3f65bd677229cc4f487e71de964e100815941a469f0"
+                               },
+                               {
+                                   "path":  "family_organizations.json",
+                                   "bytes":  6320,
+                                   "sha256":  "79f852ea9bfc6501f27a1fb38f763eda2bc9af59c7b4d1cb94b4c49c829cede4"
+                               },
+                               {
+                                   "path":  "forces.json",
+                                   "bytes":  3782,
+                                   "sha256":  "f8c157d434c8c92290123a1c4ee4c39c0d06f0db61ceb4e88325c42726d1f1cd"
+                               },
+                               {
+                                   "path":  "historical_persons.json",
+                                   "bytes":  9443,
+                                   "sha256":  "2a81cc3daedfd62d33bf24cad76750ac429b6689eff3587c13057c71a81d1e86"
+                               },
+                               {
+                                   "path":  "households.bin",
+                                   "bytes":  1727776,
+                                   "sha256":  "aae4c75d9dfbc7fa7ab0d7b454d625fd4fe3c9252fb17238c65db846a281730c"
+                               },
+                               {
+                                   "path":  "manifest.json",
+                                   "bytes":  5070,
+                                   "sha256":  "7eb834bc6e4563c01b0e7b6626bf2b7fcf6dfc7cefc91c2dde27373af7170f46"
+                               },
+                               {
+                                   "path":  "persons.bin",
+                                   "bytes":  21600032,
+                                   "sha256":  "a2f1ebeb359f2e23dfa7fec2d4d155acd642804a16117ce4091a5cef6ebbe7c3"
+                               },
+                               {
+                                   "path":  "scenario_events.json",
+                                   "bytes":  4385,
+                                   "sha256":  "72074dcaa656514bd7db97ebb22b2ba823e613c3c8516779ba1047e2005ec34f"
+                               }
+                           ],
+    "files":  [
+                  {
+                      "path":  "agriculture_supply.json",
+                      "bytes":  522389,
+                      "sha256":  "1ab605099c3da2560367dc0eae7d9e4b1cd487bd2e185d676f38466a0f6bd7ca"
+                  },
+                  {
+                      "path":  "audit_summary.json",
+                      "bytes":  1741,
+                      "sha256":  "caca7d7f83940f3b340ce1934fabab8b367a7f8af086f89a6b57419affee83a8"
+                  },
+                  {
+                      "path":  "catalogs.json",
+                      "bytes":  120566,
+                      "sha256":  "a92cf93f8b05f5967555f24fd5924163eca63a2588f9535737f5c448c83f3dc6"
+                  },
+                  {
+                      "path":  "commute_migration.json",
+                      "bytes":  541,
+                      "sha256":  "bbf56f5e895c88d154042751241f67fcff0a4fb53219969faa8b40d23648b53e"
+                  },
+                  {
+                      "path":  "event_impacts.json",
+                      "bytes":  868,
+                      "sha256":  "debdae81d356cbdb677bac41695645417b09cb5ce3476fc415e3a5b549cb49a1"
+                  },
+                  {
+                      "path":  "facilities.json",
+                      "bytes":  936288,
+                      "sha256":  "c11ce33a29b585a52a969789a8bb5541be8fc46d726b4508db657ce35b8e347d"
+                  },
+                  {
+                      "path":  "family_organizations.json",
+                      "bytes":  24160,
+                      "sha256":  "af1135217037cbac8c3598fc3b7a1652e000a8669e218976a5be69e83dd0dc0d"
+                  },
+                  {
+                      "path":  "force_routes.json",
+                      "bytes":  1467,
+                      "sha256":  "72ce7f9192356f89076ef8f9f1d5719697ac46de5cfd7c8df601eefed7c72583"
+                  },
+                  {
+                      "path":  "historical_candidate_audit.json",
+                      "bytes":  440,
+                      "sha256":  "2d0b8c331123c5c75518deb39d23f871c7d2b35c8c7c52520b6957a73e00fbbf"
+                  },
+                  {
+                      "path":  "outer_households.bin",
+                      "bytes":  861056,
+                      "sha256":  "7c54a0d413bf2b3b8a703abaa5270e975c9ff06bafd67ec39b252f2cb31cc29e"
+                  },
+                  {
+                      "path":  "outer_persons.bin",
+                      "bytes":  10400032,
+                      "sha256":  "77c4ca3f863541cf3a25c6cefdd9e51158b6409e5612d4fc3e5e90f12e688ab9"
+                  },
+                  {
+                      "path":  "roads_logistics.json",
+                      "bytes":  31773,
+                      "sha256":  "d6d3c1a6ca52c108c70d0d3db27a521723cb75f0da4f9f5696305210fcdb2f61"
+                  },
+                  {
+                      "path":  "spatial_plan.json",
+                      "bytes":  16319,
+                      "sha256":  "ec8aa7fd955631262d0266c6bc574f4fd73690110ab4cbf3814073e4bd7b6999"
+                  }
+              ],
+    "generated_at_is_metadata_only":  true
+}

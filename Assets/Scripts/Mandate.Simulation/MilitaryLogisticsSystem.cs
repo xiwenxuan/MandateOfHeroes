@@ -34,6 +34,9 @@ namespace Mandate.Simulation
             MilitaryLogisticsLiabilityPolicyIds.LossBearerCompensates;
         public string CargoConsumptionPolicyId =
             MilitaryCargoConsumptionPolicyIds.Prohibited;
+        public string DeliveryPolicyId =
+            MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions;
+        public string TargetInventoryContainerId = string.Empty;
         public int CargoQuantity;
         public int ConvoyProvisionQuantity;
         public int DailyConvoyProvisionUse = 1;
@@ -73,6 +76,114 @@ namespace Mandate.Simulation
 
         public bool IsBalanced =>
             CargoBalanced && ConvoyProvisionsBalanced && MoneyBalanced;
+    }
+
+    public sealed class MilitaryMedicalResupplyRequest
+    {
+        public StableId IssuerPersonId;
+        public StableId CarrierPersonId;
+        public StableId TargetArmyId;
+        public StableId SourceMedicineBatchId;
+        public string SourceProvisionBatchId = string.Empty;
+        public StableId RouteId;
+        public StableId DestinationLocationId;
+        public string AcquisitionMethodId;
+        public string CarrierOrganizationId;
+        public string LossBearerOrganizationId;
+        public int MedicineQuantity;
+        public int ConvoyProvisionQuantity;
+        public int DailyConvoyProvisionUse = 1;
+        public long UnitPrice;
+        public bool AutoDeliverAtFinal = true;
+    }
+
+    public sealed class MilitaryMedicalResupplySystem
+    {
+        private readonly MilitaryLogisticsSystem _logistics;
+
+        public MilitaryMedicalResupplySystem(
+            ProductionContentRegistry content = null,
+            IPersonRepository people = null)
+        {
+            _logistics = new MilitaryLogisticsSystem(content, people);
+        }
+
+        public MilitaryLogisticsOrderState Dispatch(
+            WorldState world,
+            MilitaryMedicalResupplyRequest request)
+        {
+            if (world == null)
+                throw new ArgumentNullException(nameof(world));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var army = FindArmy(world, request.TargetArmyId.Value);
+            if (!world.MilitaryMedicalInitialized ||
+                string.IsNullOrEmpty(army.MedicalInventoryContainerId))
+            {
+                throw new InvalidOperationException(
+                    "The target army has no formal medical inventory contract.");
+            }
+
+            var medicine = FindBatch(
+                world, request.SourceMedicineBatchId.Value);
+            if (medicine.ProductDefinitionId !=
+                CoreProductionContent.HerbalMedicineMaterialProductId)
+            {
+                throw new InvalidOperationException(
+                    "The first formal medical resupply route accepts herbal medicine only.");
+            }
+
+            return _logistics.Dispatch(
+                world,
+                new MilitaryLogisticsDispatchRequest
+                {
+                    IssuerPersonId = request.IssuerPersonId,
+                    CarrierPersonId = request.CarrierPersonId,
+                    TargetArmyId = request.TargetArmyId,
+                    SourceCargoBatchId = request.SourceMedicineBatchId,
+                    SourceProvisionBatchId =
+                        request.SourceProvisionBatchId,
+                    RouteId = request.RouteId,
+                    DestinationLocationId =
+                        request.DestinationLocationId,
+                    AcquisitionMethodId = request.AcquisitionMethodId,
+                    CarrierOrganizationId =
+                        request.CarrierOrganizationId,
+                    LossBearerOrganizationId =
+                        request.LossBearerOrganizationId,
+                    CargoQuantity = request.MedicineQuantity,
+                    ConvoyProvisionQuantity =
+                        request.ConvoyProvisionQuantity,
+                    DailyConvoyProvisionUse =
+                        request.DailyConvoyProvisionUse,
+                    UnitPrice = request.UnitPrice,
+                    AutoDeliverAtFinal = request.AutoDeliverAtFinal,
+                    DeliveryPolicyId = MilitaryLogisticsDeliveryPolicyIds
+                        .ArmyInventoryContainer,
+                    TargetInventoryContainerId =
+                        army.MedicalInventoryContainerId
+                });
+        }
+
+        private static ArmyState FindArmy(WorldState world, string id)
+        {
+            for (var i = 0; i < world.Armies.Count; i++)
+                if (world.Armies[i].Id == id)
+                    return world.Armies[i];
+            throw new InvalidOperationException($"Missing army {id}.");
+        }
+
+        private static ProductBatchState FindBatch(
+            WorldState world,
+            string id)
+        {
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+                if (world.ProductBatches[i].Id == id)
+                    return world.ProductBatches[i];
+            throw new InvalidOperationException(
+                $"Missing medicine batch {id}.");
+        }
     }
 
     public sealed class MilitaryLogisticsSystem
@@ -121,6 +232,7 @@ namespace Mandate.Simulation
             _ = new StableId(request.LossBearerOrganizationId);
             _ = new StableId(request.LiabilityPolicyId);
             _ = new StableId(request.CargoConsumptionPolicyId);
+            _ = new StableId(request.DeliveryPolicyId);
             ValidateRiskContract(
                 world, request.RiskPolicyId, request.ThreatOrganizationId);
 
@@ -168,13 +280,8 @@ namespace Mandate.Simulation
 
             var cargoProduct = _content.GetProduct(
                 cargoBatch.ProductDefinitionId);
-            if (!cargoProduct.CategoryTags.Contains("product.food") ||
-                !cargoProduct.CategoryTags.Contains(
-                    "product.military_supply"))
-            {
-                throw new InvalidOperationException(
-                    "This logistics slice only accepts food tagged for military supply.");
-            }
+            ValidateDeliveryContract(
+                world, request, army, cargoProduct);
 
             ProductBatchState provisionBatch = null;
             ProductDefinition provisionProduct = null;
@@ -387,7 +494,10 @@ namespace Mandate.Simulation
                 UnitPrice = request.UnitPrice,
                 TotalPaid = totalPaid,
                 OriginPublicOrderDelta = appliedPublicOrderDelta,
-                Status = MilitaryLogisticsStatus.InTransit
+                Status = MilitaryLogisticsStatus.InTransit,
+                DeliveryPolicyId = request.DeliveryPolicyId,
+                TargetInventoryContainerId =
+                    request.TargetInventoryContainerId
             };
 
             cargoBatch.Quantity = checked(
@@ -552,7 +662,16 @@ namespace Mandate.Simulation
                 }
                 if (order.AutoDeliverAtFinal)
                 {
-                    Deliver(world, order, army, order.RemainingCargoQuantity);
+                    var receivable = MaximumReceivableQuantity(
+                        world, order);
+                    if (receivable > 0)
+                    {
+                        Deliver(
+                            world,
+                            order,
+                            army,
+                            Math.Min(order.RemainingCargoQuantity, receivable));
+                    }
                 }
                 changed = true;
             }
@@ -800,7 +919,13 @@ namespace Mandate.Simulation
             }
 
             var delivered = Math.Min(
-                requestedQuantity, order.RemainingCargoQuantity);
+                Math.Min(requestedQuantity, order.RemainingCargoQuantity),
+                MaximumReceivableQuantity(world, order));
+            if (delivered <= 0)
+            {
+                throw new InvalidOperationException(
+                    "The final receiving inventory has no available capacity.");
+            }
             Deliver(world, order, army, delivered);
             world.Validate();
             return delivered;
@@ -1349,8 +1474,11 @@ namespace Mandate.Simulation
                 throw new ArgumentOutOfRangeException(nameof(delivered));
             }
 
-            var provisionsAdded = checked(
-                delivered * MilitarySupplySystem.ProvisionsPerGrainUnit);
+            var provisionsAdded = order.DeliveryPolicyId ==
+                MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions
+                ? checked(delivered *
+                    MilitarySupplySystem.ProvisionsPerGrainUnit)
+                : 0;
             order.RemainingCargoQuantity = checked(
                 order.RemainingCargoQuantity - delivered);
             order.DeliveredCargoQuantity = checked(
@@ -1372,6 +1500,11 @@ namespace Mandate.Simulation
                 }
             }
             army.Provisions = checked(army.Provisions + provisionsAdded);
+            if (order.DeliveryPolicyId ==
+                MilitaryLogisticsDeliveryPolicyIds.ArmyInventoryContainer)
+            {
+                AddInventoryReceipt(world, order, delivered);
+            }
             world.MilitaryLogisticsLedgerEntries.Add(
                 new MilitaryLogisticsLedgerEntryState
                 {
@@ -1404,6 +1537,125 @@ namespace Mandate.Simulation
                     TotalPaid = checked(order.UnitPrice * delivered),
                     Summary = "Audited logistics freight delivered to the army."
                 });
+            }
+        }
+
+        private static void AddInventoryReceipt(
+            WorldState world,
+            MilitaryLogisticsOrderState order,
+            int delivered)
+        {
+            var receiptIndex = 0;
+            for (var i = 0; i < world.InventoryTransactions.Count; i++)
+            {
+                if (world.InventoryTransactions[i].Type ==
+                        InventoryTransactionType.MilitaryLogisticsDelivered &&
+                    world.InventoryTransactions[i]
+                        .SourceMilitaryLogisticsOrderId == order.Id)
+                {
+                    receiptIndex++;
+                }
+            }
+
+            var transactionId = $"inventory_transaction.{order.Id}.delivery." +
+                receiptIndex;
+            var batch = new ProductBatchState
+            {
+                Id = $"product_batch.{order.Id}.delivery.{receiptIndex}",
+                ProductDefinitionId = order.CargoProductDefinitionId,
+                OwnerOrganizationId = order.BuyerOrganizationId,
+                InventoryContainerId = order.TargetInventoryContainerId,
+                OriginLocationId = order.OriginLocationId,
+                SourceTransactionId = transactionId,
+                UnitId = FindBatch(world, order.SourceCargoBatchId).UnitId,
+                UnitWeight = order.CargoUnitWeightAtDispatch,
+                ProducedDay = order.CreatedDay,
+                Quantity = delivered,
+                QualityBasisPoints = order.CargoQualityBasisPointsAtDispatch,
+                FreshnessBasisPoints = order.CargoFreshnessBasisPointsAtDispatch,
+                QualityDimensions = CopyQuality(
+                    order.CargoQualityDimensionsAtDispatch)
+            };
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(new InventoryTransactionState
+            {
+                Id = transactionId,
+                Day = world.AbsoluteDay,
+                Type = InventoryTransactionType.MilitaryLogisticsDelivered,
+                ActorPersonId = order.CarrierPersonId,
+                SourceMilitaryLogisticsOrderId = order.Id,
+                Summary =
+                    "Actual freight received into the target army inventory container.",
+                Lines = new List<InventoryTransactionLineState>
+                {
+                    Line(batch, delivered)
+                }
+            });
+        }
+
+        private static int MaximumReceivableQuantity(
+            WorldState world,
+            MilitaryLogisticsOrderState order)
+        {
+            if (order.DeliveryPolicyId ==
+                MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions)
+            {
+                return order.RemainingCargoQuantity;
+            }
+
+            var target = FindContainer(
+                world, order.TargetInventoryContainerId);
+            var used = CalculateTransportLoad(world, target.Id);
+            var availableWeight = target.CapacityWeight - used;
+            if (availableWeight <= 0)
+            {
+                return 0;
+            }
+
+            return (int)Math.Min(
+                order.RemainingCargoQuantity,
+                availableWeight / order.CargoUnitWeightAtDispatch);
+        }
+
+        private static void ValidateDeliveryContract(
+            WorldState world,
+            MilitaryLogisticsDispatchRequest request,
+            ArmyState army,
+            ProductDefinition cargoProduct)
+        {
+            if (request.DeliveryPolicyId ==
+                MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions)
+            {
+                if (!string.IsNullOrEmpty(
+                        request.TargetInventoryContainerId) ||
+                    !cargoProduct.CategoryTags.Contains("product.food") ||
+                    !cargoProduct.CategoryTags.Contains(
+                        "product.military_supply"))
+                {
+                    throw new InvalidOperationException(
+                        "Army provisions require military-supply food and no target inventory container.");
+                }
+
+                return;
+            }
+
+            if (request.DeliveryPolicyId !=
+                    MilitaryLogisticsDeliveryPolicyIds
+                        .ArmyInventoryContainer ||
+                string.IsNullOrEmpty(request.TargetInventoryContainerId))
+            {
+                throw new InvalidOperationException(
+                    "The military logistics delivery policy is unsupported.");
+            }
+
+            var target = FindContainer(
+                world, request.TargetInventoryContainerId);
+            if (target.OwnerOrganizationId != army.OrganizationId ||
+                target.Id != army.MedicalInventoryContainerId ||
+                !cargoProduct.CategoryTags.Contains("product.medicine"))
+            {
+                throw new InvalidOperationException(
+                    "Army inventory delivery requires medicine addressed to the target army medical store.");
             }
         }
 

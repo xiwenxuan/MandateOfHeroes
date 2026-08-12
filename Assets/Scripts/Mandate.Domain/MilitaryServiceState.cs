@@ -21,7 +21,8 @@ namespace Mandate.Domain
         Deserter,
         Captured,
         Retired,
-        Dead
+        Dead,
+        MedicalEvacuationDuty
     }
 
     public enum MilitaryFormationKind : byte

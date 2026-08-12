@@ -5,7 +5,8 @@ namespace Mandate.Domain
     public enum TaskKind : byte
     {
         LocalWork,
-        TravelDelivery
+        TravelDelivery,
+        GuidedObjective
     }
 
     public enum TaskStatus : byte

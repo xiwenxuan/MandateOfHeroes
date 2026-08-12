@@ -1,0 +1,2215 @@
+{
+  "type": "FeatureCollection",
+  "name": "strategic_cities",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C001",
+        "display_name": "襄平",
+        "historical_name": "辽东",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.youzhou.liaodong.xiangping",
+        "stable_region_id": "geo.region.northeast.asia.liaodongkoreanorth.liaoheriverplain.xiangpingcounty",
+        "longitude": 123.17,
+        "latitude": 41.27,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "襄平古城址范围后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 2683480,
+        "row": 809,
+        "column": 2454
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          123.17,
+          41.27
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C002",
+        "display_name": "乐浪",
+        "historical_name": "朝鲜县区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.youzhou.lelang.chaoxian",
+        "stable_region_id": "geo.region.northeast.asia.liaodongkoreanorth.koreanorthwestplain.chaoxiancounty",
+        "longitude": 125.75,
+        "latitude": 39.03,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "乐浪及朝鲜县定位争议保留",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3024952,
+        "row": 912,
+        "column": 2584
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          125.75,
+          39.03
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C003",
+        "display_name": "北平",
+        "historical_name": "右北平、土垠",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.youzhou.youbeiping.tuyin",
+        "stable_region_id": "geo.region.north.china.yanshanliaoxi.centralfoothillplain.tuyincounty",
+        "longitude": 118.15,
+        "latitude": 39.83,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "土垠候选区域",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3057768,
+        "row": 922,
+        "column": 2260
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.15,
+          39.83
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C004",
+        "display_name": "蓟",
+        "historical_name": "蓟县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.youzhou.guangyang.ji",
+        "stable_region_id": "geo.region.north.china.hebei.northcentralplain.jicounty",
+        "longitude": 116.4,
+        "latitude": 39.9,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3077578,
+        "row": 928,
+        "column": 2186
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.4,
+          39.9
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C005",
+        "display_name": "晋阳",
+        "historical_name": "晋阳县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.bingzhou.taiyuan.jinyang",
+        "stable_region_id": "geo.region.north.china.fenriverluliang.northcentralbasin.jinyangcounty",
+        "longitude": 112.55,
+        "latitude": 37.87,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "晋阳古城范围后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3504932,
+        "row": 1057,
+        "column": 2034
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.55,
+          37.87
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C006",
+        "display_name": "上党",
+        "historical_name": "壶关区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.bingzhou.shangdang.huguan",
+        "stable_region_id": "geo.region.north.china.taihangshangdang.southwestbasin.huguancounty",
+        "longitude": 113.21,
+        "latitude": 36.11,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "以上党郡治候选县定位",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3826427,
+        "row": 1154,
+        "column": 2071
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.21,
+          36.11
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C007",
+        "display_name": "南皮",
+        "historical_name": "渤海",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jizhou.bohai.nanpi",
+        "stable_region_id": "geo.region.north.china.hebei.eastcoastalplain.nanpicounty",
+        "longitude": 116.71,
+        "latitude": 38.04,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3415632,
+        "row": 1030,
+        "column": 2212
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.71,
+          38.04
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C008",
+        "display_name": "平原",
+        "historical_name": "平原县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.qingzhou.pingyuan.pingyuan",
+        "stable_region_id": "geo.region.east.china.loweryellowjieastplain.northwestplain.pingyuancounty",
+        "longitude": 116.43,
+        "latitude": 37.17,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3584639,
+        "row": 1081,
+        "column": 2205
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.43,
+          37.17
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C009",
+        "display_name": "邺",
+        "historical_name": "邺城",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jizhou.wei.ye",
+        "stable_region_id": "geo.region.north.china.hebei.southwestzhangheplain.yecounty",
+        "longitude": 114.46,
+        "latitude": 36.33,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3770142,
+        "row": 1137,
+        "column": 2124
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.46,
+          36.33
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C010",
+        "display_name": "钜鹿",
+        "historical_name": "钜鹿郡区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jizhou.julu",
+        "stable_region_id": "geo.region.north.china.hebei.southcentralplain",
+        "longitude": null,
+        "latitude": null,
+        "coordinate_status": "unresolved",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": false,
+        "notes": "目录是郡域代理而非唯一县治",
+        "grid_version": "HanWorldV1",
+        "cell_id": null,
+        "row": null,
+        "column": null
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C011",
+        "display_name": "甘陵",
+        "historical_name": "甘陵国区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jizhou.qinghe.ganling",
+        "stable_region_id": "geo.region.north.china.hebei.southeastplain.ganlingcounty",
+        "longitude": 115.7,
+        "latitude": 36.85,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "甘陵候选区域",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3654204,
+        "row": 1102,
+        "column": 2176
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.7,
+          36.85
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C012",
+        "display_name": "中山",
+        "historical_name": "中山国区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jizhou.zhongshan",
+        "stable_region_id": "geo.region.north.china.hebei.centralwestplain",
+        "longitude": 114.99,
+        "latitude": 38.52,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "中山国节点候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3352589,
+        "row": 1011,
+        "column": 2135
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.99,
+          38.52
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C013",
+        "display_name": "城阳",
+        "historical_name": "城阳国区域",
+        "site_type": "strategic_city",
+        "admin_reference": "",
+        "stable_region_id": "",
+        "longitude": 118.84,
+        "latitude": 35.58,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "城阳国治沿革待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3833306,
+        "row": 1156,
+        "column": 2322
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.84,
+          35.58
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C014",
+        "display_name": "北海",
+        "historical_name": "剧县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.qingzhou.beihai.ju",
+        "stable_region_id": "geo.region.east.china.ziweijiaolaiplain.easternplain.county.ju",
+        "longitude": null,
+        "latitude": null,
+        "coordinate_status": "unresolved",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": false,
+        "notes": "北海治所沿革待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": null,
+        "row": null,
+        "column": null
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C015",
+        "display_name": "济南",
+        "historical_name": "东平陵区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.qingzhou.jinan.dongpingling",
+        "stable_region_id": "geo.region.east.china.loweryellowjieastplain.southwestfoothillplain.county.dongpingling",
+        "longitude": 117.53,
+        "latitude": 36.72,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城址",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3647656,
+        "row": 1100,
+        "column": 2256
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.53,
+          36.72
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C016",
+        "display_name": "济北",
+        "historical_name": "卢县区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yanzhou.jibei.lu",
+        "stable_region_id": "geo.region.east.china.taiyifoothill.northwestplain.county.lu",
+        "longitude": 116.73,
+        "latitude": 36.56,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "济北节点候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3690704,
+        "row": 1113,
+        "column": 2222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.73,
+          36.56
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C017",
+        "display_name": "琅琊",
+        "historical_name": "开阳区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.xuzhou.langya.kaiyang",
+        "stable_region_id": "geo.region.east.china.yishuhuaihai.northwestfoothill.county.kaiyang",
+        "longitude": 118.35,
+        "latitude": 35.05,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城址",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3942650,
+        "row": 1189,
+        "column": 2304
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.35,
+          35.05
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C018",
+        "display_name": "濮阳",
+        "historical_name": "濮阳县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yanzhou.dong.puyang",
+        "stable_region_id": "geo.region.central.china.loweryellowjishui.northcentralplain.county.puyang",
+        "longitude": 115.03,
+        "latitude": 35.76,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3866277,
+        "row": 1166,
+        "column": 2153
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.03,
+          35.76
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C019",
+        "display_name": "陈留",
+        "historical_name": "陈留县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yanzhou.chenliu.chenliu",
+        "stable_region_id": "geo.region.central.china.loweryellowjishui.southwestplain.county.chenliu",
+        "longitude": 114.34,
+        "latitude": 34.72,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城址",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4071720,
+        "row": 1228,
+        "column": 2128
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.34,
+          34.72
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C020",
+        "display_name": "小沛",
+        "historical_name": "沛县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yuzhou.pei.pei",
+        "stable_region_id": "geo.region.central.china.suihuainorth.southeastplain.county.pei",
+        "longitude": 116.93,
+        "latitude": 34.73,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4028754,
+        "row": 1215,
+        "column": 2244
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.93,
+          34.73
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C021",
+        "display_name": "下邳",
+        "historical_name": "下邳县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.xuzhou.xiapi.xiapei",
+        "stable_region_id": "geo.region.east.china.sishuiriverplain.southeastplain.county.xiapei",
+        "longitude": 118.02,
+        "latitude": 34.31,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示现代县城等同古城",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4085143,
+        "row": 1232,
+        "column": 2295
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.02,
+          34.31
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C022",
+        "display_name": "广陵",
+        "historical_name": "广陵县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.xuzhou.guangling.yanling",
+        "stable_region_id": "geo.region.east.china.jianghuaieast.centralplain.county.yanling",
+        "longitude": 119.42,
+        "latitude": 32.39,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "治所范围后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4413308,
+        "row": 1331,
+        "column": 2374
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.42,
+          32.39
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C023",
+        "display_name": "陈",
+        "historical_name": "陈县、陈国",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yuzhou.chen.chen",
+        "stable_region_id": "geo.region.central.china.yingruhuai.centralplain.county.chen",
+        "longitude": 114.88,
+        "latitude": 33.73,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4247391,
+        "row": 1281,
+        "column": 2157
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.88,
+          33.73
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C024",
+        "display_name": "谯",
+        "historical_name": "谯县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yuzhou.pei.qiao",
+        "stable_region_id": "geo.region.central.china.suihuainorth.southeastplain.county.qiao",
+        "longitude": 115.78,
+        "latitude": 33.87,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4207663,
+        "row": 1269,
+        "column": 2197
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.78,
+          33.87
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C025",
+        "display_name": "许昌",
+        "historical_name": "许县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yuzhou.yingchuan.xu",
+        "stable_region_id": "geo.region.central.china.yingruhuai.northwestplain.county.xu",
+        "longitude": 113.85,
+        "latitude": 34.04,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "时期城址后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4204261,
+        "row": 1268,
+        "column": 2109
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.85,
+          34.04
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C026",
+        "display_name": "汝南",
+        "historical_name": "平舆",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yuzhou.runan.pingyu",
+        "stable_region_id": "geo.region.central.china.yingruhuai.southplain.county.pingyu",
+        "longitude": 114.64,
+        "latitude": 32.96,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "汝南郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4393201,
+        "row": 1325,
+        "column": 2151
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.64,
+          32.96
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C027",
+        "display_name": "洛阳",
+        "historical_name": "雒阳",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.sili.henan.luoyang",
+        "stable_region_id": "geo.region.central.china.heluo.luoyangbasin.county.luoyang",
+        "longitude": 112.45,
+        "latitude": 34.62,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确宫城位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4114717,
+        "row": 1241,
+        "column": 2043
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.45,
+          34.62
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C028",
+        "display_name": "弘农",
+        "historical_name": "弘农县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.sili.hongnong.hongnong",
+        "stable_region_id": "geo.region.central.china.heluo.westyellowrivercorridor.county.hongnong",
+        "longitude": 110.87,
+        "latitude": 34.52,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4147787,
+        "row": 1251,
+        "column": 1973
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.87,
+          34.52
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C029",
+        "display_name": "河内",
+        "historical_name": "怀县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.sili.henei.huai",
+        "stable_region_id": "geo.region.central.china.heluo.northyellowriverplain.county.huai",
+        "longitude": 113.4,
+        "latitude": 35.1,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "河内郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4012024,
+        "row": 1210,
+        "column": 2084
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.4,
+          35.1
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C030",
+        "display_name": "河东",
+        "historical_name": "安邑",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.sili.hedong.anyi",
+        "stable_region_id": "geo.region.north.china.southfenheyellowriver.centralbasin.county.anyi",
+        "longitude": 111.22,
+        "latitude": 35.14,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城址",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4028496,
+        "row": 1215,
+        "column": 1986
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.22,
+          35.14
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C031",
+        "display_name": "长安",
+        "historical_name": "长安县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.sili.jingzhao.changan",
+        "stable_region_id": "geo.region.northwest.china.guanzhong.centralweiriverplain.county.changan",
+        "longitude": 108.94,
+        "latitude": 34.27,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "汉长安城位置后续细分",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4210666,
+        "row": 1270,
+        "column": 1886
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.94,
+          34.27
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C032",
+        "display_name": "安定",
+        "historical_name": "临泾",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.anding.linjing",
+        "stable_region_id": "geo.region.northwest.china.loessnorthwest.southcentraljinghehills.county.linjing",
+        "longitude": 107.2,
+        "latitude": 35.68,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "安定郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3952094,
+        "row": 1192,
+        "column": 1806
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.2,
+          35.68
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C033",
+        "display_name": "天水",
+        "historical_name": "冀县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.hanyang.ji",
+        "stable_region_id": "geo.region.northwest.china.longyouweishui.southeastweishuibasin.county.ji",
+        "longitude": 105.34,
+        "latitude": 34.75,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4130967,
+        "row": 1246,
+        "column": 1723
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.34,
+          34.75
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C034",
+        "display_name": "金城",
+        "historical_name": "允吾区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.jincheng.yunwu",
+        "stable_region_id": "geo.region.northwest.china.hehuangyellowupper.easternyellowriverbasin.county.yunwu",
+        "longitude": 102.8,
+        "latitude": 36.33,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "金城郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3832595,
+        "row": 1156,
+        "column": 1611
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.8,
+          36.33
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C035",
+        "display_name": "西平",
+        "historical_name": "西都县区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.jincheng",
+        "stable_region_id": "geo.region.northwest.china.hehuangyellowupper.easternyellowriverbasin",
+        "longitude": 101.78,
+        "latitude": 36.62,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "西都县候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3772899,
+        "row": 1138,
+        "column": 1567
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.78,
+          36.62
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C036",
+        "display_name": "武威",
+        "historical_name": "姑臧",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.wuwei.guzang",
+        "stable_region_id": "geo.region.northwest.china.hexicorridor.eastshiyanghebasin.county.guzang",
+        "longitude": 102.64,
+        "latitude": 37.93,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3531016,
+        "row": 1065,
+        "column": 1606
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.64,
+          37.93
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C037",
+        "display_name": "武都",
+        "historical_name": "下辨",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.liangzhou.wudu.xiabian",
+        "stable_region_id": "geo.region.northwest.china.longnanqinba.centraljialingmountaincorridor.county.xiabian",
+        "longitude": 105.73,
+        "latitude": 33.74,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "下辨下弁异名保留",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4319883,
+        "row": 1303,
+        "column": 1741
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.73,
+          33.74
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C038",
+        "display_name": "宛",
+        "historical_name": "南阳、宛县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.nanyang.wan",
+        "stable_region_id": "geo.region.central.china.hanjianguppermiddle.northeastbasin.county.wan",
+        "longitude": 112.53,
+        "latitude": 32.99,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4416302,
+        "row": 1332,
+        "column": 2054
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.53,
+          32.99
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C039",
+        "display_name": "上庸",
+        "historical_name": "西城",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.hanzhong.shangyong",
+        "stable_region_id": "geo.region.southwest.china.hanzhongqinba.centralhanriverbasin.county.shangyong",
+        "longitude": 110.23,
+        "latitude": 32.23,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "上庸西城沿革待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4581899,
+        "row": 1382,
+        "column": 1951
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.23,
+          32.23
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C040",
+        "display_name": "新野",
+        "historical_name": "新野县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.nanyang.xinye",
+        "stable_region_id": "geo.region.central.china.hanjianguppermiddle.northeastbasin.county.xinye",
+        "longitude": 112.36,
+        "latitude": 32.52,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4505774,
+        "row": 1359,
+        "column": 2048
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.36,
+          32.52
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C041",
+        "display_name": "襄阳",
+        "historical_name": "襄阳县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.nan.xiangyang",
+        "stable_region_id": "geo.region.central.china.jianghanplain.westernplain.county.xiangyang",
+        "longitude": 112.14,
+        "latitude": 32.04,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "汉代城址范围后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4598558,
+        "row": 1387,
+        "column": 2040
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.14,
+          32.04
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C042",
+        "display_name": "江夏",
+        "historical_name": "西陵/沙羡等时期治所",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.jiangxia",
+        "stable_region_id": "geo.region.central.china.jianghanplain.easternriverlake",
+        "longitude": null,
+        "latitude": null,
+        "coordinate_status": "unresolved",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": false,
+        "notes": "郡治迁移不固定为唯一古城",
+        "grid_version": "HanWorldV1",
+        "cell_id": null,
+        "row": null,
+        "column": null
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C043",
+        "display_name": "江陵",
+        "historical_name": "江陵县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.nan.jiangling",
+        "stable_region_id": "geo.region.central.china.jianghanplain.westernplain.county.jiangling",
+        "longitude": 112.42,
+        "latitude": 30.35,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4910094,
+        "row": 1481,
+        "column": 2060
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.42,
+          30.35
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C044",
+        "display_name": "公安",
+        "historical_name": "公安县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.wuling.chanling",
+        "stable_region_id": "geo.region.south.china.dongtingxiangziyuanli.northwestbasin.county.chanling",
+        "longitude": 112.23,
+        "latitude": 30.06,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4966424,
+        "row": 1498,
+        "column": 2052
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.23,
+          30.06
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C045",
+        "display_name": "武昌",
+        "historical_name": "鄂县、武昌",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.jiangxia.e",
+        "stable_region_id": "geo.region.central.china.jianghanplain.easternriverlake.county.e",
+        "longitude": 114.89,
+        "latitude": 30.4,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "鄂县武昌时期名称分离保存",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4867129,
+        "row": 1468,
+        "column": 2177
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.89,
+          30.4
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C046",
+        "display_name": "武陵",
+        "historical_name": "临沅",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.wuling.linyuan",
+        "stable_region_id": "geo.region.south.china.dongtingxiangziyuanli.northwestbasin.county.linyuan",
+        "longitude": 111.7,
+        "latitude": 29.03,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5161929,
+        "row": 1557,
+        "column": 2031
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.7,
+          29.03
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C047",
+        "display_name": "长沙",
+        "historical_name": "临湘",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.changsha.linxiang",
+        "stable_region_id": "geo.region.south.china.dongtingxiangziyuanli.northeastplain.county.linxiang",
+        "longitude": 112.94,
+        "latitude": 28.23,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城址",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5294552,
+        "row": 1597,
+        "column": 2094
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.94,
+          28.23
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C048",
+        "display_name": "桂阳",
+        "historical_name": "郴县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.guiyang.chen",
+        "stable_region_id": "geo.region.south.china.nanlingnorth.southeastfoothill.county.chen",
+        "longitude": 113.01,
+        "latitude": 25.77,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5745271,
+        "row": 1733,
+        "column": 2109
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.01,
+          25.77
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C049",
+        "display_name": "零陵",
+        "historical_name": "泉陵",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jingzhou.lingling.quanling",
+        "stable_region_id": "geo.region.south.china.nanlingnorth.southwestbasin.county.quanling",
+        "longitude": 111.61,
+        "latitude": 26.43,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5642464,
+        "row": 1702,
+        "column": 2036
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.61,
+          26.43
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C050",
+        "display_name": "柴桑",
+        "historical_name": "柴桑县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.yuzhang.chaisang",
+        "stable_region_id": "geo.region.southeast.china.ganpoyang.centralriverlakebasin.county.chaisang",
+        "longitude": 115.99,
+        "latitude": 29.72,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "湖岸与古河道待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4973233,
+        "row": 1500,
+        "column": 2233
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.99,
+          29.72
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C051",
+        "display_name": "豫章",
+        "historical_name": "南昌县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.yuzhang.nanchang",
+        "stable_region_id": "geo.region.southeast.china.ganpoyang.centralriverlakebasin.county.nanchang",
+        "longitude": 115.86,
+        "latitude": 28.68,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "豫章郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5168759,
+        "row": 1559,
+        "column": 2233
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.86,
+          28.68
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C052",
+        "display_name": "寿春",
+        "historical_name": "寿春县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.jiujiang.shouchun",
+        "stable_region_id": "geo.region.east.china.huainanyangtzenorth.northcentralplain.county.shouchun",
+        "longitude": 116.79,
+        "latitude": 32.58,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4429756,
+        "row": 1336,
+        "column": 2252
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.79,
+          32.58
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C053",
+        "display_name": "合肥",
+        "historical_name": "合肥县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.jiujiang.hefei",
+        "stable_region_id": "geo.region.east.china.huainanyangtzenorth.northcentralplain.county.hefei",
+        "longitude": 117.23,
+        "latitude": 31.82,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4562341,
+        "row": 1376,
+        "column": 2277
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.23,
+          31.82
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C054",
+        "display_name": "庐江",
+        "historical_name": "皖县等时期治所",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.lujiang",
+        "stable_region_id": "geo.region.east.china.huainanyangtzenorth.southwestfoothillriver",
+        "longitude": null,
+        "latitude": null,
+        "coordinate_status": "unresolved",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": false,
+        "notes": "郡治沿革不固定为唯一坐标",
+        "grid_version": "HanWorldV1",
+        "cell_id": null,
+        "row": null,
+        "column": null
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C055",
+        "display_name": "皖",
+        "historical_name": "皖县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.lujiang.wan",
+        "stable_region_id": "geo.region.east.china.huainanyangtzenorth.southwestfoothillriver.county.wan",
+        "longitude": 116.58,
+        "latitude": 30.63,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "与宛城严格区分",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4794299,
+        "row": 1446,
+        "column": 2255
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.58,
+          30.63
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C056",
+        "display_name": "建业",
+        "historical_name": "秣陵、建业",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.danyang.moling",
+        "stable_region_id": "geo.region.east.china.loweryangtzetaihu.westernriverhills.county.moling",
+        "longitude": 118.8,
+        "latitude": 32.06,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "时期名称与城址后续细分",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4486190,
+        "row": 1353,
+        "column": 2348
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.8,
+          32.06
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C057",
+        "display_name": "吴",
+        "historical_name": "吴县、吴郡",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.wu.wu",
+        "stable_region_id": "geo.region.east.china.loweryangtzetaihu.easterntaihuplain.county.wu",
+        "longitude": 120.59,
+        "latitude": 31.3,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "不表示精确城墙位置",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4585699,
+        "row": 1383,
+        "column": 2437
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.59,
+          31.3
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C058",
+        "display_name": "会稽",
+        "historical_name": "山阴",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.kuaiji.shanyin",
+        "stable_region_id": "geo.region.southeast.china.qiantangzhejianghills.eastcoastalriverhills.county.shanyin",
+        "longitude": 120.58,
+        "latitude": 30.0,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "会稽治所候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4824318,
+        "row": 1455,
+        "column": 2448
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.58,
+          30.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C059",
+        "display_name": "鄱阳",
+        "historical_name": "鄱阳县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.yuzhang.poyang",
+        "stable_region_id": "geo.region.southeast.china.ganpoyang.centralriverlakebasin.county.poyang",
+        "longitude": 116.67,
+        "latitude": 29.0,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "湖岸变化后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5092574,
+        "row": 1536,
+        "column": 2270
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.67,
+          29.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C060",
+        "display_name": "庐陵",
+        "historical_name": "高昌县区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yangzhou.yuzhang.luling",
+        "stable_region_id": "geo.region.southeast.china.ganpoyang.centralriverlakebasin.county.luling",
+        "longitude": 114.99,
+        "latitude": 27.12,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5470300,
+        "row": 1650,
+        "column": 2200
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.99,
+          27.12
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C061",
+        "display_name": "建安",
+        "historical_name": "建安县",
+        "site_type": "strategic_city",
+        "admin_reference": "",
+        "stable_region_id": "",
+        "longitude": 118.32,
+        "latitude": 27.04,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5420753,
+        "row": 1635,
+        "column": 2363
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.32,
+          27.04
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C062",
+        "display_name": "南海",
+        "historical_name": "番禺",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jiaozhou.nanhai.fanyu",
+        "stable_region_id": "geo.region.south.china.pearlriverdelta.eastcentraldeltafoothills.county.fanyu",
+        "longitude": 113.26,
+        "latitude": 23.13,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "古海岸与城址待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 6225825,
+        "row": 1878,
+        "column": 2133
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.26,
+          23.13
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C063",
+        "display_name": "合浦",
+        "historical_name": "合浦郡区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jiaozhou.hepu.hepu",
+        "stable_region_id": "geo.region.south.china.beibugulfcoast.northeastcoastalplain.county.hepu",
+        "longitude": 109.2,
+        "latitude": 21.66,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "古海岸变化待核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 6537136,
+        "row": 1972,
+        "column": 1928
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.2,
+          21.66
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C064",
+        "display_name": "交趾",
+        "historical_name": "龙编",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.jiaozhou.jiaozhi.longbian",
+        "stable_region_id": "geo.region.southeastasia.redriverdelta.centralnortherndelta.county.longbian",
+        "longitude": 105.85,
+        "latitude": 21.03,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "跨现代国界参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 6666207,
+        "row": 2011,
+        "column": 1753
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.85,
+          21.03
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C065",
+        "display_name": "汉中",
+        "historical_name": "南郑",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.hanzhong.nanzheng",
+        "stable_region_id": "geo.region.southwest.china.hanzhongqinba.centralhanriverbasin.county.nanzheng",
+        "longitude": 106.93,
+        "latitude": 33.0,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4455813,
+        "row": 1344,
+        "column": 1797
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.93,
+          33.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C066",
+        "display_name": "梓潼",
+        "historical_name": "梓潼县；部分作品称“涪”",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.guanghan.zitong",
+        "stable_region_id": "geo.region.southwest.china.sichuanbasin.northwestchengduplain.county.zitong",
+        "longitude": 105.16,
+        "latitude": 31.64,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4710910,
+        "row": 1421,
+        "column": 1716
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.16,
+          31.64
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C067",
+        "display_name": "成都",
+        "historical_name": "成都县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.shu.chengdu",
+        "stable_region_id": "geo.region.southwest.china.sichuanbasin.centralchengduplain.county.chengdu",
+        "longitude": 104.07,
+        "latitude": 30.67,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "秦汉城址范围后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4893128,
+        "row": 1476,
+        "column": 1664
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.07,
+          30.67
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C068",
+        "display_name": "江州",
+        "historical_name": "巴、江州县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.ba.jiangzhou",
+        "stable_region_id": "geo.region.southwest.china.sichuanbasin.easternfoldbasin.county.jiangzhou",
+        "longitude": 106.55,
+        "latitude": 29.56,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "两江岸线后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5098714,
+        "row": 1538,
+        "column": 1782
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.55,
+          29.56
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C069",
+        "display_name": "永安",
+        "historical_name": "鱼复、永安",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.ba.yufu",
+        "stable_region_id": "geo.region.southwest.china.sichuanbasin.easternfoldbasin.county.yufu",
+        "longitude": 109.46,
+        "latitude": 31.02,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "三峡水库前地形须用历史参考修订",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4810532,
+        "row": 1451,
+        "column": 1918
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.46,
+          31.02
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C070",
+        "display_name": "永昌",
+        "historical_name": "不韦",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.yongchang.buwei",
+        "stable_region_id": "geo.region.southwest.china.hengduansouth.southwestlancangfrontier.county.buwei",
+        "longitude": 99.17,
+        "latitude": 25.12,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "永昌节点候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5890392,
+        "row": 1777,
+        "column": 1414
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          99.17,
+          25.12
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C071",
+        "display_name": "建宁",
+        "historical_name": "味县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.yizhou.wei",
+        "stable_region_id": "geo.region.southwest.china.yunguiplateau.centralyunnanbasin.county.wei",
+        "longitude": 103.8,
+        "latitude": 25.49,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "建宁郡治候选",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5850858,
+        "row": 1765,
+        "column": 1648
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8,
+          25.49
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C072",
+        "display_name": "云南",
+        "historical_name": "云南郡区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.yongchang.yunnan",
+        "stable_region_id": "geo.region.southwest.china.hengduansouth.southwestlancangfrontier.county.yunnan",
+        "longitude": 100.56,
+        "latitude": 25.48,
+        "coordinate_status": "approximate",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "设置年代和治所后续复核",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5837439,
+        "row": 1761,
+        "column": 1485
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.56,
+          25.48
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C073",
+        "display_name": "牂牁",
+        "historical_name": "故且兰等时期治所",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.zangke.guqielan",
+        "stable_region_id": "geo.region.southwest.china.yunguiplateau.northeastkarstplateau.county.guqielan",
+        "longitude": null,
+        "latitude": null,
+        "coordinate_status": "unresolved",
+        "confidence": "low",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": false,
+        "notes": "故且兰治所候选未定",
+        "grid_version": "HanWorldV1",
+        "cell_id": null,
+        "row": null,
+        "column": null
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C074",
+        "display_name": "越巂",
+        "historical_name": "邛都",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.yuexi.qiongdu",
+        "stable_region_id": "geo.region.southwest.china.hengduansouth.northeastanningvalley.county.qiongdu",
+        "longitude": 102.27,
+        "latitude": 27.9,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5400081,
+        "row": 1629,
+        "column": 1575
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.27,
+          27.9
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C075",
+        "display_name": "朱提",
+        "historical_name": "朱提县区域",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.jianweishuguo.zhuti",
+        "stable_region_id": "geo.region.southwest.china.westernsichuanmountains.southmountaincorridor.county.zhuti",
+        "longitude": 103.72,
+        "latitude": 27.34,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "县域中心参考",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5509513,
+        "row": 1662,
+        "column": 1645
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.72,
+          27.34
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C076",
+        "display_name": "涪",
+        "historical_name": "涪县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.guanghan.fu",
+        "stable_region_id": "geo.region.southwest.china.sichuanbasin.northwestchengduplain.county.fu",
+        "longitude": 104.74,
+        "latitude": 31.47,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "与梓潼独立",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4744030,
+        "row": 1431,
+        "column": 1696
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.74,
+          31.47
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "city_id": "C077",
+        "display_name": "西城",
+        "historical_name": "西城县",
+        "site_type": "strategic_city",
+        "admin_reference": "admin.han140.yizhou.hanzhong.xicheng",
+        "stable_region_id": "geo.region.southwest.china.hanzhongqinba.centralhanriverbasin.county.xicheng",
+        "longitude": 109.03,
+        "latitude": 32.69,
+        "coordinate_status": "approximate",
+        "confidence": "medium",
+        "source_ids": "source.hou_han_shu.jun_guo_zhi|source.project.prototype_location_catalog.v1",
+        "historical_claim": true,
+        "notes": "与上庸独立",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4502306,
+        "row": 1358,
+        "column": 1894
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.03,
+          32.69
+        ]
+      }
+    }
+  ]
+}

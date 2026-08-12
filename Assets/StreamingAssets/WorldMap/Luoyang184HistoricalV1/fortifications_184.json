@@ -1,0 +1,3935 @@
+{
+  "schema": "mandate.fortification-network.v1",
+  "networks": [
+    {
+      "network_id": "fortification.luoyang.main_wall",
+      "display_name": "洛阳大城防线",
+      "parent_network_id": null,
+      "wall_facility_ids": [
+        "facility.instance.luoyang.184.main_wall.1232.2034",
+        "facility.instance.luoyang.184.main_wall.1250.2034",
+        "facility.instance.luoyang.184.main_wall.1232.2035",
+        "facility.instance.luoyang.184.main_wall.1250.2035",
+        "facility.instance.luoyang.184.main_wall.1232.2036",
+        "facility.instance.luoyang.184.main_wall.1250.2036",
+        "facility.instance.luoyang.184.main_wall.1232.2037",
+        "facility.instance.luoyang.184.main_wall.1232.2038",
+        "facility.instance.luoyang.184.main_wall.1250.2038",
+        "facility.instance.luoyang.184.main_wall.1232.2039",
+        "facility.instance.luoyang.184.main_wall.1250.2039",
+        "facility.instance.luoyang.184.main_wall.1250.2040",
+        "facility.instance.luoyang.184.main_wall.1232.2041",
+        "facility.instance.luoyang.184.main_wall.1232.2042",
+        "facility.instance.luoyang.184.main_wall.1250.2042",
+        "facility.instance.luoyang.184.main_wall.1232.2043",
+        "facility.instance.luoyang.184.main_wall.1250.2043",
+        "facility.instance.luoyang.184.main_wall.1232.2044",
+        "facility.instance.luoyang.184.main_wall.1250.2044",
+        "facility.instance.luoyang.184.main_wall.1232.2045",
+        "facility.instance.luoyang.184.main_wall.1250.2046",
+        "facility.instance.luoyang.184.main_wall.1232.2047",
+        "facility.instance.luoyang.184.main_wall.1250.2047",
+        "facility.instance.luoyang.184.main_wall.1232.2048",
+        "facility.instance.luoyang.184.main_wall.1250.2048",
+        "facility.instance.luoyang.184.main_wall.1232.2049",
+        "facility.instance.luoyang.184.main_wall.1232.2050",
+        "facility.instance.luoyang.184.main_wall.1250.2050",
+        "facility.instance.luoyang.184.main_wall.1232.2051",
+        "facility.instance.luoyang.184.main_wall.1250.2051",
+        "facility.instance.luoyang.184.main_wall.1232.2052",
+        "facility.instance.luoyang.184.main_wall.1250.2052",
+        "facility.instance.luoyang.184.main_wall.1233.2034",
+        "facility.instance.luoyang.184.main_wall.1233.2052",
+        "facility.instance.luoyang.184.main_wall.1234.2034",
+        "facility.instance.luoyang.184.main_wall.1234.2052",
+        "facility.instance.luoyang.184.main_wall.1235.2034",
+        "facility.instance.luoyang.184.main_wall.1235.2052",
+        "facility.instance.luoyang.184.main_wall.1237.2034",
+        "facility.instance.luoyang.184.main_wall.1237.2052",
+        "facility.instance.luoyang.184.main_wall.1238.2034",
+        "facility.instance.luoyang.184.main_wall.1238.2052",
+        "facility.instance.luoyang.184.main_wall.1239.2034",
+        "facility.instance.luoyang.184.main_wall.1239.2052",
+        "facility.instance.luoyang.184.main_wall.1240.2034",
+        "facility.instance.luoyang.184.main_wall.1240.2052",
+        "facility.instance.luoyang.184.main_wall.1242.2034",
+        "facility.instance.luoyang.184.main_wall.1242.2052",
+        "facility.instance.luoyang.184.main_wall.1243.2034",
+        "facility.instance.luoyang.184.main_wall.1243.2052",
+        "facility.instance.luoyang.184.main_wall.1244.2034",
+        "facility.instance.luoyang.184.main_wall.1244.2052",
+        "facility.instance.luoyang.184.main_wall.1245.2034",
+        "facility.instance.luoyang.184.main_wall.1245.2052",
+        "facility.instance.luoyang.184.main_wall.1247.2034",
+        "facility.instance.luoyang.184.main_wall.1247.2052",
+        "facility.instance.luoyang.184.main_wall.1248.2034",
+        "facility.instance.luoyang.184.main_wall.1248.2052",
+        "facility.instance.luoyang.184.main_wall.1249.2034",
+        "facility.instance.luoyang.184.main_wall.1249.2052"
+      ],
+      "gate_facility_ids": [
+        "facility.instance.luoyang.184.gate.jinmen",
+        "facility.instance.luoyang.184.gate.gumen",
+        "facility.instance.luoyang.184.gate.xiaoyuanmen",
+        "facility.instance.luoyang.184.gate.pingchengmen",
+        "facility.instance.luoyang.184.gate.xiamen",
+        "facility.instance.luoyang.184.gate.kaiyangmen",
+        "facility.instance.luoyang.184.gate.shangximen",
+        "facility.instance.luoyang.184.gate.shangdongmen",
+        "facility.instance.luoyang.184.gate.yongmen",
+        "facility.instance.luoyang.184.gate.zhongdongmen",
+        "facility.instance.luoyang.184.gate.guangyangmen",
+        "facility.instance.luoyang.184.gate.maomen"
+      ],
+      "moat_feature_ids": [
+        "feature.moat.luoyang.184.001",
+        "feature.moat.luoyang.184.002",
+        "feature.moat.luoyang.184.003",
+        "feature.moat.luoyang.184.004",
+        "feature.moat.luoyang.184.005",
+        "feature.moat.luoyang.184.006",
+        "feature.moat.luoyang.184.007",
+        "feature.moat.luoyang.184.008",
+        "feature.moat.luoyang.184.009",
+        "feature.moat.luoyang.184.010",
+        "feature.moat.luoyang.184.011",
+        "feature.moat.luoyang.184.012",
+        "feature.moat.luoyang.184.013",
+        "feature.moat.luoyang.184.014",
+        "feature.moat.luoyang.184.015",
+        "feature.moat.luoyang.184.016",
+        "feature.moat.luoyang.184.017",
+        "feature.moat.luoyang.184.018",
+        "feature.moat.luoyang.184.019",
+        "feature.moat.luoyang.184.020",
+        "feature.moat.luoyang.184.021",
+        "feature.moat.luoyang.184.022",
+        "feature.moat.luoyang.184.023",
+        "feature.moat.luoyang.184.024",
+        "feature.moat.luoyang.184.025",
+        "feature.moat.luoyang.184.026",
+        "feature.moat.luoyang.184.027",
+        "feature.moat.luoyang.184.028",
+        "feature.moat.luoyang.184.029",
+        "feature.moat.luoyang.184.030",
+        "feature.moat.luoyang.184.031",
+        "feature.moat.luoyang.184.032",
+        "feature.moat.luoyang.184.033",
+        "feature.moat.luoyang.184.034",
+        "feature.moat.luoyang.184.035",
+        "feature.moat.luoyang.184.036",
+        "feature.moat.luoyang.184.037",
+        "feature.moat.luoyang.184.038",
+        "feature.moat.luoyang.184.039",
+        "feature.moat.luoyang.184.040",
+        "feature.moat.luoyang.184.041",
+        "feature.moat.luoyang.184.042",
+        "feature.moat.luoyang.184.043",
+        "feature.moat.luoyang.184.044",
+        "feature.moat.luoyang.184.045",
+        "feature.moat.luoyang.184.046",
+        "feature.moat.luoyang.184.047",
+        "feature.moat.luoyang.184.048",
+        "feature.moat.luoyang.184.049",
+        "feature.moat.luoyang.184.050",
+        "feature.moat.luoyang.184.051",
+        "feature.moat.luoyang.184.052",
+        "feature.moat.luoyang.184.053",
+        "feature.moat.luoyang.184.054",
+        "feature.moat.luoyang.184.055",
+        "feature.moat.luoyang.184.056",
+        "feature.moat.luoyang.184.057",
+        "feature.moat.luoyang.184.058",
+        "feature.moat.luoyang.184.059",
+        "feature.moat.luoyang.184.060",
+        "feature.moat.luoyang.184.061",
+        "feature.moat.luoyang.184.062",
+        "feature.moat.luoyang.184.063",
+        "feature.moat.luoyang.184.064",
+        "feature.moat.luoyang.184.065",
+        "feature.moat.luoyang.184.066",
+        "feature.moat.luoyang.184.067",
+        "feature.moat.luoyang.184.068",
+        "feature.moat.luoyang.184.069",
+        "feature.moat.luoyang.184.070",
+        "feature.moat.luoyang.184.071",
+        "feature.moat.luoyang.184.072",
+        "feature.moat.luoyang.184.073",
+        "feature.moat.luoyang.184.074",
+        "feature.moat.luoyang.184.075",
+        "feature.moat.luoyang.184.076",
+        "feature.moat.luoyang.184.077",
+        "feature.moat.luoyang.184.078",
+        "feature.moat.luoyang.184.079",
+        "feature.moat.luoyang.184.080"
+      ]
+    },
+    {
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "display_name": "北宫防线",
+      "parent_network_id": "fortification.luoyang.main_wall",
+      "wall_facility_ids": [
+        "facility.instance.luoyang.184.north_palace_wall.1234.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2038",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2038",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2039",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2039",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2040",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2040",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2041",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2041",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2042",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2042",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2043",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2044",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2044",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2045",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2045",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2046",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2046",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2047",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2047",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2048",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2048",
+        "facility.instance.luoyang.184.north_palace_wall.1234.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1240.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1235.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1235.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1236.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1236.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1237.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1237.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1238.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1238.2049",
+        "facility.instance.luoyang.184.north_palace_wall.1239.2037",
+        "facility.instance.luoyang.184.north_palace_wall.1239.2049"
+      ],
+      "gate_facility_ids": [
+        "facility.instance.luoyang.184.north_palace_gate.1240.2043"
+      ],
+      "moat_feature_ids": []
+    },
+    {
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "display_name": "南宫防线",
+      "parent_network_id": "fortification.luoyang.main_wall",
+      "wall_facility_ids": [
+        "facility.instance.luoyang.184.south_palace_wall.1242.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2038",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2038",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2039",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2039",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2040",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2040",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2041",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2041",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2042",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2042",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2043",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2044",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2044",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2045",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2045",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2046",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2046",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2047",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2047",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2048",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2048",
+        "facility.instance.luoyang.184.south_palace_wall.1242.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1248.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1243.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1243.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1244.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1244.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1245.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1245.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1246.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1246.2049",
+        "facility.instance.luoyang.184.south_palace_wall.1247.2037",
+        "facility.instance.luoyang.184.south_palace_wall.1247.2049"
+      ],
+      "gate_facility_ids": [
+        "facility.instance.luoyang.184.south_palace_gate.1242.2043"
+      ],
+      "moat_feature_ids": []
+    }
+  ],
+  "walls": [
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084882,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000005",
+        "person.luoyang.v1.recommended.00000062",
+        "person.luoyang.v1.recommended.00000089",
+        "person.luoyang.v1.recommended.00000096"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144534,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000104",
+        "person.luoyang.v1.recommended.00000129",
+        "person.luoyang.v1.recommended.00000146",
+        "person.luoyang.v1.recommended.00000154"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2035",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084883,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000155",
+        "person.luoyang.v1.recommended.00000180",
+        "person.luoyang.v1.recommended.00000188",
+        "person.luoyang.v1.recommended.00000193"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2035",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144535,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000200",
+        "person.luoyang.v1.recommended.00000223",
+        "person.luoyang.v1.recommended.00000264",
+        "person.luoyang.v1.recommended.00000265"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2036",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084884,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000289",
+        "person.luoyang.v1.recommended.00000302",
+        "person.luoyang.v1.recommended.00000311",
+        "person.luoyang.v1.recommended.00000325"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2036",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144536,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000368",
+        "person.luoyang.v1.recommended.00000381",
+        "person.luoyang.v1.recommended.00000385",
+        "person.luoyang.v1.recommended.00000395"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2037",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084885,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000410",
+        "person.luoyang.v1.recommended.00000422",
+        "person.luoyang.v1.recommended.00000464",
+        "person.luoyang.v1.recommended.00000472"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2038",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084886,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000540",
+        "person.luoyang.v1.recommended.00000558",
+        "person.luoyang.v1.recommended.00000566",
+        "person.luoyang.v1.recommended.00000572"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2038",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144538,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000574",
+        "person.luoyang.v1.recommended.00000595",
+        "person.luoyang.v1.recommended.00000604",
+        "person.luoyang.v1.recommended.00000646"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2039",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084887,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000656",
+        "person.luoyang.v1.recommended.00000658",
+        "person.luoyang.v1.recommended.00000665",
+        "person.luoyang.v1.recommended.00000666"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2039",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144539,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000678",
+        "person.luoyang.v1.recommended.00000689",
+        "person.luoyang.v1.recommended.00000706",
+        "person.luoyang.v1.recommended.00000738"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2040",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144540,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000879",
+        "person.luoyang.v1.recommended.00000914",
+        "person.luoyang.v1.recommended.00000952",
+        "person.luoyang.v1.recommended.00000959"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2041",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084889,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000992",
+        "person.luoyang.v1.recommended.00001016",
+        "person.luoyang.v1.recommended.00001026",
+        "person.luoyang.v1.recommended.00001043"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2042",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084890,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001209",
+        "person.luoyang.v1.recommended.00001219",
+        "person.luoyang.v1.recommended.00001238",
+        "person.luoyang.v1.recommended.00001253"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2042",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144542,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001255",
+        "person.luoyang.v1.recommended.00001264",
+        "person.luoyang.v1.recommended.00001279",
+        "person.luoyang.v1.recommended.00001290"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2043",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084891,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001296",
+        "person.luoyang.v1.recommended.00001325",
+        "person.luoyang.v1.recommended.00001427",
+        "person.luoyang.v1.recommended.00001466"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2043",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144543,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001494",
+        "person.luoyang.v1.recommended.00001503",
+        "person.luoyang.v1.recommended.00001537",
+        "person.luoyang.v1.recommended.00001550"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2044",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084892,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001574",
+        "person.luoyang.v1.recommended.00001576",
+        "person.luoyang.v1.recommended.00001586",
+        "person.luoyang.v1.recommended.00001595"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2044",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144544,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001610",
+        "person.luoyang.v1.recommended.00001628",
+        "person.luoyang.v1.recommended.00001631",
+        "person.luoyang.v1.recommended.00001646"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2045",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084893,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001658",
+        "person.luoyang.v1.recommended.00001667",
+        "person.luoyang.v1.recommended.00001672",
+        "person.luoyang.v1.recommended.00001722"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2046",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144546,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001883",
+        "person.luoyang.v1.recommended.00001986",
+        "person.luoyang.v1.recommended.00001997",
+        "person.luoyang.v1.recommended.00002017"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2047",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084895,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002020",
+        "person.luoyang.v1.recommended.00002116",
+        "person.luoyang.v1.recommended.00002117",
+        "person.luoyang.v1.recommended.00002137"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2047",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144547,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002152",
+        "person.luoyang.v1.recommended.00002208",
+        "person.luoyang.v1.recommended.00002223",
+        "person.luoyang.v1.recommended.00002261"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2048",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084896,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002283",
+        "person.luoyang.v1.recommended.00002309",
+        "person.luoyang.v1.recommended.00002374",
+        "person.luoyang.v1.recommended.00002377"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2048",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144548,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002438",
+        "person.luoyang.v1.recommended.00002442",
+        "person.luoyang.v1.recommended.00002524",
+        "person.luoyang.v1.recommended.00002556"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2049",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084897,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002583",
+        "person.luoyang.v1.recommended.00002584",
+        "person.luoyang.v1.recommended.00002592",
+        "person.luoyang.v1.recommended.00002600"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2050",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084898,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002772",
+        "person.luoyang.v1.recommended.00002805",
+        "person.luoyang.v1.recommended.00002864",
+        "person.luoyang.v1.recommended.00002919"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2050",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144550,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002932",
+        "person.luoyang.v1.recommended.00002937",
+        "person.luoyang.v1.recommended.00002943",
+        "person.luoyang.v1.recommended.00002948"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2051",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084899,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002958",
+        "person.luoyang.v1.recommended.00002992",
+        "person.luoyang.v1.recommended.00003009",
+        "person.luoyang.v1.recommended.00003022"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2051",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144551,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003027",
+        "person.luoyang.v1.recommended.00003036",
+        "person.luoyang.v1.recommended.00003091",
+        "person.luoyang.v1.recommended.00003092"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1232.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084900,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003136",
+        "person.luoyang.v1.recommended.00003139",
+        "person.luoyang.v1.recommended.00003158",
+        "person.luoyang.v1.recommended.00003160"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1250.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144552,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003163",
+        "person.luoyang.v1.recommended.00003168",
+        "person.luoyang.v1.recommended.00003188",
+        "person.luoyang.v1.recommended.00003208"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1233.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4088196,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003213",
+        "person.luoyang.v1.recommended.00003225",
+        "person.luoyang.v1.recommended.00003278",
+        "person.luoyang.v1.recommended.00003295"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1233.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4088214,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003308",
+        "person.luoyang.v1.recommended.00003317",
+        "person.luoyang.v1.recommended.00003339",
+        "person.luoyang.v1.recommended.00003354"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1234.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4091510,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003360",
+        "person.luoyang.v1.recommended.00003397",
+        "person.luoyang.v1.recommended.00003424",
+        "person.luoyang.v1.recommended.00003452"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1234.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4091528,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003463",
+        "person.luoyang.v1.recommended.00003467",
+        "person.luoyang.v1.recommended.00003473",
+        "person.luoyang.v1.recommended.00003492"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1235.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4094824,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003510",
+        "person.luoyang.v1.recommended.00003512",
+        "person.luoyang.v1.recommended.00003523",
+        "person.luoyang.v1.recommended.00003539"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1235.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4094842,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003542",
+        "person.luoyang.v1.recommended.00003552",
+        "person.luoyang.v1.recommended.00003613",
+        "person.luoyang.v1.recommended.00003642"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1237.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4101452,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003773",
+        "person.luoyang.v1.recommended.00003828",
+        "person.luoyang.v1.recommended.00003858",
+        "person.luoyang.v1.recommended.00003876"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1237.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4101470,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003881",
+        "person.luoyang.v1.recommended.00003910",
+        "person.luoyang.v1.recommended.00003913",
+        "person.luoyang.v1.recommended.00003934"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1238.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4104766,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003972",
+        "person.luoyang.v1.recommended.00004053",
+        "person.luoyang.v1.recommended.00004070",
+        "person.luoyang.v1.recommended.00004121"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1238.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4104784,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004136",
+        "person.luoyang.v1.recommended.00004146",
+        "person.luoyang.v1.recommended.00004209",
+        "person.luoyang.v1.recommended.00004210"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1239.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4108080,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004231",
+        "person.luoyang.v1.recommended.00004264",
+        "person.luoyang.v1.recommended.00004282",
+        "person.luoyang.v1.recommended.00004290"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1239.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4108098,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004309",
+        "person.luoyang.v1.recommended.00004324",
+        "person.luoyang.v1.recommended.00004341",
+        "person.luoyang.v1.recommended.00004350"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1240.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4111394,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004361",
+        "person.luoyang.v1.recommended.00004369",
+        "person.luoyang.v1.recommended.00004384",
+        "person.luoyang.v1.recommended.00004385"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1240.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4111412,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004459",
+        "person.luoyang.v1.recommended.00004478",
+        "person.luoyang.v1.recommended.00004493",
+        "person.luoyang.v1.recommended.00004498"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1242.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4118022,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004704",
+        "person.luoyang.v1.recommended.00004709",
+        "person.luoyang.v1.recommended.00004730",
+        "person.luoyang.v1.recommended.00004738"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1242.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4118040,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004778",
+        "person.luoyang.v1.recommended.00004811",
+        "person.luoyang.v1.recommended.00004874",
+        "person.luoyang.v1.recommended.00004897"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1243.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4121336,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004955",
+        "person.luoyang.v1.recommended.00005000",
+        "person.luoyang.v1.recommended.00005026",
+        "person.luoyang.v1.recommended.00005041"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1243.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4121354,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005061",
+        "person.luoyang.v1.recommended.00005065",
+        "person.luoyang.v1.recommended.00005082",
+        "person.luoyang.v1.recommended.00005125"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1244.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4124650,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005134",
+        "person.luoyang.v1.recommended.00005143",
+        "person.luoyang.v1.recommended.00005174",
+        "person.luoyang.v1.recommended.00005182"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1244.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4124668,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005212",
+        "person.luoyang.v1.recommended.00005253",
+        "person.luoyang.v1.recommended.00005279",
+        "person.luoyang.v1.recommended.00005315"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1245.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4127964,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005324",
+        "person.luoyang.v1.recommended.00005429",
+        "person.luoyang.v1.recommended.00005431",
+        "person.luoyang.v1.recommended.00005464"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1245.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4127982,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005467",
+        "person.luoyang.v1.recommended.00005470",
+        "person.luoyang.v1.recommended.00005490",
+        "person.luoyang.v1.recommended.00005530"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1247.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4134592,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005704",
+        "person.luoyang.v1.recommended.00005715",
+        "person.luoyang.v1.recommended.00005720",
+        "person.luoyang.v1.recommended.00005727"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1247.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4134610,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005747",
+        "person.luoyang.v1.recommended.00005768",
+        "person.luoyang.v1.recommended.00005776",
+        "person.luoyang.v1.recommended.00005780"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1248.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4137906,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005784",
+        "person.luoyang.v1.recommended.00005830",
+        "person.luoyang.v1.recommended.00005835",
+        "person.luoyang.v1.recommended.00005845"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1248.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4137924,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005919",
+        "person.luoyang.v1.recommended.00005942",
+        "person.luoyang.v1.recommended.00005960",
+        "person.luoyang.v1.recommended.00006001"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1249.2034",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4141220,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006011",
+        "person.luoyang.v1.recommended.00006042",
+        "person.luoyang.v1.recommended.00006044",
+        "person.luoyang.v1.recommended.00006046"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.main_wall.1249.2052",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4141238,
+      "height_centimetres": 920,
+      "thickness_centimetres": 700,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 12000,
+      "current_durability": 12000,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006070",
+        "person.luoyang.v1.recommended.00006073",
+        "person.luoyang.v1.recommended.00006100",
+        "person.luoyang.v1.recommended.00006101"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091513,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006129",
+        "person.luoyang.v1.recommended.00006154",
+        "person.luoyang.v1.recommended.00006169",
+        "person.luoyang.v1.recommended.00006175"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111397,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006179",
+        "person.luoyang.v1.recommended.00006266",
+        "person.luoyang.v1.recommended.00006280",
+        "person.luoyang.v1.recommended.00006285"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2038",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091514,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006316",
+        "person.luoyang.v1.recommended.00006334",
+        "person.luoyang.v1.recommended.00006394",
+        "person.luoyang.v1.recommended.00006427"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2038",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111398,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006435",
+        "person.luoyang.v1.recommended.00006453",
+        "person.luoyang.v1.recommended.00006466",
+        "person.luoyang.v1.recommended.00006475"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2039",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091515,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006505",
+        "person.luoyang.v1.recommended.00006508",
+        "person.luoyang.v1.recommended.00006537",
+        "person.luoyang.v1.recommended.00006569"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2039",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111399,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006599",
+        "person.luoyang.v1.recommended.00006664",
+        "person.luoyang.v1.recommended.00006671",
+        "person.luoyang.v1.recommended.00006684"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2040",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091516,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006754",
+        "person.luoyang.v1.recommended.00006759",
+        "person.luoyang.v1.recommended.00006813",
+        "person.luoyang.v1.recommended.00006849"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2040",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111400,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00006875",
+        "person.luoyang.v1.recommended.00006924",
+        "person.luoyang.v1.recommended.00006961",
+        "person.luoyang.v1.recommended.00006964"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2041",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091517,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007007",
+        "person.luoyang.v1.recommended.00007042",
+        "person.luoyang.v1.recommended.00007071",
+        "person.luoyang.v1.recommended.00007081"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2041",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111401,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007097",
+        "person.luoyang.v1.recommended.00007161",
+        "person.luoyang.v1.recommended.00007187",
+        "person.luoyang.v1.recommended.00007196"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2042",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091518,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007197",
+        "person.luoyang.v1.recommended.00007250",
+        "person.luoyang.v1.recommended.00007257",
+        "person.luoyang.v1.recommended.00007300"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2042",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111402,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007320",
+        "person.luoyang.v1.recommended.00007323",
+        "person.luoyang.v1.recommended.00007326",
+        "person.luoyang.v1.recommended.00007328"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2043",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091519,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007330",
+        "person.luoyang.v1.recommended.00007343",
+        "person.luoyang.v1.recommended.00007385",
+        "person.luoyang.v1.recommended.00007396"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2044",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091520,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007471",
+        "person.luoyang.v1.recommended.00007488",
+        "person.luoyang.v1.recommended.00007499",
+        "person.luoyang.v1.recommended.00007541"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2044",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111404,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007551",
+        "person.luoyang.v1.recommended.00007576",
+        "person.luoyang.v1.recommended.00007609",
+        "person.luoyang.v1.recommended.00007613"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2045",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091521,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007616",
+        "person.luoyang.v1.recommended.00007667",
+        "person.luoyang.v1.recommended.00007706",
+        "person.luoyang.v1.recommended.00007709"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2045",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111405,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007715",
+        "person.luoyang.v1.recommended.00007748",
+        "person.luoyang.v1.recommended.00007761",
+        "person.luoyang.v1.recommended.00007777"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2046",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091522,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007787",
+        "person.luoyang.v1.recommended.00007826",
+        "person.luoyang.v1.recommended.00007851",
+        "person.luoyang.v1.recommended.00007855"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2046",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111406,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007861",
+        "person.luoyang.v1.recommended.00007863",
+        "person.luoyang.v1.recommended.00007897",
+        "person.luoyang.v1.recommended.00007914"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2047",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091523,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007918",
+        "person.luoyang.v1.recommended.00007950",
+        "person.luoyang.v1.recommended.00007971",
+        "person.luoyang.v1.recommended.00007982"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2047",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111407,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008017",
+        "person.luoyang.v1.recommended.00008021",
+        "person.luoyang.v1.recommended.00008071",
+        "person.luoyang.v1.recommended.00008074"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2048",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091524,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008117",
+        "person.luoyang.v1.recommended.00008122",
+        "person.luoyang.v1.recommended.00008143",
+        "person.luoyang.v1.recommended.00008232"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2048",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111408,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008238",
+        "person.luoyang.v1.recommended.00008260",
+        "person.luoyang.v1.recommended.00008261",
+        "person.luoyang.v1.recommended.00008285"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1234.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4091525,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008290",
+        "person.luoyang.v1.recommended.00008298",
+        "person.luoyang.v1.recommended.00008311",
+        "person.luoyang.v1.recommended.00008321"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1240.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111409,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008340",
+        "person.luoyang.v1.recommended.00008344",
+        "person.luoyang.v1.recommended.00008347",
+        "person.luoyang.v1.recommended.00008363"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1235.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4094827,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008417",
+        "person.luoyang.v1.recommended.00008425",
+        "person.luoyang.v1.recommended.00008430",
+        "person.luoyang.v1.recommended.00008433"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1235.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4094839,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008451",
+        "person.luoyang.v1.recommended.00008465",
+        "person.luoyang.v1.recommended.00008466",
+        "person.luoyang.v1.recommended.00008469"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1236.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4098141,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008490",
+        "person.luoyang.v1.recommended.00008517",
+        "person.luoyang.v1.recommended.00008535",
+        "person.luoyang.v1.recommended.00008546"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1236.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4098153,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008553",
+        "person.luoyang.v1.recommended.00008571",
+        "person.luoyang.v1.recommended.00008584",
+        "person.luoyang.v1.recommended.00008637"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1237.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4101455,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008648",
+        "person.luoyang.v1.recommended.00008657",
+        "person.luoyang.v1.recommended.00008660",
+        "person.luoyang.v1.recommended.00008665"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1237.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4101467,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008670",
+        "person.luoyang.v1.recommended.00008688",
+        "person.luoyang.v1.recommended.00008690",
+        "person.luoyang.v1.recommended.00008724"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1238.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4104769,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008763",
+        "person.luoyang.v1.recommended.00008777",
+        "person.luoyang.v1.recommended.00008794",
+        "person.luoyang.v1.recommended.00008837"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1238.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4104781,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008851",
+        "person.luoyang.v1.recommended.00008869",
+        "person.luoyang.v1.recommended.00008911",
+        "person.luoyang.v1.recommended.00008938"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1239.2037",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4108083,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00008940",
+        "person.luoyang.v1.recommended.00008970",
+        "person.luoyang.v1.recommended.00009040",
+        "person.luoyang.v1.recommended.00009047"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_wall.1239.2049",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4108095,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009056",
+        "person.luoyang.v1.recommended.00009121",
+        "person.luoyang.v1.recommended.00009151",
+        "person.luoyang.v1.recommended.00009152"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118025,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009163",
+        "person.luoyang.v1.recommended.00009166",
+        "person.luoyang.v1.recommended.00009172",
+        "person.luoyang.v1.recommended.00009180"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137909,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009191",
+        "person.luoyang.v1.recommended.00009207",
+        "person.luoyang.v1.recommended.00009239",
+        "person.luoyang.v1.recommended.00009334"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2038",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118026,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009384",
+        "person.luoyang.v1.recommended.00009397",
+        "person.luoyang.v1.recommended.00009423",
+        "person.luoyang.v1.recommended.00009459"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2038",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137910,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009509",
+        "person.luoyang.v1.recommended.00009561",
+        "person.luoyang.v1.recommended.00009575",
+        "person.luoyang.v1.recommended.00009583"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2039",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118027,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009590",
+        "person.luoyang.v1.recommended.00009598",
+        "person.luoyang.v1.recommended.00009599",
+        "person.luoyang.v1.recommended.00009602"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2039",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137911,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009617",
+        "person.luoyang.v1.recommended.00009640",
+        "person.luoyang.v1.recommended.00009661",
+        "person.luoyang.v1.recommended.00009666"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2040",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118028,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009713",
+        "person.luoyang.v1.recommended.00009730",
+        "person.luoyang.v1.recommended.00009791",
+        "person.luoyang.v1.recommended.00009799"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2040",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137912,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009830",
+        "person.luoyang.v1.recommended.00009839",
+        "person.luoyang.v1.recommended.00009860",
+        "person.luoyang.v1.recommended.00009867"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2041",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118029,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009871",
+        "person.luoyang.v1.recommended.00009877",
+        "person.luoyang.v1.recommended.00009878",
+        "person.luoyang.v1.recommended.00009883"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2041",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137913,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009884",
+        "person.luoyang.v1.recommended.00009900",
+        "person.luoyang.v1.recommended.00009965",
+        "person.luoyang.v1.recommended.00009978"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2042",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118030,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00009979",
+        "person.luoyang.v1.recommended.00010018",
+        "person.luoyang.v1.recommended.00010083",
+        "person.luoyang.v1.recommended.00010114"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2042",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137914,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010122",
+        "person.luoyang.v1.recommended.00010178",
+        "person.luoyang.v1.recommended.00010187",
+        "person.luoyang.v1.recommended.00010203"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2043",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137915,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010343",
+        "person.luoyang.v1.recommended.00010344",
+        "person.luoyang.v1.recommended.00010346",
+        "person.luoyang.v1.recommended.00010355"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2044",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118032,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010373",
+        "person.luoyang.v1.recommended.00010405",
+        "person.luoyang.v1.recommended.00010412",
+        "person.luoyang.v1.recommended.00010440"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2044",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137916,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010459",
+        "person.luoyang.v1.recommended.00010463",
+        "person.luoyang.v1.recommended.00010477",
+        "person.luoyang.v1.recommended.00010482"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2045",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118033,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010496",
+        "person.luoyang.v1.recommended.00010516",
+        "person.luoyang.v1.recommended.00010559",
+        "person.luoyang.v1.recommended.00010562"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2045",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137917,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010639",
+        "person.luoyang.v1.recommended.00010651",
+        "person.luoyang.v1.recommended.00010656",
+        "person.luoyang.v1.recommended.00010726"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2046",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118034,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010741",
+        "person.luoyang.v1.recommended.00010746",
+        "person.luoyang.v1.recommended.00010770",
+        "person.luoyang.v1.recommended.00010825"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2046",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137918,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010843",
+        "person.luoyang.v1.recommended.00010849",
+        "person.luoyang.v1.recommended.00010852",
+        "person.luoyang.v1.recommended.00010882"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2047",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118035,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010901",
+        "person.luoyang.v1.recommended.00010907",
+        "person.luoyang.v1.recommended.00010929",
+        "person.luoyang.v1.recommended.00010931"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2047",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137919,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010940",
+        "person.luoyang.v1.recommended.00010954",
+        "person.luoyang.v1.recommended.00010956",
+        "person.luoyang.v1.recommended.00010999"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2048",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118036,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011005",
+        "person.luoyang.v1.recommended.00011036",
+        "person.luoyang.v1.recommended.00011051",
+        "person.luoyang.v1.recommended.00011075"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2048",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137920,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011089",
+        "person.luoyang.v1.recommended.00011104",
+        "person.luoyang.v1.recommended.00011118",
+        "person.luoyang.v1.recommended.00011136"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1242.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118037,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011170",
+        "person.luoyang.v1.recommended.00011192",
+        "person.luoyang.v1.recommended.00011250",
+        "person.luoyang.v1.recommended.00011265"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1248.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4137921,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011276",
+        "person.luoyang.v1.recommended.00011313",
+        "person.luoyang.v1.recommended.00011324",
+        "person.luoyang.v1.recommended.00011404"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1243.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4121339,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011440",
+        "person.luoyang.v1.recommended.00011455",
+        "person.luoyang.v1.recommended.00011516",
+        "person.luoyang.v1.recommended.00011569"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1243.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4121351,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011598",
+        "person.luoyang.v1.recommended.00011621",
+        "person.luoyang.v1.recommended.00011673",
+        "person.luoyang.v1.recommended.00011679"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1244.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4124653,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011715",
+        "person.luoyang.v1.recommended.00011737",
+        "person.luoyang.v1.recommended.00011743",
+        "person.luoyang.v1.recommended.00011772"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1244.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4124665,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011816",
+        "person.luoyang.v1.recommended.00011856",
+        "person.luoyang.v1.recommended.00011860",
+        "person.luoyang.v1.recommended.00011864"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1245.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4127967,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011885",
+        "person.luoyang.v1.recommended.00011910",
+        "person.luoyang.v1.recommended.00011960",
+        "person.luoyang.v1.recommended.00011969"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1245.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4127979,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00011995",
+        "person.luoyang.v1.recommended.00012026",
+        "person.luoyang.v1.recommended.00012032",
+        "person.luoyang.v1.recommended.00012113"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1246.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4131281,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00012185",
+        "person.luoyang.v1.recommended.00012195",
+        "person.luoyang.v1.recommended.00012203",
+        "person.luoyang.v1.recommended.00012271"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1246.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4131293,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00012312",
+        "person.luoyang.v1.recommended.00012349",
+        "person.luoyang.v1.recommended.00012367",
+        "person.luoyang.v1.recommended.00012373"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1247.2037",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4134595,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00012378",
+        "person.luoyang.v1.recommended.00012381",
+        "person.luoyang.v1.recommended.00012404",
+        "person.luoyang.v1.recommended.00012410"
+      ],
+      "wall_state": "Intact"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_wall.1247.2049",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4134607,
+      "height_centimetres": 680,
+      "thickness_centimetres": 430,
+      "material_id": "material.rammed_earth.faced",
+      "maximum_durability": 7800,
+      "current_durability": 7800,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00012437",
+        "person.luoyang.v1.recommended.00012570",
+        "person.luoyang.v1.recommended.00012596",
+        "person.luoyang.v1.recommended.00012626"
+      ],
+      "wall_state": "Intact"
+    }
+  ],
+  "gates": [
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.jinmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144537,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000476",
+        "person.luoyang.v1.recommended.00000490",
+        "person.luoyang.v1.recommended.00000495",
+        "person.luoyang.v1.recommended.00000526"
+      ],
+      "gate_state": "Closed",
+      "direction": "south"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.gumen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084888,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00000747",
+        "person.luoyang.v1.recommended.00000795",
+        "person.luoyang.v1.recommended.00000841",
+        "person.luoyang.v1.recommended.00000865"
+      ],
+      "gate_state": "Closed",
+      "direction": "north"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.xiaoyuanmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144541,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001147",
+        "person.luoyang.v1.recommended.00001161",
+        "person.luoyang.v1.recommended.00001184",
+        "person.luoyang.v1.recommended.00001205"
+      ],
+      "gate_state": "Closed",
+      "direction": "south"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.pingchengmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144545,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001754",
+        "person.luoyang.v1.recommended.00001756",
+        "person.luoyang.v1.recommended.00001765",
+        "person.luoyang.v1.recommended.00001788"
+      ],
+      "gate_state": "Closed",
+      "direction": "south"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.xiamen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4084894,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00001809",
+        "person.luoyang.v1.recommended.00001817",
+        "person.luoyang.v1.recommended.00001840",
+        "person.luoyang.v1.recommended.00001870"
+      ],
+      "gate_state": "Closed",
+      "direction": "north"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.kaiyangmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4144549,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00002626",
+        "person.luoyang.v1.recommended.00002650",
+        "person.luoyang.v1.recommended.00002671",
+        "person.luoyang.v1.recommended.00002698"
+      ],
+      "gate_state": "Closed",
+      "direction": "south"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.shangximen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4098138,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003657",
+        "person.luoyang.v1.recommended.00003661",
+        "person.luoyang.v1.recommended.00003717",
+        "person.luoyang.v1.recommended.00003732"
+      ],
+      "gate_state": "Closed",
+      "direction": "west"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.shangdongmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4098156,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00003736",
+        "person.luoyang.v1.recommended.00003752",
+        "person.luoyang.v1.recommended.00003757",
+        "person.luoyang.v1.recommended.00003769"
+      ],
+      "gate_state": "Closed",
+      "direction": "east"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.yongmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4114708,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004505",
+        "person.luoyang.v1.recommended.00004533",
+        "person.luoyang.v1.recommended.00004557",
+        "person.luoyang.v1.recommended.00004612"
+      ],
+      "gate_state": "Closed",
+      "direction": "west"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.zhongdongmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4114726,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00004628",
+        "person.luoyang.v1.recommended.00004646",
+        "person.luoyang.v1.recommended.00004680",
+        "person.luoyang.v1.recommended.00004690"
+      ],
+      "gate_state": "Closed",
+      "direction": "east"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.guangyangmen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4131278,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005551",
+        "person.luoyang.v1.recommended.00005574",
+        "person.luoyang.v1.recommended.00005607",
+        "person.luoyang.v1.recommended.00005632"
+      ],
+      "gate_state": "Closed",
+      "direction": "west"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.gate.maomen",
+      "network_id": "fortification.luoyang.main_wall",
+      "cell_id64": 4131296,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 9000,
+      "current_durability": 9000,
+      "passage_capacity_per_hour": 900,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00005636",
+        "person.luoyang.v1.recommended.00005663",
+        "person.luoyang.v1.recommended.00005667",
+        "person.luoyang.v1.recommended.00005674"
+      ],
+      "gate_state": "Closed",
+      "direction": "east"
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.north_palace_gate.1240.2043",
+      "network_id": "fortification.luoyang.north_palace_wall",
+      "cell_id64": 4111403,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 6500,
+      "current_durability": 6500,
+      "passage_capacity_per_hour": 420,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00007406",
+        "person.luoyang.v1.recommended.00007407",
+        "person.luoyang.v1.recommended.00007431",
+        "person.luoyang.v1.recommended.00007435"
+      ],
+      "gate_state": "Closed",
+      "direction": null
+    },
+    {
+      "facility_id": "facility.instance.luoyang.184.south_palace_gate.1242.2043",
+      "network_id": "fortification.luoyang.south_palace_wall",
+      "cell_id64": 4118031,
+      "owner_id": "organization.government.han.luoyang",
+      "controller_id": "organization.garrison.han.luoyang",
+      "maximum_durability": 6500,
+      "current_durability": 6500,
+      "passage_capacity_per_hour": 420,
+      "defender_person_ids": [
+        "person.luoyang.v1.recommended.00010275",
+        "person.luoyang.v1.recommended.00010296",
+        "person.luoyang.v1.recommended.00010300",
+        "person.luoyang.v1.recommended.00010334"
+      ],
+      "gate_state": "Closed",
+      "direction": null
+    }
+  ],
+  "moats": [
+    {
+      "feature_id": "feature.moat.luoyang.184.001",
+      "cell_id64": 4081567,
+      "grid_x": 2033,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.002",
+      "cell_id64": 4147847,
+      "grid_x": 2033,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.003",
+      "cell_id64": 4081568,
+      "grid_x": 2034,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.004",
+      "cell_id64": 4147848,
+      "grid_x": 2034,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.005",
+      "cell_id64": 4081569,
+      "grid_x": 2035,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.006",
+      "cell_id64": 4147849,
+      "grid_x": 2035,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.007",
+      "cell_id64": 4081570,
+      "grid_x": 2036,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.008",
+      "cell_id64": 4147850,
+      "grid_x": 2036,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.009",
+      "cell_id64": 4081571,
+      "grid_x": 2037,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.010",
+      "cell_id64": 4147851,
+      "grid_x": 2037,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.011",
+      "cell_id64": 4081572,
+      "grid_x": 2038,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.012",
+      "cell_id64": 4147852,
+      "grid_x": 2038,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.013",
+      "cell_id64": 4081573,
+      "grid_x": 2039,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.014",
+      "cell_id64": 4147853,
+      "grid_x": 2039,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.015",
+      "cell_id64": 4081574,
+      "grid_x": 2040,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.016",
+      "cell_id64": 4147854,
+      "grid_x": 2040,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.017",
+      "cell_id64": 4081575,
+      "grid_x": 2041,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.018",
+      "cell_id64": 4147855,
+      "grid_x": 2041,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.019",
+      "cell_id64": 4081576,
+      "grid_x": 2042,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.020",
+      "cell_id64": 4147856,
+      "grid_x": 2042,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.021",
+      "cell_id64": 4081577,
+      "grid_x": 2043,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.022",
+      "cell_id64": 4147857,
+      "grid_x": 2043,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.023",
+      "cell_id64": 4081578,
+      "grid_x": 2044,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.024",
+      "cell_id64": 4147858,
+      "grid_x": 2044,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.025",
+      "cell_id64": 4081579,
+      "grid_x": 2045,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.026",
+      "cell_id64": 4147859,
+      "grid_x": 2045,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.027",
+      "cell_id64": 4081580,
+      "grid_x": 2046,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.028",
+      "cell_id64": 4147860,
+      "grid_x": 2046,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.029",
+      "cell_id64": 4081581,
+      "grid_x": 2047,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.030",
+      "cell_id64": 4147861,
+      "grid_x": 2047,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.031",
+      "cell_id64": 4081582,
+      "grid_x": 2048,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.032",
+      "cell_id64": 4147862,
+      "grid_x": 2048,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.033",
+      "cell_id64": 4081583,
+      "grid_x": 2049,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.034",
+      "cell_id64": 4147863,
+      "grid_x": 2049,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.035",
+      "cell_id64": 4081584,
+      "grid_x": 2050,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.036",
+      "cell_id64": 4147864,
+      "grid_x": 2050,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.037",
+      "cell_id64": 4081585,
+      "grid_x": 2051,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.038",
+      "cell_id64": 4147865,
+      "grid_x": 2051,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.039",
+      "cell_id64": 4081586,
+      "grid_x": 2052,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.040",
+      "cell_id64": 4147866,
+      "grid_x": 2052,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.041",
+      "cell_id64": 4081587,
+      "grid_x": 2053,
+      "grid_y": 1231,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.042",
+      "cell_id64": 4147867,
+      "grid_x": 2053,
+      "grid_y": 1251,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.043",
+      "cell_id64": 4084881,
+      "grid_x": 2033,
+      "grid_y": 1232,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.044",
+      "cell_id64": 4084901,
+      "grid_x": 2053,
+      "grid_y": 1232,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.045",
+      "cell_id64": 4088195,
+      "grid_x": 2033,
+      "grid_y": 1233,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.046",
+      "cell_id64": 4088215,
+      "grid_x": 2053,
+      "grid_y": 1233,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.047",
+      "cell_id64": 4091509,
+      "grid_x": 2033,
+      "grid_y": 1234,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.048",
+      "cell_id64": 4091529,
+      "grid_x": 2053,
+      "grid_y": 1234,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.049",
+      "cell_id64": 4094823,
+      "grid_x": 2033,
+      "grid_y": 1235,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.050",
+      "cell_id64": 4094843,
+      "grid_x": 2053,
+      "grid_y": 1235,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.051",
+      "cell_id64": 4098137,
+      "grid_x": 2033,
+      "grid_y": 1236,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.052",
+      "cell_id64": 4098157,
+      "grid_x": 2053,
+      "grid_y": 1236,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.053",
+      "cell_id64": 4101451,
+      "grid_x": 2033,
+      "grid_y": 1237,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.054",
+      "cell_id64": 4101471,
+      "grid_x": 2053,
+      "grid_y": 1237,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.055",
+      "cell_id64": 4104765,
+      "grid_x": 2033,
+      "grid_y": 1238,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.056",
+      "cell_id64": 4104785,
+      "grid_x": 2053,
+      "grid_y": 1238,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.057",
+      "cell_id64": 4108079,
+      "grid_x": 2033,
+      "grid_y": 1239,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.058",
+      "cell_id64": 4108099,
+      "grid_x": 2053,
+      "grid_y": 1239,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.059",
+      "cell_id64": 4111393,
+      "grid_x": 2033,
+      "grid_y": 1240,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.060",
+      "cell_id64": 4111413,
+      "grid_x": 2053,
+      "grid_y": 1240,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.061",
+      "cell_id64": 4114707,
+      "grid_x": 2033,
+      "grid_y": 1241,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.062",
+      "cell_id64": 4114727,
+      "grid_x": 2053,
+      "grid_y": 1241,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.063",
+      "cell_id64": 4118021,
+      "grid_x": 2033,
+      "grid_y": 1242,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.064",
+      "cell_id64": 4118041,
+      "grid_x": 2053,
+      "grid_y": 1242,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.065",
+      "cell_id64": 4121335,
+      "grid_x": 2033,
+      "grid_y": 1243,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.066",
+      "cell_id64": 4121355,
+      "grid_x": 2053,
+      "grid_y": 1243,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.067",
+      "cell_id64": 4124649,
+      "grid_x": 2033,
+      "grid_y": 1244,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.068",
+      "cell_id64": 4124669,
+      "grid_x": 2053,
+      "grid_y": 1244,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.069",
+      "cell_id64": 4127963,
+      "grid_x": 2033,
+      "grid_y": 1245,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.070",
+      "cell_id64": 4127983,
+      "grid_x": 2053,
+      "grid_y": 1245,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.071",
+      "cell_id64": 4131277,
+      "grid_x": 2033,
+      "grid_y": 1246,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.072",
+      "cell_id64": 4131297,
+      "grid_x": 2053,
+      "grid_y": 1246,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.073",
+      "cell_id64": 4134591,
+      "grid_x": 2033,
+      "grid_y": 1247,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.074",
+      "cell_id64": 4134611,
+      "grid_x": 2053,
+      "grid_y": 1247,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.075",
+      "cell_id64": 4137905,
+      "grid_x": 2033,
+      "grid_y": 1248,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.076",
+      "cell_id64": 4137925,
+      "grid_x": 2053,
+      "grid_y": 1248,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.077",
+      "cell_id64": 4141219,
+      "grid_x": 2033,
+      "grid_y": 1249,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.078",
+      "cell_id64": 4141239,
+      "grid_x": 2053,
+      "grid_y": 1249,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.079",
+      "cell_id64": 4144533,
+      "grid_x": 2033,
+      "grid_y": 1250,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    },
+    {
+      "feature_id": "feature.moat.luoyang.184.080",
+      "cell_id64": 4144553,
+      "grid_x": 2053,
+      "grid_y": 1250,
+      "moat_state": "Flooded",
+      "width_centimetres": 1800,
+      "depth_centimetres": 320,
+      "blocks_ordinary_movement": true,
+      "siege_crossing_requires": [
+        "bridge",
+        "fill",
+        "controlled_gate_crossing"
+      ]
+    }
+  ],
+  "siege_v0": {
+    "wall_blocks_force": true,
+    "gate_controller_changes_state": true,
+    "palace_network_independent_after_main_breach": true,
+    "ladder_rule": "effective_height_cm >= wall_height_cm",
+    "breach_creates_passable_crossing": true
+  }
+}

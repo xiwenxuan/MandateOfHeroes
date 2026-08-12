@@ -1,0 +1,849 @@
+{
+  "type": "FeatureCollection",
+  "name": "strategic_sites",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.hulao",
+        "name": "虎牢",
+        "site_type": "pass",
+        "parent_location_id": "C027",
+        "longitude": "113.15",
+        "latitude": "34.82",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4068352,
+        "row": 1227,
+        "column": 2074
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.15,
+          34.82
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.hangu",
+        "name": "函谷关",
+        "site_type": "pass",
+        "parent_location_id": "C028",
+        "longitude": "110.93",
+        "latitude": "34.63",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "历史位置沿革需继续核验",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4127905,
+        "row": 1245,
+        "column": 1975
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.93,
+          34.63
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.tongguan",
+        "name": "潼关",
+        "site_type": "pass",
+        "parent_location_id": "C031",
+        "longitude": "110.25",
+        "latitude": "34.54",
+        "coordinate_status": "provisional",
+        "confidence": "medium",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4151073,
+        "row": 1252,
+        "column": 1945
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.25,
+          34.54
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.wuguan",
+        "name": "武关",
+        "site_type": "pass",
+        "parent_location_id": "C038",
+        "longitude": "110.60",
+        "latitude": "33.58",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4326734,
+        "row": 1305,
+        "column": 1964
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.6,
+          33.58
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.yangping",
+        "name": "阳平关",
+        "site_type": "pass",
+        "parent_location_id": "C065",
+        "longitude": "106.05",
+        "latitude": "32.84",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4488913,
+        "row": 1354,
+        "column": 1757
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.05,
+          32.84
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.jiange",
+        "name": "剑阁",
+        "site_type": "pass",
+        "parent_location_id": "C076",
+        "longitude": "105.45",
+        "latitude": "32.20",
+        "coordinate_status": "provisional",
+        "confidence": "medium",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4608189,
+        "row": 1390,
+        "column": 1729
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.45,
+          32.2
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.chencang",
+        "name": "陈仓",
+        "site_type": "pass",
+        "parent_location_id": "C031",
+        "longitude": "107.37",
+        "latitude": "34.36",
+        "coordinate_status": "provisional",
+        "confidence": "medium",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略交通节点候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4200653,
+        "row": 1267,
+        "column": 1815
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.37,
+          34.36
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.jiameng",
+        "name": "葭萌",
+        "site_type": "pass",
+        "parent_location_id": "C076",
+        "longitude": "105.84",
+        "latitude": "32.43",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "战略关隘候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4565125,
+        "row": 1377,
+        "column": 1747
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.84,
+          32.43
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.fancheng",
+        "name": "樊城",
+        "site_type": "fortified_town",
+        "parent_location_id": "C041",
+        "longitude": "112.14",
+        "latitude": "32.05",
+        "coordinate_status": "provisional",
+        "confidence": "medium",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "汉水北岸战略节点候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4595244,
+        "row": 1386,
+        "column": 2040
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.14,
+          32.05
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.xiakou",
+        "name": "夏口",
+        "site_type": "port",
+        "parent_location_id": "C042",
+        "longitude": "114.30",
+        "latitude": "30.58",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "时期位置沿革需继续核验",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4840588,
+        "row": 1460,
+        "column": 2148
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.3,
+          30.58
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.yiling",
+        "name": "夷陵",
+        "site_type": "pass",
+        "parent_location_id": "C043",
+        "longitude": "111.28",
+        "latitude": "30.70",
+        "coordinate_status": "provisional",
+        "confidence": "medium",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "峡江战略节点候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4857015,
+        "row": 1465,
+        "column": 2005
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.28,
+          30.7
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.ruxukou",
+        "name": "濡须口",
+        "site_type": "river_fort",
+        "parent_location_id": "C053",
+        "longitude": "117.88",
+        "latitude": "31.43",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "长江水道战略节点候选范围",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4622026,
+        "row": 1394,
+        "column": 2310
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.88,
+          31.43
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.chibi",
+        "name": "赤壁",
+        "site_type": "battle_site",
+        "parent_location_id": "C045",
+        "longitude": "113.62",
+        "latitude": "29.72",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "古战场具体位置存在争议",
+        "grid_version": "HanWorldV1",
+        "cell_id": 5009574,
+        "row": 1511,
+        "column": 2120
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.62,
+          29.72
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.lousang",
+        "name": "楼桑乡里",
+        "site_type": "village",
+        "parent_location_id": "L001",
+        "longitude": "116.00",
+        "latitude": "39.50",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作涿县周边技术代理点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3157100,
+        "row": 952,
+        "column": 2172
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.0,
+          39.5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.zhuo_horse_market",
+        "name": "涿县马市",
+        "site_type": "market",
+        "parent_location_id": "L001",
+        "longitude": "115.98",
+        "latitude": "39.47",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3163728,
+        "row": 954,
+        "column": 2172
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.98,
+          39.47
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.zhuo_office",
+        "name": "涿县县寺",
+        "site_type": "government",
+        "parent_location_id": "L001",
+        "longitude": "115.97",
+        "latitude": "39.48",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3160413,
+        "row": 953,
+        "column": 2171
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.97,
+          39.48
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.fanyang_relay",
+        "name": "范阳驿路节点",
+        "site_type": "relay",
+        "parent_location_id": "L001",
+        "longitude": "115.90",
+        "latitude": "39.32",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作路线节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3190237,
+        "row": 962,
+        "column": 2169
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.9,
+          39.32
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.yishui_ferry",
+        "name": "易水渡口",
+        "site_type": "ferry",
+        "parent_location_id": "L001",
+        "longitude": "115.75",
+        "latitude": "39.10",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作路线节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3233314,
+        "row": 975,
+        "column": 2164
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.75,
+          39.1
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.zhongshan_horse_firm",
+        "name": "中山马商行",
+        "site_type": "merchant",
+        "parent_location_id": "L004",
+        "longitude": "114.98",
+        "latitude": "38.52",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3352589,
+        "row": 1011,
+        "column": 2135
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.98,
+          38.52
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.zhongshan_herb_market",
+        "name": "中山药材市",
+        "site_type": "market",
+        "parent_location_id": "L004",
+        "longitude": "115.01",
+        "latitude": "38.50",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3355904,
+        "row": 1012,
+        "column": 2136
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.01,
+          38.5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.anping_estate",
+        "name": "安平宗室庄园",
+        "site_type": "estate",
+        "parent_location_id": "L006",
+        "longitude": "115.55",
+        "latitude": "38.22",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3402325,
+        "row": 1026,
+        "column": 2161
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.55,
+          38.22
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.taiping_altar",
+        "name": "赵魏太平道坛点",
+        "site_type": "secret_organization",
+        "parent_location_id": "L008",
+        "longitude": "115.18",
+        "latitude": "37.02",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作广宗外围技术代理点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3630982,
+        "row": 1095,
+        "column": 2152
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.18,
+          37.02
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.luzhi_camp",
+        "name": "卢植军营",
+        "site_type": "military_camp",
+        "parent_location_id": "L008",
+        "longitude": "115.13",
+        "latitude": "37.09",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作广宗外围技术代理点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3617723,
+        "row": 1091,
+        "column": 2149
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.13,
+          37.09
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.guangzong_trench",
+        "name": "广宗围壕",
+        "site_type": "battle_facility",
+        "parent_location_id": "L008",
+        "longitude": "115.16",
+        "latitude": "37.06",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3624353,
+        "row": 1093,
+        "column": 2151
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.16,
+          37.06
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.yellow_turban_camp",
+        "name": "黄巾营地",
+        "site_type": "military_camp",
+        "parent_location_id": "L008",
+        "longitude": "115.21",
+        "latitude": "37.04",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3627669,
+        "row": 1094,
+        "column": 2153
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.21,
+          37.04
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.xiaquyang_river_camp",
+        "name": "下曲阳河岸营地",
+        "site_type": "battle_facility",
+        "parent_location_id": "L007",
+        "longitude": "114.69",
+        "latitude": "38.09",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3438743,
+        "row": 1037,
+        "column": 2125
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.69,
+          38.09
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.julu_granary",
+        "name": "钜鹿粮仓",
+        "site_type": "warehouse",
+        "parent_location_id": "L009",
+        "longitude": "115.03",
+        "latitude": "37.22",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "郡域代理点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3594520,
+        "row": 1084,
+        "column": 2144
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.03,
+          37.22
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.yingtao_pass",
+        "name": "瘿陶山道出口",
+        "site_type": "pass",
+        "parent_location_id": "L010",
+        "longitude": "114.50",
+        "latitude": "37.30",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3587869,
+        "row": 1082,
+        "column": 2121
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.5,
+          37.3
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.ye_granary",
+        "name": "邺城官仓",
+        "site_type": "warehouse",
+        "parent_location_id": "L011",
+        "longitude": "114.48",
+        "latitude": "36.32",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3770143,
+        "row": 1137,
+        "column": 2125
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.48,
+          36.32
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.ye_guest_quarter",
+        "name": "邺城客舍区",
+        "site_type": "urban_district",
+        "parent_location_id": "L011",
+        "longitude": "114.46",
+        "latitude": "36.34",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作玩法节点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 3766828,
+        "row": 1136,
+        "column": 2124
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.46,
+          36.34
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "site_id": "geo.site.luoyang_dispatch",
+        "name": "洛阳军报站",
+        "site_type": "world_interface",
+        "parent_location_id": "L012",
+        "longitude": "112.60",
+        "latitude": "34.70",
+        "coordinate_status": "provisional",
+        "confidence": "low",
+        "provisional": "true",
+        "historical_claim": false,
+        "notes": "仅作世界出口代理点",
+        "grid_version": "HanWorldV1",
+        "cell_id": 4098154,
+        "row": 1236,
+        "column": 2050
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.6,
+          34.7
+        ]
+      }
+    }
+  ]
+}

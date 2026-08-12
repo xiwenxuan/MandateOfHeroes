@@ -1,0 +1,122 @@
+{
+  "schema": "mandate.historical-person-clan-scenario-index.v1",
+  "scenarios": [
+    {
+      "scenario_id": "scenario.han.140.peace",
+      "scenario_name": "汉室承平",
+      "year": 140,
+      "path": "scenarios/140.json",
+      "sha256": "95a8ed3833bed6656e4af4879b7b658f7012fd19cee1126bfe4e13f50323c317",
+      "person_count": 1070,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.184.yellow_turban",
+      "scenario_name": "黄巾起义",
+      "year": 184,
+      "path": "scenarios/184.json",
+      "sha256": "bae087251b9c23499762192230b76f973f1872fe58994a440434da031d9fa5a8",
+      "person_count": 1116,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.189.luoyang_coup",
+      "scenario_name": "洛阳政变",
+      "year": 189,
+      "path": "scenarios/189.json",
+      "sha256": "ec482e80f96dff9640e1a356eccf15529e9c48256cb86d43278740865f6410b2",
+      "person_count": 1106,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.194.warlords",
+      "scenario_name": "群雄割据",
+      "year": 194,
+      "path": "scenarios/194.json",
+      "sha256": "8149d3706de42fff8233262ff3199ceea6a944da77e7d25fd5039bab83f47cdf",
+      "person_count": 1084,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.200.guandu_eve",
+      "scenario_name": "官渡前夜",
+      "year": 200,
+      "path": "scenarios/200.json",
+      "sha256": "78dc198e0db67c19c91d6ea5563c643cdba7c931341ef2a27dc8cc9b446f518a",
+      "person_count": 1060,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.207.longzhong",
+      "scenario_name": "三顾茅庐",
+      "year": 207,
+      "path": "scenarios/207.json",
+      "sha256": "7c8a9e9cd343adfc0e6888154ba35daa06d49a142eaab67945adea4b9187bbd3",
+      "person_count": 1056,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.214.yizhou_settled",
+      "scenario_name": "益州初定·三分渐成",
+      "year": 214,
+      "path": "scenarios/214.json",
+      "sha256": "0525c60792ebd357975e20b6656cdd9fb2bd5cd6d7241ea16367d4bf34bcaf05",
+      "person_count": 1035,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.219.hanzhong_king",
+      "scenario_name": "汉中王·荆州危局",
+      "year": 219,
+      "path": "scenarios/219.json",
+      "sha256": "7eda900da0347840655122511985daf64d0a776fd685f81cad35a8e753c295f5",
+      "person_count": 1016,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.223.baidicheng",
+      "scenario_name": "白帝托孤",
+      "year": 223,
+      "path": "scenarios/223.json",
+      "sha256": "0cfff733448ea4c3106fa92d8d923f0247a1ff8bd23245553948c5053c7b4031",
+      "person_count": 983,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.227.northern_expedition",
+      "scenario_name": "出师北伐",
+      "year": 227,
+      "path": "scenarios/227.json",
+      "sha256": "22f11d253fe73f044df0ad38f2d94ade7040c4dc7158a65059037a9fde6a2d69",
+      "person_count": 974,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.234.wuzhang",
+      "scenario_name": "五丈原",
+      "year": 234,
+      "path": "scenarios/234.json",
+      "sha256": "154b103e1e502536094be8a4c3c275f128c1a7d3f2f2a454cd468d2e600b0167",
+      "person_count": 960,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.249.gaopingling",
+      "scenario_name": "高平陵之变",
+      "year": 249,
+      "path": "scenarios/249.json",
+      "sha256": "05bc21386e9f155800c1d1b2aa635179169671d82dce493bef38d9d871bc2950",
+      "person_count": 932,
+      "clan_count": 39
+    },
+    {
+      "scenario_id": "scenario.han.260.endgame",
+      "scenario_name": "曹髦之死·三国终局",
+      "year": 260,
+      "path": "scenarios/260.json",
+      "sha256": "873346ca2a09930bc4216deb0a613509b482f7423cd67bdc09b33aea46ded5f7",
+      "person_count": 901,
+      "clan_count": 39
+    }
+  ]
+}

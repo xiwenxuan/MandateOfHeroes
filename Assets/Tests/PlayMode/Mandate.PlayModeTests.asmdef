@@ -2,7 +2,10 @@
   "name": "Mandate.PlayModeTests",
   "rootNamespace": "Mandate.Tests",
   "references": [
-    "Mandate.Presentation"
+    "Mandate.Presentation",
+    "Mandate.Domain",
+    "Mandate.Persistence",
+    "Mandate.Simulation"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

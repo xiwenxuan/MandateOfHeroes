@@ -31,6 +31,14 @@ namespace Mandate.Domain
             "military_supply.cargo_consumption.emergency_authorized";
     }
 
+    public static class MilitaryLogisticsDeliveryPolicyIds
+    {
+        public const string ArmyProvisions =
+            "military_logistics.delivery.army_provisions";
+        public const string ArmyInventoryContainer =
+            "military_logistics.delivery.army_inventory_container";
+    }
+
     public static class MilitaryLogisticsRiskPolicyIds
     {
         public const string None = "military_logistics.risk.none";
@@ -406,6 +414,9 @@ namespace Mandate.Domain
         public long TotalPaid;
         public int OriginPublicOrderDelta;
         public MilitaryLogisticsStatus Status;
+        public string DeliveryPolicyId =
+            MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions;
+        public string TargetInventoryContainerId = string.Empty;
     }
 
     [Serializable]

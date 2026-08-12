@@ -28,6 +28,25 @@ namespace Mandate.Simulation
             }
 
             world.Validate();
+            if (MilitaryMedicalEvacuationSystem.IsPersonInEvacuation(
+                    world, personId.Value))
+            {
+                throw new InvalidOperationException(
+                    "A person assigned to medical evacuation can only move through that evacuation workflow.");
+            }
+            var journey = StartJourneyWithoutValidation(
+                world, personId, routeId, destinationId, mode);
+            world.Validate();
+            return journey;
+        }
+
+        internal JourneyState StartJourneyWithoutValidation(
+            WorldState world,
+            StableId personId,
+            StableId routeId,
+            StableId destinationId,
+            TravelMode mode)
+        {
             var people = PeopleFor(world);
             var person = people.GetRequired(personId.Value);
             if (!person.IsAlive)
@@ -65,7 +84,6 @@ namespace Mandate.Simulation
                 StartedSegment = world.Segment
             };
             world.Journeys.Add(journey);
-            world.Validate();
             return journey;
         }
 
@@ -187,6 +205,8 @@ namespace Mandate.Simulation
             }
             if (completedAnyJourney)
             {
+                MilitaryMedicalEvacuationSystem.ResolveArrivalsWithoutValidation(
+                    world);
                 world.Validate();
             }
         }
@@ -198,8 +218,13 @@ namespace Mandate.Simulation
             var people = PeopleFor(world);
             for (var i = 0; i < world.Journeys.Count; i++)
             {
-                var person = people.GetRequiredForUpdate(
+                var person = people.GetRequired(
                     world.Journeys[i].PersonId);
+                if (!person.IsAlive)
+                {
+                    continue;
+                }
+                person = people.GetRequiredForUpdate(person.Id);
                 if (externallyProvisionedPeople != null &&
                     externallyProvisionedPeople.Contains(person.Id))
                 {

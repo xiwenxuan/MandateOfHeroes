@@ -76,6 +76,7 @@ namespace Mandate.Domain
         public string PopulationOriginLocationId;
         public VillageOccupation VillageOccupation = VillageOccupation.Unknown;
         public int LaborCapacityBasisPoints = 10_000;
+        public int PermanentLaborCapacityPenaltyBasisPoints;
         public long NextIndependentEventDay = -1;
         public string NextIndependentEventReason;
         public LocalDutyKind LocalDuty = LocalDutyKind.None;
@@ -222,7 +223,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 36;
+        public const int CurrentSchemaVersion = 72;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -236,6 +237,10 @@ namespace Mandate.Domain
             new List<WorldCommandBatchResultState>();
         public List<WorldEventOutboxState> WorldEventOutbox =
             new List<WorldEventOutboxState>();
+        public List<WorldDecisionAgentState> WorldDecisionAgents =
+            new List<WorldDecisionAgentState>();
+        public List<WorldSimulationLodState> WorldSimulationLodStates =
+            new List<WorldSimulationLodState>();
         public List<PersonState> People = new List<PersonState>();
         public List<LocationState> Locations = new List<LocationState>();
         public List<FamilyState> Families = new List<FamilyState>();
@@ -249,6 +254,46 @@ namespace Mandate.Domain
         public List<OrganizationState> Organizations = new List<OrganizationState>();
         public List<PositionState> Positions = new List<PositionState>();
         public List<MembershipState> Memberships = new List<MembershipState>();
+        public List<CanonicalPlaceCrosswalkState> CanonicalPlaceCrosswalks =
+            new List<CanonicalPlaceCrosswalkState>();
+        public List<HistoricalIdentityState> HistoricalIdentities =
+            new List<HistoricalIdentityState>();
+        public List<PersonLineageState> PersonLineages =
+            new List<PersonLineageState>();
+        public List<FamilyOrganizationProfileState> FamilyOrganizationProfiles =
+            new List<FamilyOrganizationProfileState>();
+        public List<FamilyOrganizationMemberState> FamilyOrganizationMembers =
+            new List<FamilyOrganizationMemberState>();
+        public List<FamilyCenterState> FamilyCenters =
+            new List<FamilyCenterState>();
+        public List<OrganizationAssetState> OrganizationAssets =
+            new List<OrganizationAssetState>();
+        public List<CivilMilitaryOfficeDefinitionState>
+            CivilMilitaryOfficeDefinitions =
+                new List<CivilMilitaryOfficeDefinitionState>();
+        public List<CivilMilitaryOfficeAssignmentState>
+            CivilMilitaryOfficeAssignments =
+                new List<CivilMilitaryOfficeAssignmentState>();
+        public List<PersonPrimaryActivityState> PersonPrimaryActivities =
+            new List<PersonPrimaryActivityState>();
+        public List<HistoricalPersonFamilyIntegrationState>
+            HistoricalPersonFamilyIntegrations =
+                new List<HistoricalPersonFamilyIntegrationState>();
+        public List<Luoyang184LivingWorldState> LuoyangLivingWorlds =
+            new List<Luoyang184LivingWorldState>();
+        public List<FacilityDefinitionState> FacilityDefinitions =
+            new List<FacilityDefinitionState>();
+        public List<FacilityState> Facilities = new List<FacilityState>();
+        public List<TownFacilityState> TownFacilities =
+            new List<TownFacilityState>();
+        public List<MerchantBranchState> MerchantBranches =
+            new List<MerchantBranchState>();
+        public List<StrategicDelegationMandateState>
+            StrategicDelegationMandates =
+                new List<StrategicDelegationMandateState>();
+        public List<StrategicDelegationCommandProposalState>
+            StrategicDelegationCommandProposals =
+                new List<StrategicDelegationCommandProposalState>();
         public List<CountyGovernanceState> CountyGovernances =
             new List<CountyGovernanceState>();
         public List<CountyGentryHouseState> CountyGentryHouses =
@@ -277,6 +322,30 @@ namespace Mandate.Domain
                 new List<PublicReliefProcurementTradeState>();
         public List<PublicReliefRecoveryState> PublicReliefRecoveries =
             new List<PublicReliefRecoveryState>();
+        public List<HouseholdReliefPickupState> HouseholdReliefPickups =
+            new List<HouseholdReliefPickupState>();
+        public List<HouseholdReliefConsumptionState>
+            HouseholdReliefConsumptions =
+                new List<HouseholdReliefConsumptionState>();
+        public List<HouseholdReliefCareDeliveryState>
+            HouseholdReliefCareDeliveries =
+                new List<HouseholdReliefCareDeliveryState>();
+        public List<PersonNutritionProfileState> PersonNutritionProfiles =
+            new List<PersonNutritionProfileState>();
+        public List<PersonNutritionLedgerEntryState> PersonNutritionLedgerEntries =
+            new List<PersonNutritionLedgerEntryState>();
+        public List<NutritionConditionEpisodeState> NutritionConditionEpisodes =
+            new List<NutritionConditionEpisodeState>();
+        public List<CivilianMedicalCaseState> CivilianMedicalCases =
+            new List<CivilianMedicalCaseState>();
+        public List<CivilianMedicalPrescriptionState>
+            CivilianMedicalPrescriptions =
+                new List<CivilianMedicalPrescriptionState>();
+        public List<CivilianMedicalTreatmentState> CivilianMedicalTreatments =
+            new List<CivilianMedicalTreatmentState>();
+        public List<CivilianMedicalServiceState> CivilianMedicalServices =
+            new List<CivilianMedicalServiceState>();
+        public long CivilianMedicalServiceContractActivationDay;
         public List<FormalMarketPriceState> FormalMarketPrices =
             new List<FormalMarketPriceState>();
         public List<CivilianFreightState> CivilianFreights =
@@ -297,6 +366,98 @@ namespace Mandate.Domain
             new List<MilitarySupplyRecordState>();
         public List<MedicalTreatmentRecordState> MedicalTreatments =
             new List<MedicalTreatmentRecordState>();
+        public List<MilitaryMedicalCaseState> MilitaryMedicalCases =
+            new List<MilitaryMedicalCaseState>();
+        public List<MilitaryMedicalServiceState> MilitaryMedicalServices =
+            new List<MilitaryMedicalServiceState>();
+        public List<MilitaryMedicalEvacuationState> MilitaryMedicalEvacuations =
+            new List<MilitaryMedicalEvacuationState>();
+        public List<MilitaryRearMedicalSiteState> MilitaryRearMedicalSites =
+            new List<MilitaryRearMedicalSiteState>();
+        public List<MilitaryRearMedicalAdmissionState>
+            MilitaryRearMedicalAdmissions =
+                new List<MilitaryRearMedicalAdmissionState>();
+        public List<MilitaryRearMedicalTreatmentState>
+            MilitaryRearMedicalTreatments =
+                new List<MilitaryRearMedicalTreatmentState>();
+        public List<MilitaryMedicalTransferState> MilitaryMedicalTransfers =
+            new List<MilitaryMedicalTransferState>();
+        public long MilitaryMedicalTransferContractActivationDay;
+        public long MilitaryPostTreatmentTransferContractActivationDay;
+        public long MilitaryRepeatedMedicalTransferContractActivationDay;
+        public List<MilitaryInjuryEpisodeState> MilitaryInjuryEpisodes =
+            new List<MilitaryInjuryEpisodeState>();
+        public List<MilitaryInjuryProfileDefinitionState>
+            MilitaryInjuryProfiles =
+                new List<MilitaryInjuryProfileDefinitionState>();
+        public long MilitaryInjuryContractActivationDay;
+        public List<MilitaryWoundDeathPolicyDefinitionState>
+            MilitaryWoundDeathPolicies =
+                new List<MilitaryWoundDeathPolicyDefinitionState>();
+        public List<MilitaryWoundDeathState> MilitaryWoundDeaths =
+            new List<MilitaryWoundDeathState>();
+        public List<MilitaryFamilyInheritanceState>
+            MilitaryFamilyInheritances =
+                new List<MilitaryFamilyInheritanceState>();
+        public List<MilitarySurvivorCompensationState>
+            MilitarySurvivorCompensations =
+                new List<MilitarySurvivorCompensationState>();
+        public long MilitaryWoundDeathContractActivationDay;
+        public List<MilitaryMedicalDeathResponsibilityState>
+            MilitaryMedicalDeathResponsibilities =
+                new List<MilitaryMedicalDeathResponsibilityState>();
+        public long MilitaryMedicalDeathResponsibilityContractActivationDay;
+        public List<MilitaryInpatientDeteriorationPolicyDefinitionState>
+            MilitaryInpatientDeteriorationPolicies =
+                new List<MilitaryInpatientDeteriorationPolicyDefinitionState>();
+        public List<MilitaryInpatientDeathClosureState>
+            MilitaryInpatientDeathClosures =
+                new List<MilitaryInpatientDeathClosureState>();
+        public long MilitaryInpatientDeathContractActivationDay;
+        public List<MilitaryMedicalTransferDeathClosureState>
+            MilitaryMedicalTransferDeathClosures =
+                new List<MilitaryMedicalTransferDeathClosureState>();
+        public long MilitaryMedicalTransferDeathContractActivationDay;
+        public List<
+            MilitaryOriginalEvacuationDeteriorationPolicyDefinitionState>
+            MilitaryOriginalEvacuationDeteriorationPolicies =
+                new List<
+                    MilitaryOriginalEvacuationDeteriorationPolicyDefinitionState>();
+        public List<MilitaryOriginalEvacuationDeathClosureState>
+            MilitaryOriginalEvacuationDeathClosures =
+                new List<MilitaryOriginalEvacuationDeathClosureState>();
+        public long MilitaryOriginalEvacuationDeathContractActivationDay;
+        public List<
+            MilitaryPatientReturnDeteriorationPolicyDefinitionState>
+            MilitaryPatientReturnDeteriorationPolicies =
+                new List<
+                    MilitaryPatientReturnDeteriorationPolicyDefinitionState>();
+        public List<MilitaryPatientReturnDeathClosureState>
+            MilitaryPatientReturnDeathClosures =
+                new List<MilitaryPatientReturnDeathClosureState>();
+        public long MilitaryPatientReturnDeathContractActivationDay;
+        public long MilitaryPatientArrivalWaitingTeamDeathContractActivationDay;
+        public List<MilitaryReturnTeamDeathPolicyDefinitionState>
+            MilitaryReturnTeamDeathPolicies =
+                new List<MilitaryReturnTeamDeathPolicyDefinitionState>();
+        public List<MilitaryReturnTeamDeathState> MilitaryReturnTeamDeaths =
+            new List<MilitaryReturnTeamDeathState>();
+        public long MilitaryReturnTeamDeathContractActivationDay;
+        public List<MilitarySurgicalProcedureDefinitionState>
+            MilitarySurgicalProcedures =
+                new List<MilitarySurgicalProcedureDefinitionState>();
+        public long MilitarySurgeryContractActivationDay;
+        public List<MilitaryFieldHospitalConstructionProjectState>
+            MilitaryFieldHospitalConstructionProjects =
+                new List<MilitaryFieldHospitalConstructionProjectState>();
+        public List<MilitaryFieldHospitalConstructionWorkState>
+            MilitaryFieldHospitalConstructionWork =
+                new List<MilitaryFieldHospitalConstructionWorkState>();
+        public List<MilitaryFieldHospitalMaintenanceState>
+            MilitaryFieldHospitalMaintenance =
+                new List<MilitaryFieldHospitalMaintenanceState>();
+        public bool MilitaryMedicalInitialized;
+        public long MilitaryMedicalContractActivationDay;
         public List<ConstructionProjectState> ConstructionProjects =
             new List<ConstructionProjectState>();
         public bool PopulationLedgerInitialized;
@@ -346,6 +507,8 @@ namespace Mandate.Domain
             new List<ProductionSiteState>();
         public List<InventoryTransactionState> InventoryTransactions =
             new List<InventoryTransactionState>();
+        public List<FoodStorageLossState> FoodStorageLosses =
+            new List<FoodStorageLossState>();
         public List<ProcessingWorkOrderState> ProcessingWorkOrders =
             new List<ProcessingWorkOrderState>();
         public List<ProductionPracticeLedgerEntryState>
@@ -470,6 +633,10 @@ namespace Mandate.Domain
             }
 
             PopulationStorage.Validate(People.Count);
+            LivingWorldRuntimeRules.ValidateWorld(this);
+            HistoricalEventContractRules.ValidateWorld(this);
+            HistoricalPersonFamilyIntegrationRules.ValidateWorld(this);
+            Luoyang184LivingWorldRules.ValidateWorld(this);
             ValidateUniqueIds(
                 PersistentWorldCommands,
                 item => item.Id,
@@ -497,6 +664,18 @@ namespace Mandate.Domain
             ValidateUniqueIds(Organizations, organization => organization.Id, "organization");
             ValidateUniqueIds(Positions, position => position.Id, "position");
             ValidateUniqueIds(Memberships, membership => membership.Id, "membership");
+            ValidateUniqueIds(
+                TownFacilities, item => item.Id, "town facility");
+            ValidateUniqueIds(
+                MerchantBranches, item => item.Id, "merchant branch");
+            ValidateUniqueIds(
+                StrategicDelegationMandates,
+                item => item.Id,
+                "strategic delegation mandate");
+            ValidateUniqueIds(
+                StrategicDelegationCommandProposals,
+                item => item.Id,
+                "strategic delegation command proposal");
             ValidateUniqueIds(
                 CountyGovernances, item => item.Id, "county governance");
             ValidateUniqueIds(
@@ -529,6 +708,98 @@ namespace Mandate.Domain
                 PublicReliefRecoveries,
                 item => item.Id,
                 "public relief recovery");
+            ValidateUniqueIds(
+                HouseholdReliefPickups,
+                item => item.Id,
+                "household relief pickup");
+            ValidateUniqueIds(
+                HouseholdReliefCareDeliveries,
+                item => item.Id,
+                "household relief care delivery");
+            ValidateUniqueIds(
+                PersonNutritionProfiles,
+                item => item.Id,
+                "person nutrition profile");
+            ValidateUniqueIds(
+                PersonNutritionLedgerEntries,
+                item => item.Id,
+                "person nutrition ledger entry");
+            ValidateUniqueIds(
+                NutritionConditionEpisodes,
+                item => item.Id,
+                "nutrition condition episode");
+            ValidateUniqueIds(
+                CivilianMedicalCases,
+                item => item.Id,
+                "civilian medical case");
+            ValidateUniqueIds(
+                CivilianMedicalPrescriptions,
+                item => item.Id,
+                "civilian medical prescription");
+            ValidateUniqueIds(
+                CivilianMedicalTreatments,
+                item => item.Id,
+                "civilian medical treatment");
+            ValidateUniqueIds(
+                CivilianMedicalServices,
+                item => item.Id,
+                "civilian medical service");
+            ValidateUniqueIds(
+                MilitaryMedicalCases,
+                item => item.Id,
+                "military medical case");
+            ValidateUniqueIds(
+                MilitaryMedicalServices,
+                item => item.Id,
+                "military medical service");
+            ValidateUniqueIds(
+                MilitaryMedicalEvacuations,
+                item => item.Id,
+                "military medical evacuation");
+            ValidateUniqueIds(
+                MilitaryRearMedicalSites,
+                item => item.Id,
+                "military rear medical site");
+            ValidateUniqueIds(
+                MilitaryRearMedicalAdmissions,
+                item => item.Id,
+                "military rear medical admission");
+            ValidateUniqueIds(
+                MilitaryRearMedicalTreatments,
+                item => item.Id,
+                "military rear medical treatment");
+            ValidateUniqueIds(
+                MilitaryMedicalTransfers,
+                item => item.Id,
+                "military medical transfer");
+            ValidateUniqueIds(
+                MilitaryInjuryEpisodes,
+                item => item.Id,
+                "military injury episode");
+            ValidateUniqueIds(
+                MilitaryInjuryProfiles,
+                item => item.Id,
+                "military injury profile");
+            ValidateUniqueIds(
+                MilitarySurgicalProcedures,
+                item => item.Id,
+                "military surgical procedure");
+            ValidateUniqueIds(
+                MilitaryFieldHospitalConstructionProjects,
+                item => item.Id,
+                "military field hospital construction project");
+            ValidateUniqueIds(
+                MilitaryFieldHospitalConstructionWork,
+                item => item.Id,
+                "military field hospital construction work");
+            ValidateUniqueIds(
+                MilitaryFieldHospitalMaintenance,
+                item => item.Id,
+                "military field hospital maintenance");
+            ValidateUniqueIds(
+                FoodStorageLosses,
+                item => item.Id,
+                "food storage loss");
             ValidateUniqueIds(
                 FormalMarketPrices, item => item.Id, "formal market price");
             ValidateUniqueIds(
@@ -699,6 +970,8 @@ namespace Mandate.Domain
 
                 if (person.LaborCapacityBasisPoints < 0 ||
                     person.LaborCapacityBasisPoints > 10_000 ||
+                    person.PermanentLaborCapacityPenaltyBasisPoints < 0 ||
+                    person.PermanentLaborCapacityPenaltyBasisPoints > 10_000 ||
                     !Enum.IsDefined(
                         typeof(VillageOccupation), person.VillageOccupation) ||
                     !Enum.IsDefined(typeof(LocalDutyKind), person.LocalDuty) ||
@@ -1012,9 +1285,16 @@ namespace Mandate.Domain
 
             ValidateVillages(personIds, locationIds);
             ValidateInventoryProduction(personIds, locationIds);
+            ValidateFoodStorageLosses();
             ValidateFormalMarket(locationIds);
             ValidateCivilianFreight(personIds, locationIds);
             ValidatePublicReliefRecovery();
+            ValidateHouseholdReliefPickups();
+            ValidateHouseholdReliefConsumptions();
+            ValidateHouseholdReliefCareDeliveries();
+            ValidateLongTermNutrition();
+            ValidateCivilianMedicalCare();
+            ValidateMilitaryMedicalCare();
             ValidateProduction(personIds);
             ValidateResearch(personIds);
 
@@ -1128,6 +1408,11 @@ namespace Mandate.Domain
             }
 
             ValidateCountyGovernance(locationIds, organizationIds);
+            ValidateVillageReliefPolicies(personIds, organizationIds);
+            ValidateMerchantTownFacilities(
+                personIds,
+                locationIds,
+                organizationIds);
 
             var positionIds = new HashSet<string>(StringComparer.Ordinal);
             for (var i = 0; i < Positions.Count; i++)
@@ -1487,6 +1772,13 @@ namespace Mandate.Domain
                     throw new InvalidOperationException("A commodity cannot be null.");
                 _ = new StableId(commodity.Id);
                 commodityIds.Add(commodity.Id);
+                if (!string.IsNullOrEmpty(commodity.ProductDefinitionId))
+                {
+                    ValidateContentReference(
+                        commodity.ProductDefinitionId,
+                        "commodity product",
+                        commodity.Id);
+                }
                 if (commodity.BasePrice <= 0 || commodity.UnitWeight <= 0)
                 {
                     throw new InvalidOperationException(
@@ -1614,6 +1906,11 @@ namespace Mandate.Domain
                 }
             }
 
+            ValidateStrategicDelegation(
+                personIds,
+                locationIds,
+                organizationIds,
+                positionIds);
             ValidateEducation(personIds, positionIds);
             ValidateMilitaryService(personIds, locationIds, armyIds);
             ValidateMilitaryEquipment(personIds, armyIds);
@@ -1624,6 +1921,123 @@ namespace Mandate.Domain
             ValidateMilitaryLogisticsDelegation(
                 personIds, locationIds, organizationIds, armyIds, routeIds);
             ValidateAttention(personIds);
+        }
+
+        private void ValidateStrategicDelegation(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds,
+            HashSet<string> positionIds)
+        {
+            var mandates = new Dictionary<
+                string,
+                StrategicDelegationMandateState>(StringComparer.Ordinal);
+            for (var i = 0; i < StrategicDelegationMandates.Count; i++)
+            {
+                var mandate = StrategicDelegationMandates[i] ??
+                    throw new InvalidOperationException(
+                        "A strategic delegation mandate cannot be null.");
+                mandate.ValidateContract();
+                if (!personIds.Contains(mandate.IssuerPersonId) ||
+                    !personIds.Contains(mandate.AssigneePersonId) ||
+                    !organizationIds.Contains(mandate.OrganizationId) ||
+                    !positionIds.Contains(mandate.AssigneePositionId) ||
+                    !locationIds.Contains(mandate.JurisdictionLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Mandate {mandate.Id} contains a missing reference.");
+                }
+
+                var assigneePosition = FindPosition(
+                    Positions,
+                    mandate.AssigneePositionId);
+                if (assigneePosition.OrganizationId != mandate.OrganizationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Mandate {mandate.Id} uses an assignee position from another organization.");
+                }
+
+                if (!string.IsNullOrEmpty(mandate.IssuerPositionId))
+                {
+                    if (!positionIds.Contains(mandate.IssuerPositionId) ||
+                        FindPosition(Positions, mandate.IssuerPositionId)
+                            .OrganizationId != mandate.OrganizationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Mandate {mandate.Id} has an invalid issuer position snapshot.");
+                    }
+                }
+
+                var organization = FindOrganization(
+                    Organizations,
+                    mandate.OrganizationId);
+                var capabilities = new HashSet<string>(
+                    OrganizationStrategicDelegationCapabilityCatalog
+                        .CreateAllowedOrders(organization.Type),
+                    StringComparer.Ordinal);
+                for (var orderIndex = 0;
+                     orderIndex < mandate.AllowedOrderIdsSnapshot.Count;
+                     orderIndex++)
+                {
+                    if (!capabilities.Contains(
+                            mandate.AllowedOrderIdsSnapshot[orderIndex]))
+                    {
+                        throw new InvalidOperationException(
+                            $"Mandate {mandate.Id} exceeds organization capability.");
+                    }
+                }
+
+                mandates.Add(mandate.Id, mandate);
+            }
+
+            for (var i = 0;
+                 i < StrategicDelegationCommandProposals.Count;
+                 i++)
+            {
+                var proposal = StrategicDelegationCommandProposals[i] ??
+                    throw new InvalidOperationException(
+                        "A strategic delegation proposal cannot be null.");
+                proposal.ValidateContract();
+                if (!mandates.TryGetValue(
+                        proposal.MandateId,
+                        out var mandate) ||
+                    proposal.ActorPersonId != mandate.AssigneePersonId ||
+                    proposal.OrganizationId != mandate.OrganizationId ||
+                    !locationIds.Contains(
+                        proposal.JurisdictionLocationId) ||
+                    proposal.CreatedDay < mandate.IssuedDay ||
+                    proposal.CreatedDay > AbsoluteDay ||
+                    proposal.EstimatedCost > mandate.BudgetLimit ||
+                    !mandate.AllowedOrderIdsSnapshot.Contains(
+                        proposal.OrderId) ||
+                    !IsSameOrDescendantLocation(
+                        proposal.JurisdictionLocationId,
+                        mandate.JurisdictionLocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid strategic delegation proposal {proposal.Id}.");
+                }
+            }
+        }
+
+        private bool IsSameOrDescendantLocation(
+            string locationId,
+            string rootLocationId)
+        {
+            var cursor = FindLocation(Locations, locationId);
+            while (cursor != null)
+            {
+                if (cursor.Id == rootLocationId)
+                {
+                    return true;
+                }
+
+                cursor = string.IsNullOrEmpty(cursor.ParentLocationId)
+                    ? null
+                    : FindLocation(Locations, cursor.ParentLocationId);
+            }
+
+            return false;
         }
 
         private void ValidateMilitaryLogisticsDelegation(
@@ -2569,6 +2983,7 @@ namespace Mandate.Domain
                 _ = new StableId(order.AcquisitionMethodId);
                 _ = new StableId(order.CargoConsumptionPolicyId);
                 _ = new StableId(order.LiabilityPolicyId);
+                _ = new StableId(order.DeliveryPolicyId);
                 var hasJourney = journeys.TryGetValue(
                     order.JourneyId, out var journey);
                 var hasMarch = marches.TryGetValue(
@@ -2611,6 +3026,62 @@ namespace Mandate.Domain
                 var hasTransportContainer = containers.TryGetValue(
                     order.TransportInventoryContainerId,
                     out var transportContainer);
+                var targetArmy = FindArmy(Armies, order.TargetArmyId);
+                InventoryContainerState targetInventoryContainer = null;
+                var hasTargetContainer = string.IsNullOrEmpty(
+                        order.TargetInventoryContainerId) ||
+                    containers.TryGetValue(
+                        order.TargetInventoryContainerId,
+                        out targetInventoryContainer);
+                var validDeliveryContract = order.DeliveryPolicyId ==
+                        MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions &&
+                    string.IsNullOrEmpty(order.TargetInventoryContainerId) ||
+                    order.DeliveryPolicyId == MilitaryLogisticsDeliveryPolicyIds
+                        .ArmyInventoryContainer &&
+                    hasTargetContainer &&
+                    targetInventoryContainer != null &&
+                    targetInventoryContainer.Id ==
+                        targetArmy.MedicalInventoryContainerId &&
+                    targetInventoryContainer.OwnerOrganizationId ==
+                        order.BuyerOrganizationId;
+                long inventoryReceiptQuantity = 0;
+                var validInventoryReceipts = true;
+                for (var transactionIndex = 0;
+                     transactionIndex < InventoryTransactions.Count;
+                     transactionIndex++)
+                {
+                    var receipt = InventoryTransactions[transactionIndex];
+                    if (receipt.Type !=
+                            InventoryTransactionType
+                                .MilitaryLogisticsDelivered ||
+                        receipt.SourceMilitaryLogisticsOrderId != order.Id)
+                    {
+                        continue;
+                    }
+
+                    validInventoryReceipts &=
+                        receipt.Lines != null && receipt.Lines.Count == 1 &&
+                        receipt.Lines[0].QuantityDelta > 0 &&
+                        receipt.Lines[0].ReservedQuantityDelta == 0 &&
+                        receipt.Lines[0].ProductDefinitionId ==
+                            order.CargoProductDefinitionId &&
+                        receipt.Lines[0].OwnerOrganizationId ==
+                            order.BuyerOrganizationId &&
+                        receipt.Lines[0].InventoryContainerId ==
+                            order.TargetInventoryContainerId;
+                    if (receipt.Lines != null && receipt.Lines.Count == 1)
+                    {
+                        inventoryReceiptQuantity = checked(
+                            inventoryReceiptQuantity +
+                            receipt.Lines[0].QuantityDelta);
+                    }
+                }
+                validInventoryReceipts &= order.DeliveryPolicyId ==
+                        MilitaryLogisticsDeliveryPolicyIds
+                            .ArmyInventoryContainer
+                    ? inventoryReceiptQuantity ==
+                        order.DeliveredCargoQuantity
+                    : inventoryReceiptQuantity == 0;
                 var cargoBalanced = order.DispatchedCargoQuantity ==
                     order.RemainingCargoQuantity +
                     order.DeliveredCargoQuantity +
@@ -2637,7 +3108,7 @@ namespace Mandate.Domain
                         MilitaryLogisticsLiabilityPolicyIds
                             .LegacyNoRetroactiveSettlement ||
                     !armyIds.Contains(order.TargetArmyId) ||
-                    FindArmy(Armies, order.TargetArmyId).OrganizationId !=
+                    targetArmy.OrganizationId !=
                         order.BuyerOrganizationId ||
                     !hasCargoBatch ||
                     cargoBatch.ProductDefinitionId !=
@@ -2652,6 +3123,8 @@ namespace Mandate.Domain
                         order.CarrierPersonId ||
                     transportContainer.OwnerOrganizationId !=
                         order.CarrierOrganizationId ||
+                    !validDeliveryContract ||
+                    !validInventoryReceipts ||
                     !routeIds.Contains(order.RouteId) ||
                     !locationIds.Contains(order.OriginLocationId) ||
                     !locationIds.Contains(order.DestinationLocationId) ||
@@ -2709,6 +3182,9 @@ namespace Mandate.Domain
                         $"army={armyIds.Contains(order.TargetArmyId)}, " +
                         $"batches={hasCargoBatch}/{hasProvisionBatch}, " +
                         $"containers={hasSourceContainer}/{hasTransportContainer}, " +
+                        $"delivery={validDeliveryContract}/" +
+                        $"{validInventoryReceipts}/" +
+                        $"{inventoryReceiptQuantity}, " +
                         $"cargo={cargoBalanced} " +
                         $"({order.DispatchedCargoQuantity}/" +
                         $"{order.RemainingCargoQuantity}/" +
@@ -3697,8 +4173,15 @@ namespace Mandate.Domain
                 var available =
                     service.Status == MilitaryServiceStatus.Mustering ||
                     service.Status == MilitaryServiceStatus.Active ||
-                    service.Status == MilitaryServiceStatus.Wounded;
-                if (available && (!person.IsAlive || person.LocationId != army.LocationId) ||
+                    service.Status == MilitaryServiceStatus.Wounded ||
+                    service.Status ==
+                        MilitaryServiceStatus.MedicalEvacuationDuty;
+                var evacuationDetached =
+                    IsMilitaryMedicalEvacuationService(service.Id);
+                if (available &&
+                        (!person.IsAlive ||
+                         person.LocationId != army.LocationId &&
+                         !evacuationDetached) ||
                     service.Status == MilitaryServiceStatus.Dead && person.IsAlive)
                 {
                     throw new InvalidOperationException(
@@ -4947,6 +5430,21 @@ namespace Mandate.Domain
             return null;
         }
 
+        private static OrganizationState FindOrganization(
+            IList<OrganizationState> organizations,
+            string organizationId)
+        {
+            for (var i = 0; i < organizations.Count; i++)
+            {
+                if (organizations[i].Id == organizationId)
+                {
+                    return organizations[i];
+                }
+            }
+
+            return null;
+        }
+
         private static void ValidateBasisPoints(int value, string personId, string field)
         {
             if (value < 0 || value > 10_000)
@@ -5049,6 +5547,188 @@ namespace Mandate.Domain
             }
         }
 
+        private void ValidateMerchantTownFacilities(
+            HashSet<string> personIds,
+            HashSet<string> locationIds,
+            HashSet<string> organizationIds)
+        {
+            if (TownFacilities == null || MerchantBranches == null)
+            {
+                throw new InvalidOperationException(
+                    "Merchant town collections cannot be null.");
+            }
+
+            var familyIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < Families.Count; i++)
+            {
+                familyIds.Add(Families[i].Id);
+            }
+
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+            }
+
+            var containers = new Dictionary<string, InventoryContainerState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < InventoryContainers.Count; i++)
+            {
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            }
+
+            var facilities = new Dictionary<string, TownFacilityState>(
+                StringComparer.Ordinal);
+            var placedFacilityCoordinates = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < TownFacilities.Count; i++)
+            {
+                var facility = TownFacilities[i] ??
+                    throw new InvalidOperationException(
+                        "A town facility cannot be null.");
+                _ = new StableId(facility.Id);
+                _ = new StableId(facility.KindId);
+                _ = new StableId(facility.AccessPolicyId);
+                facilities.Add(facility.Id, facility);
+
+                var organizationOwned =
+                    !string.IsNullOrEmpty(facility.OwnerOrganizationId);
+                var familyOwned = !string.IsNullOrEmpty(facility.OwnerFamilyId);
+                if (string.IsNullOrWhiteSpace(facility.DisplayName) ||
+                    !locationIds.Contains(facility.LocationId) ||
+                    organizationOwned &&
+                    !organizationIds.Contains(facility.OwnerOrganizationId) ||
+                    familyOwned && !familyIds.Contains(facility.OwnerFamilyId) ||
+                    organizationOwned && familyOwned ||
+                    !string.IsNullOrEmpty(facility.ManagerPersonId) &&
+                    !personIds.Contains(facility.ManagerPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid town facility {facility.Id}.");
+                }
+
+                if (!string.IsNullOrEmpty(facility.InventoryContainerId))
+                {
+                    if (!containers.TryGetValue(
+                            facility.InventoryContainerId,
+                            out var container) ||
+                        container.LocationId != facility.LocationId ||
+                        organizationOwned &&
+                        container.OwnerOrganizationId !=
+                            facility.OwnerOrganizationId ||
+                        familyOwned &&
+                        container.OwnerFamilyId != facility.OwnerFamilyId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Town facility {facility.Id} has an invalid inventory container.");
+                    }
+                }
+
+                if (organizationOwned &&
+                    !string.IsNullOrEmpty(facility.ManagerPersonId) &&
+                    !HasOrganizationMembership(
+                        facility.ManagerPersonId,
+                        facility.OwnerOrganizationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Town facility {facility.Id} manager is not an organization member.");
+                }
+
+                if (facility.HasMapPlacement)
+                {
+                    if (string.IsNullOrWhiteSpace(facility.DistrictId) ||
+                        facility.MapXBasisPoints <= 0 ||
+                        facility.MapXBasisPoints >= 10_000 ||
+                        facility.MapYBasisPoints <= 0 ||
+                        facility.MapYBasisPoints >= 10_000 ||
+                        facility.FootprintWidthBasisPoints <= 0 ||
+                        facility.FootprintWidthBasisPoints > 5_000 ||
+                        facility.FootprintHeightBasisPoints <= 0 ||
+                        facility.FootprintHeightBasisPoints > 5_000)
+                    {
+                        throw new InvalidOperationException(
+                            $"Town facility {facility.Id} has an invalid map placement.");
+                    }
+                    _ = new StableId(facility.DistrictId);
+                    var coordinateKey = facility.LocationId + "|" +
+                        facility.MapXBasisPoints + "|" +
+                        facility.MapYBasisPoints;
+                    if (!placedFacilityCoordinates.Add(coordinateKey))
+                    {
+                        throw new InvalidOperationException(
+                            $"Town facility {facility.Id} duplicates a map placement.");
+                    }
+                }
+                else if (!string.IsNullOrEmpty(facility.DistrictId) ||
+                         facility.MapXBasisPoints != 0 ||
+                         facility.MapYBasisPoints != 0 ||
+                         facility.FootprintWidthBasisPoints != 0 ||
+                         facility.FootprintHeightBasisPoints != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Unplaced town facility {facility.Id} carries placement data.");
+                }
+            }
+
+            var branchLocations = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MerchantBranches.Count; i++)
+            {
+                var branch = MerchantBranches[i] ??
+                    throw new InvalidOperationException(
+                        "A merchant branch cannot be null.");
+                _ = new StableId(branch.Id);
+                if (!organizations.TryGetValue(
+                        branch.OrganizationId,
+                        out var organization) ||
+                    organization.Type != OrganizationType.Merchant ||
+                    string.IsNullOrWhiteSpace(branch.DisplayName) ||
+                    !locationIds.Contains(branch.LocationId) ||
+                    !personIds.Contains(branch.ManagerPersonId) ||
+                    !HasOrganizationMembership(
+                        branch.ManagerPersonId,
+                        branch.OrganizationId) ||
+                    branch.FacilityIds == null ||
+                    branch.FacilityIds.Count == 0 ||
+                    !branchLocations.Add(
+                        branch.OrganizationId + "|" + branch.LocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid merchant branch {branch.Id}.");
+                }
+
+                if (!containers.TryGetValue(
+                        branch.InventoryContainerId,
+                        out var branchContainer) ||
+                    branchContainer.OwnerOrganizationId !=
+                        branch.OrganizationId ||
+                    branchContainer.LocationId != branch.LocationId ||
+                    !string.IsNullOrEmpty(branchContainer.CarrierPersonId) ||
+                    branch.IsHeadquarters &&
+                    organization.HeadquartersLocationId != branch.LocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Merchant branch {branch.Id} has an invalid warehouse.");
+                }
+
+                var facilityIds = new HashSet<string>(StringComparer.Ordinal);
+                for (var facilityIndex = 0;
+                     facilityIndex < branch.FacilityIds.Count;
+                     facilityIndex++)
+                {
+                    var facilityId = branch.FacilityIds[facilityIndex];
+                    if (!facilityIds.Add(facilityId) ||
+                        !facilities.TryGetValue(facilityId, out var facility) ||
+                        facility.LocationId != branch.LocationId ||
+                        facility.OwnerOrganizationId != branch.OrganizationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Merchant branch {branch.Id} references an invalid facility.");
+                    }
+                }
+            }
+        }
+
         private void ValidateVillages(
             HashSet<string> personIds,
             HashSet<string> locationIds)
@@ -5098,6 +5778,26 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Village {village.Id} disagrees with food inventory authority.");
+                }
+
+                var usesCountyReliefAuthority =
+                    village.HouseholdReliefAuthorizationPolicyId ==
+                    HouseholdReliefAuthorizationPolicyIds.CountyGovernmentLeader;
+                var usesEmergencyReliefAuthority =
+                    village.HouseholdReliefAuthorizationPolicyId ==
+                    HouseholdReliefAuthorizationPolicyIds.EmergencySystem;
+                if (village.HouseholdReliefPriorityPolicyId !=
+                        HouseholdReliefPriorityPolicyIds
+                            .NeedSeverityVulnerability ||
+                    (!usesCountyReliefAuthority &&
+                     !usesEmergencyReliefAuthority) ||
+                    usesCountyReliefAuthority && string.IsNullOrEmpty(
+                        village.HouseholdReliefAuthorityOrganizationId) ||
+                    usesEmergencyReliefAuthority && !string.IsNullOrEmpty(
+                        village.HouseholdReliefAuthorityOrganizationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Village {village.Id} has an invalid relief policy.");
                 }
 
                 if (village.HouseholdCount != village.HouseholdIds.Count)
@@ -5366,6 +6066,46 @@ namespace Mandate.Domain
                 {
                     throw new InvalidOperationException(
                         $"Invalid county fiscal ledger entry {entry.Id}.");
+                }
+            }
+        }
+
+        private void ValidateVillageReliefPolicies(
+            HashSet<string> personIds,
+            HashSet<string> organizationIds)
+        {
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+            }
+
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                var village = Villages[i];
+                if (village.HouseholdReliefAuthorizationPolicyId ==
+                    HouseholdReliefAuthorizationPolicyIds.EmergencySystem)
+                {
+                    continue;
+                }
+                if (village.HouseholdReliefAuthorizationPolicyId !=
+                        HouseholdReliefAuthorizationPolicyIds
+                            .CountyGovernmentLeader ||
+                    !organizationIds.Contains(
+                        village.HouseholdReliefAuthorityOrganizationId) ||
+                    !organizations.TryGetValue(
+                        village.HouseholdReliefAuthorityOrganizationId,
+                        out var organization) ||
+                    organization.Type != OrganizationType.Government ||
+                    string.IsNullOrEmpty(organization.LeaderPersonId) ||
+                    !personIds.Contains(organization.LeaderPersonId) ||
+                    !CountyGovernances.Exists(item =>
+                        item.CountyLocationId == village.ParentLocationId &&
+                        item.GovernmentOrganizationId == organization.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Village {village.Id} has an invalid county relief authority.");
                 }
             }
         }
@@ -5726,7 +6466,37 @@ namespace Mandate.Domain
 
             for (var i = 0; i < VillageFacilities.Count; i++)
             {
-                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+                var facility = VillageFacilities[i] ??
+                    throw new InvalidOperationException(
+                        "A village facility cannot be null.");
+                facilities.Add(facility.Id, facility);
+                if (facility.CapabilityTags == null ||
+                    string.IsNullOrEmpty(
+                        facility.FoodStorageEnvironmentId) ||
+                    facility.FoodStorageProtectionBasisPoints < 0 ||
+                    facility.FoodStorageProtectionBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid food storage environment on {facility.Id}.");
+                }
+
+                var capabilityTags = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var tagIndex = 0;
+                     tagIndex < facility.CapabilityTags.Count;
+                     tagIndex++)
+                {
+                    ValidateContentReference(
+                        facility.CapabilityTags[tagIndex],
+                        "village facility capability",
+                        facility.Id);
+                    if (!capabilityTags.Add(
+                            facility.CapabilityTags[tagIndex]))
+                    {
+                        throw new InvalidOperationException(
+                            $"Duplicate capability on {facility.Id}.");
+                    }
+                }
             }
 
             for (var i = 0; i < ProcessingWorkOrders.Count; i++)
@@ -5787,7 +6557,11 @@ namespace Mandate.Domain
                     !string.IsNullOrEmpty(container.CarrierPersonId) &&
                     !personIds.Contains(container.CarrierPersonId) ||
                     !locationIds.Contains(container.LocationId) ||
-                    container.CapacityWeight <= 0)
+                    container.CapacityWeight <= 0 ||
+                    string.IsNullOrEmpty(
+                        container.FoodStorageEnvironmentId) ||
+                    container.FoodStorageProtectionBasisPoints < 0 ||
+                    container.FoodStorageProtectionBasisPoints > 10_000)
                 {
                     throw new InvalidOperationException(
                         $"Invalid inventory container {container.Id}.");
@@ -5943,8 +6717,15 @@ namespace Mandate.Domain
                     containers.TryGetValue(
                         batch.InventoryContainerId, out var container) &&
                     container.OwnerOrganizationId == batch.OwnerOrganizationId;
+                var validFamilyContainerStorage = familyContainerStored &&
+                    familyIds.Contains(batch.OwnerFamilyId) &&
+                    containers.TryGetValue(
+                        batch.InventoryContainerId, out var familyContainer) &&
+                    familyContainer.OwnerFamilyId == batch.OwnerFamilyId &&
+                    string.IsNullOrEmpty(familyContainer.CarrierPersonId);
                 var validCivilianFreightStorage = false;
                 var validPublicReliefFreightStorage = false;
+                var validMerchantCarrierStorage = false;
                 InventoryContainerState freightContainer = null;
                 InventoryTransactionState sourceTransaction = null;
                 CivilianFreightState civilianFreight = null;
@@ -5985,9 +6766,28 @@ namespace Mandate.Domain
                         civilianFreight.TransportInventoryContainerId ==
                             freightContainer.Id;
                 }
+                if (familyContainerStored &&
+                    containers.TryGetValue(
+                        batch.InventoryContainerId, out var merchantContainer) &&
+                    !string.IsNullOrEmpty(merchantContainer.CarrierPersonId) &&
+                    transactions.TryGetValue(
+                        batch.SourceTransactionId, out var merchantTransaction) &&
+                    merchantTransaction.Type ==
+                        InventoryTransactionType.MerchantMarketPurchased &&
+                    merchantTransaction.ActorPersonId ==
+                        merchantContainer.CarrierPersonId)
+                {
+                    var merchant = People.Find(item =>
+                        item.Id == merchantContainer.CarrierPersonId);
+                    validMerchantCarrierStorage = merchant != null &&
+                        merchant.FamilyId == batch.OwnerFamilyId &&
+                        merchantContainer.OwnerFamilyId == batch.OwnerFamilyId;
+                }
                 if (!validFamilyStorage && !validOrganizationStorage &&
+                    !validFamilyContainerStorage &&
                     !validCivilianFreightStorage &&
-                    !validPublicReliefFreightStorage ||
+                    !validPublicReliefFreightStorage &&
+                    !validMerchantCarrierStorage ||
                     !locationIds.Contains(batch.OriginLocationId) ||
                     !transactionIds.Contains(batch.SourceTransactionId) ||
                     !string.IsNullOrEmpty(batch.SourceWorkOrderId) &&
@@ -6009,7 +6809,8 @@ namespace Mandate.Domain
                     batch.SeedVigorBasisPoints < 0 ||
                     batch.SeedVigorBasisPoints > 10_000 ||
                     batch.SeedPurityBasisPoints < 0 ||
-                    batch.SeedPurityBasisPoints > 10_000)
+                    batch.SeedPurityBasisPoints > 10_000 ||
+                    batch.NextFoodStorageAssessmentDay < 0)
                 {
                     throw new InvalidOperationException(
                         $"Invalid product batch {batch.Id}.");
@@ -6019,7 +6820,9 @@ namespace Mandate.Domain
             ValidateResourceExtraction(
                 personIds,
                 locationIds,
+                familyIds,
                 organizationIds,
+                facilities,
                 productionSites,
                 containers,
                 batches,
@@ -6454,6 +7257,14 @@ namespace Mandate.Domain
                         transaction.SourceCivilianFreightId) &&
                     !civilianFreights.ContainsKey(
                         transaction.SourceCivilianFreightId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.HouseholdReliefRecipientPersonId) &&
+                    (!personIds.Contains(
+                         transaction.HouseholdReliefRecipientPersonId) ||
+                     transaction.Type !=
+                         InventoryTransactionType.FoodConsumed ||
+                     string.IsNullOrEmpty(
+                         transaction.SourceHouseholdReliefConsumptionId)) ||
                     transaction.Lines == null || transaction.Lines.Count == 0)
                 {
                     throw new InvalidOperationException(
@@ -6491,7 +7302,9 @@ namespace Mandate.Domain
                     transaction.Type == InventoryTransactionType
                         .MilitaryLogisticsHandoffReserved ||
                     transaction.Type == InventoryTransactionType
-                        .MilitaryLogisticsHandoffLoaded;
+                        .MilitaryLogisticsHandoffLoaded ||
+                    transaction.Type == InventoryTransactionType
+                        .MilitaryLogisticsDelivered;
                 var formalization = transaction.Type ==
                     InventoryTransactionType.LegacyFoodStockFormalized;
                 var foodTax = transaction.Type ==
@@ -6524,6 +7337,22 @@ namespace Mandate.Domain
                     InventoryTransactionType.CivilianFreightDelivered;
                 var civilianInventory = civilianDispatch || civilianLoss ||
                     civilianDelivery;
+                var merchantPurchased = transaction.Type ==
+                    InventoryTransactionType.MerchantMarketPurchased;
+                var merchantDamaged = transaction.Type ==
+                    InventoryTransactionType.MerchantCargoDamaged;
+                var merchantSold = transaction.Type ==
+                    InventoryTransactionType.MerchantMarketSold;
+                var merchantInventory = merchantPurchased ||
+                    merchantDamaged || merchantSold;
+                var medicalTransferReservation = transaction.Type ==
+                    InventoryTransactionType
+                        .MilitaryMedicalTransferMedicineReserved;
+                var medicalTransferRelease = transaction.Type ==
+                    InventoryTransactionType
+                        .MilitaryMedicalTransferMedicineReleased;
+                var medicalTransferReservationChange =
+                    medicalTransferReservation || medicalTransferRelease;
                 CivilianFreightState civilianFreight = null;
                 var hasCivilianFreight = !string.IsNullOrEmpty(
                         transaction.SourceCivilianFreightId) &&
@@ -6600,6 +7429,28 @@ namespace Mandate.Domain
                              transaction.SourceFormalMarketOrderId) &&
                          string.IsNullOrEmpty(
                              transaction.SourceCountyGovernanceId));
+                var validMerchantProvenance = merchantInventory &&
+                    !string.IsNullOrEmpty(transaction.ActorPersonId) &&
+                    string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceMilitaryProcurementId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceEquipmentRepairOrderId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceResourceExtractionOrderId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceMilitaryLogisticsOrderId) &&
+                    string.IsNullOrEmpty(transaction.SourceVillageId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCountyGovernanceId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceFormalMarketOrderId) &&
+                    string.IsNullOrEmpty(
+                        transaction.SourceCivilianFreightId) &&
+                    transaction.LegacyFamilyGrainDelta == 0 &&
+                    transaction.LegacyFamilySeedGrainDelta == 0 &&
+                    transaction.LegacyVillagePublicGranaryDelta == 0 &&
+                    transaction.LegacyCountyGranaryDelta == 0;
                 if (requiresOrder != hasProcessingOrder ||
                     hasAgricultureOrder && !validAgricultureInventory ||
                     requiresProcurement !=
@@ -6614,6 +7465,9 @@ namespace Mandate.Domain
                     requiresMilitaryLogistics !=
                     !string.IsNullOrEmpty(
                         transaction.SourceMilitaryLogisticsOrderId) ||
+                    medicalTransferReservationChange !=
+                    !string.IsNullOrEmpty(
+                        transaction.SourceMilitaryMedicalTransferId) ||
                     transaction.Type ==
                         InventoryTransactionType.LegacyBalanceConverted &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
@@ -6634,6 +7488,7 @@ namespace Mandate.Domain
                      transaction.LegacyCountyGranaryDelta != 0) ||
                     marketInventory && !validMarketProvenance ||
                     civilianInventory && !validCivilianProvenance ||
+                    merchantInventory && !validMerchantProvenance ||
                     !marketInventory && !civilianDispatch &&
                     !string.IsNullOrEmpty(
                         transaction.SourceFormalMarketOrderId) ||
@@ -6837,6 +7692,21 @@ namespace Mandate.Domain
                         }
                     }
 
+                    if (medicalTransferReservation &&
+                        (line.QuantityDelta != 0 ||
+                         line.ReservedQuantityDelta <= 0))
+                    {
+                        throw new InvalidOperationException(
+                            $"Medical transfer reservation {transaction.Id} has an invalid line.");
+                    }
+                    if (medicalTransferRelease &&
+                        (line.QuantityDelta != 0 ||
+                         line.ReservedQuantityDelta >= 0))
+                    {
+                        throw new InvalidOperationException(
+                            $"Medical transfer release {transaction.Id} has an invalid line.");
+                    }
+
                     if (marketTransferred)
                     {
                         var isSource = line.QuantityDelta < 0;
@@ -6994,6 +7864,32 @@ namespace Mandate.Domain
                         }
                     }
 
+                    if (merchantInventory)
+                    {
+                        containers.TryGetValue(
+                            line.InventoryContainerId ?? string.Empty,
+                            out var merchantContainer);
+                        var merchant = People.Find(item =>
+                            item.Id == transaction.ActorPersonId);
+                        var validMerchantLine =
+                            merchantContainer != null &&
+                            merchant != null &&
+                            merchantContainer.CarrierPersonId == merchant.Id &&
+                            merchantContainer.OwnerFamilyId == merchant.FamilyId &&
+                            line.OwnerFamilyId == merchant.FamilyId &&
+                            string.IsNullOrEmpty(line.OwnerOrganizationId) &&
+                            string.IsNullOrEmpty(line.StorageFacilityId) &&
+                            line.ReservedQuantityDelta == 0 &&
+                            (merchantPurchased && line.QuantityDelta > 0 ||
+                             (merchantDamaged || merchantSold) &&
+                             line.QuantityDelta < 0);
+                        if (!validMerchantLine)
+                        {
+                            throw new InvalidOperationException(
+                                $"Merchant inventory line on {transaction.Id} is invalid.");
+                        }
+                    }
+
                     AddDelta(quantityDeltas, line.BatchId, line.QuantityDelta);
                     AddDelta(
                         reservationDeltas,
@@ -7099,6 +7995,168 @@ namespace Mandate.Domain
                 }
             }
 
+            for (var personIndex = 0;
+                 personIndex < People.Count;
+                 personIndex++)
+            {
+                var person = People[personIndex];
+                long totalWeight = 0;
+                for (var inventoryIndex = 0;
+                     inventoryIndex < Inventories.Count;
+                     inventoryIndex++)
+                {
+                    var stack = Inventories[inventoryIndex];
+                    if (stack.OwnerPersonId == person.Id)
+                    {
+                        totalWeight = checked(
+                            totalWeight +
+                            (long)stack.Quantity *
+                            FindCommodity(Commodities, stack.CommodityId)
+                                .UnitWeight);
+                    }
+                }
+                for (var containerIndex = 0;
+                     containerIndex < InventoryContainers.Count;
+                     containerIndex++)
+                {
+                    var container = InventoryContainers[containerIndex];
+                    if (container.CarrierPersonId != person.Id ||
+                        container.KindId !=
+                            "inventory_container.merchant_caravan")
+                    {
+                        continue;
+                    }
+                    for (var batchIndex = 0;
+                         batchIndex < ProductBatches.Count;
+                         batchIndex++)
+                    {
+                        var batch = ProductBatches[batchIndex];
+                        if (batch.InventoryContainerId == container.Id)
+                        {
+                            totalWeight = checked(
+                                totalWeight +
+                                batch.Quantity * batch.UnitWeight);
+                        }
+                    }
+                }
+                if (totalWeight > person.CargoCapacity)
+                {
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} exceeds merchant cargo capacity.");
+                }
+            }
+
+        }
+
+        private void ValidateFoodStorageLosses()
+        {
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+            {
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            }
+            var transactions = new Dictionary<string, InventoryTransactionState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+            }
+            var recordIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < FoodStorageLosses.Count; i++)
+            {
+                var record = FoodStorageLosses[i] ??
+                    throw new InvalidOperationException(
+                        "A food storage loss cannot be null.");
+                recordIds.Add(record.Id);
+                if (!batches.TryGetValue(record.BatchId, out var batch) ||
+                    record.ProductDefinitionId != batch.ProductDefinitionId ||
+                    record.StorageFacilityId != batch.StorageFacilityId ||
+                    record.InventoryContainerId != batch.InventoryContainerId ||
+                    string.IsNullOrEmpty(record.StorageEnvironmentId) ||
+                    record.StorageProtectionBasisPoints < 0 ||
+                    record.StorageProtectionBasisPoints > 10_000 ||
+                    record.FoodSpoilageSensitivityBasisPoints < 0 ||
+                    record.FoodSpoilageSensitivityBasisPoints > 30_000 ||
+                    record.Day < 0 || record.Day > AbsoluteDay ||
+                    record.QuantityBefore < 0 ||
+                    record.ReservedQuantity < 0 ||
+                    record.ReservedQuantity > record.QuantityBefore ||
+                    record.QuantityLost < 0 ||
+                    record.QuantityAfter != checked(
+                        record.QuantityBefore - record.QuantityLost) ||
+                    record.QuantityAfter < record.ReservedQuantity ||
+                    record.FreshnessBeforeBasisPoints < 0 ||
+                    record.FreshnessBeforeBasisPoints > 10_000 ||
+                    record.FreshnessAfterBasisPoints != Math.Max(
+                        0,
+                        record.FreshnessBeforeBasisPoints -
+                        record.EffectiveLossBasisPoints) ||
+                    record.EffectiveLossBasisPoints != Math.Min(
+                        10_000L,
+                        200L * record.FoodSpoilageSensitivityBasisPoints *
+                        (10_000 - record.StorageProtectionBasisPoints) /
+                        100_000_000L))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid food storage loss {record.Id}.");
+                }
+                _ = new StableId(record.StorageEnvironmentId);
+
+                if (record.QuantityLost == 0)
+                {
+                    if (!string.IsNullOrEmpty(record.InventoryTransactionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Zero food storage loss {record.Id} has an inventory transaction.");
+                    }
+                    continue;
+                }
+
+                if (!transactions.TryGetValue(
+                        record.InventoryTransactionId,
+                        out var transaction) ||
+                    transaction.Type !=
+                        InventoryTransactionType.FoodStorageNaturalLoss ||
+                    transaction.SourceFoodStorageLossId != record.Id ||
+                    transaction.Day != record.Day ||
+                    transaction.Lines.Count != 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Food storage loss {record.Id} lacks its inventory transaction.");
+                }
+                var line = transaction.Lines[0];
+                if (line.BatchId != batch.Id ||
+                    line.ProductDefinitionId != batch.ProductDefinitionId ||
+                    line.OwnerFamilyId != batch.OwnerFamilyId ||
+                    line.OwnerOrganizationId != batch.OwnerOrganizationId ||
+                    line.StorageFacilityId != batch.StorageFacilityId ||
+                    line.InventoryContainerId != batch.InventoryContainerId ||
+                    line.UnitId != batch.UnitId ||
+                    line.QuantityDelta != -record.QuantityLost ||
+                    line.ReservedQuantityDelta != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Food storage loss transaction {transaction.Id} is inconsistent.");
+                }
+            }
+
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                var transaction = InventoryTransactions[i];
+                var storageLoss = transaction.Type ==
+                    InventoryTransactionType.FoodStorageNaturalLoss;
+                if (storageLoss != !string.IsNullOrEmpty(
+                        transaction.SourceFoodStorageLossId) ||
+                    storageLoss && !recordIds.Contains(
+                        transaction.SourceFoodStorageLossId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has invalid storage-loss provenance.");
+                }
+            }
         }
 
         private void ValidateCivilianFreightPlanning(
@@ -8493,6 +9551,5982 @@ namespace Mandate.Domain
                 freights);
         }
 
+        private void ValidateHouseholdReliefPickups()
+        {
+            var villages = new Dictionary<string, VillageState>(
+                StringComparer.Ordinal);
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            var people = new HashSet<string>(StringComparer.Ordinal);
+            var events = new Dictionary<string, WorldEventOutboxState>(
+                StringComparer.Ordinal);
+            var transactions = new Dictionary<
+                string, InventoryTransactionState>(StringComparer.Ordinal);
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Villages.Count; i++)
+                villages.Add(Villages[i].Id, Villages[i]);
+            for (var i = 0; i < Families.Count; i++)
+                families.Add(Families[i].Id, Families[i]);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id);
+            for (var i = 0; i < WorldEventOutbox.Count; i++)
+                events.Add(WorldEventOutbox[i].Id, WorldEventOutbox[i]);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(
+                    InventoryTransactions[i].Id, InventoryTransactions[i]);
+            for (var i = 0; i < Organizations.Count; i++)
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+
+            var referencedTransactions = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefPickups.Count; i++)
+            {
+                var pickup = HouseholdReliefPickups[i] ??
+                    throw new InvalidOperationException(
+                        "A household relief pickup cannot be null.");
+                _ = new StableId(pickup.Id);
+                var usesLegacyPriority = pickup.PriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds
+                        .LegacySettlementFamilyOrder;
+                var usesNeedPriority = pickup.PriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability;
+                var hasValidLegacySnapshot = usesLegacyPriority &&
+                    pickup.AuthorizationPolicyId ==
+                        HouseholdReliefAuthorizationPolicyIds.LegacySystem &&
+                    string.IsNullOrEmpty(pickup.AuthorizingOrganizationId) &&
+                    string.IsNullOrEmpty(pickup.AuthorizingPersonId) &&
+                    pickup.AuthorizedDay == -1 &&
+                    pickup.ShortfallSeverityBasisPoints == -1 &&
+                    pickup.VulnerableAffectedPersonCount == -1 &&
+                    pickup.AffectedPersonCountAtAuthorization == -1;
+                var hasCountyAuthority = usesNeedPriority &&
+                    pickup.AuthorizationPolicyId ==
+                        HouseholdReliefAuthorizationPolicyIds
+                            .CountyGovernmentLeader &&
+                    organizations.TryGetValue(
+                        pickup.AuthorizingOrganizationId,
+                        out var authorizingOrganization) &&
+                    authorizingOrganization.Type == OrganizationType.Government &&
+                    people.Contains(pickup.AuthorizingPersonId);
+                var hasEmergencyAuthority = usesNeedPriority &&
+                    pickup.AuthorizationPolicyId ==
+                        HouseholdReliefAuthorizationPolicyIds.EmergencySystem &&
+                    string.IsNullOrEmpty(pickup.AuthorizingOrganizationId) &&
+                    string.IsNullOrEmpty(pickup.AuthorizingPersonId);
+                var hasValidNeedSnapshot = usesNeedPriority &&
+                    pickup.AuthorizedDay == pickup.SettlementDay &&
+                    pickup.ShortfallSeverityBasisPoints > 0 &&
+                    pickup.ShortfallSeverityBasisPoints <= 10_000 &&
+                    pickup.AffectedPersonCountAtAuthorization > 0 &&
+                    pickup.VulnerableAffectedPersonCount >= 0 &&
+                    pickup.VulnerableAffectedPersonCount <=
+                        pickup.AffectedPersonCountAtAuthorization &&
+                    (hasCountyAuthority || hasEmergencyAuthority);
+                if (!Enum.IsDefined(
+                        typeof(HouseholdReliefPickupStatus), pickup.Status) ||
+                    !villages.TryGetValue(
+                        pickup.VillageId, out var village) ||
+                    !families.TryGetValue(
+                        pickup.FamilyId, out var family) ||
+                    family.VillageId != pickup.VillageId ||
+                    !village.HouseholdIds.Contains(pickup.FamilyId) ||
+                    !events.TryGetValue(
+                        pickup.SourceShortfallEventId,
+                        out var sourceEvent) ||
+                    sourceEvent.EventTypeId !=
+                        "mandate.event.formal_food.household_shortfall_detected" ||
+                    sourceEvent.Day != pickup.SettlementDay ||
+                    pickup.SettlementDay <= 0 ||
+                    pickup.SettlementDay > AbsoluteDay ||
+                    pickup.RequestedNutritionBasisUnits <= 0 ||
+                    pickup.DeliveredNutritionBasisUnits < 0 ||
+                    pickup.DeliveredPhysicalQuantity < 0 ||
+                    (!hasValidLegacySnapshot && !hasValidNeedSnapshot) ||
+                    pickup.RemainingNutritionBasisUnits != Math.Max(
+                        0L,
+                        pickup.RequestedNutritionBasisUnits -
+                        pickup.DeliveredNutritionBasisUnits) ||
+                    pickup.Status == HouseholdReliefPickupStatus.Waiting &&
+                        (pickup.DeliveredNutritionBasisUnits != 0 ||
+                         pickup.DeliveredPhysicalQuantity != 0 ||
+                         pickup.RemainingNutritionBasisUnits !=
+                            pickup.RequestedNutritionBasisUnits ||
+                         pickup.LastPickupDay != -1 ||
+                         !string.IsNullOrEmpty(
+                            pickup.LastCollectorPersonId) ||
+                         pickup.InventoryTransactionIds.Count != 0) ||
+                    pickup.Status ==
+                        HouseholdReliefPickupStatus.PartiallyDelivered &&
+                        (pickup.DeliveredNutritionBasisUnits <= 0 ||
+                         pickup.DeliveredPhysicalQuantity <= 0 ||
+                         pickup.RemainingNutritionBasisUnits <= 0) ||
+                    pickup.Status == HouseholdReliefPickupStatus.Fulfilled &&
+                        (pickup.DeliveredNutritionBasisUnits <
+                            pickup.RequestedNutritionBasisUnits ||
+                         pickup.DeliveredPhysicalQuantity <= 0 ||
+                         pickup.RemainingNutritionBasisUnits != 0) ||
+                    pickup.Status != HouseholdReliefPickupStatus.Waiting &&
+                        (pickup.LastPickupDay < pickup.SettlementDay ||
+                         pickup.LastPickupDay > AbsoluteDay ||
+                         !people.Contains(pickup.LastCollectorPersonId) ||
+                         !family.MemberIds.Contains(
+                            pickup.LastCollectorPersonId) ||
+                         pickup.InventoryTransactionIds.Count == 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid household relief pickup {pickup.Id}.");
+                }
+
+                long deliveredPhysical = 0;
+                for (var transactionIndex = 0;
+                     transactionIndex < pickup.InventoryTransactionIds.Count;
+                     transactionIndex++)
+                {
+                    var transactionId =
+                        pickup.InventoryTransactionIds[transactionIndex];
+                    if (!referencedTransactions.Add(transactionId) ||
+                        !transactions.TryGetValue(
+                            transactionId, out var transaction) ||
+                        transaction.Type != InventoryTransactionType
+                            .FoodVillageReliefTransferred ||
+                        transaction.SourceVillageId != pickup.VillageId ||
+                        transaction.Day < pickup.SettlementDay ||
+                        transaction.Day > pickup.LastPickupDay ||
+                        !family.MemberIds.Contains(transaction.ActorPersonId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid household relief inventory transaction {transactionId}.");
+                    }
+                    for (var lineIndex = 0;
+                         lineIndex < transaction.Lines.Count;
+                         lineIndex++)
+                    {
+                        var line = transaction.Lines[lineIndex];
+                        if (line.OwnerFamilyId == pickup.FamilyId &&
+                            line.QuantityDelta > 0)
+                        {
+                            deliveredPhysical = checked(
+                                deliveredPhysical + line.QuantityDelta);
+                        }
+                    }
+                }
+                if (deliveredPhysical != pickup.DeliveredPhysicalQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Household relief pickup {pickup.Id} has inconsistent delivered stock.");
+                }
+            }
+        }
+
+        private void ValidateHouseholdReliefConsumptions()
+        {
+            var pickups = new Dictionary<string, HouseholdReliefPickupState>(
+                StringComparer.Ordinal);
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            var villages = new Dictionary<string, VillageState>(
+                StringComparer.Ordinal);
+            var people = new HashSet<string>(StringComparer.Ordinal);
+            var transactions = new Dictionary<string, InventoryTransactionState>(
+                StringComparer.Ordinal);
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefPickups.Count; i++)
+                pickups.Add(HouseholdReliefPickups[i].Id,
+                    HouseholdReliefPickups[i]);
+            for (var i = 0; i < Families.Count; i++)
+                families.Add(Families[i].Id, Families[i]);
+            for (var i = 0; i < Villages.Count; i++)
+                villages.Add(Villages[i].Id, Villages[i]);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+            for (var i = 0; i < ProductBatches.Count; i++)
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+
+            var consumptionIds = new HashSet<string>(StringComparer.Ordinal);
+            var pickupIds = new HashSet<string>(StringComparer.Ordinal);
+            var referencedTransactions = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefConsumptions.Count; i++)
+            {
+                var consumption = HouseholdReliefConsumptions[i] ??
+                    throw new InvalidOperationException(
+                        "A household relief consumption cannot be null.");
+                _ = new StableId(consumption.Id);
+                var usesIndividualAllocation =
+                    consumption.AllocationPolicyId ==
+                    HouseholdReliefAllocationPolicyIds
+                        .ProportionalIndividualNeed;
+                var usesLegacyAllocation =
+                    consumption.AllocationPolicyId ==
+                    HouseholdReliefAllocationPolicyIds
+                        .LegacyHouseholdShared;
+                var usesCareDelivery =
+                    consumption.CareDeliveryPolicyId ==
+                    HouseholdReliefCareDeliveryPolicyIds
+                        .AgeHealthDependency;
+                var usesLegacyCare =
+                    consumption.CareDeliveryPolicyId ==
+                    HouseholdReliefCareDeliveryPolicyIds
+                        .LegacySelfService;
+                if (!consumptionIds.Add(consumption.Id) ||
+                    !pickupIds.Add(consumption.PickupId) ||
+                    !Enum.IsDefined(
+                        typeof(HouseholdReliefConsumptionStatus),
+                        consumption.Status) ||
+                    !pickups.TryGetValue(
+                        consumption.PickupId, out var pickup) ||
+                    pickup.SourceShortfallEventId !=
+                        consumption.SourceShortfallEventId ||
+                    pickup.VillageId != consumption.VillageId ||
+                    pickup.FamilyId != consumption.FamilyId ||
+                    pickup.SettlementDay != consumption.SettlementDay ||
+                    pickup.RequestedNutritionBasisUnits !=
+                        consumption.RequestedNutritionBasisUnits ||
+                    !families.TryGetValue(
+                        consumption.FamilyId, out var family) ||
+                    !villages.ContainsKey(consumption.VillageId) ||
+                    (!usesIndividualAllocation && !usesLegacyAllocation) ||
+                    (!usesCareDelivery && !usesLegacyCare) ||
+                    consumption.RequestedNutritionBasisUnits <= 0 ||
+                    consumption.ConsumedNutritionBasisUnits < 0 ||
+                    usesIndividualAllocation &&
+                        consumption.PreparedNutritionBasisUnits < 0 ||
+                    usesLegacyAllocation &&
+                        consumption.PreparedNutritionBasisUnits != -1 ||
+                    consumption.ConsumedPhysicalQuantity < 0 ||
+                    consumption.ConsumedNutritionBasisUnits >
+                        pickup.DeliveredNutritionBasisUnits ||
+                    consumption.Status ==
+                        HouseholdReliefConsumptionStatus.Waiting &&
+                        (consumption.ConsumedNutritionBasisUnits != 0 ||
+                         consumption.ConsumedPhysicalQuantity != 0 ||
+                         consumption.RemainingNutritionBasisUnits !=
+                            consumption.RequestedNutritionBasisUnits ||
+                         consumption.LastConsumptionDay != -1 ||
+                         !string.IsNullOrEmpty(
+                            consumption.LastConsumerPersonId) ||
+                         consumption.InventoryTransactionIds.Count != 0) ||
+                    consumption.Status ==
+                        HouseholdReliefConsumptionStatus.PartiallyConsumed &&
+                        (consumption.ConsumedNutritionBasisUnits <= 0 ||
+                         consumption.ConsumedPhysicalQuantity <= 0 ||
+                         consumption.RemainingNutritionBasisUnits <= 0) ||
+                    consumption.Status ==
+                        HouseholdReliefConsumptionStatus.Fulfilled &&
+                        (consumption.ConsumedNutritionBasisUnits <
+                            consumption.RequestedNutritionBasisUnits ||
+                         consumption.ConsumedPhysicalQuantity <= 0 ||
+                         consumption.RemainingNutritionBasisUnits != 0) ||
+                    consumption.Status !=
+                        HouseholdReliefConsumptionStatus.Waiting &&
+                        (consumption.LastConsumptionDay <
+                            consumption.SettlementDay ||
+                         consumption.LastConsumptionDay > AbsoluteDay ||
+                         !people.Contains(
+                            consumption.LastConsumerPersonId) ||
+                         !family.MemberIds.Contains(
+                            consumption.LastConsumerPersonId) ||
+                         consumption.InventoryTransactionIds.Count == 0) ||
+                    consumption.AffectedPeople == null ||
+                    consumption.AffectedPeople.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid household relief consumption {consumption.Id}.");
+                }
+
+                var affectedIds = new HashSet<string>(StringComparer.Ordinal);
+                long allocatedNutrition = 0;
+                long affectedConsumedNutrition = 0;
+                long individualRemainingNutrition = 0;
+                long affectedRequiredNutrition = 0;
+                var vulnerableAffectedPeople = 0;
+                for (var affectedIndex = 0;
+                     affectedIndex < consumption.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    var affected = consumption.AffectedPeople[affectedIndex] ??
+                        throw new InvalidOperationException(
+                            "A household relief affected person cannot be null.");
+                    if (!affectedIds.Add(affected.PersonId) ||
+                        !people.Contains(affected.PersonId) ||
+                        !family.MemberIds.Contains(affected.PersonId) ||
+                        usesIndividualAllocation &&
+                            (affected.RequiredNutritionBasisUnits <= 0 ||
+                             affected.AllocatedNutritionBasisUnits < 0 ||
+                             affected.ConsumedNutritionBasisUnits < 0) ||
+                        usesLegacyAllocation &&
+                            (affected.RequiredNutritionBasisUnits != -1 ||
+                             affected.AllocatedNutritionBasisUnits != -1 ||
+                             affected.ConsumedNutritionBasisUnits != -1) ||
+                        affected.AppliedHealthDamageBasisPoints < 0 ||
+                        affected.AppliedLivelihoodPressureBasisPoints < 0 ||
+                        affected.RecoveredHealthBasisPoints < 0 ||
+                        affected.RecoveredHealthBasisPoints >
+                            affected.AppliedHealthDamageBasisPoints ||
+                        affected.RecoveredLivelihoodBasisPoints < 0 ||
+                        affected.RecoveredLivelihoodBasisPoints >
+                            affected.AppliedLivelihoodPressureBasisPoints ||
+                        usesLegacyCare &&
+                            affected.RequiresCaregiverDelivery)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid affected person in {consumption.Id}.");
+                    }
+                    if (usesIndividualAllocation)
+                    {
+                        affectedRequiredNutrition = checked(
+                            affectedRequiredNutrition +
+                            affected.RequiredNutritionBasisUnits);
+                        if (affected.RequiredNutritionBasisUnits == 20_000)
+                        {
+                            vulnerableAffectedPeople++;
+                        }
+                        allocatedNutrition = checked(
+                            allocatedNutrition +
+                            affected.AllocatedNutritionBasisUnits);
+                        affectedConsumedNutrition = checked(
+                            affectedConsumedNutrition +
+                            affected.ConsumedNutritionBasisUnits);
+                        individualRemainingNutrition = checked(
+                            individualRemainingNutrition + Math.Max(
+                                0L,
+                                affected.AllocatedNutritionBasisUnits -
+                                affected.ConsumedNutritionBasisUnits));
+                    }
+                }
+                var expectedRemainingNutrition = usesIndividualAllocation
+                    ? individualRemainingNutrition
+                    : Math.Max(
+                        0L,
+                        consumption.RequestedNutritionBasisUnits -
+                        consumption.ConsumedNutritionBasisUnits);
+                if (consumption.RemainingNutritionBasisUnits !=
+                        expectedRemainingNutrition ||
+                    usesIndividualAllocation &&
+                        (allocatedNutrition !=
+                            consumption.RequestedNutritionBasisUnits ||
+                         affectedConsumedNutrition +
+                            consumption.PreparedNutritionBasisUnits !=
+                                consumption.ConsumedNutritionBasisUnits))
+                {
+                    throw new InvalidOperationException(
+                        $"Household relief allocation {consumption.Id} does not close.");
+                }
+                if (usesCareDelivery &&
+                    consumption.Status !=
+                        HouseholdReliefConsumptionStatus.Waiting &&
+                    !affectedIds.Contains(consumption.LastConsumerPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Household relief consumer {consumption.LastConsumerPersonId} is not affected by {consumption.Id}.");
+                }
+                if (pickup.PriorityPolicyId ==
+                        HouseholdReliefPriorityPolicyIds
+                            .NeedSeverityVulnerability)
+                {
+                    if (!usesIndividualAllocation ||
+                        affectedRequiredNutrition <= 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Household relief priority snapshot {pickup.Id} has no individual basis.");
+                    }
+                    var expectedSeverity = checked((int)Math.Max(
+                        1L,
+                        Math.Min(
+                            10_000L,
+                            pickup.RequestedNutritionBasisUnits * 10_000L /
+                            affectedRequiredNutrition)));
+                    if (pickup.AffectedPersonCountAtAuthorization !=
+                            consumption.AffectedPeople.Count ||
+                        pickup.VulnerableAffectedPersonCount !=
+                            vulnerableAffectedPeople ||
+                        pickup.ShortfallSeverityBasisPoints != expectedSeverity)
+                    {
+                        throw new InvalidOperationException(
+                            $"Household relief priority snapshot {pickup.Id} is inconsistent.");
+                    }
+                }
+
+                long consumedPhysical = 0;
+                var allowedPickupTransactions = new HashSet<string>(
+                    pickup.InventoryTransactionIds, StringComparer.Ordinal);
+                for (var transactionIndex = 0;
+                     transactionIndex < consumption.InventoryTransactionIds.Count;
+                     transactionIndex++)
+                {
+                    var transactionId =
+                        consumption.InventoryTransactionIds[transactionIndex];
+                    if (!referencedTransactions.Add(transactionId) ||
+                        !transactions.TryGetValue(
+                            transactionId, out var transaction) ||
+                        transaction.Type != InventoryTransactionType.FoodConsumed ||
+                        transaction.SourceHouseholdReliefConsumptionId !=
+                            consumption.Id ||
+                        transaction.Day < consumption.SettlementDay ||
+                        transaction.Day > consumption.LastConsumptionDay ||
+                        !family.MemberIds.Contains(transaction.ActorPersonId) ||
+                        usesLegacyCare &&
+                            !string.IsNullOrEmpty(
+                                transaction.HouseholdReliefRecipientPersonId) ||
+                        usesCareDelivery &&
+                            !affectedIds.Contains(
+                                transaction.HouseholdReliefRecipientPersonId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid household relief consumption transaction {transactionId}.");
+                    }
+                    if (usesCareDelivery)
+                    {
+                        var recipient = consumption.AffectedPeople.Find(item =>
+                            item.PersonId == transaction
+                                .HouseholdReliefRecipientPersonId);
+                        if (recipient.RequiresCaregiverDelivery
+                                ? transaction.ActorPersonId ==
+                                    recipient.PersonId
+                                : transaction.ActorPersonId !=
+                                    recipient.PersonId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Invalid relief meal actor for transaction {transactionId}.");
+                        }
+                    }
+                    for (var lineIndex = 0;
+                         lineIndex < transaction.Lines.Count;
+                         lineIndex++)
+                    {
+                        var line = transaction.Lines[lineIndex];
+                        if (line.OwnerFamilyId == consumption.FamilyId &&
+                            line.QuantityDelta < 0)
+                        {
+                            if (!batches.TryGetValue(
+                                    line.BatchId, out var batch) ||
+                                !allowedPickupTransactions.Contains(
+                                    batch.SourceTransactionId))
+                            {
+                                throw new InvalidOperationException(
+                                    $"Consumption {consumption.Id} used untraced food.");
+                            }
+                            consumedPhysical = checked(
+                                consumedPhysical - line.QuantityDelta);
+                        }
+                    }
+                }
+                if (consumedPhysical != consumption.ConsumedPhysicalQuantity)
+                {
+                    throw new InvalidOperationException(
+                        $"Household relief consumption {consumption.Id} has inconsistent physical stock.");
+                }
+            }
+        }
+
+        private void ValidateHouseholdReliefCareDeliveries()
+        {
+            var claims = new Dictionary<
+                string, HouseholdReliefConsumptionState>(
+                StringComparer.Ordinal);
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            var people = new HashSet<string>(StringComparer.Ordinal);
+            var transactions = new Dictionary<
+                string, InventoryTransactionState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefConsumptions.Count; i++)
+                claims.Add(
+                    HouseholdReliefConsumptions[i].Id,
+                    HouseholdReliefConsumptions[i]);
+            for (var i = 0; i < Families.Count; i++)
+                families.Add(Families[i].Id, Families[i]);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+
+            var tracedTransactions = new HashSet<string>(
+                StringComparer.Ordinal);
+            var deliveredNutrition = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefCareDeliveries.Count; i++)
+            {
+                var delivery = HouseholdReliefCareDeliveries[i] ??
+                    throw new InvalidOperationException(
+                        "A household relief care delivery cannot be null.");
+                _ = new StableId(delivery.Id);
+                if (!claims.TryGetValue(
+                        delivery.HouseholdReliefConsumptionId,
+                        out var claim) ||
+                    claim.CareDeliveryPolicyId !=
+                        HouseholdReliefCareDeliveryPolicyIds
+                            .AgeHealthDependency ||
+                    !families.TryGetValue(claim.FamilyId, out var family) ||
+                    delivery.Day < claim.SettlementDay ||
+                    delivery.Day > AbsoluteDay ||
+                    delivery.NutritionBasisUnits <= 0 ||
+                    delivery.CaregiverPersonId == delivery.RecipientPersonId ||
+                    !people.Contains(delivery.CaregiverPersonId) ||
+                    !people.Contains(delivery.RecipientPersonId) ||
+                    !family.MemberIds.Contains(delivery.CaregiverPersonId) ||
+                    !family.MemberIds.Contains(delivery.RecipientPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid household relief care delivery {delivery.Id}.");
+                }
+
+                var affected = claim.AffectedPeople.Find(item =>
+                    item.PersonId == delivery.RecipientPersonId);
+                if (affected == null || !affected.RequiresCaregiverDelivery)
+                {
+                    throw new InvalidOperationException(
+                        $"Care delivery {delivery.Id} has no dependent recipient.");
+                }
+
+                if (delivery.SourceKindId ==
+                    HouseholdReliefCareDeliverySourceIds
+                        .TracedFoodTransaction)
+                {
+                    if (string.IsNullOrEmpty(
+                            delivery.SourceInventoryTransactionId) ||
+                        !tracedTransactions.Add(
+                            delivery.SourceInventoryTransactionId) ||
+                        !transactions.TryGetValue(
+                            delivery.SourceInventoryTransactionId,
+                            out var transaction) ||
+                        transaction.Type !=
+                            InventoryTransactionType.FoodConsumed ||
+                        transaction.SourceHouseholdReliefConsumptionId !=
+                            claim.Id ||
+                        transaction.HouseholdReliefRecipientPersonId !=
+                            delivery.RecipientPersonId ||
+                        transaction.ActorPersonId !=
+                            delivery.CaregiverPersonId ||
+                        transaction.Day != delivery.Day)
+                    {
+                        throw new InvalidOperationException(
+                            $"Care delivery {delivery.Id} has invalid traced food provenance.");
+                    }
+                }
+                else if (delivery.SourceKindId ==
+                    HouseholdReliefCareDeliverySourceIds.PreparedNutrition)
+                {
+                    if (!string.IsNullOrEmpty(
+                            delivery.SourceInventoryTransactionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Prepared care delivery {delivery.Id} cannot reference inventory.");
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Care delivery {delivery.Id} has an unknown source.");
+                }
+
+                var key = claim.Id + "|" + delivery.RecipientPersonId;
+                deliveredNutrition.TryGetValue(key, out var delivered);
+                deliveredNutrition[key] = checked(
+                    delivered + delivery.NutritionBasisUnits);
+            }
+
+            for (var claimIndex = 0;
+                 claimIndex < HouseholdReliefConsumptions.Count;
+                 claimIndex++)
+            {
+                var claim = HouseholdReliefConsumptions[claimIndex];
+                for (var affectedIndex = 0;
+                     affectedIndex < claim.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    var affected = claim.AffectedPeople[affectedIndex];
+                    var key = claim.Id + "|" + affected.PersonId;
+                    deliveredNutrition.TryGetValue(key, out var delivered);
+                    if (claim.CareDeliveryPolicyId ==
+                            HouseholdReliefCareDeliveryPolicyIds
+                                .AgeHealthDependency &&
+                        affected.RequiresCaregiverDelivery
+                            ? delivered !=
+                                affected.ConsumedNutritionBasisUnits
+                            : delivered != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Care delivery nutrition does not close for {key}.");
+                    }
+                }
+            }
+        }
+
+        private void ValidateLongTermNutrition()
+        {
+            var people = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id);
+
+            var profiles = new Dictionary<
+                string, PersonNutritionProfileState>(StringComparer.Ordinal);
+            for (var i = 0; i < PersonNutritionProfiles.Count; i++)
+            {
+                var profile = PersonNutritionProfiles[i] ??
+                    throw new InvalidOperationException(
+                        "A person nutrition profile cannot be null.");
+                _ = new StableId(profile.Id);
+                if (!people.Contains(profile.PersonId) ||
+                    profile.PolicyId !=
+                        NutritionPolicyIds.LongitudinalHouseholdNutrition ||
+                    profile.FirstObservedDay < 0 ||
+                    profile.LastUpdatedDay < profile.FirstObservedDay ||
+                    profile.LastUpdatedDay > AbsoluteDay ||
+                    profile.ReferenceMonthlyNutritionBasisUnits <= 0 ||
+                    profile.NutritionDebtBasisUnits < 0 ||
+                    profile.DiseaseRiskBasisPoints < 0 ||
+                    profile.DiseaseRiskBasisPoints > 10_000 ||
+                    profile.ConsecutiveDeficitMonths < 0 ||
+                    profile.ConsecutiveAdequateMonths < 0 ||
+                    profile.ConsecutiveDeficitMonths > 0 &&
+                        profile.ConsecutiveAdequateMonths > 0 ||
+                    profiles.ContainsKey(profile.PersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid person nutrition profile {profile.Id}.");
+                }
+                profiles.Add(profile.PersonId, profile);
+            }
+
+            var episodes = new Dictionary<
+                string, NutritionConditionEpisodeState>(StringComparer.Ordinal);
+            for (var i = 0; i < NutritionConditionEpisodes.Count; i++)
+            {
+                var episode = NutritionConditionEpisodes[i] ??
+                    throw new InvalidOperationException(
+                        "A nutrition condition episode cannot be null.");
+                _ = new StableId(episode.Id);
+                if (!profiles.ContainsKey(episode.PersonId) ||
+                    episode.PolicyId !=
+                        NutritionPolicyIds.LongitudinalHouseholdNutrition ||
+                    episode.ConditionId !=
+                        NutritionConditionIds.MalnutritionIllness ||
+                    episode.StartDay < 0 ||
+                    episode.LastEvaluatedDay < episode.StartDay ||
+                    episode.LastEvaluatedDay > AbsoluteDay ||
+                    episode.EndDay != -1 &&
+                        (episode.EndDay < episode.StartDay ||
+                         episode.EndDay > episode.LastEvaluatedDay) ||
+                    episode.PeakDiseaseRiskBasisPoints <
+                        LongTermNutritionRules
+                            .IllnessRiskThresholdBasisPoints ||
+                    episode.PeakDiseaseRiskBasisPoints > 10_000 ||
+                    episode.AppliedHealthDamageBasisPoints < 0 ||
+                    episode.RecoveredHealthBasisPoints < 0 ||
+                    episode.RecoveredHealthBasisPoints >
+                        episode.AppliedHealthDamageBasisPoints ||
+                    episodes.ContainsKey(episode.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid nutrition condition episode {episode.Id}.");
+                }
+                episodes.Add(episode.Id, episode);
+            }
+
+            var claims = new Dictionary<
+                string, HouseholdReliefConsumptionState>(StringComparer.Ordinal);
+            for (var i = 0; i < HouseholdReliefConsumptions.Count; i++)
+                claims.Add(HouseholdReliefConsumptions[i].Id,
+                    HouseholdReliefConsumptions[i]);
+            var transactions = new Dictionary<
+                string, InventoryTransactionState>(StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+
+            var previous = new Dictionary<
+                string, PersonNutritionLedgerEntryState>(StringComparer.Ordinal);
+            var appliedByEpisode = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var recoveredByEpisode = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var lastEpisodeDay = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var creditedByClaimPerson = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < PersonNutritionLedgerEntries.Count; i++)
+            {
+                var entry = PersonNutritionLedgerEntries[i] ??
+                    throw new InvalidOperationException(
+                        "A person nutrition ledger entry cannot be null.");
+                _ = new StableId(entry.Id);
+                if (!profiles.TryGetValue(entry.PersonId, out var profile) ||
+                    entry.PolicyId != profile.PolicyId ||
+                    !Enum.IsDefined(typeof(NutritionLedgerEntryKind),
+                        entry.Kind) ||
+                    entry.Day < profile.FirstObservedDay ||
+                    entry.Day > AbsoluteDay ||
+                    entry.ReferenceMonthlyNutritionBasisUnits <= 0 ||
+                    entry.NutritionBasisUnits < 0 ||
+                    entry.OpeningNutritionDebtBasisUnits < 0 ||
+                    entry.ClosingNutritionDebtBasisUnits < 0 ||
+                    entry.OpeningDiseaseRiskBasisPoints < 0 ||
+                    entry.OpeningDiseaseRiskBasisPoints > 10_000 ||
+                    entry.ClosingDiseaseRiskBasisPoints < 0 ||
+                    entry.ClosingDiseaseRiskBasisPoints > 10_000 ||
+                    entry.OpeningConsecutiveDeficitMonths < 0 ||
+                    entry.ClosingConsecutiveDeficitMonths < 0 ||
+                    entry.OpeningConsecutiveAdequateMonths < 0 ||
+                    entry.ClosingConsecutiveAdequateMonths < 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid person nutrition ledger entry {entry.Id}.");
+                }
+
+                previous.TryGetValue(entry.PersonId, out var prior);
+                if (prior == null
+                        ? entry.OpeningNutritionDebtBasisUnits != 0 ||
+                          entry.OpeningDiseaseRiskBasisPoints != 0 ||
+                          entry.OpeningConsecutiveDeficitMonths != 0 ||
+                          entry.OpeningConsecutiveAdequateMonths != 0
+                        : entry.Day < prior.Day ||
+                          entry.OpeningNutritionDebtBasisUnits !=
+                              prior.ClosingNutritionDebtBasisUnits ||
+                          entry.OpeningDiseaseRiskBasisPoints !=
+                              prior.ClosingDiseaseRiskBasisPoints ||
+                          entry.OpeningConsecutiveDeficitMonths !=
+                              prior.ClosingConsecutiveDeficitMonths ||
+                          entry.OpeningConsecutiveAdequateMonths !=
+                              prior.ClosingConsecutiveAdequateMonths)
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition ledger opening does not close for {entry.Id}.");
+                }
+
+                if (entry.Kind == NutritionLedgerEntryKind.MonthlyDeficit)
+                {
+                    if (entry.NutritionBasisUnits <= 0 ||
+                        entry.ClosingNutritionDebtBasisUnits != checked(
+                            entry.OpeningNutritionDebtBasisUnits +
+                            entry.NutritionBasisUnits) ||
+                        entry.ClosingConsecutiveDeficitMonths !=
+                            entry.OpeningConsecutiveDeficitMonths + 1 ||
+                        entry.ClosingConsecutiveAdequateMonths != 0 ||
+                        !string.IsNullOrEmpty(
+                            entry.SourceHouseholdReliefConsumptionId) ||
+                        !string.IsNullOrEmpty(
+                            entry.SourceInventoryTransactionId) ||
+                        entry.HealthBasisPointsDelta > 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid monthly nutrition deficit {entry.Id}.");
+                    }
+                }
+                else if (entry.Kind ==
+                    NutritionLedgerEntryKind.MonthlyRecovery)
+                {
+                    if (entry.NutritionBasisUnits >
+                            entry.OpeningNutritionDebtBasisUnits ||
+                        entry.ClosingNutritionDebtBasisUnits !=
+                            entry.OpeningNutritionDebtBasisUnits -
+                            entry.NutritionBasisUnits ||
+                        entry.ClosingConsecutiveDeficitMonths != 0 ||
+                        entry.ClosingConsecutiveAdequateMonths !=
+                            entry.OpeningConsecutiveAdequateMonths + 1 ||
+                        !string.IsNullOrEmpty(
+                            entry.SourceHouseholdReliefConsumptionId) ||
+                        !string.IsNullOrEmpty(
+                            entry.SourceInventoryTransactionId) ||
+                        entry.HealthBasisPointsDelta < 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid monthly nutrition recovery {entry.Id}.");
+                    }
+                }
+                else
+                {
+                    if (entry.NutritionBasisUnits <= 0 ||
+                        entry.NutritionBasisUnits >
+                            entry.OpeningNutritionDebtBasisUnits ||
+                        entry.ClosingNutritionDebtBasisUnits !=
+                            entry.OpeningNutritionDebtBasisUnits -
+                            entry.NutritionBasisUnits ||
+                        entry.ClosingConsecutiveDeficitMonths !=
+                            (entry.ClosingNutritionDebtBasisUnits == 0
+                                ? 0
+                                : entry.OpeningConsecutiveDeficitMonths) ||
+                        entry.ClosingConsecutiveAdequateMonths !=
+                            entry.OpeningConsecutiveAdequateMonths ||
+                        entry.HealthBasisPointsDelta != 0 ||
+                        string.IsNullOrEmpty(
+                            entry.SourceHouseholdReliefConsumptionId) ||
+                        !claims.TryGetValue(
+                            entry.SourceHouseholdReliefConsumptionId,
+                            out var claim) ||
+                        !claim.AffectedPeople.Exists(item =>
+                            item.PersonId == entry.PersonId) ||
+                        entry.Day < claim.SettlementDay)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid relief nutrition credit {entry.Id}.");
+                    }
+                    if (!string.IsNullOrEmpty(
+                            entry.SourceInventoryTransactionId) &&
+                        (!transactions.TryGetValue(
+                                entry.SourceInventoryTransactionId,
+                                out var transaction) ||
+                         transaction.SourceHouseholdReliefConsumptionId !=
+                            claim.Id ||
+                         transaction.HouseholdReliefRecipientPersonId !=
+                            entry.PersonId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid nutrition credit inventory source {entry.Id}.");
+                    }
+                    var creditKey = claim.Id + "|" + entry.PersonId;
+                    creditedByClaimPerson.TryGetValue(
+                        creditKey, out var credited);
+                    creditedByClaimPerson[creditKey] = checked(
+                        credited + entry.NutritionBasisUnits);
+                }
+
+                var expectedRisk = LongTermNutritionRules
+                    .CalculateDiseaseRiskBasisPoints(
+                        entry.ClosingNutritionDebtBasisUnits,
+                        entry.ReferenceMonthlyNutritionBasisUnits,
+                        entry.ClosingConsecutiveDeficitMonths);
+                if (entry.ClosingDiseaseRiskBasisPoints != expectedRisk)
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition risk does not close for {entry.Id}.");
+                }
+
+                if (string.IsNullOrEmpty(entry.ConditionEpisodeId))
+                {
+                    if (entry.HealthBasisPointsDelta != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Nutrition health change lacks an episode in {entry.Id}.");
+                    }
+                }
+                else
+                {
+                    if (!episodes.TryGetValue(
+                            entry.ConditionEpisodeId, out var episode) ||
+                        episode.PersonId != entry.PersonId ||
+                        entry.Day < episode.StartDay ||
+                        episode.EndDay != -1 && entry.Day > episode.EndDay)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid nutrition episode link in {entry.Id}.");
+                    }
+                    appliedByEpisode.TryGetValue(
+                        episode.Id, out var applied);
+                    recoveredByEpisode.TryGetValue(
+                        episode.Id, out var recovered);
+                    if (entry.HealthBasisPointsDelta < 0)
+                        applied = checked(applied -
+                            entry.HealthBasisPointsDelta);
+                    else
+                        recovered = checked(recovered +
+                            entry.HealthBasisPointsDelta);
+                    appliedByEpisode[episode.Id] = applied;
+                    recoveredByEpisode[episode.Id] = recovered;
+                    lastEpisodeDay[episode.Id] = entry.Day;
+                }
+                previous[entry.PersonId] = entry;
+            }
+
+            foreach (var pair in profiles)
+            {
+                var profile = pair.Value;
+                if (!previous.TryGetValue(pair.Key, out var last) ||
+                    profile.FirstObservedDay > last.Day ||
+                    profile.LastUpdatedDay != last.Day ||
+                    profile.ReferenceMonthlyNutritionBasisUnits !=
+                        last.ReferenceMonthlyNutritionBasisUnits ||
+                    profile.NutritionDebtBasisUnits !=
+                        last.ClosingNutritionDebtBasisUnits ||
+                    profile.DiseaseRiskBasisPoints !=
+                        last.ClosingDiseaseRiskBasisPoints ||
+                    profile.ConsecutiveDeficitMonths !=
+                        last.ClosingConsecutiveDeficitMonths ||
+                    profile.ConsecutiveAdequateMonths !=
+                        last.ClosingConsecutiveAdequateMonths)
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition profile {profile.Id} does not close to its ledger.");
+                }
+                if (!string.IsNullOrEmpty(profile.ActiveConditionEpisodeId) &&
+                    (!episodes.TryGetValue(
+                            profile.ActiveConditionEpisodeId,
+                            out var activeEpisode) ||
+                     activeEpisode.PersonId != profile.PersonId ||
+                     activeEpisode.EndDay != -1))
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition profile {profile.Id} has an invalid active episode.");
+                }
+            }
+
+            foreach (var pair in episodes)
+            {
+                var episode = pair.Value;
+                appliedByEpisode.TryGetValue(pair.Key, out var applied);
+                recoveredByEpisode.TryGetValue(pair.Key, out var recovered);
+                lastEpisodeDay.TryGetValue(pair.Key, out var lastDay);
+                if (applied != episode.AppliedHealthDamageBasisPoints ||
+                    recovered != episode.RecoveredHealthBasisPoints ||
+                    lastDay != episode.LastEvaluatedDay ||
+                    episode.EndDay == -1 !=
+                        (profiles[episode.PersonId]
+                            .ActiveConditionEpisodeId == episode.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition condition episode {episode.Id} does not close.");
+                }
+            }
+
+            foreach (var pair in creditedByClaimPerson)
+            {
+                var split = pair.Key.IndexOf('|');
+                var claimId = pair.Key.Substring(0, split);
+                var personId = pair.Key.Substring(split + 1);
+                var affected = claims[claimId].AffectedPeople.Find(item =>
+                    item.PersonId == personId);
+                if (pair.Value > affected.ConsumedNutritionBasisUnits)
+                {
+                    throw new InvalidOperationException(
+                        $"Nutrition relief credits exceed consumption for {pair.Key}.");
+                }
+            }
+        }
+
+        private void ValidateMilitaryMedicalCare()
+        {
+            if (MilitaryMedicalContractActivationDay < 0 ||
+                MilitaryMedicalContractActivationDay > checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military medical contract activation day is invalid.");
+            }
+            if (MilitaryInjuryContractActivationDay < 0 ||
+                MilitaryInjuryContractActivationDay > checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military injury contract activation day is invalid.");
+            }
+            if (MilitarySurgeryContractActivationDay < 0 ||
+                MilitarySurgeryContractActivationDay > checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military surgery contract activation day is invalid.");
+            }
+            if (MilitaryMedicalTransferContractActivationDay < 0 ||
+                MilitaryMedicalTransferContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military medical transfer contract activation day is invalid.");
+            }
+            if (MilitaryPostTreatmentTransferContractActivationDay < 0 ||
+                MilitaryPostTreatmentTransferContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military post-treatment transfer contract activation day is invalid.");
+            }
+            if (MilitaryRepeatedMedicalTransferContractActivationDay < 0 ||
+                MilitaryRepeatedMedicalTransferContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military repeated-transfer contract activation day is invalid.");
+            }
+            if (MilitaryWoundDeathContractActivationDay < 0 ||
+                MilitaryWoundDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military wound-death contract activation day is invalid.");
+            }
+            if (MilitaryMedicalDeathResponsibilityContractActivationDay < 0 ||
+                MilitaryMedicalDeathResponsibilityContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military medical death-responsibility contract activation day is invalid.");
+            }
+            if (MilitaryInpatientDeathContractActivationDay < 0 ||
+                MilitaryInpatientDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military inpatient-death contract activation day is invalid.");
+            }
+            if (MilitaryMedicalTransferDeathContractActivationDay < 0 ||
+                MilitaryMedicalTransferDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military medical-transfer death contract activation day is invalid.");
+            }
+            if (MilitaryOriginalEvacuationDeathContractActivationDay < 0 ||
+                MilitaryOriginalEvacuationDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military original-evacuation death contract activation day is invalid.");
+            }
+            if (MilitaryPatientReturnDeathContractActivationDay < 0 ||
+                MilitaryPatientReturnDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military patient-return death contract activation day is invalid.");
+            }
+            if (MilitaryPatientArrivalWaitingTeamDeathContractActivationDay < 0 ||
+                MilitaryPatientArrivalWaitingTeamDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military patient-arrival waiting-team death contract activation day is invalid.");
+            }
+            if (MilitaryReturnTeamDeathContractActivationDay < 0 ||
+                MilitaryReturnTeamDeathContractActivationDay >
+                    checked(AbsoluteDay + 1))
+            {
+                throw new InvalidOperationException(
+                    "Military return-team death contract activation day is invalid.");
+            }
+
+            var armies = new Dictionary<string, ArmyState>(StringComparer.Ordinal);
+            for (var i = 0; i < Armies.Count; i++)
+                armies.Add(Armies[i].Id, Armies[i]);
+            var people = new Dictionary<string, PersonState>(StringComparer.Ordinal);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id, People[i]);
+            var militaryServices =
+                new Dictionary<string, MilitaryServiceState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryServices.Count; i++)
+                militaryServices.Add(MilitaryServices[i].Id, MilitaryServices[i]);
+            var containers =
+                new Dictionary<string, InventoryContainerState>(StringComparer.Ordinal);
+            for (var i = 0; i < InventoryContainers.Count; i++)
+                containers.Add(InventoryContainers[i].Id, InventoryContainers[i]);
+            var batches =
+                new Dictionary<string, ProductBatchState>(StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            var transactions =
+                new Dictionary<string, InventoryTransactionState>(StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(InventoryTransactions[i].Id, InventoryTransactions[i]);
+
+            if (MilitaryMedicalInitialized)
+            {
+                var assignedContainers = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var pair in armies)
+                {
+                    var army = pair.Value;
+                    if (string.IsNullOrEmpty(army.MedicalInventoryContainerId) ||
+                        !containers.TryGetValue(
+                            army.MedicalInventoryContainerId,
+                            out var container) ||
+                        container.KindId !=
+                            "inventory_container.military_medical_store" ||
+                        container.OwnerOrganizationId != army.OrganizationId ||
+                        !string.IsNullOrEmpty(container.OwnerFamilyId) ||
+                        !string.IsNullOrEmpty(container.CarrierPersonId) ||
+                        container.LocationId != army.LocationId ||
+                        !assignedContainers.Add(container.Id))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid military medical inventory for {army.Id}.");
+                    }
+                }
+            }
+            else if (MilitaryMedicalCases.Count != 0 ||
+                     MilitaryMedicalServices.Count != 0 ||
+                     MilitaryMedicalEvacuations.Count != 0 ||
+                     MilitaryRearMedicalSites.Count != 0 ||
+                     MilitaryRearMedicalAdmissions.Count != 0 ||
+                     MilitaryRearMedicalTreatments.Count != 0 ||
+                     MilitaryMedicalTransfers.Count != 0 ||
+                     MilitaryInjuryEpisodes.Count != 0 ||
+                     MilitaryWoundDeaths.Count != 0 ||
+                     MilitaryMedicalDeathResponsibilities.Count != 0 ||
+                     MilitaryInpatientDeathClosures.Count != 0 ||
+                     MilitaryMedicalTransferDeathClosures.Count != 0 ||
+                     MilitaryOriginalEvacuationDeathClosures.Count != 0 ||
+                     MilitaryPatientReturnDeathClosures.Count != 0 ||
+                     MilitaryReturnTeamDeaths.Count != 0 ||
+                     MilitaryFamilyInheritances.Count != 0 ||
+                     MilitarySurvivorCompensations.Count != 0 ||
+                     MilitaryFieldHospitalConstructionProjects.Count != 0 ||
+                     MilitaryFieldHospitalConstructionWork.Count != 0 ||
+                     MilitaryFieldHospitalMaintenance.Count != 0)
+            {
+                throw new InvalidOperationException(
+                    "Military medical history requires initialized military medicine.");
+            }
+
+            var cases =
+                new Dictionary<string, MilitaryMedicalCaseState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryMedicalCases.Count; i++)
+            {
+                var medicalCase = MilitaryMedicalCases[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical case cannot be null.");
+                _ = new StableId(medicalCase.Id);
+                _ = new StableId(medicalCase.TriageId);
+                _ = new StableId(medicalCase.TreatmentProtocolId);
+                _ = new StableId(medicalCase.AuthorizationPolicyId);
+                var validTriage = medicalCase.TriageId ==
+                        MilitaryMedicalTriageIds.Critical ||
+                    medicalCase.TriageId == MilitaryMedicalTriageIds.Severe ||
+                    medicalCase.TriageId == MilitaryMedicalTriageIds.Moderate;
+                var hasArmy = armies.TryGetValue(
+                    medicalCase.ArmyId, out var army);
+                var hasMilitaryService = militaryServices.TryGetValue(
+                    medicalCase.MilitaryServiceId, out var militaryService);
+                if (!hasArmy || !hasMilitaryService || !validTriage ||
+                    !people.ContainsKey(medicalCase.PatientPersonId) ||
+                    !people.ContainsKey(medicalCase.PhysicianPersonId) ||
+                    !people.ContainsKey(medicalCase.AuthorizingPersonId) ||
+                    militaryService.ArmyId != army.Id ||
+                    militaryService.PersonId != medicalCase.PatientPersonId ||
+                    !HasCommanderService(
+                        medicalCase.AuthorizingPersonId,
+                        medicalCase.ArmyId,
+                        militaryServices) ||
+                    medicalCase.TreatmentProtocolId !=
+                        MilitaryMedicalTreatmentProtocolIds.FieldHerbalCare ||
+                    medicalCase.DiagnosedDay <
+                        MilitaryMedicalContractActivationDay ||
+                    medicalCase.DiagnosedDay > AbsoluteDay ||
+                    medicalCase.Status != MilitaryMedicalCaseStatus.Closed ||
+                    medicalCase.ClosedDay != medicalCase.DiagnosedDay ||
+                    medicalCase.ClosureReasonId !=
+                        MilitaryMedicalCaseClosureReasonIds.ReturnedToDuty ||
+                    string.IsNullOrEmpty(
+                        medicalCase.MilitaryMedicalServiceId) ||
+                    !ValidMilitaryMedicalAuthorization(
+                        medicalCase.AuthorizationPolicyId,
+                        medicalCase.PhysicianPersonId,
+                        medicalCase.ArmyId,
+                        militaryServices))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military medical case {medicalCase.Id}.");
+                }
+                cases.Add(medicalCase.Id, medicalCase);
+            }
+
+            var serviceIds = new HashSet<string>(StringComparer.Ordinal);
+            var workByPhysicianDay = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < CivilianMedicalServices.Count; i++)
+            {
+                var civilian = CivilianMedicalServices[i];
+                AddInt(
+                    workByPhysicianDay,
+                    civilian.PhysicianPersonId + "|" + civilian.Day,
+                    civilian.WorkMinutes);
+            }
+            for (var i = 0; i < MilitaryMedicalServices.Count; i++)
+            {
+                var service = MilitaryMedicalServices[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical service cannot be null.");
+                var hasCase = cases.TryGetValue(
+                    service.MedicalCaseId, out var medicalCase);
+                var hasMilitaryService = militaryServices.TryGetValue(
+                    service.MilitaryServiceId, out var militaryService);
+                var hasBatch = batches.TryGetValue(
+                    service.SourceMedicineBatchId, out var batch);
+                var hasTransaction = transactions.TryGetValue(
+                    service.InventoryTransactionId, out var transaction);
+                var hasArmy = armies.TryGetValue(service.ArmyId, out var army);
+                if (!serviceIds.Add(service.Id) || !hasCase ||
+                    !hasMilitaryService || !hasBatch || !hasTransaction ||
+                    !hasArmy ||
+                    medicalCase.MilitaryMedicalServiceId != service.Id ||
+                    service.Day != medicalCase.DiagnosedDay ||
+                    service.ArmyId != medicalCase.ArmyId ||
+                    service.MilitaryServiceId != medicalCase.MilitaryServiceId ||
+                    service.PatientPersonId != medicalCase.PatientPersonId ||
+                    service.PhysicianPersonId != medicalCase.PhysicianPersonId ||
+                    service.AuthorizingPersonId != medicalCase.AuthorizingPersonId ||
+                    service.AuthorizationPolicyId !=
+                        medicalCase.AuthorizationPolicyId ||
+                    militaryService.ArmyId != service.ArmyId ||
+                    militaryService.PersonId != service.PatientPersonId ||
+                    service.VenuePolicyId !=
+                        MilitaryMedicalVenuePolicyIds.ArmyFieldUnit ||
+                    service.WorkMinutes !=
+                        MilitaryMedicalRules.TreatmentWorkMinutes ||
+                    service.MedicineProductDefinitionId !=
+                        CoreProductionContent.HerbalMedicineMaterialProductId ||
+                    batch.ProductDefinitionId !=
+                        service.MedicineProductDefinitionId ||
+                    batch.InventoryContainerId !=
+                        army.MedicalInventoryContainerId ||
+                    batch.OwnerOrganizationId != army.OrganizationId ||
+                    service.MedicineUnitsConsumed !=
+                        MilitaryMedicalRules.MedicineUnitsPerTreatment ||
+                    service.OpeningHealthBasisPoints < 0 ||
+                    service.OpeningHealthBasisPoints > 10_000 ||
+                    service.ClosingHealthBasisPoints != Math.Max(
+                        service.OpeningHealthBasisPoints,
+                        MilitaryMedicalRules.ReturnToDutyHealthBasisPoints) ||
+                    service.RecoveredHealthBasisPoints !=
+                        service.ClosingHealthBasisPoints -
+                        service.OpeningHealthBasisPoints ||
+                    service.OpeningMilitaryStatus !=
+                        MilitaryServiceStatus.Wounded ||
+                    service.ClosingMilitaryStatus !=
+                        MilitaryServiceStatus.Active ||
+                    service.PhysicianMedicalSkillBeforeBasisPoints <
+                        MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                    service.PhysicianMedicalSkillAfterBasisPoints != checked(
+                        service.PhysicianMedicalSkillBeforeBasisPoints +
+                        service.PhysicianMedicalSkillGainBasisPoints) ||
+                    service.PhysicianMedicalSkillGainBasisPoints <= 0 ||
+                    service.PhysicianMedicalSkillAfterBasisPoints > 10_000 ||
+                    transaction.Type != InventoryTransactionType
+                        .MilitaryMedicalTreatmentConsumed ||
+                    transaction.SourceMilitaryMedicalServiceId != service.Id ||
+                    transaction.ActorPersonId != service.PhysicianPersonId ||
+                    transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != batch.Id ||
+                    transaction.Lines[0].QuantityDelta !=
+                        -service.MedicineUnitsConsumed ||
+                    transaction.Lines[0].ReservedQuantityDelta != 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military medical service {service.Id}.");
+                }
+                AddInt(
+                    workByPhysicianDay,
+                    service.PhysicianPersonId + "|" + service.Day,
+                    service.WorkMinutes);
+            }
+
+            foreach (var pair in cases)
+            {
+                if (!serviceIds.Contains(
+                    pair.Value.MilitaryMedicalServiceId))
+                {
+                    throw new InvalidOperationException(
+                        $"Military medical case {pair.Key} lacks its service.");
+                }
+            }
+            var rearTreatmentIds = ValidateMilitaryRearMedicalCare(
+                armies,
+                people,
+                militaryServices,
+                containers,
+                batches,
+                transactions,
+                workByPhysicianDay);
+            var fieldHospitalProjectIds = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryFieldHospitalConstructionProjects.Count;
+                 i++)
+            {
+                fieldHospitalProjectIds.Add(
+                    MilitaryFieldHospitalConstructionProjects[i].Id);
+            }
+            var fieldHospitalMaintenanceIds = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryFieldHospitalMaintenance.Count; i++)
+            {
+                fieldHospitalMaintenanceIds.Add(
+                    MilitaryFieldHospitalMaintenance[i].Id);
+            }
+            foreach (var pair in workByPhysicianDay)
+            {
+                if (pair.Value >
+                    MilitaryMedicalRules.MaximumDailyPhysicianWorkMinutes)
+                {
+                    throw new InvalidOperationException(
+                        $"Physician work exceeds the daily limit for {pair.Key}.");
+                }
+            }
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                var transaction = InventoryTransactions[i];
+                var formalMilitaryConsumption = transaction.Type ==
+                    InventoryTransactionType.MilitaryMedicalTreatmentConsumed;
+                var hasSource = !string.IsNullOrWhiteSpace(
+                    transaction.SourceMilitaryMedicalServiceId);
+                if (formalMilitaryConsumption != hasSource ||
+                    hasSource && !serviceIds.Contains(
+                        transaction.SourceMilitaryMedicalServiceId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "military medical source.");
+                }
+                var rearConsumption = transaction.Type ==
+                    InventoryTransactionType
+                        .MilitaryRearMedicalTreatmentConsumed;
+                var hasRearSource = !string.IsNullOrWhiteSpace(
+                    transaction.SourceMilitaryRearMedicalTreatmentId);
+                if (rearConsumption != hasRearSource ||
+                    hasRearSource && !rearTreatmentIds.Contains(
+                        transaction.SourceMilitaryRearMedicalTreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "rear medical source.");
+                }
+                var transferReservation = transaction.Type ==
+                        InventoryTransactionType
+                            .MilitaryMedicalTransferMedicineReserved ||
+                    transaction.Type == InventoryTransactionType
+                        .MilitaryMedicalTransferMedicineReleased;
+                var hasTransferSource = !string.IsNullOrWhiteSpace(
+                    transaction.SourceMilitaryMedicalTransferId);
+                if (transferReservation != hasTransferSource ||
+                    hasTransferSource && !ContainsMilitaryMedicalTransfer(
+                        transaction.SourceMilitaryMedicalTransferId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "military medical transfer source.");
+                }
+                var constructionConsumption = transaction.Type ==
+                    InventoryTransactionType
+                        .MilitaryFieldHospitalConstructionConsumed;
+                var hasConstructionSource = !string.IsNullOrWhiteSpace(
+                    transaction
+                        .SourceMilitaryFieldHospitalConstructionProjectId);
+                if (constructionConsumption != hasConstructionSource ||
+                    hasConstructionSource && !fieldHospitalProjectIds.Contains(
+                        transaction
+                            .SourceMilitaryFieldHospitalConstructionProjectId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "field hospital construction source.");
+                }
+                var maintenanceConsumption = transaction.Type ==
+                    InventoryTransactionType
+                        .MilitaryFieldHospitalMaintenanceConsumed;
+                var hasMaintenanceSource = !string.IsNullOrWhiteSpace(
+                    transaction.SourceMilitaryFieldHospitalMaintenanceId);
+                if (maintenanceConsumption != hasMaintenanceSource ||
+                    hasMaintenanceSource &&
+                    !fieldHospitalMaintenanceIds.Contains(
+                        transaction.SourceMilitaryFieldHospitalMaintenanceId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "field hospital maintenance source.");
+                }
+            }
+
+            ValidateMilitaryMedicalEvacuations(
+                armies, people, militaryServices);
+        }
+
+        private HashSet<string> ValidateMilitaryRearMedicalCare(
+            Dictionary<string, ArmyState> armies,
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryServiceState> militaryServices,
+            Dictionary<string, InventoryContainerState> containers,
+            Dictionary<string, ProductBatchState> batches,
+            Dictionary<string, InventoryTransactionState> transactions,
+            Dictionary<string, int> workByPhysicianDay)
+        {
+            var organizations = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < Organizations.Count; i++)
+            {
+                organizations.Add(Organizations[i].Id);
+            }
+            var fieldHospitalProjects =
+                ValidateMilitaryFieldHospitalConstruction(
+                    armies,
+                    people,
+                    militaryServices,
+                    organizations,
+                    containers,
+                    batches,
+                    transactions);
+            var sites = new Dictionary<string, MilitaryRearMedicalSiteState>(
+                StringComparer.Ordinal);
+            var siteContainers = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryRearMedicalSites.Count; i++)
+            {
+                var site = MilitaryRearMedicalSites[i] ??
+                    throw new InvalidOperationException(
+                        "A rear medical site cannot be null.");
+                _ = new StableId(site.Id);
+                _ = new StableId(site.KindId);
+                var location = FindLocation(Locations, site.LocationId);
+                var hasContainer = containers.TryGetValue(
+                    site.MedicineInventoryContainerId, out var container);
+                var existingClinic = site.KindId ==
+                    MilitaryRearMedicalSiteKindIds.ExistingClinic;
+                var fieldHospital = site.KindId ==
+                    MilitaryRearMedicalSiteKindIds.FieldHospital;
+                var validKindFacts = existingClinic
+                    ? (location != null &&
+                       (location.Features & LocationFeature.Clinic) != 0 &&
+                       string.IsNullOrEmpty(site.SourceConstructionProjectId) &&
+                       string.IsNullOrEmpty(site.SupportInventoryContainerId) &&
+                       string.IsNullOrEmpty(site.MaintenancePolicyId) &&
+                       site.LastMaintenanceDay == -1 &&
+                       site.NextMaintenanceDay == -1)
+                    : fieldHospital && location != null &&
+                      fieldHospitalProjects.TryGetValue(
+                          site.SourceConstructionProjectId,
+                          out var sourceProject) &&
+                      sourceProject.Status ==
+                          MilitaryFieldHospitalConstructionStatus.Completed &&
+                      sourceProject.RearMedicalSiteId == site.Id &&
+                      sourceProject.LocationId == site.LocationId &&
+                      sourceProject.OwnerOrganizationId ==
+                          site.OwnerOrganizationId &&
+                      site.SupportInventoryContainerId ==
+                          sourceProject.MaterialInventoryContainerId &&
+                      containers.ContainsKey(site.SupportInventoryContainerId) &&
+                      site.MaintenancePolicyId ==
+                          MilitaryFieldHospitalMaintenancePolicyIds
+                              .TenDayTimberUpkeep &&
+                      site.BedCapacity ==
+                          MilitaryMedicalRules.FieldHospitalBedCapacity &&
+                      site.LastMaintenanceDay >= site.RegisteredDay &&
+                      site.NextMaintenanceDay == checked(
+                          site.LastMaintenanceDay +
+                          MilitaryMedicalRules
+                              .FieldHospitalMaintenanceIntervalDays);
+                if (!validKindFacts ||
+                    !organizations.Contains(site.OwnerOrganizationId) ||
+                    !hasContainer ||
+                    container.KindId !=
+                        "inventory_container.military_rear_medical_store" ||
+                    container.OwnerOrganizationId != site.OwnerOrganizationId ||
+                    !string.IsNullOrEmpty(container.OwnerFamilyId) ||
+                    !string.IsNullOrEmpty(container.CarrierPersonId) ||
+                    container.LocationId != site.LocationId ||
+                    !siteContainers.Add(container.Id) ||
+                    site.BedCapacity <= 0 ||
+                    site.RegisteredDay < MilitaryMedicalContractActivationDay ||
+                    site.RegisteredDay > AbsoluteDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid rear medical site {site.Id}.");
+                }
+                sites.Add(site.Id, site);
+            }
+            ValidateMilitaryFieldHospitalMaintenance(
+                people,
+                sites,
+                fieldHospitalProjects,
+                containers,
+                batches,
+                transactions);
+
+            var evacuations = new Dictionary<
+                string, MilitaryMedicalEvacuationState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryMedicalEvacuations.Count; i++)
+            {
+                evacuations.Add(
+                    MilitaryMedicalEvacuations[i].Id,
+                    MilitaryMedicalEvacuations[i]);
+            }
+            var surgicalProcedures = new Dictionary<
+                string, MilitarySurgicalProcedureDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0; i < MilitarySurgicalProcedures.Count; i++)
+            {
+                var procedure = MilitarySurgicalProcedures[i] ??
+                    throw new InvalidOperationException(
+                        "A military surgical procedure cannot be null.");
+                _ = new StableId(procedure.Id);
+                if (string.IsNullOrWhiteSpace(procedure.DisplayName) ||
+                    procedure.MinimumSeverityBasisPoints < 0 ||
+                    procedure.MinimumSeverityBasisPoints > 10_000 ||
+                    procedure.MinimumPhysicianSkillBasisPoints <
+                        MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                    procedure.MinimumPhysicianSkillBasisPoints > 10_000 ||
+                    procedure.WorkMinutes <= 0 ||
+                    procedure.WorkMinutes >
+                        MilitaryMedicalRules.MaximumDailyPhysicianWorkMinutes ||
+                    procedure.MedicineUnits <= 0 ||
+                    procedure.TargetHealthBasisPoints < 0 ||
+                    procedure.TargetHealthBasisPoints > 10_000 ||
+                    procedure.PermanentImpairmentSeverityBasisPoints <
+                        procedure.MinimumSeverityBasisPoints ||
+                    procedure.PermanentImpairmentSeverityBasisPoints > 10_000 ||
+                    procedure.PermanentImpairmentLaborPenaltyBasisPoints <= 0 ||
+                    procedure.PermanentImpairmentLaborPenaltyBasisPoints >
+                        10_000 ||
+                    surgicalProcedures.ContainsKey(procedure.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military surgical procedure {procedure.Id}.");
+                }
+                surgicalProcedures.Add(procedure.Id, procedure);
+            }
+            var injuryProfiles = new Dictionary<
+                string, MilitaryInjuryProfileDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryInjuryProfiles.Count; i++)
+            {
+                var profile = MilitaryInjuryProfiles[i] ??
+                    throw new InvalidOperationException(
+                        "A military injury profile cannot be null.");
+                _ = new StableId(profile.Id);
+                if (string.IsNullOrWhiteSpace(profile.DisplayName) ||
+                    profile.MinimumAdmissionHealthBasisPoints < 0 ||
+                    profile.MaximumAdmissionHealthBasisPoints > 10_000 ||
+                    profile.MinimumAdmissionHealthBasisPoints >
+                        profile.MaximumAdmissionHealthBasisPoints ||
+                    !string.IsNullOrEmpty(profile.SurgicalProcedureId) &&
+                        !surgicalProcedures.ContainsKey(
+                            profile.SurgicalProcedureId) ||
+                    injuryProfiles.ContainsKey(profile.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military injury profile {profile.Id}.");
+                }
+                injuryProfiles.Add(profile.Id, profile);
+            }
+            var woundDeathPolicies = new Dictionary<
+                string, MilitaryWoundDeathPolicyDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryWoundDeathPolicies.Count; i++)
+            {
+                var policy = MilitaryWoundDeathPolicies[i] ??
+                    throw new InvalidOperationException(
+                        "A military wound-death policy cannot be null.");
+                _ = new StableId(policy.Id);
+                if (string.IsNullOrWhiteSpace(policy.DisplayName) ||
+                    policy.MinimumSeverityBasisPoints < 0 ||
+                    policy.MinimumSeverityBasisPoints > 10_000 ||
+                    policy.MaximumPostTreatmentHealthBasisPoints < 0 ||
+                    policy.MaximumPostTreatmentHealthBasisPoints > 10_000 ||
+                    policy.MinimumDaysAfterCareCompletion < 0 ||
+                    policy.BaseCompensationMoney < 0 ||
+                    policy.CompensationPerRankMoney < 0 ||
+                    woundDeathPolicies.ContainsKey(policy.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military wound-death policy {policy.Id}.");
+                }
+                woundDeathPolicies.Add(policy.Id, policy);
+            }
+            var inpatientDeteriorationPolicies = new Dictionary<
+                string, MilitaryInpatientDeteriorationPolicyDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryInpatientDeteriorationPolicies.Count;
+                 i++)
+            {
+                var policy = MilitaryInpatientDeteriorationPolicies[i] ??
+                    throw new InvalidOperationException(
+                        "A military inpatient deterioration policy cannot be null.");
+                _ = new StableId(policy.Id);
+                if (string.IsNullOrWhiteSpace(policy.DisplayName) ||
+                    policy.MinimumSeverityBasisPoints < 0 ||
+                    policy.MinimumSeverityBasisPoints > 10_000 ||
+                    policy.MinimumDaysAfterAdmission < 0 ||
+                    policy.HealthLossBasisPoints <= 0 ||
+                    policy.HealthLossBasisPoints > 10_000 ||
+                    policy.MaximumClosingHealthBasisPoints < 0 ||
+                    policy.MaximumClosingHealthBasisPoints > 10_000 ||
+                    inpatientDeteriorationPolicies.ContainsKey(policy.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military inpatient deterioration policy {policy.Id}.");
+                }
+                inpatientDeteriorationPolicies.Add(policy.Id, policy);
+            }
+            var originalEvacuationDeteriorationPolicies = new Dictionary<
+                string,
+                MilitaryOriginalEvacuationDeteriorationPolicyDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryOriginalEvacuationDeteriorationPolicies.Count;
+                 i++)
+            {
+                var policy =
+                    MilitaryOriginalEvacuationDeteriorationPolicies[i] ??
+                    throw new InvalidOperationException(
+                        "A military original-evacuation deterioration policy cannot be null.");
+                _ = new StableId(policy.Id);
+                if (string.IsNullOrWhiteSpace(policy.DisplayName) ||
+                    policy.MinimumDaysAfterDispatch < 0 ||
+                    policy.MaximumOpeningHealthBasisPoints < 0 ||
+                    policy.MaximumOpeningHealthBasisPoints > 10_000 ||
+                    policy.HealthLossBasisPoints <= 0 ||
+                    policy.HealthLossBasisPoints > 10_000 ||
+                    policy.MaximumClosingHealthBasisPoints < 0 ||
+                    policy.MaximumClosingHealthBasisPoints > 10_000 ||
+                    originalEvacuationDeteriorationPolicies.ContainsKey(
+                        policy.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military original-evacuation deterioration policy {policy.Id}.");
+                }
+                originalEvacuationDeteriorationPolicies.Add(
+                    policy.Id, policy);
+            }
+            var patientReturnDeteriorationPolicies = new Dictionary<
+                string,
+                MilitaryPatientReturnDeteriorationPolicyDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryPatientReturnDeteriorationPolicies.Count;
+                 i++)
+            {
+                var policy =
+                    MilitaryPatientReturnDeteriorationPolicies[i] ??
+                    throw new InvalidOperationException(
+                        "A military patient-return deterioration policy cannot be null.");
+                _ = new StableId(policy.Id);
+                if (string.IsNullOrWhiteSpace(policy.DisplayName) ||
+                    policy.MinimumSeverityBasisPoints < 0 ||
+                    policy.MinimumSeverityBasisPoints > 10_000 ||
+                    policy.MinimumDaysAfterReturnStart < 0 ||
+                    policy.HealthLossBasisPoints <= 0 ||
+                    policy.HealthLossBasisPoints > 10_000 ||
+                    policy.MaximumClosingHealthBasisPoints < 0 ||
+                    policy.MaximumClosingHealthBasisPoints > 10_000 ||
+                    patientReturnDeteriorationPolicies.ContainsKey(
+                        policy.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military patient-return deterioration policy {policy.Id}.");
+                }
+                patientReturnDeteriorationPolicies.Add(policy.Id, policy);
+            }
+            var returnTeamDeathPolicies = new Dictionary<
+                string, MilitaryReturnTeamDeathPolicyDefinitionState>(
+                    StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryReturnTeamDeathPolicies.Count; i++)
+            {
+                var policy = MilitaryReturnTeamDeathPolicies[i] ??
+                    throw new InvalidOperationException(
+                        "A military return-team death policy cannot be null.");
+                _ = new StableId(policy.Id);
+                if (string.IsNullOrWhiteSpace(policy.DisplayName) ||
+                    policy.MinimumDaysAfterReturnStart < 0 ||
+                    policy.HealthLossBasisPoints <= 0 ||
+                    policy.HealthLossBasisPoints > 10_000 ||
+                    policy.MaximumClosingHealthBasisPoints < 0 ||
+                    policy.MaximumClosingHealthBasisPoints > 10_000 ||
+                    policy.BaseCompensationMoney < 0 ||
+                    policy.CompensationPerRankMoney < 0 ||
+                    returnTeamDeathPolicies.ContainsKey(policy.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military return-team death policy {policy.Id}.");
+                }
+                returnTeamDeathPolicies.Add(policy.Id, policy);
+            }
+            var injuryEpisodes = new Dictionary<
+                string, MilitaryInjuryEpisodeState>(StringComparer.Ordinal);
+            var injuryAdmissions = new HashSet<string>(StringComparer.Ordinal);
+            var permanentPenaltyByPerson = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryInjuryEpisodes.Count; i++)
+            {
+                var injury = MilitaryInjuryEpisodes[i] ??
+                    throw new InvalidOperationException(
+                        "A military injury episode cannot be null.");
+                _ = new StableId(injury.Id);
+                _ = new StableId(injury.InjuryProfileId);
+                var hasEvacuation = evacuations.TryGetValue(
+                    injury.EvacuationId, out var evacuation);
+                var hasService = militaryServices.TryGetValue(
+                    injury.PatientMilitaryServiceId, out var service);
+                var expectedSeverity = 10_000 -
+                    injury.AdmissionHealthBasisPoints;
+                var expectedTransit = hasEvacuation
+                    ? checked((int)Math.Max(
+                        0, evacuation.ReceivedDay - evacuation.CreatedDay))
+                    : -1;
+                var expectedContamination = expectedTransit < 0
+                    ? -1
+                    : Math.Min(
+                        10_000,
+                        checked(expectedSeverity / 2 +
+                            expectedTransit * 400));
+                var expectedProfile = MilitaryInjuryProfileCatalog.Select(
+                    MilitaryInjuryProfiles,
+                    injury.AdmissionHealthBasisPoints).Id;
+                var profile = injuryProfiles.ContainsKey(expectedProfile)
+                    ? injuryProfiles[expectedProfile]
+                    : null;
+                MilitarySurgicalProcedureDefinitionState procedure = null;
+                var surgeryContractApplies = injury.AssessedDay >=
+                    MilitarySurgeryContractActivationDay;
+                var surgeryRequired = surgeryContractApplies &&
+                    profile != null &&
+                    !string.IsNullOrEmpty(profile.SurgicalProcedureId) &&
+                    surgicalProcedures.TryGetValue(
+                        profile.SurgicalProcedureId, out procedure) &&
+                    injury.SeverityBasisPoints >=
+                        procedure.MinimumSeverityBasisPoints;
+                var expectedSurgicalProcedureId = surgeryRequired
+                    ? procedure.Id
+                    : string.Empty;
+                var infected = injury.InfectionRiskBasisPoints >=
+                    MilitaryMedicalRules.InfectionRiskThresholdBasisPoints;
+                var controlled = injury.InfectionStatus ==
+                    MilitaryInfectionStatus.Controlled;
+                var surgeryCompleted = !string.IsNullOrEmpty(
+                    injury.SurgeryTreatmentId);
+                var expectedImpairment = surgeryCompleted &&
+                    procedure != null &&
+                    injury.SeverityBasisPoints >=
+                        procedure.PermanentImpairmentSeverityBasisPoints;
+                var expectedPenalty = expectedImpairment
+                    ? procedure.PermanentImpairmentLaborPenaltyBasisPoints
+                    : 0;
+                if (injuryEpisodes.ContainsKey(injury.Id) ||
+                    !injuryAdmissions.Add(injury.AdmissionId) ||
+                    !hasEvacuation || !hasService ||
+                    !people.ContainsKey(injury.PatientPersonId) ||
+                    service.PersonId != injury.PatientPersonId ||
+                    injury.PatientPersonId != evacuation.PatientPersonId ||
+                    injury.PatientMilitaryServiceId !=
+                        evacuation.PatientMilitaryServiceId ||
+                    injury.AssessedDay < evacuation.ReceivedDay ||
+                    injury.AssessedDay > AbsoluteDay ||
+                    injury.AdmissionHealthBasisPoints < 0 ||
+                    injury.AdmissionHealthBasisPoints > 10_000 ||
+                    injury.SeverityBasisPoints != expectedSeverity ||
+                    injury.TransitDays != expectedTransit ||
+                    injury.ContaminationBasisPoints != expectedContamination ||
+                    injury.InfectionRiskBasisPoints != expectedContamination ||
+                    !injuryProfiles.ContainsKey(injury.InjuryProfileId) ||
+                    injury.InjuryProfileId != expectedProfile ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryInfectionStatus),
+                        injury.InfectionStatus) ||
+                    infected != (injury.InfectionStatus !=
+                        MilitaryInfectionStatus.AtRisk) ||
+                    controlled != !string.IsNullOrEmpty(
+                        injury.InfectionControlTreatmentId) ||
+                    controlled != (injury.InfectionControlledDay >= 0) ||
+                    controlled && injury.InfectionControlledDay <
+                        injury.AssessedDay ||
+                    controlled && injury.InfectionControlledDay > AbsoluteDay ||
+                    injury.SurgicalProcedureId !=
+                        expectedSurgicalProcedureId ||
+                    !surgeryRequired &&
+                        (surgeryCompleted ||
+                         injury.SurgeryCompletedDay != -1 ||
+                         !string.IsNullOrEmpty(injury.PermanentOutcomeId) ||
+                         injury.LaborCapacityBeforeBasisPoints != -1 ||
+                         injury.LaborCapacityAfterBasisPoints != -1 ||
+                         injury.PermanentLaborCapacityPenaltyBasisPoints != 0 ||
+                         injury.RequiresMedicalRetirement) ||
+                    surgeryRequired && !surgeryCompleted &&
+                        (injury.SurgeryCompletedDay != -1 ||
+                         !string.IsNullOrEmpty(injury.PermanentOutcomeId) ||
+                         injury.LaborCapacityBeforeBasisPoints != -1 ||
+                         injury.LaborCapacityAfterBasisPoints != -1 ||
+                         injury.PermanentLaborCapacityPenaltyBasisPoints != 0 ||
+                         injury.RequiresMedicalRetirement) ||
+                    surgeryCompleted &&
+                        (injury.SurgeryCompletedDay < injury.AssessedDay ||
+                         injury.SurgeryCompletedDay > AbsoluteDay ||
+                         injury.PermanentOutcomeId !=
+                             (expectedImpairment
+                                 ? MilitaryInjuryOutcomeIds
+                                     .PermanentMobilityImpairment
+                                 : MilitaryInjuryOutcomeIds
+                                     .NoPermanentImpairment) ||
+                         injury.LaborCapacityBeforeBasisPoints < 0 ||
+                         injury.LaborCapacityBeforeBasisPoints > 10_000 ||
+                         injury.LaborCapacityAfterBasisPoints != Math.Max(
+                             0,
+                             injury.LaborCapacityBeforeBasisPoints -
+                                 expectedPenalty) ||
+                         injury.PermanentLaborCapacityPenaltyBasisPoints !=
+                             expectedPenalty ||
+                         expectedImpairment !=
+                             injury.RequiresMedicalRetirement))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military injury episode {injury.Id}.");
+                }
+                if (expectedPenalty > 0)
+                {
+                    AddInt(
+                        permanentPenaltyByPerson,
+                        injury.PatientPersonId,
+                        expectedPenalty);
+                }
+                injuryEpisodes.Add(injury.Id, injury);
+            }
+            foreach (var pair in people)
+            {
+                permanentPenaltyByPerson.TryGetValue(
+                    pair.Key, out var expectedPermanentPenalty);
+                if (pair.Value.PermanentLaborCapacityPenaltyBasisPoints !=
+                    expectedPermanentPenalty)
+                {
+                    throw new InvalidOperationException(
+                        $"Person {pair.Key} has an invalid permanent labor penalty.");
+                }
+            }
+            var admissions = new Dictionary<
+                string, MilitaryRearMedicalAdmissionState>(StringComparer.Ordinal);
+            var medicalTransfers = new Dictionary<
+                string, MilitaryMedicalTransferState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryMedicalTransfers.Count; i++)
+            {
+                var transfer = MilitaryMedicalTransfers[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical transfer cannot be null.");
+                if (medicalTransfers.ContainsKey(transfer.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military medical transfer {transfer.Id}.");
+                }
+                medicalTransfers.Add(transfer.Id, transfer);
+            }
+            var occupiedBeds = new Dictionary<string, int>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryRearMedicalAdmissions.Count; i++)
+            {
+                var admission = MilitaryRearMedicalAdmissions[i] ??
+                    throw new InvalidOperationException(
+                        "A rear medical admission cannot be null.");
+                var hasEvacuation = evacuations.TryGetValue(
+                    admission.EvacuationId, out var evacuation);
+                var hasSite = sites.TryGetValue(
+                    admission.RearMedicalSiteId, out var site);
+                var hasPatient = people.ContainsKey(admission.PatientPersonId);
+                var hasService = militaryServices.TryGetValue(
+                    admission.PatientMilitaryServiceId, out var service);
+                var hasPhysician = people.ContainsKey(
+                    admission.PhysicianPersonId);
+                MilitaryMedicalTransferState medicalTransfer = null;
+                var hasMedicalTransfer = !string.IsNullOrEmpty(
+                        admission.MedicalTransferId) &&
+                    medicalTransfers.TryGetValue(
+                        admission.MedicalTransferId, out medicalTransfer);
+                var activeMedicalTransfer = hasMedicalTransfer &&
+                    (medicalTransfer.Status ==
+                         MilitaryMedicalTransferStatus.InTransit ||
+                     medicalTransfer.Status ==
+                         MilitaryMedicalTransferStatus.AwaitingReception ||
+                     medicalTransfer.Status ==
+                         MilitaryMedicalTransferStatus.DeceasedInTransit);
+                var expectedPhysicianPersonId = hasMedicalTransfer
+                    ? medicalTransfer.Status ==
+                        MilitaryMedicalTransferStatus.Completed
+                            ? medicalTransfer.DesignatedReceivingPersonId
+                            : medicalTransfer.SourcePhysicianPersonId
+                    : evacuation?.ReceivingPersonId;
+                var expectedEvacuationStatus =
+                    admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.InTreatment
+                        ? MilitaryMedicalEvacuationStatus.Admitted
+                        : admission.Status ==
+                            MilitaryRearMedicalAdmissionStatus.ReadyForReturn
+                            ? MilitaryMedicalEvacuationStatus.ReadyForReturn
+                            : admission.Status ==
+                                MilitaryRearMedicalAdmissionStatus.Discharged
+                                ? MilitaryMedicalEvacuationStatus.ReturningToArmy
+                                : MilitaryMedicalEvacuationStatus.Completed;
+                var hasInjury = injuryEpisodes.TryGetValue(
+                    admission.InjuryEpisodeId, out var injury);
+                var woundDeath = FindMilitaryWoundDeath(
+                    admission.Id, admission.PatientPersonId);
+                var diedDuringTreatment = woundDeath != null &&
+                    woundDeath.DeathContextId ==
+                        MilitaryWoundDeathContextIds.InTreatmentAtCareSite;
+                var diedDuringTransfer = woundDeath != null &&
+                    woundDeath.DeathContextId ==
+                        MilitaryWoundDeathContextIds
+                            .DuringCrossFacilityTransfer;
+                var diedDuringPatientReturn = woundDeath != null &&
+                    (woundDeath.DeathContextId ==
+                         MilitaryWoundDeathContextIds
+                             .DuringPatientReturnJourney ||
+                     woundDeath.DeathContextId ==
+                         MilitaryWoundDeathContextIds
+                             .AwaitingReturnTeamRejoinAtArmy);
+                var diedAwaitingReturnTeam = woundDeath != null &&
+                    woundDeath.DeathContextId ==
+                        MilitaryWoundDeathContextIds
+                            .AwaitingReturnTeamRejoinAtArmy;
+                var diedAtCareSite = woundDeath != null &&
+                    woundDeath.DeathContextId ==
+                        MilitaryWoundDeathContextIds.ReadyForReturnAtCareSite ||
+                    diedDuringTreatment;
+                var validEvacuationStatus =
+                    diedDuringTreatment && admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        evacuation != null && evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                    diedDuringTransfer && admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        evacuation != null &&
+                        (medicalTransfer.Status ==
+                             MilitaryMedicalTransferStatus
+                                 .DeceasedInTransit &&
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.Admitted ||
+                         medicalTransfer.Status ==
+                             MilitaryMedicalTransferStatus
+                                 .ClosedAfterPatientDeath &&
+                         evacuation.Status >=
+                             MilitaryMedicalEvacuationStatus
+                                 .ReadyForReturn) ||
+                    diedDuringPatientReturn &&
+                        admission.Status ==
+                            MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        evacuation != null && evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus
+                                .PatientDeceasedReturningToArmy ||
+                    diedDuringPatientReturn &&
+                        admission.Status ==
+                            MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        evacuation != null && evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus
+                                .PatientDeceasedAwaitingTeamRejoin ||
+                    evacuation != null &&
+                        evacuation.Status == expectedEvacuationStatus;
+                var fieldHospital = admission.TreatmentPlanOriginSiteKindId ==
+                    MilitaryRearMedicalSiteKindIds.FieldHospital;
+                var surgeryStageIndex = fieldHospital ? 1 : 0;
+                var surgeryPlanned = admission.TreatmentPlanProtocolIds !=
+                        null &&
+                    admission.TreatmentPlanProtocolIds.Count >
+                        surgeryStageIndex &&
+                    admission.TreatmentPlanProtocolIds[surgeryStageIndex] ==
+                        MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery;
+                var infectionStageIndex = (fieldHospital ? 1 : 0) +
+                    (surgeryPlanned ? 1 : 0);
+                var infectionPlanned = admission.TreatmentPlanProtocolIds !=
+                        null &&
+                    admission.TreatmentPlanProtocolIds.Count >
+                        infectionStageIndex &&
+                    admission.TreatmentPlanProtocolIds[infectionStageIndex] ==
+                        MilitaryRearMedicalTreatmentProtocolIds
+                            .InfectionControl;
+                var expectedStages = (fieldHospital ? 2 : 1) +
+                    (surgeryPlanned ? 1 : 0) +
+                    (infectionPlanned ? 1 : 0);
+                var validPlan = admission.TreatmentPlanProtocolIds != null &&
+                    admission.TreatmentPlanProtocolIds.Count == expectedStages &&
+                    (!surgeryPlanned ||
+                     admission.TreatmentPlanProtocolIds[surgeryStageIndex] ==
+                        MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery) &&
+                    (fieldHospital
+                        ? admission.TreatmentPlanProtocolIds[0] ==
+                              MilitaryRearMedicalTreatmentProtocolIds
+                                  .FieldStabilization &&
+                          admission.TreatmentPlanProtocolIds[
+                              expectedStages - 1] ==
+                              MilitaryRearMedicalTreatmentProtocolIds
+                                  .FieldRecovery
+                        : admission.TreatmentPlanProtocolIds[
+                              expectedStages - 1] ==
+                              MilitaryRearMedicalTreatmentProtocolIds
+                                  .InpatientHerbalRecovery);
+                var injuryRequiresControl = hasInjury &&
+                    injury.InfectionStatus != MilitaryInfectionStatus.AtRisk;
+                var injuryRequiresSurgery = hasInjury &&
+                    !string.IsNullOrEmpty(injury.SurgicalProcedureId);
+                var stagesComplete =
+                    admission.CompletedTreatmentStages == expectedStages;
+                var careClosed = stagesComplete || diedDuringTreatment ||
+                    diedDuringTransfer;
+                var expectedDischargePolicy = diedDuringTransfer
+                    ? MilitaryRearMedicalDischargePolicyIds
+                        .DeathDuringMedicalTransfer
+                    : diedAtCareSite
+                    ? MilitaryRearMedicalDischargePolicyIds.DeathAtCareSite
+                    : hasInjury && injury.RequiresMedicalRetirement
+                        ? MilitaryRearMedicalDischargePolicyIds
+                            .MedicalRetirementAtCareSite
+                        : MilitaryRearMedicalDischargePolicyIds
+                            .ReturnToSourceArmy;
+                var expectedPatientReturnPolicy = diedAtCareSite ||
+                    diedDuringTransfer
+                    ? MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .RemainAtCareSiteAfterDeath
+                    : diedDuringPatientReturn
+                        ? diedAwaitingReturnTeam
+                            ? MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .CorpseAtArmyAwaitingTeamRejoin
+                            : MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .ReturnCorpseWithTeam
+                    : hasInjury && injury.RequiresMedicalRetirement
+                        ? MilitaryMedicalEvacuationPatientReturnPolicyIds
+                            .RemainAtCareSiteForMedicalRetirement
+                        : MilitaryMedicalEvacuationPatientReturnPolicyIds
+                            .ReturnWithTeam;
+                var discharged = admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.Discharged ||
+                    admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.Completed;
+                var completed = admission.Status ==
+                    MilitaryRearMedicalAdmissionStatus.Completed;
+                if (!hasEvacuation || !hasSite || !hasPatient || !hasService ||
+                    !hasPhysician ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryRearMedicalAdmissionStatus),
+                        admission.Status) ||
+                    admission.TreatmentPlanOriginSiteKindId !=
+                        MilitaryRearMedicalSiteKindIds.FieldHospital &&
+                    admission.TreatmentPlanOriginSiteKindId !=
+                        MilitaryRearMedicalSiteKindIds.ExistingClinic ||
+                    evacuation.RearMedicalAdmissionId != admission.Id ||
+                    evacuation.RearMedicalSiteId != site.Id ||
+                    !validEvacuationStatus ||
+                    admission.PatientPersonId != evacuation.PatientPersonId ||
+                    admission.PatientMilitaryServiceId !=
+                        evacuation.PatientMilitaryServiceId ||
+                    admission.PhysicianPersonId != expectedPhysicianPersonId ||
+                    !string.IsNullOrEmpty(admission.MedicalTransferId) !=
+                        hasMedicalTransfer ||
+                    hasMedicalTransfer &&
+                        (medicalTransfer.AdmissionId != admission.Id ||
+                         medicalTransfer.EvacuationId != admission.EvacuationId) ||
+                    service.PersonId != admission.PatientPersonId ||
+                    admission.AdmittedDay < evacuation.ReceivedDay ||
+                    admission.AdmittedDay > AbsoluteDay ||
+                    !validPlan ||
+                    hasInjury != !string.IsNullOrEmpty(
+                        admission.InjuryEpisodeId) ||
+                    !hasInjury && admission.AdmittedDay >=
+                        MilitaryInjuryContractActivationDay ||
+                    hasInjury &&
+                        (injury.AdmissionId != admission.Id ||
+                         injury.EvacuationId != admission.EvacuationId ||
+                         injury.PatientPersonId != admission.PatientPersonId ||
+                         injury.PatientMilitaryServiceId !=
+                             admission.PatientMilitaryServiceId ||
+                         injury.AssessedDay != admission.AdmittedDay) ||
+                    injuryRequiresSurgery != surgeryPlanned ||
+                    injuryRequiresControl != infectionPlanned ||
+                    injuryRequiresSurgery && !string.IsNullOrEmpty(
+                        injury.SurgeryTreatmentId) !=
+                            (admission.CompletedTreatmentStages >
+                                surgeryStageIndex) ||
+                    hasInjury && injury.InfectionStatus ==
+                        MilitaryInfectionStatus.Controlled &&
+                        admission.CompletedTreatmentStages <=
+                            infectionStageIndex ||
+                    hasInjury && injury.InfectionStatus ==
+                        MilitaryInfectionStatus.Active &&
+                        admission.CompletedTreatmentStages >
+                            infectionStageIndex ||
+                    admission.TreatmentIds == null ||
+                    admission.RequiredTreatmentStages != expectedStages ||
+                    admission.CompletedTreatmentStages < 0 ||
+                    admission.CompletedTreatmentStages > expectedStages ||
+                    admission.TreatmentIds.Count !=
+                        admission.CompletedTreatmentStages ||
+                    (admission.CompletedTreatmentStages == 0) !=
+                        string.IsNullOrEmpty(admission.TreatmentId) ||
+                    admission.CompletedTreatmentStages > 0 &&
+                    admission.TreatmentId != admission.TreatmentIds[
+                            admission.TreatmentIds.Count - 1] ||
+                    (admission.Status ==
+                        MilitaryRearMedicalAdmissionStatus.InTreatment) !=
+                        (!stagesComplete && !diedDuringTreatment &&
+                         !diedDuringTransfer) ||
+                    careClosed != (admission.ReadyForReturnDay >= 0) ||
+                    careClosed != !string.IsNullOrEmpty(
+                        admission.DischargePolicyId) ||
+                    careClosed && admission.DischargePolicyId !=
+                        expectedDischargePolicy ||
+                    careClosed && evacuation.PatientReturnPolicyId !=
+                        expectedPatientReturnPolicy ||
+                    diedDuringTreatment != !string.IsNullOrEmpty(
+                        admission.InpatientDeathClosureId) ||
+                    diedDuringTreatment && admission.InpatientDeathClosureId !=
+                        woundDeath.InpatientDeathClosureId ||
+                    diedDuringTransfer != !string.IsNullOrEmpty(
+                        admission.MedicalTransferDeathClosureId) ||
+                    diedDuringTransfer &&
+                        admission.MedicalTransferDeathClosureId !=
+                            woundDeath.MedicalTransferDeathClosureId ||
+                    diedDuringPatientReturn != !string.IsNullOrEmpty(
+                        admission.PatientReturnDeathClosureId) ||
+                    diedDuringPatientReturn &&
+                        admission.PatientReturnDeathClosureId !=
+                            woundDeath.PatientReturnDeathClosureId ||
+                    discharged != (admission.DischargedDay >= 0) ||
+                    discharged && admission.DischargedDay <
+                        admission.ReadyForReturnDay ||
+                    completed != (admission.CompletedDay >= 0) ||
+                    completed && admission.CompletedDay < admission.DischargedDay ||
+                    completed &&
+                        woundDeath == null &&
+                        (admission.DischargePolicyId ==
+                            MilitaryRearMedicalDischargePolicyIds
+                                .MedicalRetirementAtCareSite) !=
+                            (service.Status == MilitaryServiceStatus.Retired) ||
+                    completed &&
+                        woundDeath == null &&
+                        (admission.DischargePolicyId ==
+                            MilitaryRearMedicalDischargePolicyIds
+                                .ReturnToSourceArmy) !=
+                            (service.Status == MilitaryServiceStatus.Active) ||
+                    completed &&
+                        woundDeath != null &&
+                        service.Status != MilitaryServiceStatus.Dead)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid rear medical admission {admission.Id}: " +
+                        $"status={admission.Status}, evacuation=" +
+                        $"{evacuation?.Status}, hasInjury={hasInjury}, " +
+                        $"planValid={validPlan}, required=" +
+                        $"{admission.RequiredTreatmentStages}, expected=" +
+                        $"{expectedStages}, completed=" +
+                        $"{admission.CompletedTreatmentStages}, readyDay=" +
+                        $"{admission.ReadyForReturnDay}, policy=" +
+                        $"{admission.DischargePolicyId}, patientPolicy=" +
+                        $"{evacuation?.PatientReturnPolicyId}, service=" +
+                        $"{service?.Status}.");
+                }
+                if (!discharged && !activeMedicalTransfer)
+                {
+                    AddInt(occupiedBeds, site.Id, 1);
+                }
+                admissions.Add(admission.Id, admission);
+            }
+            foreach (var pair in medicalTransfers)
+            {
+                if (pair.Value.Status ==
+                        MilitaryMedicalTransferStatus.InTransit ||
+                    pair.Value.Status ==
+                        MilitaryMedicalTransferStatus.AwaitingReception)
+                {
+                    AddInt(
+                        occupiedBeds,
+                        pair.Value.DestinationRearMedicalSiteId,
+                        1);
+                }
+            }
+            foreach (var pair in injuryEpisodes)
+            {
+                if (!admissions.TryGetValue(
+                        pair.Value.AdmissionId, out var admission) ||
+                    admission.InjuryEpisodeId != pair.Key)
+                {
+                    throw new InvalidOperationException(
+                        $"Military injury episode {pair.Key} lacks its admission.");
+                }
+            }
+            ValidateMilitaryWoundDeaths(
+                woundDeathPolicies,
+                inpatientDeteriorationPolicies,
+                originalEvacuationDeteriorationPolicies,
+                patientReturnDeteriorationPolicies,
+                returnTeamDeathPolicies,
+                injuryEpisodes,
+                admissions,
+                evacuations,
+                armies,
+                people,
+                militaryServices);
+            ValidateMilitaryMedicalTransfers(
+                medicalTransfers,
+                admissions,
+                evacuations,
+                sites,
+                armies,
+                people,
+                militaryServices,
+                batches,
+                transactions);
+            foreach (var pair in occupiedBeds)
+            {
+                if (!sites.TryGetValue(pair.Key, out var occupiedSite) ||
+                    pair.Value > occupiedSite.BedCapacity)
+                {
+                    throw new InvalidOperationException(
+                        $"Rear medical site {pair.Key} exceeds bed capacity.");
+                }
+            }
+
+            var treatmentIds = new HashSet<string>(StringComparer.Ordinal);
+            var treatmentStages = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryRearMedicalTreatments.Count; i++)
+            {
+                var treatment = MilitaryRearMedicalTreatments[i] ??
+                    throw new InvalidOperationException(
+                        "A rear medical treatment cannot be null.");
+                var hasAdmission = admissions.TryGetValue(
+                    treatment.AdmissionId, out var admission);
+                var hasSite = sites.TryGetValue(
+                    treatment.RearMedicalSiteId, out var site);
+                var hasBatch = batches.TryGetValue(
+                    treatment.SourceMedicineBatchId, out var batch);
+                var hasTransaction = transactions.TryGetValue(
+                    treatment.InventoryTransactionId, out var transaction);
+                var expectedStageCount = hasAdmission
+                    ? admission.RequiredTreatmentStages
+                    : 0;
+                var validStage = hasAdmission &&
+                    admission.TreatmentPlanProtocolIds != null &&
+                    treatment.StageIndex >= 0 &&
+                    treatment.StageIndex <
+                        admission.TreatmentPlanProtocolIds.Count;
+                var expectedProtocol = validStage
+                    ? admission.TreatmentPlanProtocolIds[treatment.StageIndex]
+                    : string.Empty;
+                var infectionControl = expectedProtocol ==
+                    MilitaryRearMedicalTreatmentProtocolIds.InfectionControl;
+                var surgery = expectedProtocol ==
+                    MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery;
+                var stabilization = expectedProtocol ==
+                    MilitaryRearMedicalTreatmentProtocolIds.FieldStabilization;
+                MilitaryInjuryEpisodeState treatmentInjury = null;
+                MilitarySurgicalProcedureDefinitionState treatmentProcedure =
+                    null;
+                var hasSurgicalProcedure = surgery &&
+                    hasAdmission &&
+                    injuryEpisodes.TryGetValue(
+                        admission.InjuryEpisodeId, out treatmentInjury) &&
+                    surgicalProcedures.TryGetValue(
+                        treatmentInjury.SurgicalProcedureId,
+                        out treatmentProcedure);
+                var expectedWorkMinutes = surgery && hasSurgicalProcedure
+                    ? treatmentProcedure.WorkMinutes
+                    : infectionControl
+                    ? MilitaryMedicalRules.InfectionControlWorkMinutes
+                    : stabilization
+                        ? MilitaryMedicalRules.FieldStabilizationWorkMinutes
+                        : MilitaryMedicalRules.RearTreatmentWorkMinutes;
+                var expectedHealth = surgery && hasSurgicalProcedure
+                    ? treatmentProcedure.TargetHealthBasisPoints
+                    : infectionControl
+                    ? MilitaryMedicalRules.InfectionControlHealthBasisPoints
+                    : stabilization
+                        ? MilitaryMedicalRules
+                            .FieldStabilizationHealthBasisPoints
+                        : MilitaryMedicalRules.ReturnToDutyHealthBasisPoints;
+                var expectedMedicineUnits = surgery && hasSurgicalProcedure
+                    ? treatmentProcedure.MedicineUnits
+                    : infectionControl
+                    ? MilitaryMedicalRules.InfectionControlMedicineUnits
+                    : MilitaryMedicalRules.MedicineUnitsPerTreatment;
+                var expectedMinimumSkill = surgery && hasSurgicalProcedure
+                    ? treatmentProcedure.MinimumPhysicianSkillBasisPoints
+                    : MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints;
+                var firstTreatmentTransfer = hasAdmission
+                    ? FindFirstMedicalTransferForAdmission(
+                        admission.Id, medicalTransfers)
+                    : null;
+                var treatmentTransfer = hasAdmission
+                    ? FindMedicalTransferForTreatmentStage(
+                        admission.Id,
+                        treatment.StageIndex,
+                        medicalTransfers)
+                    : null;
+                var hasTreatmentTransfer = treatmentTransfer != null;
+                var usesTransferReservation = hasTreatmentTransfer;
+                var expectedTreatmentSiteId = hasTreatmentTransfer
+                    ? treatmentTransfer.DestinationRearMedicalSiteId
+                    : firstTreatmentTransfer != null
+                        ? firstTreatmentTransfer.SourceRearMedicalSiteId
+                        : admission?.RearMedicalSiteId;
+                var expectedTreatmentPhysicianId = hasTreatmentTransfer
+                    ? treatmentTransfer.DesignatedReceivingPersonId
+                    : firstTreatmentTransfer != null
+                        ? firstTreatmentTransfer.SourcePhysicianPersonId
+                        : admission?.PhysicianPersonId;
+                if (!treatmentIds.Add(treatment.Id) ||
+                    !hasAdmission || !hasSite || !hasBatch || !hasTransaction ||
+                    !treatmentStages.Add(
+                        treatment.AdmissionId + "|" + treatment.StageIndex) ||
+                    treatment.RequiredStageCount != expectedStageCount ||
+                    treatment.StageIndex < 0 ||
+                    treatment.StageIndex >= expectedStageCount ||
+                    treatment.StageIndex >= admission.TreatmentIds.Count ||
+                    admission.TreatmentIds[treatment.StageIndex] != treatment.Id ||
+                    treatment.EvacuationId != admission.EvacuationId ||
+                    treatment.PatientPersonId != admission.PatientPersonId ||
+                    treatment.PatientMilitaryServiceId !=
+                        admission.PatientMilitaryServiceId ||
+                    treatment.RearMedicalSiteId != expectedTreatmentSiteId ||
+                    treatment.PhysicianPersonId !=
+                        expectedTreatmentPhysicianId ||
+                    usesTransferReservation &&
+                        (treatmentTransfer.Status !=
+                             MilitaryMedicalTransferStatus.Completed ||
+                         treatment.SourceMedicineBatchId !=
+                             treatmentTransfer.ReservedMedicineBatchId ||
+                         treatment.Day < treatmentTransfer.ReceivedDay) ||
+                    treatment.TreatmentProtocolId != expectedProtocol ||
+                    surgery && !hasSurgicalProcedure ||
+                    treatment.MedicineProductDefinitionId !=
+                        CoreProductionContent.HerbalMedicineMaterialProductId ||
+                    batch.ProductDefinitionId !=
+                        treatment.MedicineProductDefinitionId ||
+                    batch.InventoryContainerId !=
+                        site.MedicineInventoryContainerId ||
+                    batch.OwnerOrganizationId != site.OwnerOrganizationId ||
+                    treatment.MedicineUnitsConsumed != expectedMedicineUnits ||
+                    treatment.WorkMinutes != expectedWorkMinutes ||
+                    treatment.OpeningHealthBasisPoints < 0 ||
+                    treatment.OpeningHealthBasisPoints > 10_000 ||
+                    treatment.ClosingHealthBasisPoints != Math.Max(
+                        treatment.OpeningHealthBasisPoints,
+                        expectedHealth) ||
+                    treatment.RecoveredHealthBasisPoints !=
+                        treatment.ClosingHealthBasisPoints -
+                        treatment.OpeningHealthBasisPoints ||
+                    treatment.PhysicianMedicalSkillBeforeBasisPoints <
+                        expectedMinimumSkill ||
+                    treatment.PhysicianMedicalSkillAfterBasisPoints != checked(
+                        treatment.PhysicianMedicalSkillBeforeBasisPoints +
+                        treatment.PhysicianMedicalSkillGainBasisPoints) ||
+                    treatment.PhysicianMedicalSkillGainBasisPoints <= 0 ||
+                    treatment.PhysicianMedicalSkillAfterBasisPoints > 10_000 ||
+                    treatment.Day < admission.AdmittedDay ||
+                    treatment.Day > AbsoluteDay ||
+                    treatment.StageIndex == expectedStageCount - 1 &&
+                        treatment.Day != admission.ReadyForReturnDay ||
+                    transaction.Type != InventoryTransactionType
+                        .MilitaryRearMedicalTreatmentConsumed ||
+                    transaction.SourceMilitaryRearMedicalTreatmentId !=
+                        treatment.Id ||
+                    transaction.ActorPersonId != treatment.PhysicianPersonId ||
+                    transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != batch.Id ||
+                    transaction.Lines[0].QuantityDelta !=
+                        -treatment.MedicineUnitsConsumed ||
+                    transaction.Lines[0].ReservedQuantityDelta !=
+                        (usesTransferReservation
+                            ? -treatment.MedicineUnitsConsumed
+                            : 0))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid rear medical treatment {treatment.Id}.");
+                }
+                if (infectionControl &&
+                    (!injuryEpisodes.TryGetValue(
+                         admission.InjuryEpisodeId, out var injury) ||
+                     injury.InfectionStatus !=
+                         MilitaryInfectionStatus.Controlled ||
+                     injury.InfectionControlTreatmentId != treatment.Id ||
+                     injury.InfectionControlledDay != treatment.Day))
+                {
+                    throw new InvalidOperationException(
+                        $"Infection-control treatment {treatment.Id} lacks " +
+                        "its resolved injury episode.");
+                }
+                if (surgery &&
+                    (treatmentInjury.SurgeryTreatmentId != treatment.Id ||
+                     treatmentInjury.SurgeryCompletedDay != treatment.Day))
+                {
+                    throw new InvalidOperationException(
+                        $"Surgical treatment {treatment.Id} lacks its " +
+                        "resolved injury outcome.");
+                }
+                AddInt(
+                    workByPhysicianDay,
+                    treatment.PhysicianPersonId + "|" + treatment.Day,
+                    treatment.WorkMinutes);
+            }
+            foreach (var pair in injuryEpisodes)
+            {
+                if (pair.Value.InfectionStatus ==
+                        MilitaryInfectionStatus.Controlled &&
+                    !treatmentIds.Contains(
+                        pair.Value.InfectionControlTreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Controlled injury episode {pair.Key} lacks treatment evidence.");
+                }
+                if (!string.IsNullOrEmpty(pair.Value.SurgeryTreatmentId) &&
+                    !treatmentIds.Contains(pair.Value.SurgeryTreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Resolved surgery {pair.Key} lacks treatment evidence.");
+                }
+            }
+            foreach (var pair in admissions)
+            {
+                var admission = pair.Value;
+                for (var stage = 0;
+                     stage < admission.CompletedTreatmentStages;
+                     stage++)
+                {
+                    if (!treatmentStages.Contains(pair.Key + "|" + stage))
+                    {
+                        throw new InvalidOperationException(
+                            $"Rear medical admission {pair.Key} lacks " +
+                            $"treatment stage {stage} evidence.");
+                    }
+                }
+            }
+            return treatmentIds;
+        }
+
+        private void ValidateMilitaryWoundDeaths(
+            Dictionary<string, MilitaryWoundDeathPolicyDefinitionState>
+                policies,
+            Dictionary<string,
+                MilitaryInpatientDeteriorationPolicyDefinitionState>
+                deteriorationPolicies,
+            Dictionary<string,
+                MilitaryOriginalEvacuationDeteriorationPolicyDefinitionState>
+                originalEvacuationDeteriorationPolicies,
+            Dictionary<string,
+                MilitaryPatientReturnDeteriorationPolicyDefinitionState>
+                patientReturnDeteriorationPolicies,
+            Dictionary<string, MilitaryReturnTeamDeathPolicyDefinitionState>
+                returnTeamDeathPolicies,
+            Dictionary<string, MilitaryInjuryEpisodeState> injuries,
+            Dictionary<string, MilitaryRearMedicalAdmissionState> admissions,
+            Dictionary<string, MilitaryMedicalEvacuationState> evacuations,
+            Dictionary<string, ArmyState> armies,
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryServiceState> services)
+        {
+            var inheritances = new Dictionary<
+                string, MilitaryFamilyInheritanceState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryFamilyInheritances.Count; i++)
+            {
+                var inheritance = MilitaryFamilyInheritances[i] ??
+                    throw new InvalidOperationException(
+                        "A military family inheritance cannot be null.");
+                _ = new StableId(inheritance.Id);
+                if (inheritances.ContainsKey(inheritance.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military family inheritance {inheritance.Id}.");
+                }
+                inheritances.Add(inheritance.Id, inheritance);
+            }
+            var compensations = new Dictionary<
+                string, MilitarySurvivorCompensationState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitarySurvivorCompensations.Count; i++)
+            {
+                var compensation = MilitarySurvivorCompensations[i] ??
+                    throw new InvalidOperationException(
+                        "A military survivor compensation cannot be null.");
+                _ = new StableId(compensation.Id);
+                if (compensations.ContainsKey(compensation.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military survivor compensation {compensation.Id}.");
+                }
+                compensations.Add(compensation.Id, compensation);
+            }
+            var organizations = new Dictionary<string, OrganizationState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Organizations.Count; i++)
+                organizations.Add(Organizations[i].Id, Organizations[i]);
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Families.Count; i++)
+                families.Add(Families[i].Id, Families[i]);
+            var lifeEvents = new Dictionary<string, LifeEventRecordState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < LifeEvents.Count; i++)
+                lifeEvents.Add(LifeEvents[i].Id, LifeEvents[i]);
+            var sites = new Dictionary<string, MilitaryRearMedicalSiteState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryRearMedicalSites.Count; i++)
+                sites.Add(MilitaryRearMedicalSites[i].Id,
+                    MilitaryRearMedicalSites[i]);
+            var responsibilities = new Dictionary<
+                string, MilitaryMedicalDeathResponsibilityState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryMedicalDeathResponsibilities.Count;
+                 i++)
+            {
+                var responsibility =
+                    MilitaryMedicalDeathResponsibilities[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical death responsibility cannot be null.");
+                _ = new StableId(responsibility.Id);
+                if (responsibilities.ContainsKey(responsibility.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military medical death responsibility " +
+                        $"{responsibility.Id}.");
+                }
+                responsibilities.Add(responsibility.Id, responsibility);
+            }
+            var inpatientClosures = new Dictionary<
+                string, MilitaryInpatientDeathClosureState>(
+                    StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryInpatientDeathClosures.Count; i++)
+            {
+                var closure = MilitaryInpatientDeathClosures[i] ??
+                    throw new InvalidOperationException(
+                        "A military inpatient death closure cannot be null.");
+                _ = new StableId(closure.Id);
+                if (inpatientClosures.ContainsKey(closure.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military inpatient death closure {closure.Id}.");
+                }
+                inpatientClosures.Add(closure.Id, closure);
+            }
+            var transferDeathClosures = new Dictionary<
+                string, MilitaryMedicalTransferDeathClosureState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryMedicalTransferDeathClosures.Count;
+                 i++)
+            {
+                var closure = MilitaryMedicalTransferDeathClosures[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical-transfer death closure cannot be null.");
+                _ = new StableId(closure.Id);
+                if (transferDeathClosures.ContainsKey(closure.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military medical-transfer death closure {closure.Id}.");
+                }
+                transferDeathClosures.Add(closure.Id, closure);
+            }
+            var originalEvacuationDeathClosures = new Dictionary<
+                string, MilitaryOriginalEvacuationDeathClosureState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryOriginalEvacuationDeathClosures.Count;
+                 i++)
+            {
+                var closure = MilitaryOriginalEvacuationDeathClosures[i] ??
+                    throw new InvalidOperationException(
+                        "A military original-evacuation death closure cannot be null.");
+                _ = new StableId(closure.Id);
+                if (originalEvacuationDeathClosures.ContainsKey(closure.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military original-evacuation death closure {closure.Id}.");
+                }
+                originalEvacuationDeathClosures.Add(closure.Id, closure);
+            }
+            var patientReturnDeathClosures = new Dictionary<
+                string, MilitaryPatientReturnDeathClosureState>(
+                    StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryPatientReturnDeathClosures.Count;
+                 i++)
+            {
+                var closure = MilitaryPatientReturnDeathClosures[i] ??
+                    throw new InvalidOperationException(
+                        "A military patient-return death closure cannot be null.");
+                _ = new StableId(closure.Id);
+                if (patientReturnDeathClosures.ContainsKey(closure.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate military patient-return death closure {closure.Id}.");
+                }
+                patientReturnDeathClosures.Add(closure.Id, closure);
+            }
+            var productBatches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+                productBatches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            var inventoryTransactions = new Dictionary<
+                string, InventoryTransactionState>(StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                inventoryTransactions.Add(
+                    InventoryTransactions[i].Id, InventoryTransactions[i]);
+            var medicalTransfers = new Dictionary<
+                string, MilitaryMedicalTransferState>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryMedicalTransfers.Count; i++)
+                medicalTransfers.Add(
+                    MilitaryMedicalTransfers[i].Id,
+                    MilitaryMedicalTransfers[i]);
+
+            var deathIds = new HashSet<string>(StringComparer.Ordinal);
+            var deathPatients = new HashSet<string>(StringComparer.Ordinal);
+            var deathInjuries = new HashSet<string>(StringComparer.Ordinal);
+            var usedInheritances = new HashSet<string>(StringComparer.Ordinal);
+            var usedCompensations = new HashSet<string>(StringComparer.Ordinal);
+            var usedResponsibilities = new HashSet<string>(
+                StringComparer.Ordinal);
+            var usedInpatientClosures = new HashSet<string>(
+                StringComparer.Ordinal);
+            var usedTransferDeathClosures = new HashSet<string>(
+                StringComparer.Ordinal);
+            var usedOriginalEvacuationDeathClosures = new HashSet<string>(
+                StringComparer.Ordinal);
+            var usedPatientReturnDeathClosures = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryWoundDeaths.Count; i++)
+            {
+                var death = MilitaryWoundDeaths[i] ??
+                    throw new InvalidOperationException(
+                        "A military wound death cannot be null.");
+                _ = new StableId(death.Id);
+                _ = new StableId(death.PolicyId);
+                _ = new StableId(death.DeathContextId);
+                var postReturnDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.PostReturnMedicalRetirement;
+                var readyForReturnDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.ReadyForReturnAtCareSite;
+                var inpatientDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.InTreatmentAtCareSite;
+                var transferDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.DuringCrossFacilityTransfer;
+                var originalEvacuationDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.DuringOriginalEvacuation;
+                var patientReturnJourneyDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds.DuringPatientReturnJourney;
+                var patientAwaitingTeamDeath = death.DeathContextId ==
+                    MilitaryWoundDeathContextIds
+                        .AwaitingReturnTeamRejoinAtArmy;
+                var patientReturnDeath = patientReturnJourneyDeath ||
+                    patientAwaitingTeamDeath;
+                var careSiteDeath = readyForReturnDeath || inpatientDeath;
+                var hasPolicy = policies.TryGetValue(
+                    death.PolicyId, out var policy);
+                var hasInjury = injuries.TryGetValue(
+                    death.InjuryEpisodeId, out var injury);
+                var hasAdmission = admissions.TryGetValue(
+                    death.AdmissionId, out var admission);
+                var hasEvacuation = evacuations.TryGetValue(
+                    death.EvacuationId, out var evacuation);
+                var hasService = services.TryGetValue(
+                    death.PatientMilitaryServiceId, out var service);
+                var hasArmy = armies.TryGetValue(death.ArmyId, out var army);
+                var hasOrganization = organizations.TryGetValue(
+                    death.OrganizationId, out var organization);
+                var hasPatient = people.TryGetValue(
+                    death.PatientPersonId, out var patient);
+                var hasFamily = families.TryGetValue(
+                    death.FamilyId, out var family);
+                var hasInheritance = inheritances.TryGetValue(
+                    death.FamilyInheritanceId, out var inheritance);
+                var hasCompensation = compensations.TryGetValue(
+                    death.SurvivorCompensationId, out var compensation);
+                var hasDeathEvent = lifeEvents.TryGetValue(
+                    death.DeathLifeEventId, out var deathEvent);
+                MilitaryMedicalDeathResponsibilityState responsibility = null;
+                var hasResponsibility = !string.IsNullOrEmpty(
+                        death.MedicalResponsibilityId) &&
+                    responsibilities.TryGetValue(
+                        death.MedicalResponsibilityId, out responsibility);
+                MilitaryRearMedicalSiteState responsibilitySite = null;
+                var hasResponsibilitySite = hasResponsibility &&
+                    sites.TryGetValue(
+                        responsibility.RearMedicalSiteId,
+                        out responsibilitySite);
+                var hasResponsiblePhysician = hasResponsibility &&
+                    people.ContainsKey(
+                        responsibility.ResponsiblePhysicianPersonId);
+                MilitaryInpatientDeathClosureState inpatientClosure = null;
+                var hasInpatientClosure = !string.IsNullOrEmpty(
+                        death.InpatientDeathClosureId) &&
+                    inpatientClosures.TryGetValue(
+                        death.InpatientDeathClosureId, out inpatientClosure);
+                MilitaryInpatientDeteriorationPolicyDefinitionState
+                    deteriorationPolicy = null;
+                var hasDeteriorationPolicy = hasInpatientClosure &&
+                    deteriorationPolicies.TryGetValue(
+                        inpatientClosure.DeteriorationPolicyId,
+                        out deteriorationPolicy);
+                MilitaryMedicalTransferDeathClosureState transferClosure =
+                    null;
+                var hasTransferClosure = !string.IsNullOrEmpty(
+                        death.MedicalTransferDeathClosureId) &&
+                    transferDeathClosures.TryGetValue(
+                        death.MedicalTransferDeathClosureId,
+                        out transferClosure);
+                if (!hasDeteriorationPolicy && hasTransferClosure)
+                {
+                    hasDeteriorationPolicy =
+                        deteriorationPolicies.TryGetValue(
+                            transferClosure.DeteriorationPolicyId,
+                            out deteriorationPolicy);
+                }
+                MilitaryOriginalEvacuationDeathClosureState
+                    originalEvacuationClosure = null;
+                var hasOriginalEvacuationClosure = !string.IsNullOrEmpty(
+                        death.OriginalEvacuationDeathClosureId) &&
+                    originalEvacuationDeathClosures.TryGetValue(
+                        death.OriginalEvacuationDeathClosureId,
+                        out originalEvacuationClosure);
+                MilitaryOriginalEvacuationDeteriorationPolicyDefinitionState
+                    originalEvacuationPolicy = null;
+                var hasOriginalEvacuationPolicy =
+                    hasOriginalEvacuationClosure &&
+                    originalEvacuationDeteriorationPolicies.TryGetValue(
+                        originalEvacuationClosure.DeteriorationPolicyId,
+                        out originalEvacuationPolicy);
+                MilitaryPatientReturnDeathClosureState patientReturnClosure =
+                    null;
+                var hasPatientReturnClosure = !string.IsNullOrEmpty(
+                        death.PatientReturnDeathClosureId) &&
+                    patientReturnDeathClosures.TryGetValue(
+                        death.PatientReturnDeathClosureId,
+                        out patientReturnClosure);
+                MilitaryPatientReturnDeteriorationPolicyDefinitionState
+                    patientReturnPolicy = null;
+                var hasPatientReturnPolicy = hasPatientReturnClosure &&
+                    patientReturnDeteriorationPolicies.TryGetValue(
+                        patientReturnClosure.DeteriorationPolicyId,
+                        out patientReturnPolicy);
+                var headChanged = hasInheritance && inheritance.HeadChanged;
+                LifeEventRecordState successionEvent = null;
+                var hasSuccessionEvent = headChanged &&
+                    lifeEvents.TryGetValue(
+                        death.SuccessionLifeEventId, out successionEvent);
+                var expectedCompensation = hasPolicy && hasService
+                    ? checked(
+                        policy.BaseCompensationMoney +
+                        policy.CompensationPerRankMoney * service.Rank)
+                    : -1;
+                var validDeathPhase = hasEvacuation &&
+                    (originalEvacuationDeath && !hasAdmission &&
+                        !hasInjury &&
+                        (evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus
+                                 .DeceasedInTransit ||
+                         evacuation.Status >=
+                             MilitaryMedicalEvacuationStatus.ReadyForReturn) ||
+                     hasAdmission && postReturnDeath &&
+                        admission.Status ==
+                            MilitaryRearMedicalAdmissionStatus.Completed &&
+                        evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.Completed ||
+                     hasAdmission && readyForReturnDeath &&
+                        admission.Status !=
+                            MilitaryRearMedicalAdmissionStatus.InTreatment &&
+                        (evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.Completed) ||
+                     hasAdmission && inpatientDeath &&
+                        admission.Status >=
+                            MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        (evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.Completed) ||
+                     hasAdmission && transferDeath &&
+                        admission.Status >=
+                            MilitaryRearMedicalAdmissionStatus.Discharged &&
+                        (medicalTransfers.TryGetValue(
+                             admission.MedicalTransferId,
+                             out var deathTransfer) &&
+                         (deathTransfer.Status ==
+                              MilitaryMedicalTransferStatus
+                                  .DeceasedInTransit &&
+                          evacuation.Status ==
+                              MilitaryMedicalEvacuationStatus.Admitted ||
+                          deathTransfer.Status ==
+                              MilitaryMedicalTransferStatus
+                                  .ClosedAfterPatientDeath &&
+                          (evacuation.Status ==
+                               MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                           evacuation.Status ==
+                               MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                           evacuation.Status ==
+                               MilitaryMedicalEvacuationStatus.Completed))) ||
+                      hasAdmission && patientReturnDeath &&
+                         (admission.Status ==
+                              MilitaryRearMedicalAdmissionStatus.Discharged &&
+                          (evacuation.Status ==
+                               MilitaryMedicalEvacuationStatus
+                                   .PatientDeceasedReturningToArmy ||
+                           evacuation.Status ==
+                               MilitaryMedicalEvacuationStatus
+                                   .PatientDeceasedAwaitingTeamRejoin) ||
+                          admission.Status ==
+                              MilitaryRearMedicalAdmissionStatus.Completed &&
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.Completed));
+                var waitingPeriodStartDay = hasAdmission
+                    ? readyForReturnDeath
+                        ? admission.ReadyForReturnDay
+                        : inpatientDeath
+                            ? admission.AdmittedDay
+                        : transferDeath
+                            ? admission.AdmittedDay
+                        : patientReturnDeath
+                            ? evacuation.ReturnStartedDay
+                        : admission.CompletedDay
+                    : -1;
+                MilitaryMedicalTransferState closureTransfer = null;
+                var hasClosureTransfer = hasInpatientClosure &&
+                    !string.IsNullOrEmpty(inpatientClosure.MedicalTransferId) &&
+                    medicalTransfers.TryGetValue(
+                        inpatientClosure.MedicalTransferId,
+                        out closureTransfer);
+                ProductBatchState closureBatch = null;
+                var hasClosureBatch = hasInpatientClosure &&
+                    !string.IsNullOrEmpty(
+                        inpatientClosure.ReservedMedicineBatchId) &&
+                    productBatches.TryGetValue(
+                        inpatientClosure.ReservedMedicineBatchId,
+                        out closureBatch);
+                InventoryTransactionState closureReleaseTransaction = null;
+                var hasClosureReleaseTransaction = hasInpatientClosure &&
+                    !string.IsNullOrEmpty(
+                        inpatientClosure
+                            .ReservationReleaseInventoryTransactionId) &&
+                    inventoryTransactions.TryGetValue(
+                        inpatientClosure
+                            .ReservationReleaseInventoryTransactionId,
+                        out closureReleaseTransaction);
+                var currentPatientReturnJourney = hasPatientReturnClosure
+                    ? FindJourneyById(
+                        patientReturnClosure.PatientReturnJourneyId)
+                    : null;
+                var validPatientReturnTeamSnapshots =
+                    !hasPatientReturnClosure ||
+                    ValidatePatientReturnTeamJourneySnapshots(
+                        evacuation, patientReturnClosure);
+                if (!deathIds.Add(death.Id) ||
+                    !deathPatients.Add(death.PatientPersonId) ||
+                    !originalEvacuationDeath &&
+                        !deathInjuries.Add(death.InjuryEpisodeId) ||
+                    !usedInheritances.Add(death.FamilyInheritanceId) ||
+                    !usedCompensations.Add(death.SurvivorCompensationId) ||
+                    !hasPolicy || !hasEvacuation || !hasService || !hasArmy ||
+                    !hasOrganization || !hasPatient || !hasFamily ||
+                    !hasInheritance || !hasCompensation || !hasDeathEvent ||
+                    !originalEvacuationDeath && (!hasInjury || !hasAdmission) ||
+                    !postReturnDeath && !readyForReturnDeath &&
+                        !inpatientDeath && !transferDeath &&
+                        !originalEvacuationDeath && !patientReturnDeath ||
+                    !validDeathPhase ||
+                    death.Day < MilitaryWoundDeathContractActivationDay ||
+                    death.Day > AbsoluteDay ||
+                    !originalEvacuationDeath &&
+                        (injury.AdmissionId != admission.Id ||
+                         injury.EvacuationId != evacuation.Id ||
+                         injury.PatientPersonId != patient.Id ||
+                         injury.PatientMilitaryServiceId != service.Id ||
+                         admission.EvacuationId != evacuation.Id ||
+                         admission.PatientPersonId != patient.Id ||
+                         admission.PatientMilitaryServiceId != service.Id) ||
+                    service.PersonId != patient.Id ||
+                    service.ArmyId != army.Id ||
+                    service.Status != MilitaryServiceStatus.Dead ||
+                    army.OrganizationId != organization.Id ||
+                    !originalEvacuationDeath && !inpatientDeath &&
+                        !transferDeath && !patientReturnDeath &&
+                        !injury.RequiresMedicalRetirement ||
+                    !originalEvacuationDeath &&
+                        death.SeverityBasisPoints !=
+                            injury.SeverityBasisPoints ||
+                    death.SeverityBasisPoints <
+                        policy.MinimumSeverityBasisPoints ||
+                    death.HealthAtDeathBasisPoints < 0 ||
+                    death.HealthAtDeathBasisPoints >
+                        policy.MaximumPostTreatmentHealthBasisPoints ||
+                    patient.HealthBasisPoints !=
+                        death.HealthAtDeathBasisPoints ||
+                    patient.IsAlive || patient.Wealth != 0 ||
+                    !transferDeath && !originalEvacuationDeath &&
+                        !patientReturnDeath &&
+                        (death.DeathLocationId != patient.LocationId ||
+                         death.DeathLocationId !=
+                            evacuation.CurrentCareLocationId) ||
+                    !originalEvacuationDeath && !inpatientDeath &&
+                        !transferDeath && !patientReturnDeath &&
+                        death.Day < checked(
+                        waitingPeriodStartDay +
+                        policy.MinimumDaysAfterCareCompletion) ||
+                    !inpatientDeath && !string.IsNullOrEmpty(
+                        death.InpatientDeathClosureId) ||
+                    !transferDeath && !string.IsNullOrEmpty(
+                        death.MedicalTransferDeathClosureId) ||
+                    !originalEvacuationDeath && !string.IsNullOrEmpty(
+                        death.OriginalEvacuationDeathClosureId) ||
+                    !patientReturnDeath && !string.IsNullOrEmpty(
+                        death.PatientReturnDeathClosureId) ||
+                    postReturnDeath &&
+                        (!string.IsNullOrEmpty(
+                            death.MedicalResponsibilityId) ||
+                         admission.DischargePolicyId !=
+                            MilitaryRearMedicalDischargePolicyIds
+                                .MedicalRetirementAtCareSite ||
+                         evacuation.PatientReturnPolicyId !=
+                            MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .RemainAtCareSiteForMedicalRetirement) ||
+                     patientReturnDeath &&
+                         (!hasResponsibility || !hasResponsibilitySite ||
+                         !hasResponsiblePhysician ||
+                         !hasPatientReturnClosure ||
+                         !hasPatientReturnPolicy ||
+                         !usedResponsibilities.Add(
+                             death.MedicalResponsibilityId) ||
+                         !usedPatientReturnDeathClosures.Add(
+                             death.PatientReturnDeathClosureId) ||
+                          death.Day <
+                              (patientAwaitingTeamDeath
+                                  ? MilitaryPatientArrivalWaitingTeamDeathContractActivationDay
+                                  : MilitaryPatientReturnDeathContractActivationDay) ||
+                          death.DeathLocationId !=
+                              (patientAwaitingTeamDeath
+                                  ? evacuation.ReturnDestinationLocationId
+                                  : string.Empty) ||
+                         admission.Status !=
+                             (evacuation.Status ==
+                                  MilitaryMedicalEvacuationStatus.Completed
+                                 ? MilitaryRearMedicalAdmissionStatus.Completed
+                                 : MilitaryRearMedicalAdmissionStatus.Discharged) ||
+                         admission.PatientReturnDeathClosureId !=
+                             patientReturnClosure.Id ||
+                         evacuation.PatientReturnDeathClosureId !=
+                             patientReturnClosure.Id ||
+                          evacuation.PatientReturnPolicyId !=
+                              (patientAwaitingTeamDeath
+                                  ? MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                      .CorpseAtArmyAwaitingTeamRejoin
+                                  : MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                      .ReturnCorpseWithTeam) ||
+                         responsibility.Day != death.Day ||
+                         responsibility.WoundDeathId != death.Id ||
+                         responsibility.DeathContextId != death.DeathContextId ||
+                         responsibility.ResponsibilityPolicyId !=
+                             MilitaryMedicalDeathResponsibilityPolicyIds
+                                 .LastCareTeamDuringAuthorizedReturn ||
+                         responsibility.AdmissionId != admission.Id ||
+                         responsibility.EvacuationId != evacuation.Id ||
+                         responsibility.InjuryEpisodeId != injury.Id ||
+                         responsibility.PatientPersonId != patient.Id ||
+                         responsibility.RearMedicalSiteId !=
+                             admission.RearMedicalSiteId ||
+                         responsibility.CareOrganizationId !=
+                             responsibilitySite.OwnerOrganizationId ||
+                         !string.IsNullOrEmpty(responsibility.SourceArmyId) ||
+                         responsibility.ResponsiblePhysicianPersonId !=
+                             admission.PhysicianPersonId ||
+                         responsibility.ResponsiblePhysicianMedicalSkillBasisPoints <
+                             MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                         responsibility.ResponsiblePhysicianMedicalSkillBasisPoints >
+                             10_000 ||
+                         responsibility.AuthorizingPersonId !=
+                             death.AuthorizingPersonId ||
+                         responsibility.AuthorizingAuthority !=
+                             death.AuthorizingAuthority ||
+                         patientReturnClosure.Day != death.Day ||
+                         patientReturnClosure.WoundDeathId != death.Id ||
+                         patientReturnClosure.AdmissionId != admission.Id ||
+                         patientReturnClosure.EvacuationId != evacuation.Id ||
+                         patientReturnClosure.InjuryEpisodeId != injury.Id ||
+                         patientReturnClosure.PatientPersonId != patient.Id ||
+                         patientReturnClosure.PatientMilitaryServiceId !=
+                             service.Id ||
+                         patientReturnClosure.SourceArmyId != army.Id ||
+                         patientReturnClosure.SourceRearMedicalSiteId !=
+                             admission.RearMedicalSiteId ||
+                         patientReturnClosure.SourcePhysicianPersonId !=
+                             admission.PhysicianPersonId ||
+                         patientReturnClosure.ReturnRouteId !=
+                             evacuation.ReturnRouteId ||
+                         patientReturnClosure.ReturnOriginLocationId !=
+                             evacuation.CurrentCareLocationId ||
+                         patientReturnClosure.ReturnDestinationLocationId !=
+                             evacuation.ReturnDestinationLocationId ||
+                         patientReturnClosure.PatientReturnJourneyId !=
+                             evacuation.PatientReturnJourneyId ||
+                          patientReturnClosure.ReturnStartedDay !=
+                              evacuation.ReturnStartedDay ||
+                          patientReturnClosure
+                              .PatientJourneyCompletedBeforeDeath !=
+                                  patientAwaitingTeamDeath ||
+                          patientAwaitingTeamDeath &&
+                              patientReturnClosure
+                                  .RemainingKilometersAtDeath != 0 ||
+                          !patientAwaitingTeamDeath &&
+                              patientReturnClosure
+                                  .RemainingKilometersAtDeath <= 0 ||
+                          !validPatientReturnTeamSnapshots ||
+                         patientReturnClosure.OpeningHealthBasisPoints < 0 ||
+                         patientReturnClosure.OpeningHealthBasisPoints >
+                             10_000 ||
+                         patientReturnClosure.HealthLossBasisPoints !=
+                             patientReturnPolicy.HealthLossBasisPoints ||
+                         patientReturnClosure.ClosingHealthBasisPoints !=
+                             Math.Max(
+                                 0,
+                                 patientReturnClosure
+                                     .OpeningHealthBasisPoints -
+                                 patientReturnClosure
+                                     .HealthLossBasisPoints) ||
+                         patientReturnClosure.ClosingHealthBasisPoints !=
+                             death.HealthAtDeathBasisPoints ||
+                         patientReturnClosure.ClosingHealthBasisPoints >
+                             patientReturnPolicy
+                                 .MaximumClosingHealthBasisPoints ||
+                         injury.SeverityBasisPoints <
+                             patientReturnPolicy
+                                 .MinimumSeverityBasisPoints ||
+                         death.Day < checked(
+                             evacuation.ReturnStartedDay +
+                             patientReturnPolicy
+                                 .MinimumDaysAfterReturnStart) ||
+                          evacuation.Status ==
+                              MilitaryMedicalEvacuationStatus
+                                  .PatientDeceasedReturningToArmy &&
+                              (patientAwaitingTeamDeath ||
+                               currentPatientReturnJourney == null ||
+                               currentPatientReturnJourney.PersonId !=
+                                   patient.Id ||
+                              currentPatientReturnJourney.RemainingKilometers <=
+                                  0 ||
+                              currentPatientReturnJourney.RemainingKilometers >
+                                  patientReturnClosure
+                                       .RemainingKilometersAtDeath) ||
+                          evacuation.Status ==
+                              MilitaryMedicalEvacuationStatus
+                                  .PatientDeceasedAwaitingTeamRejoin &&
+                              (!patientAwaitingTeamDeath ||
+                               currentPatientReturnJourney != null ||
+                               patient.LocationId !=
+                                   evacuation.ReturnDestinationLocationId) ||
+                          evacuation.Status ==
+                              MilitaryMedicalEvacuationStatus.Completed &&
+                             (currentPatientReturnJourney != null ||
+                              patient.LocationId !=
+                                  evacuation.ReturnDestinationLocationId)) ||
+                    careSiteDeath &&
+                        (!hasResponsibility || !hasResponsibilitySite ||
+                         !hasResponsiblePhysician ||
+                         !usedResponsibilities.Add(
+                            death.MedicalResponsibilityId) ||
+                         death.Day <
+                            MilitaryMedicalDeathResponsibilityContractActivationDay ||
+                         admission.DischargePolicyId !=
+                            MilitaryRearMedicalDischargePolicyIds
+                                .DeathAtCareSite ||
+                         evacuation.PatientReturnPolicyId !=
+                            MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .RemainAtCareSiteAfterDeath ||
+                         responsibility.Day != death.Day ||
+                         responsibility.WoundDeathId != death.Id ||
+                         responsibility.DeathContextId != death.DeathContextId ||
+                         responsibility.ResponsibilityPolicyId !=
+                            MilitaryMedicalDeathResponsibilityPolicyIds
+                                .CurrentCareTeamDocumented ||
+                         responsibility.AdmissionId != admission.Id ||
+                         responsibility.EvacuationId != evacuation.Id ||
+                         responsibility.InjuryEpisodeId != injury.Id ||
+                         responsibility.PatientPersonId != patient.Id ||
+                         responsibility.RearMedicalSiteId !=
+                            admission.RearMedicalSiteId ||
+                         responsibility.CareOrganizationId !=
+                            responsibilitySite.OwnerOrganizationId ||
+                         responsibility.CareOrganizationId !=
+                            organization.Id ||
+                         !string.IsNullOrEmpty(
+                            responsibility.SourceArmyId) ||
+                         responsibility.ResponsiblePhysicianPersonId !=
+                            admission.PhysicianPersonId ||
+                         responsibility.ResponsiblePhysicianMedicalSkillBasisPoints <
+                            MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                         responsibility.ResponsiblePhysicianMedicalSkillBasisPoints >
+                            10000 ||
+                         responsibility.AuthorizingPersonId !=
+                            death.AuthorizingPersonId ||
+                         responsibility.AuthorizingAuthority !=
+                            death.AuthorizingAuthority) ||
+                    transferDeath &&
+                        (!hasResponsibility || !hasTransferClosure ||
+                         !hasDeteriorationPolicy ||
+                         !sites.TryGetValue(
+                             transferClosure.SourceRearMedicalSiteId,
+                             out var transferResponsibilitySite) ||
+                         !people.ContainsKey(
+                             transferClosure.SourcePhysicianPersonId) ||
+                         !usedResponsibilities.Add(
+                             death.MedicalResponsibilityId) ||
+                         !usedTransferDeathClosures.Add(
+                             death.MedicalTransferDeathClosureId) ||
+                         death.Day <
+                            MilitaryMedicalTransferDeathContractActivationDay ||
+                         admission.DischargePolicyId !=
+                            MilitaryRearMedicalDischargePolicyIds
+                                .DeathDuringMedicalTransfer ||
+                         evacuation.PatientReturnPolicyId !=
+                            MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .RemainAtCareSiteAfterDeath ||
+                         responsibility.Day != death.Day ||
+                         responsibility.WoundDeathId != death.Id ||
+                         responsibility.DeathContextId != death.DeathContextId ||
+                         responsibility.ResponsibilityPolicyId !=
+                            MilitaryMedicalDeathResponsibilityPolicyIds
+                                .SourceCareUntilTransferHandoff ||
+                         responsibility.AdmissionId != admission.Id ||
+                         responsibility.EvacuationId != evacuation.Id ||
+                         responsibility.InjuryEpisodeId != injury.Id ||
+                         responsibility.PatientPersonId != patient.Id ||
+                         responsibility.RearMedicalSiteId !=
+                            transferClosure.SourceRearMedicalSiteId ||
+                         responsibility.CareOrganizationId !=
+                            transferResponsibilitySite.OwnerOrganizationId ||
+                         responsibility.CareOrganizationId != organization.Id ||
+                         !string.IsNullOrEmpty(
+                            responsibility.SourceArmyId) ||
+                         responsibility.ResponsiblePhysicianPersonId !=
+                            transferClosure.SourcePhysicianPersonId ||
+                         responsibility.AuthorizingPersonId !=
+                            death.AuthorizingPersonId ||
+                         responsibility.AuthorizingAuthority !=
+                            death.AuthorizingAuthority ||
+                         transferClosure.Day != death.Day ||
+                         transferClosure.WoundDeathId != death.Id ||
+                         transferClosure.MedicalTransferId !=
+                            admission.MedicalTransferId ||
+                         transferClosure.AdmissionId != admission.Id ||
+                         transferClosure.EvacuationId != evacuation.Id ||
+                         transferClosure.InjuryEpisodeId != injury.Id ||
+                         transferClosure.PatientPersonId != patient.Id ||
+                         !medicalTransfers.TryGetValue(
+                             transferClosure.MedicalTransferId,
+                             out var closureDeathTransfer) ||
+                         closureDeathTransfer.DeathClosureId !=
+                            transferClosure.Id ||
+                         closureDeathTransfer.Status !=
+                                MilitaryMedicalTransferStatus
+                                    .DeceasedInTransit &&
+                            closureDeathTransfer.Status !=
+                                MilitaryMedicalTransferStatus
+                                    .ClosedAfterPatientDeath ||
+                         transferClosure.SourceRearMedicalSiteId !=
+                            closureDeathTransfer.SourceRearMedicalSiteId ||
+                         transferClosure.DestinationRearMedicalSiteId !=
+                            closureDeathTransfer
+                                .DestinationRearMedicalSiteId ||
+                         transferClosure.SourcePhysicianPersonId !=
+                            closureDeathTransfer.SourcePhysicianPersonId ||
+                         transferClosure.DesignatedReceivingPersonId !=
+                            closureDeathTransfer
+                                .DesignatedReceivingPersonId ||
+                         transferClosure.RouteId !=
+                            closureDeathTransfer.RouteId ||
+                         transferClosure.OccurredInTransit &&
+                            (transferClosure.RemainingKilometersAtDeath <= 0 ||
+                             !string.IsNullOrEmpty(death.DeathLocationId)) ||
+                         !transferClosure.OccurredInTransit &&
+                            (transferClosure.RemainingKilometersAtDeath != 0 ||
+                             !sites.TryGetValue(
+                                 transferClosure
+                                    .DestinationRearMedicalSiteId,
+                                 out var transferDestinationSite) ||
+                             death.DeathLocationId !=
+                                 transferDestinationSite.LocationId) ||
+                         transferClosure.AuthorizingPersonId !=
+                            death.AuthorizingPersonId ||
+                         transferClosure.AuthorizingAuthority !=
+                            death.AuthorizingAuthority ||
+                         transferClosure.OpeningHealthBasisPoints !=
+                            ExpectedAdmissionHealthBeforeDeath(
+                                admission, injury) ||
+                         transferClosure.HealthLossBasisPoints !=
+                            deteriorationPolicy.HealthLossBasisPoints ||
+                         transferClosure.ClosingHealthBasisPoints != Math.Max(
+                            0,
+                            transferClosure.OpeningHealthBasisPoints -
+                            transferClosure.HealthLossBasisPoints) ||
+                         transferClosure.ClosingHealthBasisPoints !=
+                            death.HealthAtDeathBasisPoints ||
+                         transferClosure.ClosingHealthBasisPoints >
+                            deteriorationPolicy
+                                .MaximumClosingHealthBasisPoints ||
+                         injury.SeverityBasisPoints <
+                            deteriorationPolicy.MinimumSeverityBasisPoints ||
+                         death.Day < checked(
+                            admission.AdmittedDay +
+                            deteriorationPolicy.MinimumDaysAfterAdmission) ||
+                         admission.MedicalTransferDeathClosureId !=
+                            transferClosure.Id ||
+                         admission.ReadyForReturnDay != death.Day ||
+                         admission.DischargedDay != death.Day) ||
+                    originalEvacuationDeath &&
+                        (!hasResponsibility ||
+                         !hasOriginalEvacuationClosure ||
+                         !hasOriginalEvacuationPolicy ||
+                         !usedResponsibilities.Add(
+                            death.MedicalResponsibilityId) ||
+                         !usedOriginalEvacuationDeathClosures.Add(
+                            death.OriginalEvacuationDeathClosureId) ||
+                         death.Day <
+                            MilitaryOriginalEvacuationDeathContractActivationDay ||
+                         responsibility.Day != death.Day ||
+                         responsibility.WoundDeathId != death.Id ||
+                         responsibility.DeathContextId != death.DeathContextId ||
+                         responsibility.ResponsibilityPolicyId !=
+                            MilitaryMedicalDeathResponsibilityPolicyIds
+                                .SourceArmyUntilRearHandoff ||
+                         !string.IsNullOrEmpty(responsibility.AdmissionId) ||
+                         responsibility.EvacuationId != evacuation.Id ||
+                         !string.IsNullOrEmpty(
+                            responsibility.InjuryEpisodeId) ||
+                         responsibility.PatientPersonId != patient.Id ||
+                         !string.IsNullOrEmpty(
+                            responsibility.RearMedicalSiteId) ||
+                         responsibility.CareOrganizationId != organization.Id ||
+                         responsibility.SourceArmyId != army.Id ||
+                         !string.IsNullOrEmpty(
+                            responsibility.ResponsiblePhysicianPersonId) ||
+                         responsibility
+                            .ResponsiblePhysicianMedicalSkillBasisPoints != 0 ||
+                         responsibility.AuthorizingPersonId !=
+                            death.AuthorizingPersonId ||
+                         responsibility.AuthorizingAuthority !=
+                            death.AuthorizingAuthority ||
+                         originalEvacuationClosure.Day != death.Day ||
+                         originalEvacuationClosure.WoundDeathId != death.Id ||
+                         originalEvacuationClosure.EvacuationId !=
+                            evacuation.Id ||
+                         originalEvacuationClosure.PatientPersonId !=
+                            patient.Id ||
+                         originalEvacuationClosure.PatientMilitaryServiceId !=
+                            service.Id ||
+                         originalEvacuationClosure.SourceArmyId != army.Id ||
+                         originalEvacuationClosure.SourceOrganizationId !=
+                            organization.Id ||
+                         originalEvacuationClosure
+                            .EvacuationAuthorizingPersonId !=
+                            evacuation.AuthorizingPersonId ||
+                         originalEvacuationClosure
+                            .EvacuationAuthorizingAuthority !=
+                            evacuation.AuthorizingAuthority ||
+                         originalEvacuationClosure.DeathAuthorizingPersonId !=
+                            death.AuthorizingPersonId ||
+                         originalEvacuationClosure
+                            .DeathAuthorizingAuthority !=
+                            death.AuthorizingAuthority ||
+                         originalEvacuationClosure.OriginLocationId !=
+                            evacuation.OriginLocationId ||
+                         originalEvacuationClosure.DestinationLocationId !=
+                            evacuation.DestinationLocationId ||
+                         originalEvacuationClosure
+                            .DesignatedReceivingPersonId !=
+                            evacuation.DesignatedReceivingPersonId ||
+                         originalEvacuationClosure.RouteId !=
+                            evacuation.RouteId ||
+                         originalEvacuationClosure.OccurredInTransit &&
+                            (originalEvacuationClosure
+                                 .RemainingKilometersAtDeath <= 0 ||
+                             !string.IsNullOrEmpty(death.DeathLocationId)) ||
+                         !originalEvacuationClosure.OccurredInTransit &&
+                            (originalEvacuationClosure
+                                 .RemainingKilometersAtDeath != 0 ||
+                             death.DeathLocationId !=
+                                 evacuation.DestinationLocationId) ||
+                         originalEvacuationClosure.OpeningHealthBasisPoints < 0 ||
+                         originalEvacuationClosure.OpeningHealthBasisPoints >
+                            originalEvacuationPolicy
+                                .MaximumOpeningHealthBasisPoints ||
+                         originalEvacuationClosure.HealthLossBasisPoints !=
+                            originalEvacuationPolicy.HealthLossBasisPoints ||
+                         originalEvacuationClosure.ClosingHealthBasisPoints !=
+                            Math.Max(
+                                0,
+                                originalEvacuationClosure
+                                    .OpeningHealthBasisPoints -
+                                originalEvacuationClosure
+                                    .HealthLossBasisPoints) ||
+                         originalEvacuationClosure.ClosingHealthBasisPoints >
+                            originalEvacuationPolicy
+                                .MaximumClosingHealthBasisPoints ||
+                         originalEvacuationClosure.ClosingHealthBasisPoints !=
+                            death.HealthAtDeathBasisPoints ||
+                         originalEvacuationClosure.DerivedSeverityBasisPoints !=
+                            10_000 - originalEvacuationClosure
+                                .OpeningHealthBasisPoints ||
+                         originalEvacuationClosure.DerivedSeverityBasisPoints !=
+                            death.SeverityBasisPoints ||
+                         death.Day < checked(
+                            evacuation.CreatedDay +
+                            originalEvacuationPolicy
+                                .MinimumDaysAfterDispatch) ||
+                         evacuation.OriginalEvacuationDeathClosureId !=
+                            originalEvacuationClosure.Id ||
+                         evacuation.PatientReturnPolicyId !=
+                            MilitaryMedicalEvacuationPatientReturnPolicyIds
+                                .RemainAtCareSiteAfterDeath ||
+                         !string.IsNullOrEmpty(
+                            evacuation.ReceivingPersonId) ||
+                         evacuation.ReceivedDay != -1 ||
+                         evacuation.ReceivingMedicalSkillBasisPoints != 0 ||
+                         !string.IsNullOrEmpty(
+                            evacuation.RearMedicalSiteId) ||
+                         !string.IsNullOrEmpty(
+                            evacuation.RearMedicalAdmissionId)) ||
+                    inpatientDeath &&
+                        (!hasInpatientClosure ||
+                         !hasDeteriorationPolicy ||
+                         !usedInpatientClosures.Add(
+                            death.InpatientDeathClosureId) ||
+                         death.Day <
+                            MilitaryInpatientDeathContractActivationDay ||
+                         inpatientClosure.Day != death.Day ||
+                         inpatientClosure.WoundDeathId != death.Id ||
+                         inpatientClosure.AdmissionId != admission.Id ||
+                         inpatientClosure.EvacuationId != evacuation.Id ||
+                         inpatientClosure.InjuryEpisodeId != injury.Id ||
+                         inpatientClosure.PatientPersonId != patient.Id ||
+                         inpatientClosure.RearMedicalSiteId !=
+                            admission.RearMedicalSiteId ||
+                         inpatientClosure.PhysicianPersonId !=
+                            admission.PhysicianPersonId ||
+                         inpatientClosure.CompletedTreatmentStagesAtDeath !=
+                            admission.CompletedTreatmentStages ||
+                         inpatientClosure.RequiredTreatmentStagesAtDeath !=
+                            admission.RequiredTreatmentStages ||
+                         inpatientClosure.CompletedTreatmentStagesAtDeath < 0 ||
+                         inpatientClosure.CompletedTreatmentStagesAtDeath >=
+                            inpatientClosure.RequiredTreatmentStagesAtDeath ||
+                         inpatientClosure.NextTreatmentProtocolId !=
+                            admission.TreatmentPlanProtocolIds[
+                                admission.CompletedTreatmentStages] ||
+                         inpatientClosure.OpeningHealthBasisPoints !=
+                            ExpectedAdmissionHealthBeforeDeath(
+                                admission, injury) ||
+                         inpatientClosure.OpeningHealthBasisPoints < 0 ||
+                         inpatientClosure.OpeningHealthBasisPoints > 10_000 ||
+                         inpatientClosure.HealthLossBasisPoints !=
+                            deteriorationPolicy.HealthLossBasisPoints ||
+                         inpatientClosure.ClosingHealthBasisPoints != Math.Max(
+                            0,
+                            inpatientClosure.OpeningHealthBasisPoints -
+                            inpatientClosure.HealthLossBasisPoints) ||
+                         inpatientClosure.ClosingHealthBasisPoints !=
+                            death.HealthAtDeathBasisPoints ||
+                         inpatientClosure.ClosingHealthBasisPoints >
+                            deteriorationPolicy
+                                .MaximumClosingHealthBasisPoints ||
+                         injury.SeverityBasisPoints <
+                            deteriorationPolicy.MinimumSeverityBasisPoints ||
+                         death.Day < checked(
+                            admission.AdmittedDay +
+                            deteriorationPolicy.MinimumDaysAfterAdmission) ||
+                         admission.InpatientDeathClosureId !=
+                            inpatientClosure.Id ||
+                         admission.ReadyForReturnDay != death.Day ||
+                         admission.DischargedDay != death.Day ||
+                         string.IsNullOrEmpty(
+                                inpatientClosure.MedicalTransferId) &&
+                            (!string.IsNullOrEmpty(
+                                inpatientClosure.ReservedMedicineBatchId) ||
+                             inpatientClosure
+                                .ReservedMedicineUnitsBeforeRelease != 0 ||
+                             inpatientClosure
+                                .ReleasedReservedMedicineUnits != 0 ||
+                             inpatientClosure
+                                .ReservedMedicineUnitsAfterRelease != 0 ||
+                             !string.IsNullOrEmpty(
+                                inpatientClosure
+                                    .ReservationReleaseInventoryTransactionId)) ||
+                         !string.IsNullOrEmpty(
+                                inpatientClosure.MedicalTransferId) &&
+                            (!hasClosureTransfer || !hasClosureBatch ||
+                             closureTransfer.Status !=
+                                MilitaryMedicalTransferStatus.Completed ||
+                             closureTransfer.Id != admission.MedicalTransferId ||
+                             closureTransfer.ReservedMedicineBatchId !=
+                                closureBatch.Id ||
+                             inpatientClosure.ReservedMedicineBatchId !=
+                                closureBatch.Id ||
+                             inpatientClosure.ReleasedReservedMedicineUnits !=
+                                closureTransfer.ReleasedReservedMedicineUnits ||
+                             inpatientClosure.ReleasedReservedMedicineUnits !=
+                                closureTransfer.ReservedMedicineUnits -
+                                closureTransfer
+                                    .ConsumedReservedMedicineUnits ||
+                             inpatientClosure.ReservedMedicineUnitsBeforeRelease <
+                                inpatientClosure
+                                    .ReleasedReservedMedicineUnits ||
+                             inpatientClosure.ReservedMedicineUnitsAfterRelease !=
+                                inpatientClosure
+                                    .ReservedMedicineUnitsBeforeRelease -
+                                inpatientClosure
+                                    .ReleasedReservedMedicineUnits ||
+                             (inpatientClosure
+                                .ReleasedReservedMedicineUnits > 0) !=
+                                hasClosureReleaseTransaction ||
+                             closureTransfer
+                                .ReservationReleaseInventoryTransactionId !=
+                                inpatientClosure
+                                    .ReservationReleaseInventoryTransactionId ||
+                             hasClosureReleaseTransaction &&
+                                (closureReleaseTransaction.Type !=
+                                    InventoryTransactionType
+                                        .MilitaryMedicalTransferMedicineReleased ||
+                                 closureReleaseTransaction
+                                    .SourceMilitaryMedicalTransferId !=
+                                        closureTransfer.Id ||
+                                 closureReleaseTransaction.ActorPersonId !=
+                                    inpatientClosure.PhysicianPersonId ||
+                                 closureReleaseTransaction.Day != death.Day ||
+                                 closureReleaseTransaction.Lines == null ||
+                                 closureReleaseTransaction.Lines.Count != 1 ||
+                                 closureReleaseTransaction.Lines[0].BatchId !=
+                                    closureBatch.Id ||
+                                 closureReleaseTransaction.Lines[0]
+                                    .QuantityDelta != 0 ||
+                                 closureReleaseTransaction.Lines[0]
+                                    .ReservedQuantityDelta !=
+                                        -inpatientClosure
+                                            .ReleasedReservedMedicineUnits))) ||
+                    !people.ContainsKey(death.AuthorizingPersonId) ||
+                    death.AuthorizingAuthority < MilitaryAuthorityLevel.Army ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        death.AuthorizingAuthority) ||
+                    !family.MemberIds.Contains(patient.Id) ||
+                    inheritance.WoundDeathId != death.Id ||
+                    !string.IsNullOrEmpty(inheritance.ReturnTeamDeathId) ||
+                    inheritance.Day != death.Day ||
+                    inheritance.FamilyId != family.Id ||
+                    inheritance.DeceasedPersonId != patient.Id ||
+                    !family.MemberIds.Contains(
+                        inheritance.FormerHeadPersonId) ||
+                    !family.MemberIds.Contains(
+                        inheritance.SuccessorPersonId) ||
+                    inheritance.SuccessorPersonId == patient.Id ||
+                    inheritance.HeadChanged !=
+                        (inheritance.FormerHeadPersonId == patient.Id) ||
+                    !inheritance.HeadChanged &&
+                        inheritance.SuccessorPersonId !=
+                            inheritance.FormerHeadPersonId ||
+                    inheritance.DeceasedWealthBefore < 0 ||
+                    inheritance.DeceasedWealthAfter != 0 ||
+                    inheritance.FamilyWealthAfter != checked(
+                        inheritance.FamilyWealthBefore +
+                        inheritance.DeceasedWealthBefore) ||
+                    compensation.WoundDeathId != death.Id ||
+                    !string.IsNullOrEmpty(compensation.ReturnTeamDeathId) ||
+                    compensation.Day != death.Day ||
+                    compensation.PolicyId != policy.Id ||
+                    compensation.ArmyId != army.Id ||
+                    compensation.OrganizationId != organization.Id ||
+                    compensation.FamilyId != family.Id ||
+                    compensation.DeceasedPersonId != patient.Id ||
+                    compensation.AuthorizingPersonId !=
+                        death.AuthorizingPersonId ||
+                    compensation.AuthorizingAuthority !=
+                        death.AuthorizingAuthority ||
+                    compensation.MilitaryRankAtDeath != service.Rank ||
+                    compensation.Amount != expectedCompensation ||
+                    compensation.OrganizationTreasuryBefore <
+                        compensation.Amount ||
+                    compensation.OrganizationTreasuryAfter != checked(
+                        compensation.OrganizationTreasuryBefore -
+                        compensation.Amount) ||
+                    compensation.FamilyWealthBefore !=
+                        inheritance.FamilyWealthAfter ||
+                    compensation.FamilyWealthAfter != checked(
+                        compensation.FamilyWealthBefore +
+                        compensation.Amount) ||
+                    deathEvent.Type != LifeEventType.Death ||
+                    deathEvent.Day != death.Day ||
+                    deathEvent.PrimaryPersonId != patient.Id ||
+                    deathEvent.FamilyId != family.Id ||
+                    headChanged !=
+                        !string.IsNullOrEmpty(death.SuccessionLifeEventId) ||
+                    headChanged &&
+                        (!hasSuccessionEvent ||
+                         successionEvent.Type != LifeEventType.Succession ||
+                         successionEvent.Day != death.Day ||
+                         successionEvent.PrimaryPersonId !=
+                            inheritance.SuccessorPersonId ||
+                         successionEvent.SecondaryPersonId != patient.Id ||
+                         successionEvent.FamilyId != family.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military wound death {death.Id}: " +
+                        $"context={death.DeathContextId}, phase={validDeathPhase}, " +
+                        $"responsibility={hasResponsibility}, inpatientClosure=" +
+                        $"{hasInpatientClosure}, transferClosure=" +
+                        $"{hasTransferClosure}, policy={hasPolicy}, " +
+                        $"deterioration={hasDeteriorationPolicy}, " +
+                        $"admission={admission?.Status}, evacuation=" +
+                        $"{evacuation?.Status}, service={service?.Status}, " +
+                        $"patientAlive={patient?.IsAlive}, patientHealth=" +
+                        $"{patient?.HealthBasisPoints}, deathHealth=" +
+                        $"{death.HealthAtDeathBasisPoints}.");
+                }
+            }
+            ValidateMilitaryReturnTeamDeaths(
+                returnTeamDeathPolicies,
+                evacuations,
+                armies,
+                organizations,
+                families,
+                people,
+                services,
+                lifeEvents,
+                inheritances,
+                compensations,
+                deathIds,
+                deathPatients,
+                usedInheritances,
+                usedCompensations);
+            if (usedInheritances.Count != inheritances.Count ||
+                usedCompensations.Count != compensations.Count ||
+                usedResponsibilities.Count != responsibilities.Count ||
+                usedInpatientClosures.Count != inpatientClosures.Count ||
+                usedTransferDeathClosures.Count !=
+                    transferDeathClosures.Count ||
+                usedOriginalEvacuationDeathClosures.Count !=
+                    originalEvacuationDeathClosures.Count ||
+                usedPatientReturnDeathClosures.Count !=
+                    patientReturnDeathClosures.Count)
+            {
+                throw new InvalidOperationException(
+                    "Military wound-death ledgers contain orphan records.");
+            }
+        }
+
+        private void ValidateMilitaryReturnTeamDeaths(
+            Dictionary<string, MilitaryReturnTeamDeathPolicyDefinitionState>
+                policies,
+            Dictionary<string, MilitaryMedicalEvacuationState> evacuations,
+            Dictionary<string, ArmyState> armies,
+            Dictionary<string, OrganizationState> organizations,
+            Dictionary<string, FamilyState> families,
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryServiceState> services,
+            Dictionary<string, LifeEventRecordState> lifeEvents,
+            Dictionary<string, MilitaryFamilyInheritanceState> inheritances,
+            Dictionary<string, MilitarySurvivorCompensationState>
+                compensations,
+            HashSet<string> deathIds,
+            HashSet<string> deathPeople,
+            HashSet<string> usedInheritances,
+            HashSet<string> usedCompensations)
+        {
+            for (var i = 0; i < MilitaryReturnTeamDeaths.Count; i++)
+            {
+                var death = MilitaryReturnTeamDeaths[i] ??
+                    throw new InvalidOperationException(
+                        "A military return-team death cannot be null.");
+                _ = new StableId(death.Id);
+                _ = new StableId(death.PolicyId);
+                _ = new StableId(death.CorpsePolicyId);
+                _ = new StableId(death.ReturnJourneyId);
+                var hasPolicy = policies.TryGetValue(
+                    death.PolicyId, out var policy);
+                var hasEvacuation = evacuations.TryGetValue(
+                    death.EvacuationId, out var evacuation);
+                var hasPerson = people.TryGetValue(
+                    death.PersonId, out var person);
+                var hasService = services.TryGetValue(
+                    death.MilitaryServiceId, out var service);
+                var hasArmy = armies.TryGetValue(
+                    death.SourceArmyId, out var army);
+                var hasOrganization = organizations.TryGetValue(
+                    death.OrganizationId, out var organization);
+                var hasFamily = families.TryGetValue(
+                    death.FamilyId, out var family);
+                var hasInheritance = inheritances.TryGetValue(
+                    death.FamilyInheritanceId, out var inheritance);
+                var hasCompensation = compensations.TryGetValue(
+                    death.SurvivorCompensationId, out var compensation);
+                var hasDeathEvent = lifeEvents.TryGetValue(
+                    death.DeathLifeEventId, out var deathEvent);
+                LifeEventRecordState successionEvent = null;
+                var hasSuccessionEvent = !string.IsNullOrEmpty(
+                        death.SuccessionLifeEventId) &&
+                    lifeEvents.TryGetValue(
+                        death.SuccessionLifeEventId, out successionEvent);
+                var member = hasEvacuation && evacuation.TeamMembers != null
+                    ? evacuation.TeamMembers.Find(item =>
+                        item.PersonId == death.PersonId)
+                    : null;
+                var journey = FindJourneyById(death.ReturnJourneyId);
+                var inReturnPhase = hasEvacuation &&
+                    (evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                     evacuation.Status == MilitaryMedicalEvacuationStatus
+                         .PatientDeceasedReturningToArmy ||
+                     evacuation.Status == MilitaryMedicalEvacuationStatus
+                         .PatientDeceasedAwaitingTeamRejoin ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.Completed);
+                var expectedCompensation = hasPolicy && hasService
+                    ? checked(
+                        policy.BaseCompensationMoney +
+                        policy.CompensationPerRankMoney * service.Rank)
+                    : -1;
+                var headChanged = hasInheritance &&
+                    inheritance.FormerHeadPersonId == death.PersonId;
+                if (!deathIds.Add(death.Id) ||
+                    !deathPeople.Add(death.PersonId) ||
+                    !usedInheritances.Add(death.FamilyInheritanceId) ||
+                    !usedCompensations.Add(death.SurvivorCompensationId) ||
+                    !hasPolicy || !hasEvacuation || !hasPerson ||
+                    !hasService || !hasArmy || !hasOrganization ||
+                    !hasFamily || !hasInheritance || !hasCompensation ||
+                    !hasDeathEvent || member == null || !inReturnPhase ||
+                    death.Day < MilitaryReturnTeamDeathContractActivationDay ||
+                    death.Day > AbsoluteDay ||
+                    death.CorpsePolicyId !=
+                        MilitaryReturnTeamCorpsePolicyIds
+                            .ContinueExistingJourneyToSourceArmy ||
+                    member.ReturnDeathId != death.Id ||
+                    member.MilitaryServiceId != service.Id ||
+                    member.ReturnJourneyId != death.ReturnJourneyId ||
+                    service.PersonId != person.Id ||
+                    service.ArmyId != army.Id ||
+                    service.Status != MilitaryServiceStatus.Dead ||
+                    army.OrganizationId != organization.Id ||
+                    death.ReturnRouteId != evacuation.ReturnRouteId ||
+                    death.ReturnOriginLocationId !=
+                        evacuation.CurrentCareLocationId ||
+                    death.ReturnDestinationLocationId !=
+                        evacuation.ReturnDestinationLocationId ||
+                    death.ReturnStartedDay != evacuation.ReturnStartedDay ||
+                    death.Day < checked(
+                        death.ReturnStartedDay +
+                        policy.MinimumDaysAfterReturnStart) ||
+                    death.RemainingKilometersAtDeath <= 0 ||
+                    death.OpeningHealthBasisPoints < 0 ||
+                    death.OpeningHealthBasisPoints > 10_000 ||
+                    death.HealthLossBasisPoints !=
+                        policy.HealthLossBasisPoints ||
+                    death.ClosingHealthBasisPoints != Math.Max(
+                        0,
+                        death.OpeningHealthBasisPoints -
+                        death.HealthLossBasisPoints) ||
+                    death.ClosingHealthBasisPoints >
+                        policy.MaximumClosingHealthBasisPoints ||
+                    person.IsAlive ||
+                    person.HealthBasisPoints !=
+                        death.ClosingHealthBasisPoints ||
+                    person.Wealth != 0 ||
+                    journey != null &&
+                        (death.CorpseArrivedDay != -1 ||
+                         journey.PersonId != person.Id ||
+                         journey.RouteId != death.ReturnRouteId ||
+                         journey.OriginLocationId !=
+                            death.ReturnOriginLocationId ||
+                         journey.DestinationLocationId !=
+                            death.ReturnDestinationLocationId ||
+                         journey.Mode != TravelMode.Foot ||
+                         journey.RemainingKilometers <= 0 ||
+                         journey.RemainingKilometers >
+                            death.RemainingKilometersAtDeath ||
+                         person.LocationId !=
+                            death.ReturnOriginLocationId) ||
+                    journey == null &&
+                        (person.LocationId !=
+                             death.ReturnDestinationLocationId ||
+                         death.CorpseArrivedDay < death.Day ||
+                         death.CorpseArrivedDay > AbsoluteDay) ||
+                    !people.ContainsKey(death.AuthorizingPersonId) ||
+                    death.AuthorizingAuthority <
+                        MilitaryAuthorityLevel.Army ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        death.AuthorizingAuthority) ||
+                    !family.MemberIds.Contains(person.Id) ||
+                    inheritance.WoundDeathId != string.Empty ||
+                    inheritance.ReturnTeamDeathId != death.Id ||
+                    inheritance.Day != death.Day ||
+                    inheritance.FamilyId != family.Id ||
+                    inheritance.DeceasedPersonId != person.Id ||
+                    !family.MemberIds.Contains(
+                        inheritance.FormerHeadPersonId) ||
+                    !family.MemberIds.Contains(
+                        inheritance.SuccessorPersonId) ||
+                    inheritance.SuccessorPersonId == person.Id ||
+                    inheritance.HeadChanged != headChanged ||
+                    !inheritance.HeadChanged &&
+                        inheritance.SuccessorPersonId !=
+                            inheritance.FormerHeadPersonId ||
+                    inheritance.DeceasedWealthBefore < 0 ||
+                    inheritance.DeceasedWealthAfter != 0 ||
+                    inheritance.FamilyWealthAfter != checked(
+                        inheritance.FamilyWealthBefore +
+                        inheritance.DeceasedWealthBefore) ||
+                    compensation.WoundDeathId != string.Empty ||
+                    compensation.ReturnTeamDeathId != death.Id ||
+                    compensation.Day != death.Day ||
+                    compensation.PolicyId != policy.Id ||
+                    compensation.ArmyId != army.Id ||
+                    compensation.OrganizationId != organization.Id ||
+                    compensation.FamilyId != family.Id ||
+                    compensation.DeceasedPersonId != person.Id ||
+                    compensation.AuthorizingPersonId !=
+                        death.AuthorizingPersonId ||
+                    compensation.AuthorizingAuthority !=
+                        death.AuthorizingAuthority ||
+                    compensation.MilitaryRankAtDeath != service.Rank ||
+                    compensation.Amount != expectedCompensation ||
+                    compensation.OrganizationTreasuryBefore <
+                        compensation.Amount ||
+                    compensation.OrganizationTreasuryAfter != checked(
+                        compensation.OrganizationTreasuryBefore -
+                        compensation.Amount) ||
+                    compensation.FamilyWealthBefore !=
+                        inheritance.FamilyWealthAfter ||
+                    compensation.FamilyWealthAfter != checked(
+                        compensation.FamilyWealthBefore +
+                        compensation.Amount) ||
+                    deathEvent.Type != LifeEventType.Death ||
+                    deathEvent.Day != death.Day ||
+                    deathEvent.PrimaryPersonId != person.Id ||
+                    deathEvent.FamilyId != family.Id ||
+                    headChanged != hasSuccessionEvent ||
+                    headChanged &&
+                        (successionEvent.Type != LifeEventType.Succession ||
+                         successionEvent.Day != death.Day ||
+                         successionEvent.PrimaryPersonId !=
+                            inheritance.SuccessorPersonId ||
+                         successionEvent.SecondaryPersonId != person.Id ||
+                         successionEvent.FamilyId != family.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military return-team death {death.Id}: " +
+                        $"policy={hasPolicy}, evacuation={hasEvacuation}, " +
+                        $"person={hasPerson}, service={service?.Status}, " +
+                        $"member={member != null}, phase={inReturnPhase}, " +
+                        $"day={death.Day}/{AbsoluteDay}, activation=" +
+                        $"{MilitaryReturnTeamDeathContractActivationDay}, " +
+                        $"journey={journey?.RemainingKilometers}, " +
+                        $"snapshot={death.RemainingKilometersAtDeath}, " +
+                        $"arrival={death.CorpseArrivedDay}, location=" +
+                        $"{person?.LocationId}, destination=" +
+                        $"{death.ReturnDestinationLocationId}, health=" +
+                        $"{person?.HealthBasisPoints}/" +
+                        $"{death.ClosingHealthBasisPoints}."
+                    );
+                }
+            }
+        }
+
+        private void ValidateMilitaryMedicalTransfers(
+            Dictionary<string, MilitaryMedicalTransferState> transfers,
+            Dictionary<string, MilitaryRearMedicalAdmissionState> admissions,
+            Dictionary<string, MilitaryMedicalEvacuationState> evacuations,
+            Dictionary<string, MilitaryRearMedicalSiteState> sites,
+            Dictionary<string, ArmyState> armies,
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryServiceState> militaryServices,
+            Dictionary<string, ProductBatchState> batches,
+            Dictionary<string, InventoryTransactionState> transactions)
+        {
+            var transferSegments = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var pair in transfers)
+            {
+                var transfer = pair.Value;
+                _ = new StableId(transfer.Id);
+                _ = new StableId(transfer.PatientJourneyId);
+                MilitaryMedicalTransferState previousTransfer = null;
+                var hasPreviousReference = !string.IsNullOrEmpty(
+                    transfer.PreviousMedicalTransferId);
+                var hasPreviousTransfer = hasPreviousReference &&
+                    transfers.TryGetValue(
+                        transfer.PreviousMedicalTransferId,
+                        out previousTransfer);
+                MilitaryMedicalTransferState nextTransfer = null;
+                var hasNextReference = !string.IsNullOrEmpty(
+                    transfer.NextMedicalTransferId);
+                var hasNextTransfer = hasNextReference &&
+                    transfers.TryGetValue(
+                        transfer.NextMedicalTransferId,
+                        out nextTransfer);
+                var isLatestTransfer = !hasNextReference;
+                var hasAdmission = admissions.TryGetValue(
+                    transfer.AdmissionId, out var admission);
+                var hasEvacuation = evacuations.TryGetValue(
+                    transfer.EvacuationId, out var evacuation);
+                var hasSourceSite = sites.TryGetValue(
+                    transfer.SourceRearMedicalSiteId, out var sourceSite);
+                var hasDestinationSite = sites.TryGetValue(
+                    transfer.DestinationRearMedicalSiteId,
+                    out var destinationSite);
+                ArmyState army = null;
+                var hasArmy = hasEvacuation && armies.TryGetValue(
+                    evacuation.SourceArmyId, out army);
+                PersonState patient = null;
+                var hasPatient = hasAdmission && people.TryGetValue(
+                    admission.PatientPersonId, out patient);
+                var hasSourcePhysician = people.ContainsKey(
+                    transfer.SourcePhysicianPersonId);
+                var hasReceiver = people.ContainsKey(
+                    transfer.DesignatedReceivingPersonId);
+                var hasAuthorizer = people.ContainsKey(
+                    transfer.AuthorizingPersonId);
+                var hasBatch = batches.TryGetValue(
+                    transfer.ReservedMedicineBatchId, out var batch);
+                var hasTransaction = transactions.TryGetValue(
+                    transfer.ReservationInventoryTransactionId,
+                    out var transaction);
+                InventoryTransactionState releaseTransaction = null;
+                var hasReleaseTransaction = !string.IsNullOrEmpty(
+                        transfer.ReservationReleaseInventoryTransactionId) &&
+                    transactions.TryGetValue(
+                        transfer.ReservationReleaseInventoryTransactionId,
+                        out releaseTransaction);
+                var route = FindRouteById(transfer.RouteId);
+                var validRoute = hasSourceSite && hasDestinationSite &&
+                    route != null &&
+                    (route.FromLocationId == sourceSite.LocationId &&
+                         route.ToLocationId == destinationSite.LocationId ||
+                     route.Bidirectional &&
+                         route.ToLocationId == sourceSite.LocationId &&
+                         route.FromLocationId == destinationSite.LocationId);
+                var expectedMedicineUnits = hasAdmission
+                    ? RequiredMedicalTransferMedicineUnits(
+                        admission,
+                        transfer.CompletedTreatmentStagesAtDispatch)
+                    : -1;
+                var completed = transfer.Status ==
+                    MilitaryMedicalTransferStatus.Completed;
+                var deceasedInTransit = transfer.Status ==
+                    MilitaryMedicalTransferStatus.DeceasedInTransit;
+                var closedAfterDeath = transfer.Status ==
+                    MilitaryMedicalTransferStatus.ClosedAfterPatientDeath;
+                var deathClosed = deceasedInTransit || closedAfterDeath;
+                var transferDeathClosure = string.IsNullOrEmpty(
+                        transfer.DeathClosureId)
+                    ? null
+                    : MilitaryMedicalTransferDeathClosures.Find(item =>
+                        item.Id == transfer.DeathClosureId);
+                var arrived = transfer.Status !=
+                        MilitaryMedicalTransferStatus.InTransit &&
+                    !deceasedInTransit;
+                var validReceipt = completed
+                    ? transfer.ReceivingPersonId ==
+                          transfer.DesignatedReceivingPersonId &&
+                      transfer.ReceivingMedicalSkillBasisPoints >=
+                          MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints &&
+                      transfer.ReceivingMedicalSkillBasisPoints <= 10_000 &&
+                      transfer.ReceivedDay >= transfer.ArrivedDay &&
+                      transfer.ReceivedDay <= AbsoluteDay &&
+                      transfer.ResponsibilityTransferredDay ==
+                          transfer.ReceivedDay
+                    : string.IsNullOrEmpty(transfer.ReceivingPersonId) &&
+                      transfer.ReceivingMedicalSkillBasisPoints == 0 &&
+                      transfer.ReceivedDay == -1 &&
+                      transfer.ResponsibilityTransferredDay == -1;
+                if (!hasAdmission || !hasEvacuation || !hasSourceSite ||
+                    !hasDestinationSite || !hasArmy || !hasPatient ||
+                    !hasSourcePhysician || !hasReceiver || !hasAuthorizer ||
+                    !hasBatch || !hasTransaction || !validRoute ||
+                    !transferSegments.Add(
+                        transfer.AdmissionId + "|" + transfer.SequenceIndex) ||
+                    sourceSite.Id == destinationSite.Id ||
+                    sourceSite.OwnerOrganizationId !=
+                        destinationSite.OwnerOrganizationId ||
+                    transfer.SequenceIndex < 0 ||
+                    transfer.SequenceIndex >= MilitaryMedicalRules
+                        .MaximumMedicalTransfersPerAdmission ||
+                    (transfer.SequenceIndex == 0) != !hasPreviousReference ||
+                    hasPreviousReference != hasPreviousTransfer ||
+                    hasNextReference != hasNextTransfer ||
+                    isLatestTransfer !=
+                        (admission.MedicalTransferId == transfer.Id) ||
+                    hasPreviousTransfer &&
+                        (previousTransfer.NextMedicalTransferId != transfer.Id ||
+                         previousTransfer.SequenceIndex + 1 !=
+                            transfer.SequenceIndex ||
+                         previousTransfer.AdmissionId != transfer.AdmissionId ||
+                         previousTransfer.EvacuationId != transfer.EvacuationId ||
+                         previousTransfer.Status !=
+                            MilitaryMedicalTransferStatus.Completed ||
+                         previousTransfer.DestinationRearMedicalSiteId !=
+                            transfer.SourceRearMedicalSiteId ||
+                         previousTransfer.DesignatedReceivingPersonId !=
+                            transfer.SourcePhysicianPersonId ||
+                         transfer.CreatedDay < previousTransfer.ReceivedDay ||
+                         transfer.CompletedTreatmentStagesAtDispatch <
+                            previousTransfer
+                                .CompletedTreatmentStagesAtDispatch) ||
+                    hasNextTransfer &&
+                        (nextTransfer.PreviousMedicalTransferId != transfer.Id ||
+                         nextTransfer.SequenceIndex !=
+                            transfer.SequenceIndex + 1 ||
+                         nextTransfer.AdmissionId != transfer.AdmissionId ||
+                         nextTransfer.EvacuationId != transfer.EvacuationId ||
+                         nextTransfer.SourceRearMedicalSiteId !=
+                            transfer.DestinationRearMedicalSiteId ||
+                         nextTransfer.SourcePhysicianPersonId !=
+                            transfer.DesignatedReceivingPersonId ||
+                         nextTransfer.CreatedDay < transfer.ReceivedDay ||
+                         nextTransfer.CompletedTreatmentStagesAtDispatch <
+                            transfer.CompletedTreatmentStagesAtDispatch ||
+                         transfer.Status !=
+                            MilitaryMedicalTransferStatus.Completed) ||
+                    transfer.SequenceIndex > 0 && transfer.CreatedDay <
+                        MilitaryRepeatedMedicalTransferContractActivationDay ||
+                    evacuation.RearMedicalAdmissionId != admission.Id ||
+                    transfer.CompletedTreatmentStagesAtDispatch < 0 ||
+                    transfer.CompletedTreatmentStagesAtDispatch >=
+                        admission.RequiredTreatmentStages ||
+                    transfer.CompletedTreatmentStagesAtDispatch >
+                        admission.CompletedTreatmentStages ||
+                    transfer.CompletedTreatmentStagesAtDispatch > 0 &&
+                        transfer.CreatedDay <
+                            MilitaryPostTreatmentTransferContractActivationDay ||
+                    transfer.CreatedDay <
+                        MilitaryMedicalTransferContractActivationDay ||
+                    transfer.CreatedDay < admission.AdmittedDay ||
+                    transfer.CreatedDay > AbsoluteDay ||
+                    transfer.AuthorizingAuthority < MilitaryAuthorityLevel.Army ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        transfer.AuthorizingAuthority) ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryMedicalTransferStatus),
+                        transfer.Status) ||
+                    transfer.ReservedMedicineUnits != expectedMedicineUnits ||
+                    transfer.ReservedMedicineUnits <= 0 ||
+                    transfer.ConsumedReservedMedicineUnits < 0 ||
+                    transfer.ConsumedReservedMedicineUnits >
+                        transfer.ReservedMedicineUnits ||
+                    transfer.ReleasedReservedMedicineUnits < 0 ||
+                    transfer.ReleasedReservedMedicineUnits >
+                        transfer.ReservedMedicineUnits -
+                        transfer.ConsumedReservedMedicineUnits ||
+                    deathClosed != !string.IsNullOrEmpty(
+                        transfer.DeathClosureId) ||
+                    deathClosed != (transferDeathClosure != null) ||
+                    deathClosed &&
+                        (transferDeathClosure.MedicalTransferId != transfer.Id ||
+                         transferDeathClosure.AdmissionId != admission.Id ||
+                         transferDeathClosure.EvacuationId != evacuation.Id ||
+                         transferDeathClosure.SourceRearMedicalSiteId !=
+                            sourceSite.Id ||
+                         transferDeathClosure.DestinationRearMedicalSiteId !=
+                            destinationSite.Id ||
+                         transferDeathClosure.SourcePhysicianPersonId !=
+                            transfer.SourcePhysicianPersonId ||
+                         transferDeathClosure.DesignatedReceivingPersonId !=
+                            transfer.DesignatedReceivingPersonId ||
+                         transferDeathClosure.RouteId != transfer.RouteId ||
+                         transferDeathClosure.OccurredInTransit !=
+                            (deceasedInTransit || closedAfterDeath &&
+                             transferDeathClosure
+                                .RemainingKilometersAtDeath > 0) ||
+                         transferDeathClosure.RemainingKilometersAtDeath < 0 ||
+                         transferDeathClosure.ReservedMedicineBatchId !=
+                            transfer.ReservedMedicineBatchId ||
+                         transferDeathClosure.ReleasedReservedMedicineUnits !=
+                            transfer.ReleasedReservedMedicineUnits ||
+                         transferDeathClosure.ReservedMedicineUnitsAfterRelease !=
+                            transferDeathClosure
+                                .ReservedMedicineUnitsBeforeRelease -
+                            transferDeathClosure
+                                .ReleasedReservedMedicineUnits ||
+                         transferDeathClosure
+                            .ReservationReleaseInventoryTransactionId !=
+                            transfer.ReservationReleaseInventoryTransactionId) ||
+                    (transfer.ReleasedReservedMedicineUnits > 0) !=
+                        hasReleaseTransaction ||
+                    batch.ProductDefinitionId != CoreProductionContent
+                        .HerbalMedicineMaterialProductId ||
+                    batch.InventoryContainerId !=
+                        destinationSite.MedicineInventoryContainerId ||
+                    batch.OwnerOrganizationId !=
+                        destinationSite.OwnerOrganizationId ||
+                    transaction.Type != InventoryTransactionType
+                        .MilitaryMedicalTransferMedicineReserved ||
+                    transaction.SourceMilitaryMedicalTransferId != transfer.Id ||
+                    transaction.ActorPersonId !=
+                        transfer.DesignatedReceivingPersonId ||
+                    transaction.Day != transfer.CreatedDay ||
+                    transaction.FacilityInventoryDelta != 0 ||
+                    transaction.Lines == null || transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != batch.Id ||
+                    transaction.Lines[0].QuantityDelta != 0 ||
+                    transaction.Lines[0].ReservedQuantityDelta !=
+                        transfer.ReservedMedicineUnits ||
+                    hasReleaseTransaction &&
+                        (releaseTransaction.Type !=
+                            InventoryTransactionType
+                                .MilitaryMedicalTransferMedicineReleased ||
+                         releaseTransaction.SourceMilitaryMedicalTransferId !=
+                            transfer.Id ||
+                         releaseTransaction.Day < transfer.ReceivedDay ||
+                         releaseTransaction.Day > AbsoluteDay ||
+                         releaseTransaction.FacilityInventoryDelta != 0 ||
+                         releaseTransaction.Lines == null ||
+                         releaseTransaction.Lines.Count != 1 ||
+                         releaseTransaction.Lines[0].BatchId != batch.Id ||
+                         releaseTransaction.Lines[0].QuantityDelta != 0 ||
+                         releaseTransaction.Lines[0].ReservedQuantityDelta !=
+                            -transfer.ReleasedReservedMedicineUnits) ||
+                    deathClosed &&
+                        (transfer.ConsumedReservedMedicineUnits != 0 ||
+                         transfer.ReleasedReservedMedicineUnits !=
+                            transfer.ReservedMedicineUnits ||
+                         !hasReleaseTransaction ||
+                         releaseTransaction.ActorPersonId !=
+                            transfer.SourcePhysicianPersonId ||
+                         releaseTransaction.Day !=
+                            transferDeathClosure.Day ||
+                         transferDeathClosure
+                            .ReservedMedicineUnitsBeforeRelease <
+                            transfer.ReservedMedicineUnits ||
+                         transferDeathClosure
+                            .ReleasedReservedMedicineUnits !=
+                            transfer.ReservedMedicineUnits) ||
+                    hasNextTransfer &&
+                        (transfer.ReleasedReservedMedicineUnits !=
+                            transfer.ReservedMedicineUnits -
+                                transfer.ConsumedReservedMedicineUnits ||
+                         !hasReleaseTransaction ||
+                         releaseTransaction.ActorPersonId !=
+                            transfer.DesignatedReceivingPersonId ||
+                         releaseTransaction.Day != nextTransfer.CreatedDay) ||
+                    !validReceipt)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military medical transfer {transfer.Id}.");
+                }
+
+                var expectedCurrentSite = completed || closedAfterDeath
+                    ? destinationSite
+                    : sourceSite;
+                var expectedCurrentPhysician = completed
+                    ? transfer.DesignatedReceivingPersonId
+                    : transfer.SourcePhysicianPersonId;
+                if (transfer.SequenceIndex == 0 &&
+                        transfer.SourcePhysicianPersonId !=
+                            evacuation.ReceivingPersonId ||
+                    isLatestTransfer &&
+                        (admission.RearMedicalSiteId != expectedCurrentSite.Id ||
+                         admission.PhysicianPersonId !=
+                            expectedCurrentPhysician ||
+                         evacuation.RearMedicalSiteId != expectedCurrentSite.Id ||
+                         evacuation.CurrentCareLocationId !=
+                            expectedCurrentSite.LocationId))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical transfer {transfer.Id} has an invalid responsibility chain.");
+                }
+
+                ValidateMedicalTransferJourney(
+                    transfer,
+                    patient,
+                    transfer.PatientJourneyId,
+                    sourceSite.LocationId,
+                    destinationSite.LocationId,
+                    arrived,
+                    isLatestTransfer && evacuation.Status <
+                        MilitaryMedicalEvacuationStatus.ReturningToArmy);
+                if (transfer.TeamMembers == null ||
+                    transfer.TeamMembers.Count != evacuation.TeamMembers.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"Medical transfer {transfer.Id} has an invalid escort team.");
+                }
+                var teamPeople = new HashSet<string>(StringComparer.Ordinal);
+                for (var memberIndex = 0;
+                     memberIndex < transfer.TeamMembers.Count;
+                     memberIndex++)
+                {
+                    var member = transfer.TeamMembers[memberIndex] ??
+                        throw new InvalidOperationException(
+                            $"Medical transfer {transfer.Id} has a null escort.");
+                    var evacuationMember = evacuation.TeamMembers[memberIndex];
+                    if (!people.TryGetValue(member.PersonId, out var person) ||
+                        !militaryServices.TryGetValue(
+                            member.MilitaryServiceId, out var service) ||
+                        !teamPeople.Add(member.PersonId) ||
+                        member.PersonId != evacuationMember.PersonId ||
+                        member.MilitaryServiceId !=
+                            evacuationMember.MilitaryServiceId ||
+                        service.PersonId != member.PersonId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Medical transfer {transfer.Id} has an invalid escort.");
+                    }
+                    ValidateMedicalTransferJourney(
+                        transfer,
+                        person,
+                        member.JourneyId,
+                        sourceSite.LocationId,
+                        destinationSite.LocationId,
+                        arrived,
+                        isLatestTransfer && evacuation.Status <
+                            MilitaryMedicalEvacuationStatus.ReturningToArmy);
+                }
+                if (arrived != (transfer.ArrivedDay >= 0) ||
+                    arrived && (transfer.ArrivedDay < transfer.CreatedDay ||
+                                transfer.ArrivedDay > AbsoluteDay))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical transfer {transfer.Id} has invalid arrival facts.");
+                }
+
+                var consumed = 0;
+                for (var treatmentIndex = 0;
+                     treatmentIndex < MilitaryRearMedicalTreatments.Count;
+                     treatmentIndex++)
+                {
+                    var treatment = MilitaryRearMedicalTreatments[treatmentIndex];
+                    if (treatment.AdmissionId == admission.Id &&
+                        treatment.StageIndex >=
+                            transfer.CompletedTreatmentStagesAtDispatch &&
+                        (!hasNextTransfer || treatment.StageIndex <
+                            nextTransfer.CompletedTreatmentStagesAtDispatch))
+                    {
+                        consumed = checked(
+                            consumed + treatment.MedicineUnitsConsumed);
+                    }
+                }
+                if (transfer.ConsumedReservedMedicineUnits != consumed ||
+                    batch.ReservedQuantity < checked(
+                        transfer.ReservedMedicineUnits - consumed -
+                        transfer.ReleasedReservedMedicineUnits))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical transfer {transfer.Id} does not close its medicine reservation.");
+                }
+            }
+        }
+
+        private void ValidateMedicalTransferJourney(
+            MilitaryMedicalTransferState transfer,
+            PersonState person,
+            string journeyId,
+            string sourceLocationId,
+            string destinationLocationId,
+            bool arrived,
+            bool stillAtCareSite)
+        {
+            _ = new StableId(journeyId);
+            var journey = FindJourneyById(journeyId);
+            if (!arrived)
+            {
+                if (journey != null)
+                {
+                    if (journey.PersonId != person.Id ||
+                        journey.RouteId != transfer.RouteId ||
+                        journey.OriginLocationId != sourceLocationId ||
+                        journey.DestinationLocationId != destinationLocationId ||
+                        journey.Mode != TravelMode.Foot ||
+                        person.LocationId != sourceLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Medical transfer {transfer.Id} has an invalid journey.");
+                    }
+                }
+                else if (person.LocationId != destinationLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Medical transfer traveler {person.Id} has invalid progress.");
+                }
+            }
+            else if (journey != null ||
+                     stillAtCareSite && person.LocationId != destinationLocationId)
+            {
+                throw new InvalidOperationException(
+                    $"Medical transfer traveler {person.Id} has invalid arrival state.");
+            }
+        }
+
+        private int RequiredMedicalTransferMedicineUnits(
+            MilitaryRearMedicalAdmissionState admission,
+            int firstStageIndex)
+        {
+            var total = 0;
+            if (firstStageIndex < 0 ||
+                firstStageIndex >= admission.TreatmentPlanProtocolIds.Count)
+            {
+                return -1;
+            }
+            for (var i = firstStageIndex;
+                 i < admission.TreatmentPlanProtocolIds.Count;
+                 i++)
+            {
+                var protocol = admission.TreatmentPlanProtocolIds[i];
+                if (protocol ==
+                    MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery)
+                {
+                    MilitaryInjuryEpisodeState injury = null;
+                    for (var injuryIndex = 0;
+                         injuryIndex < MilitaryInjuryEpisodes.Count;
+                         injuryIndex++)
+                    {
+                        if (MilitaryInjuryEpisodes[injuryIndex].Id ==
+                            admission.InjuryEpisodeId)
+                        {
+                            injury = MilitaryInjuryEpisodes[injuryIndex];
+                            break;
+                        }
+                    }
+                    MilitarySurgicalProcedureDefinitionState procedure = null;
+                    for (var procedureIndex = 0;
+                         procedureIndex < MilitarySurgicalProcedures.Count;
+                         procedureIndex++)
+                    {
+                        if (MilitarySurgicalProcedures[procedureIndex].Id ==
+                            injury?.SurgicalProcedureId)
+                        {
+                            procedure = MilitarySurgicalProcedures[procedureIndex];
+                            break;
+                        }
+                    }
+                    if (procedure == null)
+                    {
+                        return -1;
+                    }
+                    total = checked(total + procedure.MedicineUnits);
+                }
+                else if (protocol ==
+                    MilitaryRearMedicalTreatmentProtocolIds.InfectionControl)
+                {
+                    total = checked(total +
+                        MilitaryMedicalRules.InfectionControlMedicineUnits);
+                }
+                else
+                {
+                    total = checked(total +
+                        MilitaryMedicalRules.MedicineUnitsPerTreatment);
+                }
+            }
+            return total;
+        }
+
+        private static MilitaryMedicalTransferState
+            FindFirstMedicalTransferForAdmission(
+                string admissionId,
+                Dictionary<string, MilitaryMedicalTransferState> transfers)
+        {
+            MilitaryMedicalTransferState first = null;
+            foreach (var pair in transfers)
+            {
+                var candidate = pair.Value;
+                if (candidate.AdmissionId == admissionId &&
+                    (first == null ||
+                     candidate.SequenceIndex < first.SequenceIndex))
+                {
+                    first = candidate;
+                }
+            }
+            return first;
+        }
+
+        private static MilitaryMedicalTransferState
+            FindMedicalTransferForTreatmentStage(
+                string admissionId,
+                int stageIndex,
+                Dictionary<string, MilitaryMedicalTransferState> transfers)
+        {
+            MilitaryMedicalTransferState selected = null;
+            foreach (var pair in transfers)
+            {
+                var candidate = pair.Value;
+                if (candidate.AdmissionId != admissionId ||
+                    candidate.CompletedTreatmentStagesAtDispatch > stageIndex)
+                {
+                    continue;
+                }
+                if (selected == null ||
+                    candidate.SequenceIndex > selected.SequenceIndex)
+                {
+                    selected = candidate;
+                }
+            }
+            return selected;
+        }
+
+        private int ExpectedAdmissionHealthBeforeDeath(
+            MilitaryRearMedicalAdmissionState admission,
+            MilitaryInjuryEpisodeState injury)
+        {
+            if (admission.CompletedTreatmentStages == 0)
+            {
+                return injury.AdmissionHealthBasisPoints;
+            }
+            for (var i = 0; i < MilitaryRearMedicalTreatments.Count; i++)
+            {
+                var treatment = MilitaryRearMedicalTreatments[i];
+                if (treatment.Id == admission.TreatmentId)
+                {
+                    return treatment.ClosingHealthBasisPoints;
+                }
+            }
+            return -1;
+        }
+
+        private Dictionary<string, MilitaryFieldHospitalConstructionProjectState>
+            ValidateMilitaryFieldHospitalConstruction(
+                Dictionary<string, ArmyState> armies,
+                Dictionary<string, PersonState> people,
+                Dictionary<string, MilitaryServiceState> militaryServices,
+                HashSet<string> organizations,
+                Dictionary<string, InventoryContainerState> containers,
+                Dictionary<string, ProductBatchState> batches,
+                Dictionary<string, InventoryTransactionState> transactions)
+        {
+            var projects = new Dictionary<
+                string,
+                MilitaryFieldHospitalConstructionProjectState>(
+                    StringComparer.Ordinal);
+            var locations = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryFieldHospitalConstructionProjects.Count;
+                 i++)
+            {
+                var project = MilitaryFieldHospitalConstructionProjects[i] ??
+                    throw new InvalidOperationException(
+                        "A field-hospital construction project cannot be null.");
+                _ = new StableId(project.Id);
+                _ = new StableId(project.ProfileId);
+                var hasArmy = armies.TryGetValue(
+                    project.SourceArmyId, out var army);
+                var hasContainer = containers.TryGetValue(
+                    project.MaterialInventoryContainerId, out var container);
+                var hasTransaction = transactions.TryGetValue(
+                    project.InventoryTransactionId, out var transaction);
+                if (projects.ContainsKey(project.Id) ||
+                    !locations.Add(
+                        project.OwnerOrganizationId + "|" +
+                        project.LocationId) ||
+                    !hasArmy || !hasContainer || !hasTransaction ||
+                    !people.ContainsKey(project.AuthorizingPersonId) ||
+                    !people.ContainsKey(project.ManagerPersonId) ||
+                    !organizations.Contains(project.OwnerOrganizationId) ||
+                    !ContainsLocation(project.LocationId) ||
+                    army.OrganizationId != project.OwnerOrganizationId ||
+                    project.ProfileId !=
+                        MilitaryFieldHospitalConstructionProfileIds
+                            .TimberLeatherCamp ||
+                    project.AuthorizingAuthority < MilitaryAuthorityLevel.Army ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        project.AuthorizingAuthority) ||
+                    project.RequiredTimberUnits !=
+                        MilitaryMedicalRules.FieldHospitalRequiredTimberUnits ||
+                    project.RequiredLeatherUnits !=
+                        MilitaryMedicalRules.FieldHospitalRequiredLeatherUnits ||
+                    project.RequiredMoney !=
+                        MilitaryMedicalRules.FieldHospitalRequiredMoney ||
+                    project.RequiredLaborDays !=
+                        MilitaryMedicalRules.FieldHospitalRequiredLaborDays ||
+                    project.CompletedLaborDays < 0 ||
+                    project.CompletedLaborDays > project.RequiredLaborDays ||
+                    project.OwnerTreasuryBefore < project.RequiredMoney ||
+                    project.OwnerTreasuryAfter != checked(
+                        project.OwnerTreasuryBefore - project.RequiredMoney) ||
+                    project.StartedDay < MilitaryMedicalContractActivationDay ||
+                    project.StartedDay > AbsoluteDay ||
+                    container.OwnerOrganizationId !=
+                        project.OwnerOrganizationId ||
+                    !string.IsNullOrEmpty(container.OwnerFamilyId) ||
+                    !string.IsNullOrEmpty(container.CarrierPersonId) ||
+                    container.LocationId != project.LocationId ||
+                    transaction.Type != InventoryTransactionType
+                        .MilitaryFieldHospitalConstructionConsumed ||
+                    transaction
+                        .SourceMilitaryFieldHospitalConstructionProjectId !=
+                        project.Id ||
+                    transaction.ActorPersonId != project.ManagerPersonId ||
+                    transaction.Day != project.StartedDay)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid field-hospital construction project {project.Id}.");
+                }
+                projects.Add(project.Id, project);
+
+                long timber = 0;
+                long leather = 0;
+                long weight = 0;
+                if (transaction.Lines == null || transaction.Lines.Count == 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Field-hospital project {project.Id} lacks material evidence.");
+                }
+                for (var lineIndex = 0;
+                     lineIndex < transaction.Lines.Count;
+                     lineIndex++)
+                {
+                    var line = transaction.Lines[lineIndex];
+                    if (!batches.TryGetValue(line.BatchId, out var batch) ||
+                        line.QuantityDelta >= 0 ||
+                        line.ReservedQuantityDelta != 0 ||
+                        line.InventoryContainerId != container.Id ||
+                        line.OwnerOrganizationId !=
+                            project.OwnerOrganizationId ||
+                        batch.InventoryContainerId != container.Id ||
+                        batch.OwnerOrganizationId !=
+                            project.OwnerOrganizationId ||
+                        batch.ProductDefinitionId !=
+                            line.ProductDefinitionId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid construction material line for {project.Id}.");
+                    }
+                    var consumed = checked(-line.QuantityDelta);
+                    if (line.ProductDefinitionId ==
+                        CoreProductionContent.TimberMaterialProductId)
+                    {
+                        timber = checked(timber + consumed);
+                    }
+                    else if (line.ProductDefinitionId ==
+                        CoreProductionContent.LeatherMaterialProductId)
+                    {
+                        leather = checked(leather + consumed);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Unsupported construction material for {project.Id}.");
+                    }
+                    weight = checked(weight + consumed * batch.UnitWeight);
+                }
+                if (timber != project.RequiredTimberUnits ||
+                    leather != project.RequiredLeatherUnits ||
+                    transaction.FacilityInventoryDelta != -weight)
+                {
+                    throw new InvalidOperationException(
+                        $"Construction material totals are invalid for {project.Id}.");
+                }
+            }
+
+            var laborByProject = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var workerDays = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0;
+                 i < MilitaryFieldHospitalConstructionWork.Count;
+                 i++)
+            {
+                var work = MilitaryFieldHospitalConstructionWork[i] ??
+                    throw new InvalidOperationException(
+                        "Field-hospital construction work cannot be null.");
+                _ = new StableId(work.Id);
+                if (!projects.TryGetValue(work.ProjectId, out var project) ||
+                    !people.ContainsKey(work.WorkerPersonId) ||
+                    !workerDays.Add(
+                        work.ProjectId + "|" + work.WorkerPersonId + "|" +
+                        work.Day) ||
+                    work.Day < project.StartedDay ||
+                    work.Day > AbsoluteDay ||
+                    work.LaborDays != 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid field-hospital construction work {work.Id}.");
+                }
+                AddInt(laborByProject, work.ProjectId, work.LaborDays);
+            }
+            foreach (var pair in projects)
+            {
+                var project = pair.Value;
+                laborByProject.TryGetValue(project.Id, out var labor);
+                var completed = project.Status ==
+                    MilitaryFieldHospitalConstructionStatus.Completed;
+                if (!Enum.IsDefined(
+                        typeof(MilitaryFieldHospitalConstructionStatus),
+                        project.Status) ||
+                    labor != project.CompletedLaborDays ||
+                    completed !=
+                        (project.CompletedLaborDays == project.RequiredLaborDays) ||
+                    completed != (project.CompletedDay >= project.StartedDay) ||
+                    completed != !string.IsNullOrEmpty(
+                        project.RearMedicalSiteId) ||
+                    completed && project.CompletedDay > AbsoluteDay ||
+                    !completed && project.CompletedDay != -1)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid construction closure for {project.Id}.");
+                }
+            }
+            return projects;
+        }
+
+        private void ValidateMilitaryFieldHospitalMaintenance(
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryRearMedicalSiteState> sites,
+            Dictionary<string, MilitaryFieldHospitalConstructionProjectState>
+                projects,
+            Dictionary<string, InventoryContainerState> containers,
+            Dictionary<string, ProductBatchState> batches,
+            Dictionary<string, InventoryTransactionState> transactions)
+        {
+            foreach (var pair in projects)
+            {
+                var project = pair.Value;
+                if (project.Status ==
+                        MilitaryFieldHospitalConstructionStatus.Completed &&
+                    (!sites.TryGetValue(project.RearMedicalSiteId, out var site) ||
+                     site.SourceConstructionProjectId != project.Id ||
+                     site.RegisteredDay != project.CompletedDay))
+                {
+                    throw new InvalidOperationException(
+                        $"Completed field-hospital project {project.Id} lacks its site.");
+                }
+            }
+
+            var bySite = new Dictionary<
+                string,
+                List<MilitaryFieldHospitalMaintenanceState>>(
+                    StringComparer.Ordinal);
+            var siteDays = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryFieldHospitalMaintenance.Count; i++)
+            {
+                var maintenance = MilitaryFieldHospitalMaintenance[i] ??
+                    throw new InvalidOperationException(
+                        "Field-hospital maintenance cannot be null.");
+                _ = new StableId(maintenance.Id);
+                var hasSite = sites.TryGetValue(
+                    maintenance.RearMedicalSiteId, out var site);
+                InventoryContainerState container = null;
+                var hasContainer = hasSite && containers.TryGetValue(
+                    site.SupportInventoryContainerId, out container);
+                var hasBatch = batches.TryGetValue(
+                    maintenance.SourceTimberBatchId, out var batch);
+                var hasTransaction = transactions.TryGetValue(
+                    maintenance.InventoryTransactionId, out var transaction);
+                if (!hasSite || !hasContainer || !hasBatch || !hasTransaction ||
+                    site.KindId != MilitaryRearMedicalSiteKindIds.FieldHospital ||
+                    !people.ContainsKey(maintenance.ManagerPersonId) ||
+                    !siteDays.Add(site.Id + "|" + maintenance.Day) ||
+                    maintenance.Day < site.RegisteredDay ||
+                    maintenance.Day > AbsoluteDay ||
+                    maintenance.TimberUnitsConsumed !=
+                        MilitaryMedicalRules
+                            .FieldHospitalMaintenanceTimberUnits ||
+                    maintenance.MoneyPaid !=
+                        MilitaryMedicalRules.FieldHospitalMaintenanceMoney ||
+                    maintenance.OwnerTreasuryBefore < maintenance.MoneyPaid ||
+                    maintenance.OwnerTreasuryAfter != checked(
+                        maintenance.OwnerTreasuryBefore -
+                        maintenance.MoneyPaid) ||
+                    maintenance.Day < maintenance.PreviousNextMaintenanceDay ||
+                    maintenance.NewNextMaintenanceDay != checked(
+                        maintenance.Day + MilitaryMedicalRules
+                            .FieldHospitalMaintenanceIntervalDays) ||
+                    batch.ProductDefinitionId !=
+                        CoreProductionContent.TimberMaterialProductId ||
+                    batch.InventoryContainerId != container.Id ||
+                    batch.OwnerOrganizationId != site.OwnerOrganizationId ||
+                    transaction.Type != InventoryTransactionType
+                        .MilitaryFieldHospitalMaintenanceConsumed ||
+                    transaction.SourceMilitaryFieldHospitalMaintenanceId !=
+                        maintenance.Id ||
+                    transaction.ActorPersonId != maintenance.ManagerPersonId ||
+                    transaction.Day != maintenance.Day ||
+                    transaction.Lines == null ||
+                    transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != batch.Id ||
+                    transaction.Lines[0].QuantityDelta !=
+                        -maintenance.TimberUnitsConsumed ||
+                    transaction.Lines[0].ReservedQuantityDelta != 0 ||
+                    transaction.FacilityInventoryDelta !=
+                        -checked((long)maintenance.TimberUnitsConsumed *
+                            batch.UnitWeight))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid field-hospital maintenance {maintenance.Id}.");
+                }
+                if (!bySite.TryGetValue(site.Id, out var records))
+                {
+                    records = new List<MilitaryFieldHospitalMaintenanceState>();
+                    bySite.Add(site.Id, records);
+                }
+                records.Add(maintenance);
+            }
+
+            foreach (var pair in sites)
+            {
+                var site = pair.Value;
+                if (site.KindId != MilitaryRearMedicalSiteKindIds.FieldHospital)
+                {
+                    continue;
+                }
+                var expectedNext = checked(
+                    site.RegisteredDay + MilitaryMedicalRules
+                        .FieldHospitalMaintenanceIntervalDays);
+                var expectedLast = site.RegisteredDay;
+                if (bySite.TryGetValue(site.Id, out var records))
+                {
+                    records.Sort((left, right) =>
+                    {
+                        var day = left.Day.CompareTo(right.Day);
+                        return day != 0
+                            ? day
+                            : string.CompareOrdinal(left.Id, right.Id);
+                    });
+                    for (var i = 0; i < records.Count; i++)
+                    {
+                        if (records[i].PreviousNextMaintenanceDay != expectedNext)
+                        {
+                            throw new InvalidOperationException(
+                                $"Maintenance chain is invalid for {site.Id}.");
+                        }
+                        expectedLast = records[i].Day;
+                        expectedNext = records[i].NewNextMaintenanceDay;
+                    }
+                }
+                if (site.LastMaintenanceDay != expectedLast ||
+                    site.NextMaintenanceDay != expectedNext)
+                {
+                    throw new InvalidOperationException(
+                        $"Maintenance summary is invalid for {site.Id}.");
+                }
+            }
+        }
+
+        private void ValidateMilitaryMedicalEvacuations(
+            Dictionary<string, ArmyState> armies,
+            Dictionary<string, PersonState> people,
+            Dictionary<string, MilitaryServiceState> militaryServices)
+        {
+            var evacuationServices = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < MilitaryMedicalEvacuations.Count; i++)
+            {
+                var evacuation = MilitaryMedicalEvacuations[i] ??
+                    throw new InvalidOperationException(
+                        "A military medical evacuation cannot be null.");
+                _ = new StableId(evacuation.Id);
+                _ = new StableId(evacuation.TransportPolicyId);
+                _ = new StableId(evacuation.ReceptionPolicyId);
+                _ = new StableId(evacuation.PatientReturnPolicyId);
+                var hasArmy = armies.TryGetValue(
+                    evacuation.SourceArmyId, out var army);
+                var hasPatientService = militaryServices.TryGetValue(
+                    evacuation.PatientMilitaryServiceId,
+                    out var patientService);
+                var hasPatient = people.TryGetValue(
+                    evacuation.PatientPersonId, out var patient);
+                var hasAuthorizer = people.ContainsKey(
+                    evacuation.AuthorizingPersonId);
+                var hasReceiver = people.ContainsKey(
+                    evacuation.DesignatedReceivingPersonId);
+                var route = FindRouteById(evacuation.RouteId);
+                var routeValid = route != null &&
+                    (route.FromLocationId == evacuation.OriginLocationId &&
+                     route.ToLocationId == evacuation.DestinationLocationId ||
+                     route.Bidirectional &&
+                     route.ToLocationId == evacuation.OriginLocationId &&
+                     route.FromLocationId == evacuation.DestinationLocationId);
+                var completed = evacuation.Status ==
+                    MilitaryMedicalEvacuationStatus.Completed;
+                var deceasedInOriginalTransit = evacuation.Status ==
+                    MilitaryMedicalEvacuationStatus.DeceasedInTransit;
+                var originalDeathClosure = string.IsNullOrEmpty(
+                        evacuation.OriginalEvacuationDeathClosureId)
+                    ? null
+                    : MilitaryOriginalEvacuationDeathClosures.Find(item =>
+                        item.Id ==
+                            evacuation.OriginalEvacuationDeathClosureId);
+                var originalEvacuationDeath = originalDeathClosure != null;
+                var patientDied = HasMilitaryWoundDeath(
+                    evacuation.RearMedicalAdmissionId,
+                    evacuation.PatientPersonId);
+                var patientReturns = evacuation.PatientReturnPolicyId ==
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .ReturnWithTeam;
+                var patientCorpseReturns = evacuation.PatientReturnPolicyId ==
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .ReturnCorpseWithTeam;
+                var patientCorpseAwaitsTeam =
+                    evacuation.PatientReturnPolicyId ==
+                        MilitaryMedicalEvacuationPatientReturnPolicyIds
+                            .CorpseAtArmyAwaitingTeamRejoin;
+                var patientOrCorpseReturns =
+                    patientReturns || patientCorpseReturns ||
+                    patientCorpseAwaitsTeam;
+                var patientRetires = evacuation.PatientReturnPolicyId ==
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .RemainAtCareSiteForMedicalRetirement;
+                var patientRemainsAfterDeath =
+                    evacuation.PatientReturnPolicyId ==
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .RemainAtCareSiteAfterDeath;
+                var patientReturnDeathClosure = string.IsNullOrEmpty(
+                        evacuation.PatientReturnDeathClosureId)
+                    ? null
+                    : MilitaryPatientReturnDeathClosures.Find(item =>
+                        item.Id == evacuation.PatientReturnDeathClosureId);
+                var patientReturnDeath =
+                    patientReturnDeathClosure != null;
+                MilitaryMedicalTransferState activeTransfer = null;
+                var hasAnyMedicalTransfer = false;
+                for (var transferIndex = 0;
+                     transferIndex < MilitaryMedicalTransfers.Count;
+                     transferIndex++)
+                {
+                    var candidate = MilitaryMedicalTransfers[transferIndex];
+                    if (candidate.EvacuationId != evacuation.Id)
+                    {
+                        continue;
+                    }
+                    hasAnyMedicalTransfer = true;
+                    if (candidate.Status ==
+                            MilitaryMedicalTransferStatus.InTransit ||
+                        candidate.Status ==
+                            MilitaryMedicalTransferStatus.AwaitingReception ||
+                        candidate.Status ==
+                            MilitaryMedicalTransferStatus.DeceasedInTransit)
+                    {
+                        if (activeTransfer != null)
+                        {
+                            throw new InvalidOperationException(
+                                $"Evacuation {evacuation.Id} has multiple active transfers.");
+                        }
+                        activeTransfer = candidate;
+                    }
+                }
+                if (!hasArmy || !hasPatientService || !hasPatient ||
+                    !hasAuthorizer || !hasReceiver || !routeValid ||
+                    army.Id != patientService.ArmyId ||
+                    patientService.PersonId != patient.Id ||
+                    patientService.Status != (patientDied
+                        ? MilitaryServiceStatus.Dead
+                        : completed
+                            ? patientRetires
+                                ? MilitaryServiceStatus.Retired
+                                : MilitaryServiceStatus.Active
+                            : MilitaryServiceStatus.Wounded) ||
+                    !patientReturns && !patientCorpseReturns &&
+                        !patientCorpseAwaitsTeam &&
+                        !patientRetires &&
+                        !patientRemainsAfterDeath ||
+                    originalEvacuationDeath != !string.IsNullOrEmpty(
+                        evacuation.OriginalEvacuationDeathClosureId) ||
+                    deceasedInOriginalTransit !=
+                        (originalEvacuationDeath &&
+                         originalDeathClosure.OccurredInTransit &&
+                         evacuation.ArrivedDay == -1) ||
+                    originalEvacuationDeath &&
+                        (!patientRemainsAfterDeath || !patientDied ||
+                         originalDeathClosure.EvacuationId != evacuation.Id) ||
+                    patientReturnDeath != !string.IsNullOrEmpty(
+                        evacuation.PatientReturnDeathClosureId) ||
+                    patientReturnDeath &&
+                        (!patientCorpseReturns && !patientCorpseAwaitsTeam ||
+                         !patientDied ||
+                         patientReturnDeathClosure.EvacuationId !=
+                             evacuation.Id ||
+                         evacuation.Status !=
+                             MilitaryMedicalEvacuationStatus
+                                  .PatientDeceasedReturningToArmy &&
+                         evacuation.Status !=
+                             MilitaryMedicalEvacuationStatus
+                                 .PatientDeceasedAwaitingTeamRejoin &&
+                         evacuation.Status !=
+                             MilitaryMedicalEvacuationStatus.Completed) ||
+                    evacuation.OriginLocationId != route.FromLocationId &&
+                        evacuation.OriginLocationId != route.ToLocationId ||
+                    !ContainsLocation(evacuation.OriginLocationId) ||
+                    !ContainsLocation(evacuation.DestinationLocationId) ||
+                    !ContainsLocation(evacuation.CurrentCareLocationId) ||
+                    !hasAnyMedicalTransfer &&
+                        evacuation.CurrentCareLocationId !=
+                            evacuation.DestinationLocationId ||
+                    evacuation.AuthorizingAuthority <
+                        MilitaryAuthorityLevel.Army ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryAuthorityLevel),
+                        evacuation.AuthorizingAuthority) ||
+                    evacuation.TransportPolicyId !=
+                        MilitaryMedicalEvacuationTransportPolicyIds
+                            .StretcherTeamFoot ||
+                    evacuation.ReceptionPolicyId !=
+                        MilitaryMedicalEvacuationReceptionPolicyIds
+                            .DesignatedPractitionerHandoff ||
+                    evacuation.CreatedDay <
+                        MilitaryMedicalContractActivationDay ||
+                    evacuation.CreatedDay > AbsoluteDay ||
+                    !Enum.IsDefined(
+                        typeof(MilitaryMedicalEvacuationStatus),
+                        evacuation.Status) ||
+                    !completed && !evacuationServices.Add(patientService.Id) ||
+                    evacuation.TeamMembers == null ||
+                    evacuation.TeamMembers.Count <
+                        MilitaryMedicalRules.MinimumEvacuationTeamMembers ||
+                    evacuation.TeamMembers.Count >
+                        MilitaryMedicalRules.MaximumEvacuationTeamMembers)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid military medical evacuation {evacuation.Id}.");
+                }
+
+                ValidateEvacuationTraveler(
+                    evacuation,
+                    patient,
+                    evacuation.PatientJourneyId,
+                    evacuation.PatientReturnJourneyId,
+                    patientService.Id,
+                    evacuationServices,
+                    false,
+                    patientOrCorpseReturns,
+                    activeTransfer,
+                    activeTransfer?.PatientJourneyId);
+                var memberPeople = new HashSet<string>(StringComparer.Ordinal);
+                for (var memberIndex = 0;
+                     memberIndex < evacuation.TeamMembers.Count;
+                     memberIndex++)
+                {
+                    var member = evacuation.TeamMembers[memberIndex] ??
+                        throw new InvalidOperationException(
+                            $"Evacuation {evacuation.Id} has a null team member.");
+                    var hasService = militaryServices.TryGetValue(
+                        member.MilitaryServiceId, out var memberService);
+                    var hasPerson = people.TryGetValue(
+                        member.PersonId, out var memberPerson);
+                    var returnTeamDeath = string.IsNullOrEmpty(
+                            member.ReturnDeathId)
+                        ? null
+                        : MilitaryReturnTeamDeaths.Find(item =>
+                            item.Id == member.ReturnDeathId);
+                    var memberDied = returnTeamDeath != null;
+                    if (!hasService || !hasPerson ||
+                        !memberPeople.Add(member.PersonId) ||
+                        memberService.PersonId != member.PersonId ||
+                        memberService.ArmyId != army.Id ||
+                        memberDied != !string.IsNullOrEmpty(
+                            member.ReturnDeathId) ||
+                        memberDied &&
+                            (returnTeamDeath.EvacuationId != evacuation.Id ||
+                             returnTeamDeath.PersonId != member.PersonId ||
+                             returnTeamDeath.MilitaryServiceId !=
+                                member.MilitaryServiceId) ||
+                        memberService.Status != (memberDied
+                            ? MilitaryServiceStatus.Dead
+                            : completed
+                                ? MilitaryServiceStatus.Active
+                                : MilitaryServiceStatus
+                                    .MedicalEvacuationDuty) ||
+                        member.RoleId !=
+                            MilitaryMedicalEvacuationTeamRoleIds.StretcherBearer ||
+                        (evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus
+                                 .PatientDeceasedReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus
+                                 .PatientDeceasedAwaitingTeamRejoin ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus.Completed) !=
+                            !string.IsNullOrEmpty(member.ReturnJourneyId) ||
+                        member.PersonId == patient.Id)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid team member in evacuation {evacuation.Id}.");
+                    }
+                    ValidateEvacuationTraveler(
+                        evacuation,
+                        memberPerson,
+                        member.JourneyId,
+                        member.ReturnJourneyId,
+                        memberService.Id,
+                        evacuationServices,
+                        !completed,
+                        true,
+                        activeTransfer,
+                        FindMedicalTransferTeamJourneyId(
+                            activeTransfer, member.PersonId));
+                }
+
+                if (evacuation.Status ==
+                        MilitaryMedicalEvacuationStatus.InTransit ||
+                    deceasedInOriginalTransit)
+                {
+                    if (evacuation.ArrivedDay != -1 ||
+                        !string.IsNullOrEmpty(evacuation.ReceivingPersonId) ||
+                        evacuation.ReceivedDay != -1 ||
+                        evacuation.ReceivingMedicalSkillBasisPoints != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"In-transit evacuation {evacuation.Id} has reception facts.");
+                    }
+                }
+                else
+                {
+                    if (evacuation.ArrivedDay < evacuation.CreatedDay ||
+                        evacuation.ArrivedDay > AbsoluteDay ||
+                        FindJourneyById(evacuation.PatientJourneyId) != null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Arrived evacuation {evacuation.Id} has invalid arrival facts.");
+                    }
+                    for (var memberIndex = 0;
+                         memberIndex < evacuation.TeamMembers.Count;
+                         memberIndex++)
+                    {
+                        if (FindJourneyById(
+                                evacuation.TeamMembers[memberIndex].JourneyId) != null)
+                        {
+                            throw new InvalidOperationException(
+                                $"Arrived evacuation {evacuation.Id} still has a journey.");
+                        }
+                    }
+                }
+
+                if (evacuation.Status ==
+                        MilitaryMedicalEvacuationStatus.AwaitingReception ||
+                    originalEvacuationDeath)
+                {
+                    if (!string.IsNullOrEmpty(evacuation.ReceivingPersonId) ||
+                        evacuation.ReceivedDay != -1 ||
+                        evacuation.ReceivingMedicalSkillBasisPoints != 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"Awaiting evacuation {evacuation.Id} has receipt facts.");
+                    }
+                }
+                else if (evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.Received ||
+                         evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.Admitted ||
+                         evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                         evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus
+                                 .PatientDeceasedReturningToArmy ||
+                         evacuation.Status ==
+                             MilitaryMedicalEvacuationStatus
+                                 .PatientDeceasedAwaitingTeamRejoin ||
+                         evacuation.Status ==
+                            MilitaryMedicalEvacuationStatus.Completed)
+                {
+                    if (evacuation.ReceivingPersonId !=
+                            evacuation.DesignatedReceivingPersonId ||
+                        evacuation.ReceivedDay < evacuation.ArrivedDay ||
+                        evacuation.ReceivedDay > AbsoluteDay ||
+                        evacuation.ReceivingMedicalSkillBasisPoints <
+                            MilitaryMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                        !people.TryGetValue(
+                            evacuation.ReceivingPersonId, out var receiver) ||
+                        receiver.LocationId != evacuation.DestinationLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Received evacuation {evacuation.Id} has invalid receipt facts.");
+                    }
+                }
+
+                var rearStarted = !originalEvacuationDeath &&
+                    (evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.Admitted ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.ReadyForReturn ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus
+                             .PatientDeceasedReturningToArmy ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus
+                             .PatientDeceasedAwaitingTeamRejoin ||
+                     evacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.Completed);
+                if (rearStarted !=
+                        !string.IsNullOrEmpty(evacuation.RearMedicalSiteId) ||
+                    rearStarted !=
+                        !string.IsNullOrEmpty(evacuation.RearMedicalAdmissionId))
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation {evacuation.Id} has invalid rear-care references.");
+                }
+                var returnStarted = evacuation.Status ==
+                        MilitaryMedicalEvacuationStatus.ReturningToArmy ||
+                    evacuation.Status == MilitaryMedicalEvacuationStatus
+                        .PatientDeceasedReturningToArmy ||
+                    evacuation.Status == MilitaryMedicalEvacuationStatus
+                        .PatientDeceasedAwaitingTeamRejoin ||
+                    evacuation.Status ==
+                        MilitaryMedicalEvacuationStatus.Completed;
+                if (returnStarted !=
+                        !string.IsNullOrEmpty(evacuation.ReturnRouteId) ||
+                    returnStarted != !string.IsNullOrEmpty(
+                        evacuation.ReturnDestinationLocationId) ||
+                    returnStarted && patientOrCorpseReturns !=
+                        !string.IsNullOrEmpty(
+                        evacuation.PatientReturnJourneyId) ||
+                    !patientOrCorpseReturns && !string.IsNullOrEmpty(
+                        evacuation.PatientReturnJourneyId) ||
+                    returnStarted != (evacuation.ReturnStartedDay >= 0) ||
+                    returnStarted &&
+                        (evacuation.ReturnStartedDay <
+                             (originalEvacuationDeath
+                                 ? evacuation.ArrivedDay
+                                 : evacuation.ReceivedDay) ||
+                         evacuation.ReturnStartedDay > AbsoluteDay))
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation {evacuation.Id} has invalid return facts.");
+                }
+                if (returnStarted)
+                {
+                    var returnRoute = FindRouteById(evacuation.ReturnRouteId);
+                    var validReturnRoute = returnRoute != null &&
+                        (returnRoute.FromLocationId ==
+                             evacuation.CurrentCareLocationId &&
+                         returnRoute.ToLocationId ==
+                             evacuation.ReturnDestinationLocationId ||
+                         returnRoute.Bidirectional &&
+                         returnRoute.ToLocationId ==
+                             evacuation.CurrentCareLocationId &&
+                         returnRoute.FromLocationId ==
+                             evacuation.ReturnDestinationLocationId);
+                    if (!validReturnRoute ||
+                        army.LocationId !=
+                            evacuation.ReturnDestinationLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Evacuation {evacuation.Id} has an invalid rejoin route.");
+                    }
+                }
+                if (completed != (evacuation.CompletedDay >= 0) ||
+                    completed &&
+                        (evacuation.CompletedDay < evacuation.ReturnStartedDay ||
+                         evacuation.CompletedDay > AbsoluteDay))
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation {evacuation.Id} has invalid completion facts.");
+                }
+            }
+
+            for (var i = 0; i < MilitaryServices.Count; i++)
+            {
+                if (MilitaryServices[i].Status ==
+                        MilitaryServiceStatus.MedicalEvacuationDuty &&
+                    !evacuationServices.Contains(MilitaryServices[i].Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical evacuation duty {MilitaryServices[i].Id} lacks an evacuation.");
+                }
+            }
+        }
+
+        private void ValidateEvacuationTraveler(
+            MilitaryMedicalEvacuationState evacuation,
+            PersonState person,
+            string journeyId,
+            string returnJourneyId,
+            string serviceId,
+            HashSet<string> evacuationServices,
+            bool addService,
+            bool returnsToArmy,
+            MilitaryMedicalTransferState activeTransfer,
+            string transferJourneyId)
+        {
+            _ = new StableId(journeyId);
+            if (!string.IsNullOrEmpty(returnJourneyId))
+            {
+                _ = new StableId(returnJourneyId);
+            }
+            var permittedWoundDeath =
+                person.Id == evacuation.PatientPersonId &&
+                HasMilitaryWoundDeath(
+                    evacuation.RearMedicalAdmissionId,
+                    evacuation.PatientPersonId);
+            var permittedReturnTeamDeath =
+                HasMilitaryReturnTeamDeath(evacuation.Id, person.Id);
+            if (!person.IsAlive && !permittedWoundDeath &&
+                    !permittedReturnTeamDeath ||
+                addService && !evacuationServices.Add(serviceId))
+            {
+                throw new InvalidOperationException(
+                    $"Invalid traveler in evacuation {evacuation.Id}.");
+            }
+            var journey = FindJourneyById(journeyId);
+            if (evacuation.Status ==
+                    MilitaryMedicalEvacuationStatus.InTransit ||
+                evacuation.Status ==
+                    MilitaryMedicalEvacuationStatus.DeceasedInTransit)
+            {
+                if (journey != null)
+                {
+                    if (journey.PersonId != person.Id ||
+                        journey.RouteId != evacuation.RouteId ||
+                        journey.OriginLocationId != evacuation.OriginLocationId ||
+                        journey.DestinationLocationId !=
+                            evacuation.DestinationLocationId ||
+                        journey.Mode != TravelMode.Foot ||
+                        person.LocationId != evacuation.OriginLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid journey in evacuation {evacuation.Id}.");
+                    }
+                }
+                else if (person.LocationId != evacuation.DestinationLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation traveler {person.Id} is neither traveling nor arrived.");
+                }
+            }
+            else if (journey != null)
+            {
+                throw new InvalidOperationException(
+                    $"Evacuation traveler {person.Id} has invalid arrival state.");
+            }
+            else if (evacuation.Status <
+                     MilitaryMedicalEvacuationStatus.ReturningToArmy)
+            {
+                if (!string.IsNullOrEmpty(returnJourneyId))
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation traveler {person.Id} has invalid care-site state.");
+                }
+                if (activeTransfer != null)
+                {
+                    _ = new StableId(transferJourneyId);
+                    var transferJourney = FindJourneyById(transferJourneyId);
+                    if (activeTransfer.Status ==
+                            MilitaryMedicalTransferStatus.InTransit ||
+                        activeTransfer.Status ==
+                            MilitaryMedicalTransferStatus.DeceasedInTransit)
+                    {
+                        if (transferJourney != null)
+                        {
+                            if (transferJourney.PersonId != person.Id ||
+                                transferJourney.RouteId !=
+                                    activeTransfer.RouteId ||
+                                transferJourney.OriginLocationId !=
+                                    evacuation.CurrentCareLocationId ||
+                                transferJourney.Mode != TravelMode.Foot ||
+                                person.LocationId !=
+                                    evacuation.CurrentCareLocationId)
+                            {
+                                throw new InvalidOperationException(
+                                    $"Evacuation traveler {person.Id} has an invalid transfer journey.");
+                            }
+                        }
+                        else if (person.LocationId ==
+                            evacuation.CurrentCareLocationId)
+                        {
+                            throw new InvalidOperationException(
+                                $"Evacuation traveler {person.Id} has not progressed on its transfer.");
+                        }
+                    }
+                    else if (transferJourney != null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Evacuation traveler {person.Id} retained a completed transfer journey.");
+                    }
+                }
+                else if (person.LocationId !=
+                    evacuation.CurrentCareLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation traveler {person.Id} has invalid care-site state.");
+                }
+            }
+            else
+            {
+                if (!returnsToArmy)
+                {
+                    if (!string.IsNullOrEmpty(returnJourneyId) ||
+                        person.LocationId != evacuation.CurrentCareLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Evacuation patient {person.Id} has an invalid " +
+                            "medical-retirement location.");
+                    }
+                    return;
+                }
+                var returnJourney = FindJourneyById(returnJourneyId);
+                if (returnJourney != null)
+                {
+                    if (evacuation.Status !=
+                            MilitaryMedicalEvacuationStatus.ReturningToArmy &&
+                        evacuation.Status !=
+                            MilitaryMedicalEvacuationStatus
+                                .PatientDeceasedReturningToArmy &&
+                        evacuation.Status !=
+                            MilitaryMedicalEvacuationStatus
+                                .PatientDeceasedAwaitingTeamRejoin ||
+                        returnJourney.PersonId != person.Id ||
+                        returnJourney.RouteId != evacuation.ReturnRouteId ||
+                        returnJourney.OriginLocationId !=
+                            evacuation.CurrentCareLocationId ||
+                        returnJourney.DestinationLocationId !=
+                            evacuation.ReturnDestinationLocationId ||
+                        returnJourney.Mode != TravelMode.Foot ||
+                        person.LocationId != evacuation.CurrentCareLocationId)
+                    {
+                        throw new InvalidOperationException(
+                            $"Evacuation traveler {person.Id} has an invalid return journey.");
+                    }
+                }
+                else if (person.LocationId !=
+                         evacuation.ReturnDestinationLocationId)
+                {
+                    throw new InvalidOperationException(
+                        $"Evacuation traveler {person.Id} has not rejoined its army.");
+                }
+            }
+        }
+
+        private bool ValidatePatientReturnTeamJourneySnapshots(
+            MilitaryMedicalEvacuationState evacuation,
+            MilitaryPatientReturnDeathClosureState closure)
+        {
+            if (closure.TeamJourneySnapshotsAtDeath == null)
+            {
+                return false;
+            }
+            if (!closure.PatientJourneyCompletedBeforeDeath)
+            {
+                return closure.TeamJourneySnapshotsAtDeath.Count == 0;
+            }
+            if (evacuation == null || evacuation.TeamMembers == null ||
+                closure.TeamJourneySnapshotsAtDeath.Count !=
+                    evacuation.TeamMembers.Count)
+            {
+                return false;
+            }
+
+            var seenPeople = new HashSet<string>(StringComparer.Ordinal);
+            var seenServices = new HashSet<string>(StringComparer.Ordinal);
+            var seenJourneys = new HashSet<string>(StringComparer.Ordinal);
+            var anyOutstandingAtDeath = false;
+            for (var i = 0;
+                 i < closure.TeamJourneySnapshotsAtDeath.Count;
+                 i++)
+            {
+                var snapshot = closure.TeamJourneySnapshotsAtDeath[i];
+                if (snapshot == null)
+                {
+                    return false;
+                }
+                _ = new StableId(snapshot.PersonId);
+                _ = new StableId(snapshot.MilitaryServiceId);
+                _ = new StableId(snapshot.ReturnJourneyId);
+                if (!seenPeople.Add(snapshot.PersonId) ||
+                    !seenServices.Add(snapshot.MilitaryServiceId) ||
+                    !seenJourneys.Add(snapshot.ReturnJourneyId) ||
+                    snapshot.RemainingKilometersAtDeath < 0)
+                {
+                    return false;
+                }
+
+                var member = evacuation.TeamMembers.Find(item =>
+                    item.PersonId == snapshot.PersonId);
+                var person = People.Find(item =>
+                    item.Id == snapshot.PersonId);
+                if (member == null || person == null ||
+                    member.MilitaryServiceId != snapshot.MilitaryServiceId ||
+                    member.ReturnJourneyId != snapshot.ReturnJourneyId)
+                {
+                    return false;
+                }
+
+                var journey = FindJourneyById(snapshot.ReturnJourneyId);
+                if (snapshot.RemainingKilometersAtDeath == 0)
+                {
+                    if (journey != null || person.LocationId !=
+                        evacuation.ReturnDestinationLocationId)
+                    {
+                        return false;
+                    }
+                    continue;
+                }
+
+                anyOutstandingAtDeath = true;
+                if (journey != null)
+                {
+                    if (journey.PersonId != snapshot.PersonId ||
+                        journey.RouteId != evacuation.ReturnRouteId ||
+                        journey.OriginLocationId !=
+                            evacuation.CurrentCareLocationId ||
+                        journey.DestinationLocationId !=
+                            evacuation.ReturnDestinationLocationId ||
+                        journey.Mode != TravelMode.Foot ||
+                        journey.RemainingKilometers <= 0 ||
+                        journey.RemainingKilometers >
+                            snapshot.RemainingKilometersAtDeath)
+                    {
+                        return false;
+                    }
+                }
+                else if (person.LocationId !=
+                         evacuation.ReturnDestinationLocationId)
+                {
+                    return false;
+                }
+            }
+            return anyOutstandingAtDeath;
+        }
+
+        private bool IsMilitaryMedicalEvacuationService(string serviceId)
+        {
+            for (var i = 0; i < MilitaryMedicalEvacuations.Count; i++)
+            {
+                var evacuation = MilitaryMedicalEvacuations[i];
+                if (evacuation.Status ==
+                    MilitaryMedicalEvacuationStatus.Completed)
+                {
+                    continue;
+                }
+                if (evacuation.PatientMilitaryServiceId == serviceId)
+                {
+                    return true;
+                }
+                if (evacuation.TeamMembers == null)
+                {
+                    continue;
+                }
+                for (var memberIndex = 0;
+                     memberIndex < evacuation.TeamMembers.Count;
+                     memberIndex++)
+                {
+                    if (evacuation.TeamMembers[memberIndex] != null &&
+                        evacuation.TeamMembers[memberIndex].MilitaryServiceId ==
+                            serviceId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private JourneyState FindJourneyById(string journeyId)
+        {
+            for (var i = 0; i < Journeys.Count; i++)
+            {
+                if (Journeys[i].Id == journeyId)
+                {
+                    return Journeys[i];
+                }
+            }
+            return null;
+        }
+
+        private RouteState FindRouteById(string routeId)
+        {
+            for (var i = 0; i < Routes.Count; i++)
+            {
+                if (Routes[i].Id == routeId)
+                {
+                    return Routes[i];
+                }
+            }
+            return null;
+        }
+
+        private bool ContainsLocation(string locationId)
+        {
+            for (var i = 0; i < Locations.Count; i++)
+            {
+                if (Locations[i].Id == locationId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ContainsMilitaryMedicalTransfer(string transferId)
+        {
+            for (var i = 0; i < MilitaryMedicalTransfers.Count; i++)
+            {
+                if (MilitaryMedicalTransfers[i].Id == transferId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool HasMilitaryWoundDeath(
+            string admissionId,
+            string patientPersonId)
+        {
+            return FindMilitaryWoundDeath(
+                admissionId, patientPersonId) != null;
+        }
+
+        private MilitaryWoundDeathState FindMilitaryWoundDeath(
+            string admissionId,
+            string patientPersonId)
+        {
+            for (var i = 0; i < MilitaryWoundDeaths.Count; i++)
+            {
+                var death = MilitaryWoundDeaths[i];
+                if (death != null &&
+                    (death.AdmissionId == admissionId ||
+                     string.IsNullOrEmpty(death.AdmissionId) &&
+                     string.IsNullOrEmpty(admissionId)) &&
+                    death.PatientPersonId == patientPersonId)
+                {
+                    return death;
+                }
+            }
+            return null;
+        }
+
+        private bool HasMilitaryReturnTeamDeath(
+            string evacuationId,
+            string personId)
+        {
+            for (var i = 0; i < MilitaryReturnTeamDeaths.Count; i++)
+            {
+                var death = MilitaryReturnTeamDeaths[i];
+                if (death != null &&
+                    death.EvacuationId == evacuationId &&
+                    death.PersonId == personId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static string FindMedicalTransferTeamJourneyId(
+            MilitaryMedicalTransferState transfer,
+            string personId)
+        {
+            if (transfer?.TeamMembers == null)
+            {
+                return string.Empty;
+            }
+            for (var i = 0; i < transfer.TeamMembers.Count; i++)
+            {
+                if (transfer.TeamMembers[i]?.PersonId == personId)
+                {
+                    return transfer.TeamMembers[i].JourneyId;
+                }
+            }
+            return string.Empty;
+        }
+
+        private static bool ValidMilitaryMedicalAuthorization(
+            string policyId,
+            string physicianPersonId,
+            string armyId,
+            Dictionary<string, MilitaryServiceState> services)
+        {
+            if (policyId == MilitaryMedicalAuthorizationPolicyIds
+                    .CommanderAuthorizedPractitioner)
+            {
+                return true;
+            }
+            if (policyId !=
+                MilitaryMedicalAuthorizationPolicyIds.InternalMedic)
+            {
+                return false;
+            }
+            foreach (var pair in services)
+            {
+                var service = pair.Value;
+                if (service.PersonId == physicianPersonId &&
+                    service.ArmyId == armyId &&
+                    service.Role == MilitaryServiceRole.Medic)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool HasCommanderService(
+            string personId,
+            string armyId,
+            Dictionary<string, MilitaryServiceState> services)
+        {
+            foreach (var pair in services)
+            {
+                var service = pair.Value;
+                if (service.PersonId == personId &&
+                    service.ArmyId == armyId &&
+                    service.Role == MilitaryServiceRole.Commander)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void ValidateCivilianMedicalCare()
+        {
+            var people = new Dictionary<string, PersonState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < People.Count; i++)
+                people.Add(People[i].Id, People[i]);
+            var families = new Dictionary<string, FamilyState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Families.Count; i++)
+                families.Add(Families[i].Id, Families[i]);
+            var villages = new Dictionary<string, VillageState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < Villages.Count; i++)
+                villages.Add(Villages[i].Id, Villages[i]);
+            var facilities = new Dictionary<string, VillageFacilityState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < VillageFacilities.Count; i++)
+                facilities.Add(VillageFacilities[i].Id, VillageFacilities[i]);
+            var episodes = new Dictionary<string, NutritionConditionEpisodeState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < NutritionConditionEpisodes.Count; i++)
+                episodes.Add(
+                    NutritionConditionEpisodes[i].Id,
+                    NutritionConditionEpisodes[i]);
+            var batches = new Dictionary<string, ProductBatchState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < ProductBatches.Count; i++)
+                batches.Add(ProductBatches[i].Id, ProductBatches[i]);
+            var transactions = new Dictionary<string, InventoryTransactionState>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+                transactions.Add(
+                    InventoryTransactions[i].Id,
+                    InventoryTransactions[i]);
+
+            var cases = new Dictionary<string, CivilianMedicalCaseState>(
+                StringComparer.Ordinal);
+            var caseByEpisode = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < CivilianMedicalCases.Count; i++)
+            {
+                var medicalCase = CivilianMedicalCases[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian medical case cannot be null.");
+                _ = new StableId(medicalCase.Id);
+                var hasEpisode = episodes.TryGetValue(
+                    medicalCase.NutritionConditionEpisodeId,
+                    out var episode);
+                var hasPatient = people.TryGetValue(
+                    medicalCase.PatientPersonId,
+                    out var patient);
+                var hasPhysician = people.ContainsKey(
+                    medicalCase.DiagnosingPhysicianPersonId);
+                var hasAuthorizer = people.TryGetValue(
+                    medicalCase.AuthorizingPersonId,
+                    out var authorizer);
+                var selfAuthorized = medicalCase.AuthorizationPolicyId ==
+                    CivilianMedicalAuthorizationPolicyIds.PatientSelf &&
+                    medicalCase.AuthorizingPersonId ==
+                        medicalCase.PatientPersonId;
+                var caregiverAuthorized = medicalCase.AuthorizationPolicyId ==
+                    CivilianMedicalAuthorizationPolicyIds
+                        .HouseholdAdultCaregiver &&
+                    medicalCase.AuthorizingPersonId !=
+                        medicalCase.PatientPersonId &&
+                    medicalCase.PatientFamilyIdAtDiagnosis ==
+                        medicalCase.AuthorizingFamilyIdAtDiagnosis;
+                var authorizerAge = hasAuthorizer
+                    ? (medicalCase.DiagnosedDay - authorizer.BirthDay) / 360
+                    : -1;
+                if (!hasEpisode || !hasPatient || !hasPhysician ||
+                    !hasAuthorizer || episode.PersonId != patient.Id ||
+                    medicalCase.DiagnosisId !=
+                        CivilianMedicalDiagnosisIds.MalnutritionIllness ||
+                    medicalCase.TreatmentProtocolId !=
+                        CivilianMedicalTreatmentProtocolIds.SupportiveHerbalCare ||
+                    medicalCase.DiagnosedDay < episode.StartDay ||
+                    medicalCase.DiagnosedDay > AbsoluteDay ||
+                    medicalCase.PhysicianMedicalSkillBasisPointsAtDiagnosis <
+                        CivilianMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                    medicalCase.PhysicianMedicalSkillBasisPointsAtDiagnosis >
+                        10_000 ||
+                    !families.ContainsKey(
+                        medicalCase.PatientFamilyIdAtDiagnosis) ||
+                    !families.ContainsKey(
+                        medicalCase.AuthorizingFamilyIdAtDiagnosis) ||
+                    (!selfAuthorized && !caregiverAuthorized) ||
+                    authorizerAge < CivilianMedicalRules.AdultAgeYears ||
+                    medicalCase.LastTreatmentDay < -1 ||
+                    medicalCase.LastTreatmentDay > AbsoluteDay ||
+                    medicalCase.LastTreatmentDay != -1 &&
+                        medicalCase.LastTreatmentDay < medicalCase.DiagnosedDay ||
+                    medicalCase.TotalMedicineUnitsConsumed < 0 ||
+                    medicalCase.TotalRecoveredHealthBasisPoints < 0 ||
+                    !Enum.IsDefined(
+                        typeof(CivilianMedicalCaseStatus), medicalCase.Status) ||
+                    medicalCase.Status == CivilianMedicalCaseStatus.Active &&
+                        (medicalCase.ClosedDay != -1 ||
+                         !string.IsNullOrEmpty(medicalCase.ClosureReasonId)) ||
+                    medicalCase.Status == CivilianMedicalCaseStatus.Closed &&
+                        (medicalCase.ClosedDay < medicalCase.DiagnosedDay ||
+                         medicalCase.ClosedDay > AbsoluteDay ||
+                         !IsCivilianMedicalClosureReason(
+                             medicalCase.ClosureReasonId)) ||
+                    !caseByEpisode.Add(medicalCase.NutritionConditionEpisodeId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian medical case {medicalCase.Id}.");
+                }
+                cases.Add(medicalCase.Id, medicalCase);
+            }
+
+            if (CivilianMedicalServiceContractActivationDay < 0 ||
+                CivilianMedicalServiceContractActivationDay >
+                    AbsoluteDay + 1)
+            {
+                throw new InvalidOperationException(
+                    "Civilian medical service activation day is invalid.");
+            }
+
+            var prescriptions = new Dictionary<
+                string, CivilianMedicalPrescriptionState>(
+                    StringComparer.Ordinal);
+            var prescriptionByCase = new HashSet<string>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < CivilianMedicalPrescriptions.Count; i++)
+            {
+                var prescription = CivilianMedicalPrescriptions[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian medical prescription cannot be null.");
+                _ = new StableId(prescription.Id);
+                var hasCase = cases.TryGetValue(
+                    prescription.MedicalCaseId, out var medicalCase);
+                if (!hasCase ||
+                    medicalCase.PrescriptionId != prescription.Id ||
+                    prescription.PatientPersonId != medicalCase.PatientPersonId ||
+                    prescription.PrescribingPhysicianPersonId !=
+                        medicalCase.DiagnosingPhysicianPersonId ||
+                    prescription.IssuedDay < medicalCase.DiagnosedDay ||
+                    prescription.IssuedDay > AbsoluteDay ||
+                    prescription.PrescriptionProtocolId !=
+                        CivilianMedicalPrescriptionProtocolIds
+                            .SupportiveHerbalMaterial ||
+                    prescription.Items == null ||
+                    prescription.Items.Count == 0 ||
+                    prescription.IsActive !=
+                        (medicalCase.Status == CivilianMedicalCaseStatus.Active) ||
+                    prescription.IsActive && prescription.ClosedDay != -1 ||
+                    !prescription.IsActive &&
+                        prescription.ClosedDay != medicalCase.ClosedDay ||
+                    !prescriptionByCase.Add(prescription.MedicalCaseId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian medical prescription {prescription.Id}.");
+                }
+
+                var hasHerbalLine = false;
+                var prescribedProducts = new HashSet<string>(
+                    StringComparer.Ordinal);
+                for (var itemIndex = 0;
+                     itemIndex < prescription.Items.Count;
+                     itemIndex++)
+                {
+                    var item = prescription.Items[itemIndex] ??
+                        throw new InvalidOperationException(
+                            $"Prescription {prescription.Id} has a null item.");
+                    _ = new StableId(item.ProductDefinitionId);
+                    _ = new StableId(item.AdministrationRouteId);
+                    if (item.UnitsPerTreatment <= 0 ||
+                        !prescribedProducts.Add(item.ProductDefinitionId))
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid prescription item in {prescription.Id}.");
+                    }
+                    if (item.ProductDefinitionId ==
+                            CoreProductionContent
+                                .HerbalMedicineMaterialProductId &&
+                        item.UnitsPerTreatment ==
+                            CivilianMedicalRules.MedicineUnitsPerTreatment &&
+                        item.AdministrationRouteId ==
+                            CivilianMedicalAdministrationRouteIds
+                                .OralPreparedHerbalMedicine)
+                    {
+                        hasHerbalLine = true;
+                    }
+                }
+                if (!hasHerbalLine)
+                {
+                    throw new InvalidOperationException(
+                        $"Prescription {prescription.Id} lacks its herbal line.");
+                }
+                prescriptions.Add(prescription.Id, prescription);
+            }
+
+            foreach (var pair in cases)
+            {
+                if (!string.IsNullOrEmpty(pair.Value.PrescriptionId) &&
+                    !prescriptions.ContainsKey(pair.Value.PrescriptionId))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical case {pair.Key} references a missing prescription.");
+                }
+            }
+
+            var services = new Dictionary<string, CivilianMedicalServiceState>(
+                StringComparer.Ordinal);
+            var serviceByTreatment = new HashSet<string>(
+                StringComparer.Ordinal);
+            var physicianWorkByDay = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            for (var i = 0; i < CivilianMedicalServices.Count; i++)
+            {
+                var service = CivilianMedicalServices[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian medical service cannot be null.");
+                _ = new StableId(service.Id);
+                var hasCase = cases.TryGetValue(
+                    service.MedicalCaseId, out var medicalCase);
+                var hasPrescription = prescriptions.TryGetValue(
+                    service.PrescriptionId, out var prescription);
+                var isClinic = service.VenuePolicyId ==
+                    CivilianMedicalVenuePolicyIds.VillageClinic;
+                var isHomeVisit = service.VenuePolicyId ==
+                    CivilianMedicalVenuePolicyIds.HomeVisit;
+                var validClinic = isClinic &&
+                    !string.IsNullOrEmpty(service.ClinicFacilityId) &&
+                    facilities.TryGetValue(
+                        service.ClinicFacilityId, out var clinic) &&
+                    clinic.Kind == VillageFacilityKind.Clinic &&
+                    villages.ContainsKey(clinic.VillageId);
+                var sameFamily = service.PayerFamilyId == service.PayeeFamilyId;
+                var expectedTotalFee = sameFamily
+                    ? 0
+                    : CivilianMedicalRules.RecommendedTreatmentFee(
+                        service.PhysicianMedicalSkillBeforeBasisPoints);
+                if (!hasCase || !hasPrescription ||
+                    prescription.MedicalCaseId != medicalCase.Id ||
+                    service.Day < CivilianMedicalServiceContractActivationDay ||
+                    service.Day < medicalCase.DiagnosedDay ||
+                    service.Day > AbsoluteDay ||
+                    service.PatientPersonId != medicalCase.PatientPersonId ||
+                    service.PhysicianPersonId !=
+                        medicalCase.DiagnosingPhysicianPersonId ||
+                    service.AuthorizingPersonId !=
+                        medicalCase.AuthorizingPersonId ||
+                    !people.ContainsKey(service.PatientPersonId) ||
+                    !people.ContainsKey(service.PhysicianPersonId) ||
+                    !families.ContainsKey(service.PayerFamilyId) ||
+                    !families.ContainsKey(service.PayeeFamilyId) ||
+                    (!validClinic &&
+                     !(isHomeVisit &&
+                       string.IsNullOrEmpty(service.ClinicFacilityId))) ||
+                    service.WorkMinutes !=
+                        CivilianMedicalRules.TreatmentWorkMinutes ||
+                    service.TotalFee != expectedTotalFee ||
+                    service.TotalFee != checked(
+                        service.ConsultationFee + service.MedicineFee) ||
+                    sameFamily &&
+                        (service.PaymentPolicyId !=
+                            CivilianMedicalPaymentPolicyIds.SameHouseholdCare ||
+                         service.ConsultationFee != 0 ||
+                         service.MedicineFee != 0 ||
+                         service.PayerFamilyWealthBefore !=
+                            service.PayerFamilyWealthAfter ||
+                         service.PayeeFamilyWealthBefore !=
+                            service.PayeeFamilyWealthAfter) ||
+                    !sameFamily &&
+                        (service.PaymentPolicyId !=
+                            CivilianMedicalPaymentPolicyIds.HouseholdDirect ||
+                         service.ConsultationFee !=
+                            CivilianMedicalRules.BaseConsultationFee +
+                            service.PhysicianMedicalSkillBeforeBasisPoints / 500L ||
+                         service.MedicineFee !=
+                            CivilianMedicalRules.MedicineServiceFee ||
+                         service.PayerFamilyWealthAfter != checked(
+                            service.PayerFamilyWealthBefore -
+                            service.TotalFee) ||
+                         service.PayeeFamilyWealthAfter != checked(
+                            service.PayeeFamilyWealthBefore +
+                            service.TotalFee)) ||
+                    service.PhysicianMedicalSkillBeforeBasisPoints <
+                        CivilianMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                    service.PhysicianMedicalSkillAfterBasisPoints <
+                        service.PhysicianMedicalSkillBeforeBasisPoints ||
+                    service.PhysicianMedicalSkillAfterBasisPoints > 10_000 ||
+                    service.PhysicianMedicalSkillGainBasisPoints < 0 ||
+                    service.PhysicianMedicalSkillAfterBasisPoints != checked(
+                        service.PhysicianMedicalSkillBeforeBasisPoints +
+                        service.PhysicianMedicalSkillGainBasisPoints) ||
+                    string.IsNullOrEmpty(service.TreatmentId) ||
+                    !serviceByTreatment.Add(service.TreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian medical service {service.Id}.");
+                }
+
+                var workKey = service.PhysicianPersonId + "|" + service.Day;
+                physicianWorkByDay.TryGetValue(workKey, out var workMinutes);
+                workMinutes = checked(workMinutes + service.WorkMinutes);
+                if (workMinutes >
+                    CivilianMedicalRules.MaximumDailyPhysicianWorkMinutes)
+                {
+                    throw new InvalidOperationException(
+                        $"Physician work exceeds the daily limit for {workKey}.");
+                }
+                physicianWorkByDay[workKey] = workMinutes;
+                services.Add(service.Id, service);
+            }
+
+            var medicineByCase = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var recoveryByCase = new Dictionary<string, int>(
+                StringComparer.Ordinal);
+            var lastTreatmentByCase = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            var treatmentIds = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < CivilianMedicalTreatments.Count; i++)
+            {
+                var treatment = CivilianMedicalTreatments[i] ??
+                    throw new InvalidOperationException(
+                        "A civilian medical treatment cannot be null.");
+                _ = new StableId(treatment.Id);
+                var hasCase = cases.TryGetValue(
+                    treatment.MedicalCaseId,
+                    out var medicalCase);
+                var hasBatch = batches.TryGetValue(
+                    treatment.SourceMedicineBatchId,
+                    out var batch);
+                var hasTransaction = transactions.TryGetValue(
+                    treatment.InventoryTransactionId,
+                    out var transaction);
+                var requiresFormalService = treatment.Day >=
+                    CivilianMedicalServiceContractActivationDay;
+                CivilianMedicalServiceState service = null;
+                var hasService = !string.IsNullOrEmpty(
+                        treatment.MedicalServiceId) &&
+                    services.TryGetValue(
+                        treatment.MedicalServiceId, out service);
+                if (!treatmentIds.Add(treatment.Id) ||
+                    !hasCase || !hasBatch || !hasTransaction ||
+                    treatment.PatientPersonId != medicalCase.PatientPersonId ||
+                    treatment.PhysicianPersonId !=
+                        medicalCase.DiagnosingPhysicianPersonId ||
+                    treatment.AuthorizingPersonId !=
+                        medicalCase.AuthorizingPersonId ||
+                    treatment.AuthorizationPolicyId !=
+                        medicalCase.AuthorizationPolicyId ||
+                    treatment.Day < medicalCase.DiagnosedDay ||
+                    treatment.Day > AbsoluteDay ||
+                    treatment.PhysicianMedicalSkillBasisPoints <
+                        CivilianMedicalRules.MinimumPhysicianSkillBasisPoints ||
+                    treatment.PhysicianMedicalSkillBasisPoints > 10_000 ||
+                    treatment.MedicineProductDefinitionId !=
+                        CoreProductionContent.HerbalMedicineMaterialProductId ||
+                    batch.ProductDefinitionId !=
+                        treatment.MedicineProductDefinitionId ||
+                    treatment.MedicineUnitsConsumed !=
+                        CivilianMedicalRules.MedicineUnitsPerTreatment ||
+                    treatment.OpeningHealthBasisPoints < 0 ||
+                    treatment.OpeningHealthBasisPoints > 10_000 ||
+                    treatment.ClosingHealthBasisPoints < 0 ||
+                    treatment.ClosingHealthBasisPoints > 10_000 ||
+                    treatment.RecoveredHealthBasisPoints <= 0 ||
+                    treatment.ClosingHealthBasisPoints != checked(
+                        treatment.OpeningHealthBasisPoints +
+                        treatment.RecoveredHealthBasisPoints) ||
+                    treatment.OpeningNutritionDebtBasisUnits < 0 ||
+                    treatment.OpeningNutritionDebtBasisUnits !=
+                        treatment.ClosingNutritionDebtBasisUnits ||
+                    treatment.OpeningDiseaseRiskBasisPoints < 0 ||
+                    treatment.OpeningDiseaseRiskBasisPoints > 10_000 ||
+                    treatment.OpeningDiseaseRiskBasisPoints !=
+                        treatment.ClosingDiseaseRiskBasisPoints ||
+                    transaction.Type !=
+                        InventoryTransactionType.MedicalTreatmentConsumed ||
+                    transaction.SourceCivilianMedicalTreatmentId !=
+                        treatment.Id ||
+                    transaction.ActorPersonId != treatment.PhysicianPersonId ||
+                    transaction.Lines.Count != 1 ||
+                    transaction.Lines[0].BatchId != batch.Id ||
+                    transaction.Lines[0].ProductDefinitionId !=
+                        treatment.MedicineProductDefinitionId ||
+                    transaction.Lines[0].QuantityDelta !=
+                        -treatment.MedicineUnitsConsumed ||
+                    transaction.Lines[0].ReservedQuantityDelta != 0 ||
+                    requiresFormalService != hasService ||
+                    requiresFormalService &&
+                        (string.IsNullOrEmpty(treatment.PrescriptionId) ||
+                         !prescriptions.TryGetValue(
+                            treatment.PrescriptionId,
+                            out var treatmentPrescription) ||
+                         treatmentPrescription.MedicalCaseId != medicalCase.Id ||
+                         service.TreatmentId != treatment.Id ||
+                         service.MedicalCaseId != medicalCase.Id ||
+                         service.PrescriptionId != treatment.PrescriptionId ||
+                         service.PatientPersonId != treatment.PatientPersonId ||
+                         service.PhysicianPersonId !=
+                            treatment.PhysicianPersonId ||
+                         service.AuthorizingPersonId !=
+                            treatment.AuthorizingPersonId))
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid civilian medical treatment {treatment.Id}.");
+                }
+
+                medicineByCase.TryGetValue(medicalCase.Id, out var medicine);
+                recoveryByCase.TryGetValue(medicalCase.Id, out var recovery);
+                medicineByCase[medicalCase.Id] = checked(
+                    medicine + treatment.MedicineUnitsConsumed);
+                recoveryByCase[medicalCase.Id] = checked(
+                    recovery + treatment.RecoveredHealthBasisPoints);
+                if (!lastTreatmentByCase.TryGetValue(
+                        medicalCase.Id, out var lastDay) ||
+                    treatment.Day > lastDay)
+                {
+                    lastTreatmentByCase[medicalCase.Id] = treatment.Day;
+                }
+            }
+
+            foreach (var pair in services)
+            {
+                if (!treatmentIds.Contains(pair.Value.TreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Medical service {pair.Key} references a missing treatment.");
+                }
+            }
+
+            for (var i = 0; i < InventoryTransactions.Count; i++)
+            {
+                var transaction = InventoryTransactions[i];
+                var isMedicalConsumption = transaction.Type ==
+                    InventoryTransactionType.MedicalTreatmentConsumed;
+                var hasMedicalTreatmentSource = !string.IsNullOrWhiteSpace(
+                    transaction.SourceCivilianMedicalTreatmentId);
+                if (isMedicalConsumption != hasMedicalTreatmentSource ||
+                    hasMedicalTreatmentSource && !treatmentIds.Contains(
+                        transaction.SourceCivilianMedicalTreatmentId))
+                {
+                    throw new InvalidOperationException(
+                        $"Inventory transaction {transaction.Id} has an invalid " +
+                        "civilian medical treatment source.");
+                }
+            }
+
+            foreach (var pair in cases)
+            {
+                medicineByCase.TryGetValue(pair.Key, out var medicine);
+                recoveryByCase.TryGetValue(pair.Key, out var recovery);
+                lastTreatmentByCase.TryGetValue(pair.Key, out var lastDay);
+                var expectedLastDay = medicine == 0 ? -1 : lastDay;
+                var episode = episodes[pair.Value.NutritionConditionEpisodeId];
+                var closureMatches = pair.Value.Status ==
+                    CivilianMedicalCaseStatus.Active ||
+                    pair.Value.ClosureReasonId ==
+                        CivilianMedicalCaseClosureReasonIds.InjuryRecovered &&
+                        episode.AppliedHealthDamageBasisPoints -
+                            episode.RecoveredHealthBasisPoints - recovery <= 0 ||
+                    pair.Value.ClosureReasonId ==
+                        CivilianMedicalCaseClosureReasonIds
+                            .NutritionConditionResolved &&
+                        episode.EndDay != -1 &&
+                        pair.Value.ClosedDay >= episode.EndDay ||
+                    pair.Value.ClosureReasonId ==
+                        CivilianMedicalCaseClosureReasonIds.PatientDied &&
+                        !people[pair.Value.PatientPersonId].IsAlive;
+                if (pair.Value.TotalMedicineUnitsConsumed != medicine ||
+                    pair.Value.TotalRecoveredHealthBasisPoints != recovery ||
+                    pair.Value.LastTreatmentDay != expectedLastDay ||
+                    recovery > episode.AppliedHealthDamageBasisPoints -
+                        episode.RecoveredHealthBasisPoints ||
+                    !closureMatches)
+                {
+                    throw new InvalidOperationException(
+                        $"Civilian medical case {pair.Key} does not close.");
+                }
+            }
+        }
+
+        private static bool IsCivilianMedicalClosureReason(string reasonId)
+        {
+            return reasonId ==
+                    CivilianMedicalCaseClosureReasonIds.InjuryRecovered ||
+                reasonId == CivilianMedicalCaseClosureReasonIds
+                    .NutritionConditionResolved ||
+                reasonId == CivilianMedicalCaseClosureReasonIds.PatientDied;
+        }
+
         private void ValidatePublicReliefRecovery()
         {
             var governances = new Dictionary<string, CountyGovernanceState>(
@@ -8744,7 +15778,9 @@ namespace Mandate.Domain
         private void ValidateResourceExtraction(
             HashSet<string> personIds,
             HashSet<string> locationIds,
+            HashSet<string> familyIds,
             HashSet<string> organizationIds,
+            IDictionary<string, VillageFacilityState> facilities,
             IDictionary<string, ProductionSiteState> productionSites,
             IDictionary<string, InventoryContainerState> containers,
             IDictionary<string, ProductBatchState> batches,
@@ -8804,21 +15840,47 @@ namespace Mandate.Domain
                 orders.Add(order.Id, order);
                 var validResource = resources.TryGetValue(
                     order.ResourceBodyId, out var resource);
-                var validSite = productionSites.TryGetValue(
-                    order.ProductionSiteId, out var site);
-                var validContainer = containers.TryGetValue(
-                    order.InventoryContainerId, out var container);
-                if (!validResource || !validSite || !validContainer ||
-                    !organizationIds.Contains(order.OwnerOrganizationId) ||
-                    site.OwnerOrganizationId != order.OwnerOrganizationId ||
-                    site.InventoryContainerId != container.Id ||
-                    container.OwnerOrganizationId != order.OwnerOrganizationId ||
-                    site.LocationId != resource.LocationId ||
-                    !site.FacilityTags.Contains(resource.RequiredFacilityTag) ||
-                    site.ManagerPersonId != order.ManagerPersonId ||
+                var organizationOrder =
+                    !string.IsNullOrEmpty(order.OwnerOrganizationId) &&
+                    string.IsNullOrEmpty(order.OwnerFamilyId) &&
+                    !string.IsNullOrEmpty(order.ProductionSiteId) &&
+                    !string.IsNullOrEmpty(order.InventoryContainerId) &&
+                    string.IsNullOrEmpty(order.StorageFacilityId);
+                var familyOrder =
+                    string.IsNullOrEmpty(order.OwnerOrganizationId) &&
+                    !string.IsNullOrEmpty(order.OwnerFamilyId) &&
+                    string.IsNullOrEmpty(order.ProductionSiteId) &&
+                    string.IsNullOrEmpty(order.InventoryContainerId) &&
+                    !string.IsNullOrEmpty(order.StorageFacilityId);
+                var validOrganizationOrder = organizationOrder &&
+                    productionSites.TryGetValue(
+                        order.ProductionSiteId, out var site) &&
+                    containers.TryGetValue(
+                        order.InventoryContainerId, out var container) &&
+                    organizationIds.Contains(order.OwnerOrganizationId) &&
+                    site.OwnerOrganizationId == order.OwnerOrganizationId &&
+                    site.InventoryContainerId == container.Id &&
+                    container.OwnerOrganizationId == order.OwnerOrganizationId &&
+                    site.LocationId == resource?.LocationId &&
+                    site.FacilityTags.Contains(
+                        resource?.RequiredFacilityTag ?? string.Empty) &&
+                    site.ManagerPersonId == order.ManagerPersonId &&
+                    HasOrganizationMembership(
+                        order.ManagerPersonId, order.OwnerOrganizationId);
+                var validFamilyOrder = familyOrder &&
+                    facilities.TryGetValue(
+                        order.StorageFacilityId, out var storage) &&
+                    familyIds.Contains(order.OwnerFamilyId) &&
+                    storage.OwnerFamilyId == order.OwnerFamilyId &&
+                    FindVillageLocationId(storage.VillageId) ==
+                        resource?.LocationId &&
+                    storage.CapabilityTags.Contains(
+                        resource?.RequiredFacilityTag ?? string.Empty) &&
+                    FamilyContainsPerson(
+                        Families, order.OwnerFamilyId, order.ManagerPersonId);
+                if (!validResource ||
+                    (!validOrganizationOrder && !validFamilyOrder) ||
                     !personIds.Contains(order.ManagerPersonId) ||
-                    !HasOrganizationMembership(
-                        order.ManagerPersonId, order.OwnerOrganizationId) ||
                     !Enum.IsDefined(
                         typeof(ProductionControlMode), order.ControlMode) ||
                     (order.Status != ProductionOrderStatus.Active &&
@@ -8851,8 +15913,10 @@ namespace Mandate.Domain
                 {
                     var workerId = order.WorkerPersonIds[workerIndex];
                     if (!personIds.Contains(workerId) ||
-                        !HasOrganizationMembership(
+                        organizationOrder && !HasOrganizationMembership(
                             workerId, order.OwnerOrganizationId) ||
+                        familyOrder && !FamilyContainsPerson(
+                            Families, order.OwnerFamilyId, workerId) ||
                         !workers.Add(workerId) ||
                         previous != null &&
                         string.CompareOrdinal(previous, workerId) >= 0)
@@ -8871,8 +15935,15 @@ namespace Mandate.Domain
                         output.SourceWorkOrderId != order.Id ||
                         output.ProductDefinitionId !=
                             resource.OutputProductDefinitionId ||
-                        output.OwnerOrganizationId != order.OwnerOrganizationId ||
-                        output.InventoryContainerId != order.InventoryContainerId ||
+                        organizationOrder &&
+                            (output.OwnerOrganizationId !=
+                                order.OwnerOrganizationId ||
+                             output.InventoryContainerId !=
+                                order.InventoryContainerId) ||
+                        familyOrder &&
+                            (output.OwnerFamilyId != order.OwnerFamilyId ||
+                             output.StorageFacilityId !=
+                                order.StorageFacilityId) ||
                         !transactionIds.Contains(output.SourceTransactionId))
                     {
                         throw new InvalidOperationException(
@@ -9314,6 +16385,19 @@ namespace Mandate.Domain
             return false;
         }
 
+        private string FindVillageLocationId(string villageId)
+        {
+            for (var i = 0; i < Villages.Count; i++)
+            {
+                if (Villages[i].Id == villageId)
+                {
+                    return Villages[i].LocationId;
+                }
+            }
+
+            return string.Empty;
+        }
+
         private static bool HasMembershipPosition(
             IList<MembershipState> memberships,
             string personId,
@@ -9489,6 +16573,15 @@ namespace Mandate.Domain
             IDictionary<string, long> values,
             string key,
             long delta)
+        {
+            values.TryGetValue(key, out var current);
+            values[key] = checked(current + delta);
+        }
+
+        private static void AddInt(
+            IDictionary<string, int> values,
+            string key,
+            int delta)
         {
             values.TryGetValue(key, out var current);
             values[key] = checked(current + delta);

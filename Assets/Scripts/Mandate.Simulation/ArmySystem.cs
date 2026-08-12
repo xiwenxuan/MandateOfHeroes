@@ -30,6 +30,12 @@ namespace Mandate.Simulation
 
             world.Validate();
             var army = FindArmy(world, armyId.Value);
+            if (MilitaryRearMedicalSystem.HasReturningEvacuationForArmy(
+                    world, army.Id))
+            {
+                throw new InvalidOperationException(
+                    "The army must wait for its returning medical party before marching.");
+            }
             var order = new MilitaryAuthoritySystem().IssueOrder(
                 world,
                 issuerPersonId,
@@ -96,6 +102,22 @@ namespace Mandate.Simulation
                 world.ArmyMarches.RemoveAt(i);
                 var army = FindArmy(world, march.ArmyId);
                 army.LocationId = march.DestinationLocationId;
+                if (!string.IsNullOrEmpty(
+                        army.MedicalInventoryContainerId))
+                {
+                    for (var containerIndex = 0;
+                         containerIndex < world.InventoryContainers.Count;
+                         containerIndex++)
+                    {
+                        if (world.InventoryContainers[containerIndex].Id ==
+                            army.MedicalInventoryContainerId)
+                        {
+                            world.InventoryContainers[containerIndex].LocationId =
+                                march.DestinationLocationId;
+                            break;
+                        }
+                    }
+                }
                 for (var orderIndex = 0;
                      orderIndex < world.MilitaryLogisticsOrders.Count;
                      orderIndex++)
@@ -146,7 +168,9 @@ namespace Mandate.Simulation
                         if (service.ArmyId == army.Id &&
                             (service.Status == MilitaryServiceStatus.Mustering ||
                              service.Status == MilitaryServiceStatus.Active ||
-                             service.Status == MilitaryServiceStatus.Wounded))
+                             service.Status == MilitaryServiceStatus.Wounded &&
+                             !MilitaryMedicalEvacuationSystem
+                                 .IsServiceInEvacuation(world, service.Id)))
                         {
                             personnel.Add(people.GetRequired(service.PersonId));
                         }

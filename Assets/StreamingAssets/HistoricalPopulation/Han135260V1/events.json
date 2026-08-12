@@ -1,0 +1,407 @@
+{
+  "schema": "mandate.historical-population-events.v1",
+  "events": [
+    {
+      "event_id": "pop.event.epidemic.151",
+      "name": "元嘉疫病模型事件",
+      "start_year": 151,
+      "end_year": 151,
+      "impact_type": "Epidemic",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.jizhou"
+      ],
+      "severity_basis_points": 35,
+      "mortality_share_basis_points": 6500,
+      "migration_share_basis_points": 500,
+      "birth_impact_basis_points": -120,
+      "registration_impact_basis_points": -80,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "C"
+    },
+    {
+      "event_id": "pop.event.epidemic.171",
+      "name": "建宁四年大疫",
+      "start_year": 171,
+      "end_year": 171,
+      "impact_type": "Epidemic",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.jizhou",
+        "admin.han140.yanzhou"
+      ],
+      "severity_basis_points": 65,
+      "mortality_share_basis_points": 7000,
+      "migration_share_basis_points": 700,
+      "birth_impact_basis_points": -180,
+      "registration_impact_basis_points": -120,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.epidemic.173",
+      "name": "熹平二年疫病",
+      "start_year": 173,
+      "end_year": 173,
+      "impact_type": "Epidemic",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.jizhou",
+        "admin.han140.qingzhou"
+      ],
+      "severity_basis_points": 55,
+      "mortality_share_basis_points": 7000,
+      "migration_share_basis_points": 600,
+      "birth_impact_basis_points": -160,
+      "registration_impact_basis_points": -100,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.epidemic.179",
+      "name": "光和二年大疫",
+      "start_year": 179,
+      "end_year": 179,
+      "impact_type": "Epidemic",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.jizhou",
+        "admin.han140.yanzhou",
+        "admin.han140.qingzhou"
+      ],
+      "severity_basis_points": 85,
+      "mortality_share_basis_points": 7200,
+      "migration_share_basis_points": 800,
+      "birth_impact_basis_points": -220,
+      "registration_impact_basis_points": -180,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.epidemic.182",
+      "name": "光和五年大疫",
+      "start_year": 182,
+      "end_year": 182,
+      "impact_type": "Epidemic",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.jizhou",
+        "admin.han140.yanzhou",
+        "admin.han140.qingzhou",
+        "admin.han140.jingzhou"
+      ],
+      "severity_basis_points": 95,
+      "mortality_share_basis_points": 7400,
+      "migration_share_basis_points": 900,
+      "birth_impact_basis_points": -260,
+      "registration_impact_basis_points": -220,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.184.yellow_turban",
+      "name": "黄巾起义及镇压",
+      "start_year": 184,
+      "end_year": 185,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.jizhou",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou",
+        "admin.han140.qingzhou",
+        "admin.han140.jingzhou",
+        "admin.han140.sili"
+      ],
+      "severity_basis_points": 250,
+      "mortality_share_basis_points": 5200,
+      "migration_share_basis_points": 3200,
+      "birth_impact_basis_points": -420,
+      "registration_impact_basis_points": -700,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.migration.190.luoyang_changan",
+      "name": "董卓迁都与洛阳人口西迁",
+      "start_year": 190,
+      "end_year": 191,
+      "impact_type": "ForcedRelocation",
+      "affected_provinces": [
+        "admin.han140.sili"
+      ],
+      "from_region_ids": [
+        "admin.han140.sili.henan"
+      ],
+      "to_region_ids": [
+        "admin.han140.sili.jingzhao",
+        "admin.han140.sili.youfufeng"
+      ],
+      "severity_basis_points": 180,
+      "mortality_share_basis_points": 1800,
+      "migration_share_basis_points": 6500,
+      "birth_impact_basis_points": -260,
+      "registration_impact_basis_points": -850,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.190_196.central_plains",
+      "name": "关东与中原连年战争",
+      "start_year": 190,
+      "end_year": 196,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou",
+        "admin.han140.xuzhou",
+        "admin.han140.jingzhou"
+      ],
+      "severity_basis_points": 150,
+      "mortality_share_basis_points": 5000,
+      "migration_share_basis_points": 3500,
+      "birth_impact_basis_points": -320,
+      "registration_impact_basis_points": -520,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.migration.190_207.southward",
+      "name": "中原人口向荆益江南迁徙",
+      "start_year": 190,
+      "end_year": 207,
+      "impact_type": "MassMigration",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou",
+        "admin.han140.jingzhou",
+        "admin.han140.yangzhou",
+        "admin.han140.yizhou"
+      ],
+      "from_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou"
+      ],
+      "to_provinces": [
+        "admin.han140.jingzhou",
+        "admin.han140.yangzhou",
+        "admin.han140.yizhou"
+      ],
+      "severity_basis_points": 80,
+      "mortality_share_basis_points": 400,
+      "migration_share_basis_points": 7800,
+      "birth_impact_basis_points": -40,
+      "registration_impact_basis_points": -240,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.193_194.xuzhou",
+      "name": "徐州战争人口冲击",
+      "start_year": 193,
+      "end_year": 194,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.xuzhou",
+        "admin.han140.yanzhou"
+      ],
+      "severity_basis_points": 210,
+      "mortality_share_basis_points": 5600,
+      "migration_share_basis_points": 3300,
+      "birth_impact_basis_points": -380,
+      "registration_impact_basis_points": -600,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.recovery.196_207.tuntian",
+      "name": "北方屯田与重新编户",
+      "start_year": 196,
+      "end_year": 207,
+      "impact_type": "Tuntian",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou",
+        "admin.han140.jizhou"
+      ],
+      "severity_basis_points": 55,
+      "mortality_share_basis_points": 0,
+      "migration_share_basis_points": 1800,
+      "birth_impact_basis_points": 120,
+      "registration_impact_basis_points": 260,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.200.guandu",
+      "name": "官渡及河北兼并战争",
+      "start_year": 200,
+      "end_year": 207,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.jizhou",
+        "admin.han140.yanzhou",
+        "admin.han140.youzhou",
+        "admin.han140.bingzhou"
+      ],
+      "severity_basis_points": 80,
+      "mortality_share_basis_points": 4200,
+      "migration_share_basis_points": 2500,
+      "birth_impact_basis_points": -120,
+      "registration_impact_basis_points": -160,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.migration.208.jingzhou",
+      "name": "赤壁前后荆州人口重分布",
+      "start_year": 208,
+      "end_year": 211,
+      "impact_type": "MassMigration",
+      "affected_provinces": [
+        "admin.han140.jingzhou",
+        "admin.han140.yangzhou",
+        "admin.han140.yizhou"
+      ],
+      "from_provinces": [
+        "admin.han140.jingzhou"
+      ],
+      "to_provinces": [
+        "admin.han140.yangzhou",
+        "admin.han140.yizhou"
+      ],
+      "severity_basis_points": 110,
+      "mortality_share_basis_points": 1200,
+      "migration_share_basis_points": 6000,
+      "birth_impact_basis_points": -120,
+      "registration_impact_basis_points": -220,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.211_219.hanzhong",
+      "name": "关中与汉中战争",
+      "start_year": 211,
+      "end_year": 219,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.liangzhou",
+        "admin.han140.yizhou"
+      ],
+      "severity_basis_points": 75,
+      "mortality_share_basis_points": 4200,
+      "migration_share_basis_points": 2500,
+      "birth_impact_basis_points": -110,
+      "registration_impact_basis_points": -120,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.recovery.220_260.wei",
+      "name": "曹魏北方屯田、恢复与编户",
+      "start_year": 220,
+      "end_year": 260,
+      "impact_type": "PopulationRecovery",
+      "affected_provinces": [
+        "admin.han140.sili",
+        "admin.han140.yuzhou",
+        "admin.han140.yanzhou",
+        "admin.han140.jizhou",
+        "admin.han140.xuzhou",
+        "admin.han140.qingzhou",
+        "admin.han140.youzhou",
+        "admin.han140.bingzhou",
+        "admin.han140.liangzhou"
+      ],
+      "severity_basis_points": 35,
+      "mortality_share_basis_points": 0,
+      "migration_share_basis_points": 800,
+      "birth_impact_basis_points": 90,
+      "registration_impact_basis_points": 170,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "C"
+    },
+    {
+      "event_id": "pop.event.recovery.220_260.wu",
+      "name": "孙吴江南开发与山越整合",
+      "start_year": 220,
+      "end_year": 260,
+      "impact_type": "Colonization",
+      "affected_provinces": [
+        "admin.han140.yangzhou",
+        "admin.han140.jingzhou",
+        "admin.han140.jiaozhou"
+      ],
+      "severity_basis_points": 55,
+      "mortality_share_basis_points": 0,
+      "migration_share_basis_points": 1200,
+      "birth_impact_basis_points": 120,
+      "registration_impact_basis_points": 130,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "C"
+    },
+    {
+      "event_id": "pop.event.recovery.220_260.shu",
+      "name": "蜀汉益州稳定与南中整合",
+      "start_year": 220,
+      "end_year": 260,
+      "impact_type": "Colonization",
+      "affected_provinces": [
+        "admin.han140.yizhou"
+      ],
+      "severity_basis_points": 40,
+      "mortality_share_basis_points": 0,
+      "migration_share_basis_points": 700,
+      "birth_impact_basis_points": 90,
+      "registration_impact_basis_points": 110,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "C"
+    },
+    {
+      "event_id": "pop.event.war.241_257.huainan",
+      "name": "淮南军事冲突与三叛",
+      "start_year": 241,
+      "end_year": 257,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.yangzhou",
+        "admin.han140.yuzhou",
+        "admin.han140.xuzhou"
+      ],
+      "severity_basis_points": 35,
+      "mortality_share_basis_points": 3500,
+      "migration_share_basis_points": 1800,
+      "birth_impact_basis_points": -60,
+      "registration_impact_basis_points": -60,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    },
+    {
+      "event_id": "pop.event.war.255.taoxi",
+      "name": "洮西战争",
+      "start_year": 255,
+      "end_year": 255,
+      "impact_type": "War",
+      "affected_provinces": [
+        "admin.han140.liangzhou",
+        "admin.han140.yizhou"
+      ],
+      "severity_basis_points": 55,
+      "mortality_share_basis_points": 4300,
+      "migration_share_basis_points": 1500,
+      "birth_impact_basis_points": -80,
+      "registration_impact_basis_points": -70,
+      "source_id": "source.project.historical_population.v0_1",
+      "confidence": "B"
+    }
+  ]
+}

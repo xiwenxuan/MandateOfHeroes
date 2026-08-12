@@ -25,6 +25,7 @@ namespace Mandate.Presentation
         private enum PlayerPanel : byte
         {
             Map,
+            Town,
             Character,
             Actions,
             Tasks,
@@ -47,6 +48,12 @@ namespace Mandate.Presentation
             Local
         }
 
+        private enum MapNavigationMode : byte
+        {
+            StrategicAtlas,
+            CaravanJourney
+        }
+
         private static readonly string[] StartingIdentityLabels =
         {
             "军人",
@@ -64,8 +71,8 @@ namespace Mandate.Presentation
             "受助家户"
         };
 
-        private readonly NewGameSetupService _newGameSetupService =
-            new NewGameSetupService();
+        private MerchantHouseholdContentRegistry _merchantContent;
+        private NewGameSetupService _newGameSetupService;
         private WorldState _world;
         private WorldState _selectionPreview;
         private WorldSimulator _simulator;
@@ -98,12 +105,16 @@ namespace Mandate.Presentation
         private MedicalSystem _medicalSystem;
         private readonly ConstructionSystem _constructionSystem =
             new ConstructionSystem();
+        private readonly MerchantTownOperationSystem _townOperationSystem =
+            new MerchantTownOperationSystem();
         private readonly PopulationLedgerSystem _populationLedgerSystem =
             new PopulationLedgerSystem();
         private readonly EducationSystem _educationSystem =
             new EducationSystem();
         private readonly Dictionary<string, NpcDecision> _decisions =
             new Dictionary<string, NpcDecision>(StringComparer.Ordinal);
+        private readonly PlayerActionPresentationSequence _actionPresentation =
+            new PlayerActionPresentationSequence();
 
         private Vector2 _scroll;
         private string _snapshot;
@@ -127,6 +138,7 @@ namespace Mandate.Presentation
         private Vector2 _selectionScroll;
         private MapOverlay _mapOverlay;
         private MapPerspective _mapPerspective;
+        private MapNavigationMode _mapNavigationMode;
         private float _mapZoom = 1f;
         private Vector2 _mapPan;
         private bool _mapDragging;
@@ -134,17 +146,28 @@ namespace Mandate.Presentation
         private Vector2 _mapDragStart;
         private Vector2 _mapPanStart;
         private string _selectedLocationId;
+        private string _enteredTownLocationId;
+        private string _enteredTownFacilityId;
         private GUIStyle _titleStyle;
         private GUIStyle _sectionStyle;
         private GUIStyle _normalStyle;
         private GUIStyle _mapLabelStyle;
         private GUIStyle _mapSealStyle;
+        private GUIStyle _townHeroTitleStyle;
+        private GUIStyle _townHeroDetailStyle;
+        private GUIStyle _townCardTitleStyle;
+        private GUIStyle _townCardDetailStyle;
         private ProceduralSilkMapArt _mapArt;
+        private Texture2D _townOverviewTexture;
 
         private void Awake()
         {
             EnsurePlayableSceneObjects();
             _mapArt = new ProceduralSilkMapArt();
+            _townOverviewTexture = Resources.Load<Texture2D>(
+                TownVisualPresentation.ZhongshanOverviewResourcePath);
+            _merchantContent = LoadMerchantHouseholdContent();
+            _newGameSetupService = new NewGameSetupService(_merchantContent);
             _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
             _message = "请选择开始新游戏，创建人物或扮演世界中的现有人物。";
         }
@@ -215,6 +238,30 @@ namespace Mandate.Presentation
                 _selectionPreview = PrototypeWorldFactory.Create184World(DefaultSeed);
                 _screen = ScreenMode.NewGame;
                 _message = "请选择自建人物或现有人物。";
+            }
+
+            if (GUILayout.Button("商旅—家族体验（推荐）", GUILayout.Height(48)))
+            {
+                try
+                {
+                    EnterWorld(_newGameSetupService.CreateCustom184World(
+                        new NewGameCharacterRequest
+                        {
+                            DisplayName = "沈衡",
+                            Age = 24,
+                            Gender = PersonGender.Male,
+                            Identity = StartingIdentity.Merchant,
+                            BackgroundId = StartingBackgroundIds.LocalHousehold,
+                            StartingLocationId = "location.zhongshan"
+                        },
+                        DefaultSeed));
+                    _playerPanel = PlayerPanel.Actions;
+                    _message = "中山家中欠账在即。先查看目标、行情来源与每项行动的代价，再决定怎样筹资本。";
+                }
+                catch (Exception exception)
+                {
+                    _message = exception.Message;
+                }
             }
 
             GUI.enabled = _world != null;
@@ -564,15 +611,22 @@ namespace Mandate.Presentation
             _mapZoom = 1f;
             _mapPan = Vector2.zero;
             _selectedLocationId = FindPlayer().LocationId;
+            _actionPresentation.ResetActive();
             _mapPerspective = MapPerspectiveSystem.RecommendForPlayer(
                 _world,
                 _world.PlayerPersonId);
+            _mapNavigationMode = _mapPerspective == MapPerspective.Commerce
+                ? MapNavigationMode.CaravanJourney
+                : MapNavigationMode.StrategicAtlas;
         }
 
         private void DrawPlayerGame()
         {
+            _actionPresentation.Update(Time.realtimeSinceStartup);
             GUILayout.BeginArea(new Rect(16, 16, Screen.width - 32, Screen.height - 32));
             DrawPlayerHeader();
+            DrawTrackedMerchantGoal();
+            DrawActionPresentation();
             GUILayout.Space(8);
             GUILayout.Label(_message, _normalStyle);
             GUILayout.Space(8);
@@ -582,6 +636,9 @@ namespace Mandate.Presentation
             {
                 case PlayerPanel.Map:
                     DrawPlayerMap();
+                    break;
+                case PlayerPanel.Town:
+                    DrawPlayerTown();
                     break;
                 case PlayerPanel.Character:
                     DrawPlayerCharacter();
@@ -626,6 +683,11 @@ namespace Mandate.Presentation
             if (GUILayout.Button("地图", GUILayout.Height(32)))
             {
                 SetPlayerPanel(PlayerPanel.Map);
+            }
+
+            if (GUILayout.Button("城镇", GUILayout.Height(32)))
+            {
+                SetPlayerPanel(PlayerPanel.Town);
             }
 
             if (GUILayout.Button("人物", GUILayout.Height(32)))
@@ -699,6 +761,91 @@ namespace Mandate.Presentation
             _scroll = Vector2.zero;
         }
 
+        private void DrawTownNavigationCallout(
+            PersonState player,
+            JourneyState journey)
+        {
+            var entry = TownNavigationPresentation.Build(
+                _world,
+                player.Id,
+                journey != null,
+                _townOperationSystem);
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Label("当前位置与城镇入口", _sectionStyle);
+            GUILayout.Label(entry.Guidance, _normalStyle);
+            GUI.enabled = entry.CanEnter;
+            if (GUILayout.Button(entry.ButtonLabel, GUILayout.Height(42)))
+            {
+                OpenCurrentTown(FindLocation(entry.LocationId));
+            }
+            GUI.enabled = true;
+            GUILayout.EndVertical();
+            GUILayout.Space(8);
+        }
+
+        private void OpenCurrentTown(LocationState location)
+        {
+            var player = FindPlayer();
+            if (location == null || player.LocationId != location.Id ||
+                FindJourney(player.Id) != null)
+            {
+                _message = "必须先抵达当前地点，才能进入城镇。";
+                return;
+            }
+
+            _selectedLocationId = location.Id;
+            _enteredTownLocationId = location.Id;
+            _enteredTownFacilityId = string.Empty;
+            _mapZoom = Mathf.Max(_mapZoom, 1.75f);
+            _mapPerspective = MapPerspective.Commerce;
+            _mapNavigationMode = MapNavigationMode.CaravanJourney;
+            SetPlayerPanel(PlayerPanel.Town);
+            _message =
+                $"已进入{location.DisplayName}城镇；请选择要进入的具体建筑。";
+        }
+
+        private void DrawPlayerTown()
+        {
+            var player = FindPlayer();
+            var journey = FindJourney(player.Id);
+            GUILayout.Label("当前城镇", _sectionStyle);
+            if (journey != null)
+            {
+                GUILayout.Label(
+                    $"正在前往{FindLocationName(journey.DestinationLocationId)}，" +
+                    "抵达后才能进入当地建筑。",
+                    _normalStyle);
+                if (GUILayout.Button("返回地图", GUILayout.Height(36)))
+                {
+                    SetPlayerPanel(PlayerPanel.Map);
+                }
+                return;
+            }
+
+            var location = FindLocation(player.LocationId);
+            var entry = TownNavigationPresentation.Build(
+                _world,
+                player.Id,
+                false,
+                _townOperationSystem);
+            GUILayout.Label(entry.Guidance, _normalStyle);
+            if (entry.VisibleFacilityCount == 0)
+            {
+                GUILayout.Label(
+                    "请返回地图旅行到中山，体验首批商号、仓库、市场和客舍建筑。",
+                    _normalStyle);
+                if (GUILayout.Button("返回地图", GUILayout.Height(36)))
+                {
+                    SetPlayerPanel(PlayerPanel.Map);
+                }
+                return;
+            }
+
+            _selectedLocationId = location.Id;
+            _enteredTownLocationId = location.Id;
+            DrawTownFacilities(location, player);
+        }
+
         private void DrawPlayerMap()
         {
             var player = FindPlayer();
@@ -706,6 +853,21 @@ namespace Mandate.Presentation
             GUILayout.Label("地区地图", _sectionStyle);
             GUILayout.Label(
                 "点击地点查看详情；鼠标滚轮缩放，按住鼠标右键或中键拖动地图。",
+                _normalStyle);
+
+            DrawTownNavigationCallout(player, journey);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("地图模式", GUILayout.Width(70f), GUILayout.Height(30f));
+            _mapNavigationMode = (MapNavigationMode)GUILayout.Toolbar(
+                (int)_mapNavigationMode,
+                new[] { "战略舆图", "商队行旅" },
+                GUILayout.Height(30f));
+            GUILayout.EndHorizontal();
+            GUILayout.Label(
+                _mapNavigationMode == MapNavigationMode.StrategicAtlas
+                    ? "战略舆图读取城市、道路、军队和地方形势，用于全局判断。"
+                    : "商队行旅读取同一世界事实，突出当前车队、载货、口粮、路线与市场机会。",
                 _normalStyle);
 
             GUILayout.BeginHorizontal();
@@ -756,6 +918,10 @@ namespace Mandate.Presentation
             else
             {
                 DrawSelectedLocationDetails(player);
+            }
+            if (_mapNavigationMode == MapNavigationMode.CaravanJourney)
+            {
+                DrawCaravanJourneyStatus(player, journey);
             }
         }
 
@@ -826,7 +992,10 @@ namespace Mandate.Presentation
             DrawMapRiver(canvas);
             DrawMapRoutes(canvas);
             DrawLocalMapDetails(canvas);
-            DrawArmyMarkers(canvas);
+            if (_mapNavigationMode == MapNavigationMode.StrategicAtlas)
+            {
+                DrawArmyMarkers(canvas);
+            }
             DrawLocationNodes(canvas, player);
             DrawPlayerMarker(canvas, player, journey);
             DrawMapLegend(canvas);
@@ -1192,6 +1361,18 @@ namespace Mandate.Presentation
                 var isCurrent = location.Id == player.LocationId;
                 var isSelected = location.Id == _selectedLocationId;
                 var isAdjacent = FindRouteBetween(player.LocationId, location.Id) != null;
+                var townFacilityCount = 0;
+                for (var facilityIndex = 0;
+                     facilityIndex < _world.TownFacilities.Count;
+                     facilityIndex++)
+                {
+                    var facility = _world.TownFacilities[facilityIndex];
+                    if (facility.LocationId == location.Id &&
+                        facility.IsPubliclyVisible)
+                    {
+                        townFacilityCount++;
+                    }
+                }
                 var border = isCurrent
                     ? new Color(1f, 0.78f, 0.18f, 1f)
                     : isSelected
@@ -1208,6 +1389,11 @@ namespace Mandate.Presentation
                     sealSize,
                     sealSize);
                 var locationColor = LocationColor(location);
+                if (townFacilityCount > 0 &&
+                    detailLevel != MapDetailLevel.Strategic)
+                {
+                    DrawTownNodeSilhouette(point, sealSize, townFacilityCount);
+                }
                 GUI.color = border;
                 GUI.DrawTexture(
                     new Rect(
@@ -1235,7 +1421,11 @@ namespace Mandate.Presentation
                 DrawMapPanel(labelRect, 0.87f);
                 var label = detailLevel == MapDetailLevel.Strategic
                     ? location.DisplayName
-                    : location.DisplayName + "\n" + LocationOverlayLabel(location);
+                    : location.DisplayName + "\n" +
+                        LocationOverlayLabel(location) +
+                        (townFacilityCount > 0
+                            ? $" · {townFacilityCount}处建筑"
+                            : string.Empty);
                 GUI.Label(labelRect, label, _mapLabelStyle);
                 var tooltip =
                     $"{location.DisplayName}　{LocationKindName(location.Kind)}　" +
@@ -1257,10 +1447,48 @@ namespace Mandate.Presentation
                         GUIStyle.none))
                 {
                     _selectedLocationId = location.Id;
+                    _enteredTownLocationId = string.Empty;
+                    _enteredTownFacilityId = string.Empty;
                     _message = $"已选择{location.DisplayName}。";
                 }
 
+                if (isCurrent && townFacilityCount > 0 &&
+                    FindJourney(player.Id) == null)
+                {
+                    var enterRect = new Rect(
+                        labelRect.x,
+                        labelRect.yMax + 3f,
+                        labelRect.width,
+                        22f);
+                    if (GUI.Button(enterRect, "进入城镇"))
+                    {
+                        _selectedLocationId = location.Id;
+                        OpenCurrentTown(location);
+                    }
+                }
+
                 GUI.color = previous;
+            }
+        }
+
+        private void DrawTownNodeSilhouette(
+            Vector2 point,
+            float sealSize,
+            int facilityCount)
+        {
+            var shown = Mathf.Clamp(facilityCount, 2, 5);
+            var baseY = point.y + sealSize * 0.56f;
+            for (var i = 0; i < shown; i++)
+            {
+                var width = 13f + i % 2 * 4f;
+                var height = 8f + i % 3 * 2f;
+                var x = point.x - shown * 7f + i * 14f;
+                DrawSolidRect(
+                    new Rect(x, baseY - height, width, height),
+                    new Color(0.20f, 0.16f, 0.11f, 0.88f));
+                DrawSolidRect(
+                    new Rect(x - 2f, baseY - height - 3f, width + 4f, 3f),
+                    ProceduralSilkMapArt.Cinnabar);
             }
         }
 
@@ -1338,11 +1566,17 @@ namespace Mandate.Presentation
             GUI.Label(
                 legendRect,
                 $"{MapDetailLevelName(CurrentMapDetailLevel())}　" +
+                $"模式：{MapNavigationModeName(_mapNavigationMode)}　" +
                 $"视角：{MapPerspectiveName(_mapPerspective)}　" +
                 $"图层：{MapOverlayName(_mapOverlay)}　缩放：{_mapZoom:F1}倍\n" +
                 "金色=玩家　石青=汉军　朱砂=黄巾　线色=道路治安",
                 _mapLabelStyle);
         }
+
+        private static string MapNavigationModeName(MapNavigationMode mode) =>
+            mode == MapNavigationMode.CaravanJourney
+                ? "商队行旅"
+                : "战略舆图";
 
         private static void DrawMapPanel(Rect rect, float opacity)
         {
@@ -1469,6 +1703,11 @@ namespace Mandate.Presentation
                 $"{MapPerspectiveName(_mapPerspective)}情报：" +
                 $"{perspectiveInfo.PrimaryMetric}　{perspectiveInfo.SecondaryMetric}",
                 _normalStyle);
+            if (_mapPerspective == MapPerspective.Commerce ||
+                _mapNavigationMode == MapNavigationMode.CaravanJourney)
+            {
+                DrawLocalMarketDetails(selected);
+            }
             DrawLocationConstruction(selected, player);
 
             var armyCount = 0;
@@ -1495,6 +1734,16 @@ namespace Mandate.Presentation
             if (selected.Id == player.LocationId)
             {
                 GUILayout.Label("这是你当前所在的地点。", _normalStyle);
+                if (GUILayout.Button(
+                        "进入城镇（查看并进入真实建筑）",
+                        GUILayout.Height(38)))
+                {
+                    OpenCurrentTown(selected);
+                }
+                if (_enteredTownLocationId == selected.Id)
+                {
+                    DrawTownFacilities(selected, player);
+                }
                 return;
             }
 
@@ -1511,6 +1760,642 @@ namespace Mandate.Presentation
                     GUILayout.Height(40)))
             {
                 TryStartPlayerJourney(route, selected.Id);
+            }
+        }
+
+        private void DrawTownFacilities(
+            LocationState location,
+            PersonState player)
+        {
+            GUILayout.Space(10);
+            GUILayout.Label(location.DisplayName + "城镇建筑", _sectionStyle);
+            var town = _townOperationSystem.InspectTown(
+                _world,
+                player.Id,
+                location.Id);
+            if (town.Facilities.Count == 0)
+            {
+                GUILayout.Label(
+                    "该地点还没有已建立的可见建筑事实。",
+                    _normalStyle);
+                return;
+            }
+
+            DrawTownOverview(location, town);
+
+            var unplacedCount = 0;
+            for (var i = 0; i < town.Facilities.Count; i++)
+            {
+                if (town.Facilities[i].HasMapPlacement)
+                {
+                    continue;
+                }
+                if (unplacedCount == 0)
+                {
+                    GUILayout.Label("待布置建筑", _sectionStyle);
+                }
+                DrawTownFacilityCard(town.Facilities[i]);
+                GUILayout.Space(7f);
+                unplacedCount++;
+            }
+
+            if (string.IsNullOrEmpty(_enteredTownFacilityId))
+            {
+                return;
+            }
+
+            TownFacilityView entered;
+            try
+            {
+                entered = _townOperationSystem.EnterFacility(
+                    _world,
+                    player.Id,
+                    _enteredTownFacilityId);
+            }
+            catch (Exception exception)
+            {
+                _enteredTownFacilityId = string.Empty;
+                _message = exception.Message;
+                return;
+            }
+
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Label("当前建筑：" + entered.DisplayName, _sectionStyle);
+            DrawTownFacilityContents(location, player, entered);
+            if (entered.OperationIds.Contains(
+                    TownFacilityOperationIds.PrepareCaravan))
+            {
+                if (GUILayout.Button(
+                        "打开经营准备与人物行动",
+                        GUILayout.Height(34)))
+                {
+                    SetPlayerPanel(PlayerPanel.Actions);
+                    _message =
+                        "已从城镇建筑进入经营准备；采购、装货和启程会写回同一世界账。";
+                }
+            }
+            if (GUILayout.Button("离开建筑", GUILayout.Height(28)))
+            {
+                _enteredTownFacilityId = string.Empty;
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void DrawTownOverview(
+            LocationState location,
+            TownOperationView town)
+        {
+            var accessibleCount = 0;
+            for (var i = 0; i < town.Facilities.Count; i++)
+            {
+                if (town.Facilities[i].CanEnter)
+                {
+                    accessibleCount++;
+                }
+            }
+
+            var panorama = GUILayoutUtility.GetRect(
+                320f,
+                Mathf.Clamp(Screen.height * 0.48f, 400f, 620f),
+                GUILayout.ExpandWidth(true));
+            if (_townOverviewTexture != null &&
+                !string.IsNullOrEmpty(
+                    TownVisualPresentation.OverviewResourcePath(location.Id)))
+            {
+                GUI.DrawTexture(
+                    panorama,
+                    _townOverviewTexture,
+                    ScaleMode.ScaleAndCrop,
+                    true);
+            }
+            else
+            {
+                GUI.DrawTextureWithTexCoords(
+                    panorama,
+                    _mapArt.SilkTexture,
+                    new Rect(
+                        0f,
+                        0f,
+                        panorama.width / 128f,
+                        panorama.height / 128f));
+            }
+
+            DrawSolidRect(
+                new Rect(
+                    panorama.x,
+                    panorama.yMax - 64f,
+                    panorama.width,
+                    64f),
+                new Color(0.08f, 0.06f, 0.04f, 0.78f));
+            DrawSolidRect(
+                new Rect(panorama.x, panorama.y, panorama.width, 4f),
+                ProceduralSilkMapArt.Cinnabar);
+            GUI.Label(
+                new Rect(
+                    panorama.x + 18f,
+                    panorama.yMax - 59f,
+                    panorama.width - 36f,
+                    30f),
+                location.DisplayName + "城镇空间近览",
+                _townHeroTitleStyle);
+            GUI.Label(
+                new Rect(
+                    panorama.x + 20f,
+                    panorama.yMax - 31f,
+                    panorama.width - 40f,
+                    24f),
+                $"在册建筑 {town.Facilities.Count} 处　当前可进入 {accessibleCount} 处　" +
+                "点击地图建筑进入",
+                _townHeroDetailStyle);
+            GUI.Label(
+                new Rect(
+                    panorama.xMax - 190f,
+                    panorama.y + 12f,
+                    174f,
+                    30f),
+                "东汉城镇·原创美术",
+                _townHeroDetailStyle);
+
+            for (var i = 0; i < town.Facilities.Count; i++)
+            {
+                var facility = town.Facilities[i];
+                if (!facility.HasMapPlacement)
+                {
+                    continue;
+                }
+
+                var width = Mathf.Clamp(
+                    panorama.width *
+                        facility.FootprintWidthBasisPoints / 10_000f,
+                    96f,
+                    162f);
+                var height = Mathf.Clamp(
+                    panorama.height *
+                        facility.FootprintHeightBasisPoints / 10_000f,
+                    58f,
+                    88f);
+                var centerX = panorama.x + panorama.width *
+                    facility.MapXBasisPoints / 10_000f;
+                var centerY = panorama.y + panorama.height *
+                    facility.MapYBasisPoints / 10_000f;
+                DrawTownFacilityMarker(
+                    new Rect(
+                        centerX - width * 0.5f,
+                        centerY - height * 0.5f,
+                        width,
+                        height),
+                    facility);
+            }
+            GUILayout.Space(10f);
+        }
+
+        private void DrawTownFacilityMarker(
+            Rect marker,
+            TownFacilityView facility)
+        {
+            var visual = TownVisualPresentation.Describe(facility.KindId);
+            var tone = TownToneColor(visual.Tone);
+            var entered = facility.FacilityId == _enteredTownFacilityId;
+            var background = facility.CanEnter
+                ? new Color(0.91f, 0.84f, 0.66f, 0.96f)
+                : new Color(0.42f, 0.40f, 0.36f, 0.94f);
+            if (entered)
+            {
+                background = new Color(0.98f, 0.85f, 0.48f, 1f);
+            }
+
+            DrawSolidRect(marker, ProceduralSilkMapArt.Ink);
+            var inner = new Rect(
+                marker.x + 2f,
+                marker.y + 2f,
+                marker.width - 4f,
+                marker.height - 4f);
+            DrawSolidRect(inner, background);
+            DrawSolidRect(
+                new Rect(inner.x, inner.y, inner.width, 5f),
+                tone);
+            var seal = new Rect(
+                inner.x + 7f,
+                inner.y + 11f,
+                Mathf.Min(32f, inner.height - 18f),
+                Mathf.Min(32f, inner.height - 18f));
+            DrawSolidRect(seal, tone);
+            GUI.Label(seal, visual.Seal, _mapSealStyle);
+            GUI.Label(
+                new Rect(
+                    seal.xMax + 6f,
+                    inner.y + 9f,
+                    inner.xMax - seal.xMax - 10f,
+                    22f),
+                facility.DisplayName,
+                _townCardTitleStyle);
+            GUI.Label(
+                new Rect(
+                    seal.xMax + 6f,
+                    inner.y + 31f,
+                    inner.xMax - seal.xMax - 10f,
+                    19f),
+                TownVisualPresentation.DistrictName(facility.DistrictId) +
+                (facility.CanEnter ? " · 可进入" : " · 权限受限"),
+                _townCardDetailStyle);
+
+            GUI.enabled = facility.CanEnter;
+            if (GUI.Button(
+                    marker,
+                    new GUIContent(
+                        string.Empty,
+                        facility.CanEnter
+                            ? "点击进入" + facility.DisplayName
+                            : facility.UnavailableReason),
+                    GUIStyle.none))
+            {
+                TryEnterTownFacility(facility);
+            }
+            GUI.enabled = true;
+        }
+
+        private void DrawTownFacilityCard(TownFacilityView facility)
+        {
+            var visual = TownVisualPresentation.Describe(facility.KindId);
+            var card = GUILayoutUtility.GetRect(
+                230f,
+                132f,
+                GUILayout.ExpandWidth(true));
+            var entered = facility.FacilityId == _enteredTownFacilityId;
+            var tone = TownToneColor(visual.Tone);
+            var background = facility.CanEnter
+                ? new Color(0.84f, 0.77f, 0.60f, 0.96f)
+                : new Color(0.42f, 0.40f, 0.36f, 0.94f);
+            if (entered)
+            {
+                background = new Color(0.91f, 0.81f, 0.55f, 1f);
+            }
+
+            DrawSolidRect(card, ProceduralSilkMapArt.Ink);
+            var inner = new Rect(
+                card.x + 3f,
+                card.y + 3f,
+                card.width - 6f,
+                card.height - 6f);
+            DrawSolidRect(inner, background);
+            DrawSolidRect(
+                new Rect(inner.x, inner.y, 7f, inner.height),
+                tone);
+
+            var seal = new Rect(inner.x + 18f, inner.y + 17f, 58f, 58f);
+            DrawSolidRect(
+                new Rect(
+                    seal.x - 3f,
+                    seal.y - 3f,
+                    seal.width + 6f,
+                    seal.height + 6f),
+                ProceduralSilkMapArt.Ink);
+            DrawSolidRect(seal, tone);
+            GUI.Label(seal, visual.Seal, _mapSealStyle);
+
+            var titleX = seal.xMax + 14f;
+            GUI.Label(
+                new Rect(
+                    titleX,
+                    inner.y + 13f,
+                    inner.xMax - titleX - 12f,
+                    28f),
+                facility.DisplayName,
+                _townCardTitleStyle);
+            GUI.Label(
+                new Rect(
+                    titleX,
+                    inner.y + 42f,
+                    inner.xMax - titleX - 12f,
+                    22f),
+                visual.Category,
+                _townCardDetailStyle);
+            GUI.Label(
+                new Rect(
+                    inner.x + 18f,
+                    inner.y + 82f,
+                    inner.width - 36f,
+                    21f),
+                "所有者：" + facility.OwnerName +
+                (string.IsNullOrEmpty(facility.ManagerName)
+                    ? string.Empty
+                    : "　负责人：" + facility.ManagerName),
+                _townCardDetailStyle);
+            GUI.Label(
+                new Rect(
+                    inner.x + 18f,
+                    inner.y + 104f,
+                    inner.width - 36f,
+                    20f),
+                entered
+                    ? "● 当前所在建筑"
+                    : facility.CanEnter
+                        ? "● 开放进入"
+                        : "○ " + facility.UnavailableReason,
+                _townCardDetailStyle);
+
+            GUI.enabled = facility.CanEnter;
+            if (GUI.Button(
+                    card,
+                    new GUIContent(
+                        string.Empty,
+                        facility.CanEnter
+                            ? "点击进入" + facility.DisplayName
+                            : facility.UnavailableReason),
+                    GUIStyle.none))
+            {
+                TryEnterTownFacility(facility);
+            }
+            GUI.enabled = true;
+        }
+
+        private void TryEnterTownFacility(TownFacilityView facility)
+        {
+            try
+            {
+                _townOperationSystem.EnterFacility(
+                    _world,
+                    _world.PlayerPersonId,
+                    facility.FacilityId);
+                _enteredTownFacilityId = facility.FacilityId;
+                _message = "已进入" + facility.DisplayName + "。";
+            }
+            catch (Exception exception)
+            {
+                _message = exception.Message;
+            }
+        }
+
+        private static Color TownToneColor(TownFacilityVisualTone tone)
+        {
+            switch (tone)
+            {
+                case TownFacilityVisualTone.Commerce:
+                    return new Color(0.66f, 0.35f, 0.13f, 1f);
+                case TownFacilityVisualTone.Organization:
+                    return new Color(0.60f, 0.18f, 0.12f, 1f);
+                case TownFacilityVisualTone.Storage:
+                    return new Color(0.43f, 0.31f, 0.15f, 1f);
+                case TownFacilityVisualTone.Hospitality:
+                    return new Color(0.38f, 0.49f, 0.25f, 1f);
+                case TownFacilityVisualTone.Transport:
+                    return new Color(0.22f, 0.43f, 0.52f, 1f);
+                case TownFacilityVisualTone.Guild:
+                    return new Color(0.43f, 0.28f, 0.48f, 1f);
+                case TownFacilityVisualTone.Government:
+                    return new Color(0.30f, 0.30f, 0.28f, 1f);
+                default:
+                    return ProceduralSilkMapArt.Ochre;
+            }
+        }
+
+        private void DrawTownFacilityContents(
+            LocationState location,
+            PersonState player,
+            TownFacilityView facility)
+        {
+            if (facility.KindId == TownFacilityKindIds.Market)
+            {
+                DrawLocalMarketDetails(location);
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.MerchantHall)
+            {
+                var branch = _world.MerchantBranches.Find(item =>
+                    item.LocationId == location.Id && item.IsHeadquarters);
+                var organization = branch == null
+                    ? null
+                    : _world.Organizations.Find(item =>
+                        item.Id == branch.OrganizationId);
+                if (organization == null)
+                {
+                    GUILayout.Label(
+                        "此处没有登记中的商号据点。",
+                        _normalStyle);
+                    return;
+                }
+                var memberCount = _world.Memberships.FindAll(item =>
+                    item.OrganizationId == organization.Id).Count;
+                GUILayout.Label(
+                    $"{organization.DisplayName}　资金{organization.Treasury}钱　" +
+                    $"声望{organization.ReputationBasisPoints / 100f:F1}%　" +
+                    $"成员{memberCount}人",
+                    _normalStyle);
+                GUILayout.Label(
+                    "主堂提供商号账本、成员与商旅准备入口；经营结果仍由正式市场、库存和行程系统结算。",
+                    _normalStyle);
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.Warehouse)
+            {
+                long quantity = 0;
+                long weight = 0;
+                var batchCount = 0;
+                for (var i = 0; i < _world.ProductBatches.Count; i++)
+                {
+                    var batch = _world.ProductBatches[i];
+                    if (batch.InventoryContainerId !=
+                        facility.InventoryContainerId || batch.Quantity <= 0)
+                    {
+                        continue;
+                    }
+                    quantity = checked(quantity + batch.Quantity);
+                    weight = checked(
+                        weight + batch.Quantity * batch.UnitWeight);
+                    batchCount++;
+                }
+                var container = _world.InventoryContainers.Find(item =>
+                    item.Id == facility.InventoryContainerId);
+                GUILayout.Label(
+                    $"正式库存：{batchCount}批、{quantity}单位、{weight}/" +
+                    $"{(container == null ? 0 : container.CapacityWeight)}重量",
+                    _normalStyle);
+                GUILayout.Label(
+                    batchCount == 0
+                        ? "仓库当前为空；它不会自动生成商品，采购或生产后才会出现具体批次。"
+                        : "每批货物保留产品、所有者、来源、数量、品质与存放容器。",
+                    _normalStyle);
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.Inn)
+            {
+                var shown = 0;
+                GUILayout.Label(
+                    "本地可接触人物（招募合同将在后续子任务建立）：",
+                    _normalStyle);
+                for (var i = 0; i < _world.People.Count && shown < 5; i++)
+                {
+                    var person = _world.People[i];
+                    if (!person.IsAlive || person.Id == player.Id ||
+                        person.LocationId != location.Id)
+                    {
+                        continue;
+                    }
+                    GUILayout.Label("· " + person.DisplayName, _normalStyle);
+                    shown++;
+                }
+                if (shown == 0)
+                {
+                    GUILayout.Label(
+                        "目前没有可见的本地人物。",
+                        _normalStyle);
+                }
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.VehicleYard)
+            {
+                GUILayout.Label(
+                    $"当前人物载重：{player.CargoCapacity}；" +
+                    "载具、牲畜和耐久合同将在后续商队任务中接入。",
+                    _normalStyle);
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.GuildHall)
+            {
+                GUILayout.Label(
+                    "这里汇集商会、居民与军队的真实需求；可承接委托来自任务系统。",
+                    _normalStyle);
+                return;
+            }
+
+            if (facility.KindId == TownFacilityKindIds.GovernmentOffice)
+            {
+                GUILayout.Label(
+                    "官署用于查看许可、税费与官府任务；具体权限仍由人物职位和组织关系决定。",
+                    _normalStyle);
+                return;
+            }
+
+            GUILayout.Label(
+                "该建筑暂时没有可执行的经营操作。",
+                _normalStyle);
+        }
+
+        private void DrawLocalMarketDetails(LocationState location)
+        {
+            GUILayout.Space(6);
+            GUILayout.Label("当地市场", _sectionStyle);
+            var count = 0;
+            for (var i = 0; i < _world.MarketListings.Count; i++)
+            {
+                var listing = _world.MarketListings[i];
+                if (listing.LocationId != location.Id)
+                {
+                    continue;
+                }
+                var commodity = _world.Commodities.Find(item =>
+                    item.Id == listing.CommodityId);
+                GUILayout.Label(
+                    $"{(commodity == null ? listing.CommodityId : commodity.DisplayName)}　" +
+                    $"现价{listing.Price}钱　库存{listing.Stock}　" +
+                    $"常态库存{listing.TargetStock}",
+                    _normalStyle);
+                count++;
+            }
+            if (count == 0)
+            {
+                GUILayout.Label("当前没有可公开查询的市场货单。", _normalStyle);
+            }
+        }
+
+        private void DrawCaravanJourneyStatus(
+            PersonState player,
+            JourneyState journey)
+        {
+            GUILayout.Space(10);
+            GUILayout.Label("商队行旅账", _sectionStyle);
+            long cargoWeight = 0;
+            long clothQuantity = 0;
+            var batchCount = 0;
+            for (var containerIndex = 0;
+                 containerIndex < _world.InventoryContainers.Count;
+                 containerIndex++)
+            {
+                var container = _world.InventoryContainers[containerIndex];
+                if (container.CarrierPersonId != player.Id)
+                {
+                    continue;
+                }
+                for (var batchIndex = 0;
+                     batchIndex < _world.ProductBatches.Count;
+                     batchIndex++)
+                {
+                    var batch = _world.ProductBatches[batchIndex];
+                    if (batch.InventoryContainerId != container.Id ||
+                        batch.Quantity <= 0)
+                    {
+                        continue;
+                    }
+                    cargoWeight = checked(
+                        cargoWeight + batch.Quantity * batch.UnitWeight);
+                    if (batch.ProductDefinitionId ==
+                        CoreProductionContent.PlainClothProductId)
+                    {
+                        clothQuantity = checked(
+                            clothQuantity + batch.Quantity);
+                    }
+                    batchCount++;
+                }
+            }
+            for (var i = 0; i < _world.Inventories.Count; i++)
+            {
+                var stack = _world.Inventories[i];
+                if (stack.OwnerPersonId != player.Id)
+                {
+                    continue;
+                }
+                var commodity = _world.Commodities.Find(item =>
+                    item.Id == stack.CommodityId);
+                if (commodity != null)
+                {
+                    cargoWeight = checked(
+                        cargoWeight + (long)stack.Quantity *
+                        commodity.UnitWeight);
+                }
+            }
+
+            GUILayout.Label(
+                $"载货：{cargoWeight}/{player.CargoCapacity}重量　" +
+                $"正式批次{batchCount}批　素布{clothQuantity}匹　" +
+                $"口粮{player.Provisions}份",
+                _normalStyle);
+            GUILayout.Label(
+                journey == null
+                    ? $"位置：{FindLocationName(player.LocationId)}　车队当前停驻"
+                    : $"路线：{FindLocationName(journey.OriginLocationId)}→" +
+                      $"{FindLocationName(journey.DestinationLocationId)}　" +
+                      $"剩余{journey.RemainingKilometers}公里",
+                _normalStyle);
+
+            var companion = _world.People.Find(item =>
+                item.Id == "person.su_shuang");
+            if (companion != null)
+            {
+                var relationship = _world.Relationships.Find(item =>
+                    item.FromPersonId == player.Id &&
+                    item.ToPersonId == companion.Id);
+                GUILayout.Label(
+                    $"同行：{companion.DisplayName}　" +
+                    $"信任{(relationship == null ? 0 : relationship.Trust)}　" +
+                    $"状态{(FindJourney(companion.Id) == null ? "停驻" : "在途")}",
+                    _normalStyle);
+            }
+
+            var goal = _playerActionService.InspectMerchantGoal(
+                _world, player.Id);
+            if (goal.IsAvailable && goal.MarketOpportunity != null)
+            {
+                GUILayout.Label(
+                    $"已知商机：{FindLocationName(goal.MarketOpportunity.OriginLocationId)}" +
+                    $"→{FindLocationName(goal.MarketOpportunity.TargetLocationId)}　" +
+                    $"口信毛利{goal.MarketOpportunity.ExpectedGrossMargin}钱　" +
+                    $"可信度{goal.MarketOpportunity.ReliabilityBasisPoints / 100f:F1}%",
+                    _normalStyle);
             }
         }
 
@@ -2318,13 +3203,29 @@ namespace Mandate.Presentation
                 GUILayout.BeginVertical(GUI.skin.box);
                 GUILayout.Label(action.DisplayName, _sectionStyle);
                 GUILayout.Label(action.Description, _normalStyle);
+                if (!string.IsNullOrWhiteSpace(action.Motivation))
+                {
+                    GUILayout.Label("缘由：" + action.Motivation, _normalStyle);
+                }
+                if (!string.IsNullOrWhiteSpace(action.ExpectedOutcome))
+                {
+                    GUILayout.Label("预期：" + action.ExpectedOutcome, _normalStyle);
+                }
+                if (!string.IsNullOrWhiteSpace(action.Cost))
+                {
+                    GUILayout.Label("代价：" + action.Cost, _normalStyle);
+                }
+                if (!string.IsNullOrWhiteSpace(action.KnownRisk))
+                {
+                    GUILayout.Label("已知风险：" + action.KnownRisk, _normalStyle);
+                }
                 if (!action.IsAvailable)
                 {
                     GUILayout.Label(
                         "暂不可用：" + action.UnavailableReason,
                         _normalStyle);
                 }
-                GUI.enabled = action.IsAvailable;
+                GUI.enabled = action.IsAvailable && !_actionPresentation.IsActive;
                 if (GUILayout.Button("执行", GUILayout.Height(32)))
                 {
                     try
@@ -2332,6 +3233,11 @@ namespace Mandate.Presentation
                         var result = _playerActionService.Execute(
                             _world, player.Id, action.Id);
                         _message = PlayerActionSummary(result);
+                        _actionPresentation.Begin(
+                            result.ResultId,
+                            result.PresentationCue,
+                            _message,
+                            Time.realtimeSinceStartup);
                         _actionLog.Insert(
                             0,
                             $"第{_world.AbsoluteDay + 1}日　" + _message);
@@ -2388,6 +3294,63 @@ namespace Mandate.Presentation
 
         private static string Signed(long value) =>
             value > 0 ? "+" + value : value.ToString();
+
+        private void DrawTrackedMerchantGoal()
+        {
+            if (_playerActionService == null || _world == null)
+            {
+                return;
+            }
+
+            var goal = _playerActionService.InspectMerchantGoal(
+                _world, _world.PlayerPersonId);
+            if (!goal.IsAvailable)
+            {
+                return;
+            }
+
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Label("当前目标：" + goal.DisplayName, _sectionStyle);
+            GUILayout.Label(goal.CurrentObjective, _normalStyle);
+            GUILayout.Label("追踪：" + goal.TrackedObjective, _normalStyle);
+            GUILayout.Label("家中：" + goal.FamilySituation, _normalStyle);
+            if (goal.MarketOpportunity != null)
+            {
+                var intel = goal.MarketOpportunity;
+                GUILayout.Label(
+                    $"行情来源：{intel.SourceName}（第{intel.LearnedDay + 1}日，可靠度{intel.ReliabilityBasisPoints / 100f:0}%）",
+                    _normalStyle);
+                GUILayout.Label(
+                    $"估价：中山{intel.ExpectedOriginUnitPrice} / 涿县{intel.ExpectedTargetUnitPrice}；预计毛差{intel.ExpectedGrossMargin}，路程约{intel.EstimatedTravelDays}日，口粮约{intel.EstimatedProvisionCost}。",
+                    _normalStyle);
+            }
+            if (!string.IsNullOrWhiteSpace(goal.LatestImportantResult))
+            {
+                GUILayout.Label("记忆：" + goal.LatestImportantResult, _normalStyle);
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void DrawActionPresentation()
+        {
+            if (!_actionPresentation.IsActive)
+            {
+                return;
+            }
+
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Label("行动结果", _sectionStyle);
+            GUILayout.Label(_actionPresentation.Summary, _normalStyle);
+            GUILayout.HorizontalSlider(
+                _actionPresentation.Progress(Time.realtimeSinceStartup),
+                0f,
+                1f);
+            if (GUILayout.Button("跳过表现（结果已经结算）", GUILayout.Height(26)))
+            {
+                _actionPresentation.Skip();
+            }
+            GUILayout.EndVertical();
+        }
 
         private void DrawDeveloperDashboard()
         {
@@ -3701,9 +4664,12 @@ namespace Mandate.Presentation
 
         private void RebindServices()
         {
+            _enteredTownLocationId = string.Empty;
+            _enteredTownFacilityId = string.Empty;
             _simulator = new WorldSimulator(
                 _world.MasterSeed, LoadProductionContent());
-            _playerActionService = new PlayerActionService(_simulator);
+            _playerActionService = new PlayerActionService(
+                _simulator, _merchantContent);
             _decisionSystem = new NpcDecisionSystem(_world.MasterSeed);
             _actionResolver = new NpcActionResolver(_world.MasterSeed);
             _battleResolver = new BattleResolver(_world.MasterSeed);
@@ -3721,6 +4687,20 @@ namespace Mandate.Presentation
             }
 
             return ProductionContentRegistry.FromJson(asset.text);
+        }
+
+        private static MerchantHouseholdContentRegistry
+            LoadMerchantHouseholdContent()
+        {
+            var asset = Resources.Load<TextAsset>(
+                "Content/Core/Gameplay/merchant-household-p1");
+            if (asset == null)
+            {
+                throw new InvalidOperationException(
+                    "Merchant-household P1 content resource is missing.");
+            }
+
+            return MerchantHouseholdContentRegistry.FromJson(asset.text);
         }
 
         private void ResolveMonthlyNpcActions()
@@ -4196,6 +5176,32 @@ namespace Mandate.Presentation
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = new Color(0.95f, 0.85f, 0.59f, 1f) }
+            };
+            _townHeroTitleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 24,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.96f, 0.86f, 0.63f, 1f) }
+            };
+            _townHeroDetailStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 14,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleLeft,
+                normal = { textColor = new Color(0.94f, 0.88f, 0.72f, 1f) }
+            };
+            _townCardTitleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 18,
+                fontStyle = FontStyle.Bold,
+                clipping = TextClipping.Clip,
+                normal = { textColor = ProceduralSilkMapArt.Ink }
+            };
+            _townCardDetailStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 13,
+                clipping = TextClipping.Clip,
+                normal = { textColor = ProceduralSilkMapArt.Ink }
             };
         }
 

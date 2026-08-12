@@ -1,0 +1,51 @@
+{
+  "PackageId": "mandate.gameplay.merchant_household.p1",
+  "Version": "1.0.0",
+  "Goals": [
+    {
+      "Id": "goal.m26p1.zhongshan_zhuo_household_recovery",
+      "DisplayName": "把中山布帛送到涿县，缓解家中债务",
+      "OriginLocationId": "location.zhongshan",
+      "TargetLocationId": "location.zhuo",
+      "RouteId": "route.zhuo_zhongshan",
+      "CommodityId": "commodity.cloth",
+      "CargoQuantity": 6,
+      "ExpectedOriginUnitPrice": 165,
+      "ExpectedTargetUnitPrice": 195,
+      "IntelligenceReliabilityBasisPoints": 7500,
+      "IntelligenceSourceName": "中山商行昨日行脚口信",
+      "IssuerOrganizationId": "organization.zhongshan_merchants",
+      "CompanionPersonId": "person.su_shuang",
+      "InitialFamilyDebt": 600,
+      "PersonalReserveContribution": 200,
+      "GuildAdvanceMoney": 400,
+      "GuildAdvanceDebt": 440,
+      "DeliveryCommission": 300,
+      "LateCommission": 150,
+      "DebtRepayment": 600,
+      "CartInvestmentCost": 500,
+      "CartCapacityGain": 40,
+      "DurationDays": 20,
+      "TravelEventId": "event.m26p1.roadside_broken_cart",
+      "DebtFollowupDefinitionId": "task_definition.m26p1.rebuild_household_reserve",
+      "CartFollowupDefinitionId": "task_definition.m26p1.expand_trade_route"
+    }
+  ],
+  "TravelEvents": [
+    {
+      "Id": "event.m26p1.roadside_broken_cart",
+      "DisplayName": "滹沱河道旁的折轴车",
+      "SpeakerRole": "同行商人苏双",
+      "TriggerRemainingKilometers": 116,
+      "HelpProvisionCost": 2,
+      "GuardProvisionCost": 1,
+      "RefuseProvisionCost": 1,
+      "HelpTrustGain": 500,
+      "GuardTrustChange": 100,
+      "RefuseTrustChange": -300,
+      "HelpCargoLossChanceBasisPoints": 2500,
+      "GuardInjuryChanceBasisPoints": 2000,
+      "GuardHealthLoss": 800
+    }
+  ]
+}

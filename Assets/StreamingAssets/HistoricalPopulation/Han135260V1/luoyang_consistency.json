@@ -1,0 +1,32 @@
+{
+  "schema": "mandate.luoyang-national-population-consistency.v1",
+  "year": 184,
+  "henan_yin_registered_population": 1073655,
+  "henan_yin_modeled_actual_population": 1070779,
+  "luoyang_county_modeled_actual_population": 130169,
+  "luoyang_walled_population": 200000,
+  "luoyang_urban_population": 270000,
+  "luoyang_metropolitan_population": 400000,
+  "luoyang_metropolitan_share_of_henan_yin": 0.37355981,
+  "metropolitan_conclusion": "PASS",
+  "supply_region_candidate_population": 700000,
+  "supply_region_county_ids": [
+    "admin.han140.sili.henan.chenggao",
+    "admin.han140.sili.henan.goushi",
+    "admin.han140.sili.henan.jing",
+    "admin.han140.sili.henan.juan",
+    "admin.han140.sili.henan.kaifeng",
+    "admin.han140.sili.henan.luoyang",
+    "admin.han140.sili.henan.mi",
+    "admin.han140.sili.henan.pingyin",
+    "admin.han140.sili.henan.xincheng",
+    "admin.han140.sili.henan.yangwu",
+    "admin.han140.sili.henan.yingyang",
+    "admin.han140.sili.henan.yuanwu",
+    "admin.han140.sili.henan.zhongmou"
+  ],
+  "supply_region_represented_population": 735269,
+  "supply_region_conclusion": "KEEP_700K",
+  "double_counting_rule": "700K is an inclusive supply-region envelope containing the 400K metropolitan population; it is not 400K+700K.",
+  "notes": "河南尹采用全国时间线值；既有400K Person包未被修改。"
+}

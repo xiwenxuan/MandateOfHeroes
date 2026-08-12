@@ -1,0 +1,8 @@
+{
+  "scenario_id": "S03_189",
+  "year": 189,
+  "snapshot_moment": "YEAR_START",
+  "source_year_file": "../years/year_189.json",
+  "source_year_sha256": "48d5c7f58bafe1596e3c23f192854525c8af6ed20cf6e11d75162f8917a033cb",
+  "derivation": "direct_reference_to_annual_population_timeline"
+}

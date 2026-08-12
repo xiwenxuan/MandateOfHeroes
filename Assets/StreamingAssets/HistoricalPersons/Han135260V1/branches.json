@@ -1,0 +1,265 @@
+{
+  "schema": "mandate.historical-lineage-branch-master.v1",
+  "branches": [
+    {
+      "branch_id": "branch.han.v1.f415.eastern_han_mainline",
+      "clan_id": "clan.han.v1.f415",
+      "parent_branch_id": null,
+      "branch_name": "东汉帝系",
+      "founder_person_id": "P0001",
+      "origin_region_id": "admin.han140.yuzhou.chen",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f092.yuan_feng",
+      "clan_id": "clan.han.v1.f092",
+      "parent_branch_id": null,
+      "branch_name": "袁逢支",
+      "founder_person_id": "P0012",
+      "origin_region_id": "admin.han140.yuzhou.runan",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f092.yuan_wei",
+      "clan_id": "clan.han.v1.f092",
+      "parent_branch_id": null,
+      "branch_name": "袁隗支",
+      "founder_person_id": "P0013",
+      "origin_region_id": "admin.han140.yuzhou.runan",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f102.sima_yi",
+      "clan_id": "clan.han.v1.f102",
+      "parent_branch_id": null,
+      "branch_name": "司马懿支",
+      "founder_person_id": "P0148",
+      "origin_region_id": "admin.han140.sili.henei",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f102.sima_fu",
+      "clan_id": "clan.han.v1.f102",
+      "parent_branch_id": null,
+      "branch_name": "司马孚支",
+      "founder_person_id": "P0149",
+      "origin_region_id": "admin.han140.sili.henei",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f120.zhuge_jin",
+      "clan_id": "clan.han.v1.f120",
+      "parent_branch_id": null,
+      "branch_name": "诸葛瑾支",
+      "founder_person_id": "P0258",
+      "origin_region_id": "admin.han140.xuzhou.langya.yangdu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f120.zhuge_liang",
+      "clan_id": "clan.han.v1.f120",
+      "parent_branch_id": null,
+      "branch_name": "诸葛亮支",
+      "founder_person_id": "P0193",
+      "origin_region_id": "admin.han140.xuzhou.langya.yangdu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f120.zhuge_dan",
+      "clan_id": "clan.han.v1.f120",
+      "parent_branch_id": null,
+      "branch_name": "诸葛诞支",
+      "founder_person_id": "P0169",
+      "origin_region_id": "admin.han140.xuzhou.langya.yangdu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f133.cao_song",
+      "clan_id": "clan.han.v1.f133",
+      "parent_branch_id": null,
+      "branch_name": "曹嵩—曹操支",
+      "founder_person_id": "P0107",
+      "origin_region_id": "admin.han140.yuzhou.pei",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f133.cao_ren",
+      "clan_id": "clan.han.v1.f133",
+      "parent_branch_id": null,
+      "branch_name": "曹仁支",
+      "founder_person_id": "P0120",
+      "origin_region_id": "admin.han140.yuzhou.pei",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f133.cao_hong",
+      "clan_id": "clan.han.v1.f133",
+      "parent_branch_id": null,
+      "branch_name": "曹洪支",
+      "founder_person_id": "P0121",
+      "origin_region_id": "admin.han140.yuzhou.pei",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f045.sun_jian",
+      "clan_id": "clan.han.v1.f045",
+      "parent_branch_id": null,
+      "branch_name": "孙坚支",
+      "founder_person_id": "P0231",
+      "origin_region_id": "admin.han140.yangzhou.wu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f045.sun_jing",
+      "clan_id": "clan.han.v1.f045",
+      "parent_branch_id": null,
+      "branch_name": "孙静支",
+      "founder_person_id": "P0237",
+      "origin_region_id": "admin.han140.yangzhou.wu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f045.sun_qiang",
+      "clan_id": "clan.han.v1.f045",
+      "parent_branch_id": null,
+      "branch_name": "孙羌支",
+      "founder_person_id": "P0238",
+      "origin_region_id": "admin.han140.yangzhou.wu",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    },
+    {
+      "branch_id": "branch.han.v1.f154.xun_shu",
+      "clan_id": "clan.han.v1.f154",
+      "parent_branch_id": null,
+      "branch_name": "荀淑后裔支",
+      "founder_person_id": "P0536",
+      "origin_region_id": "admin.han140.yuzhou.yingchuan",
+      "start_year": null,
+      "end_year": null,
+      "branch_description": "依据V5明确谱系骨架建立的保守支系；不代表运行时共同生活或共同资产。",
+      "evidence_level": "B",
+      "source": "Existing Historical Dataset V5",
+      "notes": null
+    }
+  ],
+  "branch_members": {
+    "branch.han.v1.f415.eastern_han_mainline": [
+      "P0001",
+      "P0038",
+      "P0039",
+      "P0040"
+    ],
+    "branch.han.v1.f092.yuan_feng": [
+      "P0012"
+    ],
+    "branch.han.v1.f092.yuan_wei": [
+      "P0013"
+    ],
+    "branch.han.v1.f133.cao_song": [
+      "P0107"
+    ],
+    "branch.han.v1.f133.cao_ren": [
+      "P0120"
+    ],
+    "branch.han.v1.f133.cao_hong": [
+      "P0121"
+    ],
+    "branch.han.v1.f102.sima_yi": [
+      "P0148"
+    ],
+    "branch.han.v1.f102.sima_fu": [
+      "P0149"
+    ],
+    "branch.han.v1.f120.zhuge_dan": [
+      "P0169"
+    ],
+    "branch.han.v1.f120.zhuge_liang": [
+      "P0193"
+    ],
+    "branch.han.v1.f045.sun_jian": [
+      "P0231"
+    ],
+    "branch.han.v1.f045.sun_jing": [
+      "P0237"
+    ],
+    "branch.han.v1.f045.sun_qiang": [
+      "P0238"
+    ],
+    "branch.han.v1.f120.zhuge_jin": [
+      "P0258"
+    ],
+    "branch.han.v1.f154.xun_shu": [
+      "P0536"
+    ]
+  }
+}

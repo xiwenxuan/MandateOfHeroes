@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Mandate.Domain;
 using Mandate.Persistence;
 using Mandate.Simulation;
@@ -8,7 +9,7 @@ using NUnit.Framework;
 
 namespace Mandate.Tests
 {
-    public sealed class WorldKernelTests
+    public sealed partial class WorldKernelTests
     {
         [Test]
         public void WorldTime_CarriesSegmentsIntoNextDay()
@@ -952,20 +953,8 @@ namespace Mandate.Tests
             var equipmentStocksBefore =
                 EquipmentStockQuantity(first);
             Assert.That(woundedBefore, Is.GreaterThan(0));
-            Assert.That(
-                new TradingSystem().Buy(
-                    first,
-                    new StableId(firstPhysician.Id),
-                    new StableId("commodity.herbs"),
-                    5).Success,
-                Is.True);
-            Assert.That(
-                new TradingSystem().Buy(
-                    second,
-                    new StableId(secondPhysician.Id),
-                    new StableId("commodity.herbs"),
-                    5).Success,
-                Is.True);
+            var firstMedicineBefore = ArmyMedicineQuantity(first, firstArmy);
+            var secondMedicineBefore = ArmyMedicineQuantity(second, secondArmy);
 
             var firstResult = new MedicalSystem(first.MasterSeed).TreatArmyWounded(
                 first,
@@ -999,14 +988,18 @@ namespace Mandate.Tests
             Assert.That(
                 EquipmentStockQuantity(first),
                 Is.EqualTo(equipmentStocksBefore));
-            var remainingHerbs = first.Inventories.Find(
-                item =>
-                    item.OwnerPersonId == firstPhysician.Id &&
-                    item.CommodityId == "commodity.herbs");
-            Assert.That(remainingHerbs, Is.Not.Null);
             Assert.That(
-                remainingHerbs.Quantity,
-                Is.EqualTo(5 - firstResult.HerbsConsumed));
+                ArmyMedicineQuantity(first, firstArmy),
+                Is.EqualTo(firstMedicineBefore - firstResult.HerbsConsumed));
+            Assert.That(
+                ArmyMedicineQuantity(second, secondArmy),
+                Is.EqualTo(secondMedicineBefore - secondResult.HerbsConsumed));
+            Assert.That(
+                first.MilitaryMedicalServices.Count,
+                Is.EqualTo(firstResult.RecoveredTroops));
+            Assert.That(
+                first.MilitaryMedicalCases.Count,
+                Is.EqualTo(firstResult.RecoveredTroops));
         }
 
         [Test]
@@ -1023,6 +1016,7 @@ namespace Mandate.Tests
             var army = world.Armies.Find(
                 item => item.Id == "army.han_jizhou_vanguard");
             var woundedBefore = army.WoundedTroops;
+            RemoveArmyMedicine(world, army);
 
             var result = new MedicalSystem(world.MasterSeed).TreatArmyWounded(
                 world,
@@ -1058,20 +1052,6 @@ namespace Mandate.Tests
                 item => item.Id == "army.han_jizhou_vanguard");
             var accessedArmy = accessed.Armies.Find(
                 item => item.Id == "army.han_jizhou_vanguard");
-            Assert.That(
-                new TradingSystem().Buy(
-                    inline,
-                    new StableId(inlinePhysician.Id),
-                    new StableId("commodity.herbs"),
-                    5).Success,
-                Is.True);
-            Assert.That(
-                new TradingSystem().Buy(
-                    accessed,
-                    new StableId(accessedPhysician.Id),
-                    new StableId("commodity.herbs"),
-                    5).Success,
-                Is.True);
             var repository = new WorldStatePersonRepository(accessed);
 
             var inlineResult = new MedicalSystem(inline.MasterSeed)
@@ -1096,10 +1076,14 @@ namespace Mandate.Tests
                 Is.EqualTo(WorldSnapshotSerializer.Serialize(inline)));
             var changedPeople = repository.GetChangedPersonIds();
             Assert.That(changedPeople.Count, Is.EqualTo(
-                accessedResult.RecoveredTroops));
-            Assert.That(changedPeople, Does.Not.Contain(accessedPhysician.Id));
+                accessedResult.RecoveredTroops + 1));
+            Assert.That(changedPeople, Does.Contain(accessedPhysician.Id));
             for (var i = 0; i < changedPeople.Count; i++)
             {
+                if (changedPeople[i] == accessedPhysician.Id)
+                {
+                    continue;
+                }
                 var service = accessed.MilitaryServices.Find(
                     item => item.PersonId == changedPeople[i]);
                 Assert.That(service, Is.Not.Null);
@@ -1128,6 +1112,7 @@ namespace Mandate.Tests
             var army = world.Armies.Find(
                 item => item.Id == "army.han_jizhou_vanguard");
             var repository = new WorldStatePersonRepository(world);
+            RemoveArmyMedicine(world, army);
             var before = WorldSnapshotSerializer.Serialize(world);
 
             var result = new MedicalSystem(
@@ -1158,11 +1143,6 @@ namespace Mandate.Tests
                 item => item.Id == "person.generated.physician_001");
             var army = world.Armies.Find(
                 item => item.Id == "army.han_jizhou_vanguard");
-            new TradingSystem().Buy(
-                world,
-                new StableId(physician.Id),
-                new StableId("commodity.herbs"),
-                5);
             new MedicalSystem(world.MasterSeed).TreatArmyWounded(
                 world,
                 new StableId(physician.Id),
@@ -1179,6 +1159,4242 @@ namespace Mandate.Tests
             Assert.That(
                 loaded.MedicalTreatments[0].RecoveredTroops,
                 Is.GreaterThan(0));
+            Assert.That(
+                loaded.MilitaryMedicalServices.Count,
+                Is.EqualTo(world.MilitaryMedicalServices.Count));
+            Assert.That(
+                loaded.MilitaryMedicalCases.Count,
+                Is.EqualTo(world.MilitaryMedicalCases.Count));
+        }
+
+        [Test]
+        public void MilitaryMedical_PrototypeCreatesOneOrganizationStorePerArmy()
+        {
+            var world = PrototypeWorldFactory.Create184World(184_025);
+
+            Assert.That(world.MilitaryMedicalInitialized, Is.True);
+            Assert.That(
+                world.Armies.TrueForAll(army =>
+                    !string.IsNullOrEmpty(
+                        army.MedicalInventoryContainerId) &&
+                    ArmyMedicineQuantity(world, army) ==
+                        MilitaryMedicalRules
+                            .PrototypeOpeningMedicineQuantity),
+                Is.True);
+            var containerIds = new HashSet<string>();
+            for (var i = 0; i < world.Armies.Count; i++)
+                containerIds.Add(
+                    world.Armies[i].MedicalInventoryContainerId);
+            Assert.That(containerIds.Count, Is.EqualTo(world.Armies.Count));
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedical_DailyWorkLimitIsSharedAndSecondAttemptIsAtomic()
+        {
+            var world = BuildGuangzongBattleWorld();
+            var army = world.Armies.Find(item =>
+                item.Id == "army.han_jizhou_vanguard");
+            var physician = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            new MilitaryServiceSystem().ApplyCasualties(
+                world,
+                new StableId(army.Id),
+                12,
+                12,
+                25);
+
+            var result = new MedicalSystem(world.MasterSeed)
+                .TreatArmyWounded(
+                    world,
+                    new StableId(physician.Id),
+                    new StableId(army.Id),
+                    12);
+            var afterFirst = WorldSnapshotSerializer.Serialize(world);
+            var rejected = new MedicalSystem(world.MasterSeed)
+                .TreatArmyWounded(
+                    world,
+                    new StableId(physician.Id),
+                    new StableId(army.Id),
+                    1);
+
+            Assert.That(result.Success, Is.True, result.Message);
+            Assert.That(result.PatientsTreated, Is.EqualTo(8));
+            Assert.That(rejected.Success, Is.False);
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(afterFirst));
+        }
+
+        [Test]
+        public void MilitaryMedical_TamperedInventorySourceIsRejected()
+        {
+            var world = BuildGuangzongBattleWorld();
+            new BattleResolver(world.MasterSeed).Resolve(
+                world,
+                new StableId("person.guo_dian"),
+                new StableId("army.han_jizhou_vanguard"),
+                new StableId("army.yellow_turban_guangzong"));
+            var physician = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            var army = world.Armies.Find(item =>
+                item.Id == "army.han_jizhou_vanguard");
+            new MedicalSystem(world.MasterSeed).TreatArmyWounded(
+                world,
+                new StableId(physician.Id),
+                new StableId(army.Id),
+                1);
+            var service = world.MilitaryMedicalServices[0];
+            world.InventoryTransactions.Find(item =>
+                item.Id == service.InventoryTransactionId)
+                .SourceMilitaryMedicalServiceId = "military_medical_service.missing";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortySixWithoutFabricatingMilitaryMedicine()
+        {
+            var world = WorldState.Create(184_027);
+            world.AbsoluteDay = 40;
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 46");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(
+                loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryMedicalInitialized, Is.False);
+            Assert.That(loaded.MilitaryMedicalCases, Is.Empty);
+            Assert.That(loaded.MilitaryMedicalServices, Is.Empty);
+            Assert.That(
+                loaded.MilitaryMedicalContractActivationDay,
+                Is.EqualTo(41));
+        }
+
+        [Test]
+        public void MilitaryMedicalResupply_CommercialFreightPaysLosesAndReceivesRealBatch()
+        {
+            var world = PrepareMerchantLogisticsWorld();
+            AddMilitaryMedicalLogisticsBatch(world, 40);
+            var army = world.Armies.Find(item =>
+                item.Id == "army.youzhou_reinforcement");
+            var buyer = world.Organizations.Find(item =>
+                item.Id == army.OrganizationId);
+            var supplier = world.Organizations.Find(item =>
+                item.Id == "organization.zhongshan_merchants");
+            var medicineBefore = ArmyMedicineQuantity(world, army);
+            var buyerMoneyBefore = buyer.Treasury;
+            var supplierMoneyBefore = supplier.Treasury;
+            StartYouzhouArmyToAnping(world);
+
+            var order = new MilitaryMedicalResupplySystem().Dispatch(
+                world, MedicalResupplyRequest(30, 4, true));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 18);
+
+            Assert.That(order.Status,
+                Is.EqualTo(MilitaryLogisticsStatus.Delivered));
+            Assert.That(order.DeliveryPolicyId, Is.EqualTo(
+                MilitaryLogisticsDeliveryPolicyIds.ArmyInventoryContainer));
+            Assert.That(order.TargetInventoryContainerId,
+                Is.EqualTo(army.MedicalInventoryContainerId));
+            Assert.That(order.NaturalLossQuantity, Is.GreaterThan(0));
+            Assert.That(
+                ArmyMedicineQuantity(world, army),
+                Is.EqualTo(medicineBefore + order.DeliveredCargoQuantity));
+            Assert.That(buyer.Treasury,
+                Is.EqualTo(buyerMoneyBefore - order.TotalPaid));
+            Assert.That(supplier.Treasury,
+                Is.EqualTo(supplierMoneyBefore + order.TotalPaid));
+            Assert.That(world.InventoryTransactions.Exists(item =>
+                item.Type == InventoryTransactionType
+                    .MilitaryLogisticsDelivered &&
+                item.SourceMilitaryLogisticsOrderId == order.Id), Is.True);
+            Assert.That(world.MilitarySupplies.Exists(item =>
+                item.SourceLogisticsOrderId == order.Id), Is.False);
+            Assert.That(
+                new MilitaryLogisticsSystem().Audit(world, order.Id)
+                    .IsBalanced,
+                Is.True);
+            world.Validate();
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryLogisticsOrders.Find(item =>
+                item.Id == order.Id).TargetInventoryContainerId,
+                Is.EqualTo(army.MedicalInventoryContainerId));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalResupply_CapacityAllowsOnlyAuditedPartialReceipt()
+        {
+            var world = PrepareMerchantLogisticsWorld();
+            AddMilitaryMedicalLogisticsBatch(world, 20);
+            var army = world.Armies.Find(item =>
+                item.Id == "army.youzhou_reinforcement");
+            var medicalContainer = world.InventoryContainers.Find(item =>
+                item.Id == army.MedicalInventoryContainerId);
+            medicalContainer.CapacityWeight =
+                ArmyMedicineQuantity(world, army) + 2;
+            StartYouzhouArmyToAnping(world);
+            var order = new MilitaryMedicalResupplySystem().Dispatch(
+                world, MedicalResupplyRequest(10, 4, false));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 18);
+            new MilitaryLogisticsSystem().ResolveArrivals(world);
+
+            var delivered = new MilitaryLogisticsSystem().DeliverPartial(
+                world, order.Id, 10);
+            var afterFirst = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.That(delivered, Is.EqualTo(2));
+            Assert.That(order.Status,
+                Is.EqualTo(MilitaryLogisticsStatus.AwaitingArmy));
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryLogisticsSystem().DeliverPartial(
+                    world, order.Id, 1));
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(afterFirst));
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalResupply_RejectsNonMedicineWithoutMutation()
+        {
+            var world = PrepareMerchantLogisticsWorld();
+            StartYouzhouArmyToAnping(world);
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var request = MedicalResupplyRequest(10, 4, true);
+            request.SourceMedicineBatchId = new StableId(
+                "product_batch.logistics.merchant_cargo");
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryMedicalResupplySystem().Dispatch(
+                    world, request));
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MilitaryMedicalResupply_TamperedDestinationIsRejected()
+        {
+            var world = PrepareMerchantLogisticsWorld();
+            AddMilitaryMedicalLogisticsBatch(world, 20);
+            StartYouzhouArmyToAnping(world);
+            var order = new MilitaryMedicalResupplySystem().Dispatch(
+                world, MedicalResupplyRequest(10, 4, false));
+            var otherArmy = world.Armies.Find(item =>
+                item.Id != order.TargetArmyId);
+            order.TargetInventoryContainerId =
+                otherArmy.MedicalInventoryContainerId;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortySevenToLegacyProvisionDelivery()
+        {
+            var world = PrepareMerchantLogisticsWorld();
+            StartYouzhouArmyToAnping(world);
+            new MilitaryLogisticsSystem().Dispatch(
+                world,
+                MerchantLogisticsRequest(
+                    MilitarySupplyAcquisitionMethodIds.CommercialPurchase,
+                    3));
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 47")
+                .Replace(
+                    "\"DeliveryPolicyId\": \"" +
+                        MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions +
+                        "\",",
+                    "\"DeliveryPolicyId\": null,")
+                .Replace(
+                    "\"TargetInventoryContainerId\": \"\"",
+                    "\"TargetInventoryContainerId\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryLogisticsOrders[0].DeliveryPolicyId,
+                Is.EqualTo(
+                    MilitaryLogisticsDeliveryPolicyIds.ArmyProvisions));
+            Assert.That(loaded.MilitaryLogisticsOrders[0]
+                .TargetInventoryContainerId, Is.Empty);
+            Assert.That(loaded.InventoryTransactions.Exists(item =>
+                item.Type == InventoryTransactionType
+                    .MilitaryLogisticsDelivered), Is.False);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalEvacuation_DispatchTravelsAndReceivesWithoutHealing()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var patient = world.People.Find(item =>
+                item.Id == patientService.PersonId);
+            var healthBefore = patient.HealthBasisPoints;
+            var troopsBefore = army.Troops;
+
+            var evacuation = new MilitaryMedicalEvacuationSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patientService.Id),
+                teamServices.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                new StableId(receiver.Id));
+
+            Assert.That(world.Journeys.Count(item =>
+                item.Id == evacuation.PatientJourneyId ||
+                evacuation.TeamMembers.Exists(member =>
+                    member.JourneyId == item.Id)), Is.EqualTo(3));
+            Assert.That(army.Troops, Is.EqualTo(troopsBefore - 2));
+            Assert.That(army.WoundedTroops, Is.EqualTo(1));
+            Assert.That(teamServices.TrueForAll(item =>
+                item.Status ==
+                    MilitaryServiceStatus.MedicalEvacuationDuty), Is.True);
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 13);
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.AwaitingReception));
+            Assert.That(patient.LocationId, Is.EqualTo("location.anping"));
+            Assert.That(teamServices.TrueForAll(service =>
+                world.People.Find(item => item.Id == service.PersonId)
+                    .LocationId == "location.anping"), Is.True);
+            new MilitaryMedicalEvacuationSystem().Receive(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(receiver.Id));
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Received));
+            Assert.That(evacuation.ReceivingPersonId, Is.EqualTo(receiver.Id));
+            Assert.That(patient.HealthBasisPoints, Is.EqualTo(healthBefore));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Wounded));
+            Assert.That(world.MilitaryMedicalServices, Is.Empty);
+            var receivedSnapshot = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() =>
+                new TravelSystem().StartJourney(
+                    world,
+                    new StableId(patient.Id),
+                    new StableId("route.anping_xiaquyang"),
+                    new StableId("location.xiaquyang"),
+                    TravelMode.Foot));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(receivedSnapshot));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryMedicalEvacuations.Count,
+                Is.EqualTo(1));
+            Assert.That(loaded.MilitaryMedicalEvacuations[0].Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Received));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalEvacuation_ArmyMarchDoesNotTeleportDetachedPeople()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var evacuation = new MilitaryMedicalEvacuationSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patientService.Id),
+                teamServices.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                new StableId(receiver.Id));
+            new ArmySystem().StartMarch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(army.Id),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId("location.zhuo"));
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 28);
+
+            Assert.That(army.LocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.AwaitingReception));
+            Assert.That(world.People.Find(item =>
+                item.Id == patientService.PersonId).LocationId,
+                Is.EqualTo("location.anping"));
+            Assert.That(teamServices.TrueForAll(service =>
+                world.People.Find(item => item.Id == service.PersonId)
+                    .LocationId == "location.anping"), Is.True);
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalEvacuation_SourceArmyCannotTreatPatientRemotely()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var physicianService = world.MilitaryServices.Find(item =>
+                item.ArmyId == army.Id &&
+                item.Role == MilitaryServiceRole.Medic &&
+                item.Status == MilitaryServiceStatus.Active);
+            var physician = world.People.Find(item =>
+                item.Id == physicianService.PersonId);
+            physician.MedicalSkillBasisPoints = 7_500;
+            physician.ProfessionalSkills.Medicine = 7_500;
+            new MilitaryMedicalEvacuationSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patientService.Id),
+                teamServices.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                new StableId(receiver.Id));
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            var result = new MedicalSystem(world.MasterSeed).TreatArmyWounded(
+                world,
+                new StableId(physician.Id),
+                new StableId(army.Id),
+                1);
+
+            Assert.That(result.Success, Is.False);
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MilitaryMedicalEvacuation_InvalidTeamIsRejectedAtomically()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryMedicalEvacuationSystem().Dispatch(
+                    world,
+                    new StableId(army.CommanderPersonId),
+                    new StableId(patientService.Id),
+                    new List<StableId>
+                    {
+                        new StableId(teamServices[0].Id),
+                        new StableId(teamServices[0].Id)
+                    },
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping"),
+                    new StableId(receiver.Id)));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyEightWithoutFabricatingEvacuation()
+        {
+            var world = PrototypeWorldFactory.Create184World(184_049);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 48");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryMedicalEvacuations, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryMedicalEvacuation_TamperedJourneyIsRejected()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var evacuation = new MilitaryMedicalEvacuationSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patientService.Id),
+                teamServices.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                new StableId(receiver.Id));
+            world.Journeys.Find(item =>
+                item.Id == evacuation.PatientJourneyId).RouteId =
+                "route.anping_xiaquyang";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void MilitaryRearMedicalCare_TreatsReturnsAndRejoinsWithoutTeleporting()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                5,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var troopsBeforeDispatch = army.Troops;
+            var medicineBefore = world.ProductBatches.Find(item =>
+                item.InventoryContainerId == site.MedicineInventoryContainerId)
+                .Quantity;
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+
+            var treatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+
+            Assert.That(treatment.MedicineUnitsConsumed, Is.EqualTo(1));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == treatment.SourceMedicineBatchId).Quantity,
+                Is.EqualTo(medicineBefore - 1));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Wounded));
+            Assert.That(world.People.Find(item =>
+                item.Id == patientService.PersonId).HealthBasisPoints,
+                Is.EqualTo(MilitaryMedicalRules.ReturnToDutyHealthBasisPoints));
+            Assert.That(army.WoundedTroops, Is.EqualTo(1));
+
+            var readySnapshot = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() => rear.StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.anping_xiaquyang")));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(readySnapshot));
+            rear.StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.zhongshan_anping"));
+            var returningSnapshot = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() =>
+                new ArmySystem().StartMarch(
+                    world,
+                    new StableId(army.CommanderPersonId),
+                    new StableId(army.Id),
+                    new StableId("route.zhuo_zhongshan"),
+                    new StableId("location.zhuo")));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(returningSnapshot));
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 13);
+
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.Completed));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Active));
+            Assert.That(teamServices.TrueForAll(item =>
+                item.Status == MilitaryServiceStatus.Active), Is.True);
+            Assert.That(army.WoundedTroops, Is.Zero);
+            Assert.That(army.Troops, Is.EqualTo(troopsBeforeDispatch + 1));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryRearMedicalSites.Count, Is.EqualTo(1));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0].Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.Completed));
+            Assert.That(loaded.MilitaryMedicalEvacuations[0].Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            loaded.Validate();
+
+            Assert.DoesNotThrow(() => new TravelSystem().StartJourney(
+                world,
+                new StableId(patientService.PersonId),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                TravelMode.Foot));
+        }
+
+        [Test]
+        public void MilitaryRearMedicalCare_BedCapacityRejectsSecondAdmissionAtomically()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                5,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var first = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.Admit(
+                world,
+                new StableId(first.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+
+            var eligible = world.MilitaryServices.FindAll(item =>
+                item.ArmyId == army.Id &&
+                item.Role == MilitaryServiceRole.Soldier &&
+                item.Status == MilitaryServiceStatus.Active);
+            eligible.Sort((left, right) =>
+                string.CompareOrdinal(left.Id, right.Id));
+            var secondPatient = eligible[0];
+            secondPatient.Status = MilitaryServiceStatus.Wounded;
+            secondPatient.LastStatusChangeDay = world.AbsoluteDay;
+            world.People.Find(item =>
+                item.Id == secondPatient.PersonId).HealthBasisPoints = 4_000;
+            var secondTeam = new List<MilitaryServiceState>
+            {
+                eligible[1],
+                eligible[2]
+            };
+            new MilitaryServiceSystem().SynchronizeArmyCaches(world, army.Id);
+            world.Validate();
+            var second = DispatchAndReceiveEvacuation(
+                world, army, secondPatient, secondTeam, receiver);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() => rear.Admit(
+                world,
+                new StableId(second.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id)));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MilitaryRearMedicalCare_MissingMedicineRejectsTreatmentAtomically()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                0,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                rear.TreatInpatient(world, new StableId(admission.Id)));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MilitaryRearMedicalCare_TamperedTreatmentSourceIsRejected()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                5,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+            var treatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            world.InventoryTransactions.Find(item =>
+                item.Id == treatment.InventoryTransactionId)
+                .SourceMilitaryRearMedicalTreatmentId = string.Empty;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyNineWithoutFabricatingRearCare()
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 49");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryRearMedicalSites, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalTreatments, Is.Empty);
+            Assert.That(loaded.MilitaryMedicalEvacuations[0].Id,
+                Is.EqualTo(evacuation.Id));
+            Assert.That(loaded.MilitaryMedicalEvacuations[0]
+                .ReturnStartedDay, Is.EqualTo(-1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryFieldHospital_ConstructionConsumesFormalResourcesAndLabor()
+        {
+            var world = BuildFieldHospitalWorld(
+                out var army,
+                out var project,
+                out var site,
+                out var materialContainer);
+
+            Assert.That(project.Status,
+                Is.EqualTo(MilitaryFieldHospitalConstructionStatus.Completed));
+            Assert.That(project.CompletedLaborDays,
+                Is.EqualTo(MilitaryMedicalRules.FieldHospitalRequiredLaborDays));
+            Assert.That(site.KindId,
+                Is.EqualTo(MilitaryRearMedicalSiteKindIds.FieldHospital));
+            Assert.That(site.LocationId, Is.EqualTo(army.LocationId));
+            Assert.That(site.SupportInventoryContainerId,
+                Is.EqualTo(materialContainer.Id));
+            Assert.That(world.Locations.Find(item =>
+                item.Id == site.LocationId).Features & LocationFeature.Clinic,
+                Is.EqualTo(LocationFeature.None));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == "product_batch.field_hospital.timber").Quantity,
+                Is.EqualTo(10));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == "product_batch.field_hospital.leather").Quantity,
+                Is.EqualTo(5));
+            Assert.That(world.MilitaryFieldHospitalConstructionWork.Count,
+                Is.EqualTo(3));
+            Assert.That(world.InventoryTransactions.Find(item =>
+                    item.Id == project.InventoryTransactionId).Type,
+                Is.EqualTo(InventoryTransactionType
+                    .MilitaryFieldHospitalConstructionConsumed));
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryFieldHospital_OverdueMaintenanceDisablesAndRestoresSite()
+        {
+            var world = BuildFieldHospitalWorld(
+                out var army,
+                out var project,
+                out var site,
+                out var materialContainer);
+            var organization = world.Organizations.Find(item =>
+                item.Id == army.OrganizationId);
+            var treasuryBefore = organization.Treasury;
+            var timberBefore = world.ProductBatches.Find(item =>
+                item.Id == "product_batch.field_hospital.timber").Quantity;
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 11);
+
+            Assert.That(world.AbsoluteDay, Is.GreaterThan(site.NextMaintenanceDay));
+            Assert.That(site.IsOperational, Is.False);
+            var maintenance = new MilitaryFieldHospitalSystem().Maintain(
+                world,
+                new StableId(site.Id),
+                new StableId(army.CommanderPersonId));
+
+            Assert.That(site.IsOperational, Is.True);
+            Assert.That(site.LastMaintenanceDay, Is.EqualTo(world.AbsoluteDay));
+            Assert.That(site.NextMaintenanceDay, Is.EqualTo(
+                world.AbsoluteDay +
+                MilitaryMedicalRules.FieldHospitalMaintenanceIntervalDays));
+            Assert.That(organization.Treasury, Is.EqualTo(
+                treasuryBefore -
+                MilitaryMedicalRules.FieldHospitalMaintenanceMoney));
+            Assert.That(world.ProductBatches.Find(item =>
+                    item.Id == maintenance.SourceTimberBatchId).Quantity,
+                Is.EqualTo(
+                    timberBefore -
+                    MilitaryMedicalRules.FieldHospitalMaintenanceTimberUnits));
+            Assert.That(world.InventoryTransactions.Find(item =>
+                    item.Id == maintenance.InventoryTransactionId).Type,
+                Is.EqualTo(InventoryTransactionType
+                    .MilitaryFieldHospitalMaintenanceConsumed));
+            world.Validate();
+        }
+
+        [Test]
+        public void MilitaryFieldHospital_RequiresStabilizationThenRecovery()
+        {
+            var world = BuildFieldHospitalWorld(
+                out var army,
+                out var project,
+                out var site,
+                out var materialContainer);
+            AddOrganizationProductBatch(
+                world,
+                "product_batch.field_hospital.medicine",
+                site.OwnerOrganizationId,
+                site.MedicineInventoryContainerId,
+                site.LocationId,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                3,
+                army.CommanderPersonId);
+            RelocateArmyForFieldHospitalTest(
+                world, army, "location.zhuo");
+            var eligible = world.MilitaryServices.FindAll(item =>
+                item.ArmyId == army.Id &&
+                item.Role == MilitaryServiceRole.Soldier &&
+                item.Status == MilitaryServiceStatus.Active);
+            eligible.Sort((left, right) =>
+                string.CompareOrdinal(left.Id, right.Id));
+            var patient = eligible[0];
+            patient.Status = MilitaryServiceStatus.Wounded;
+            patient.LastStatusChangeDay = world.AbsoluteDay;
+            world.People.Find(item => item.Id == patient.PersonId)
+                .HealthBasisPoints = 4_000;
+            var team = new List<MilitaryServiceState>
+            {
+                eligible[1],
+                eligible[2]
+            };
+            new MilitaryServiceSystem().SynchronizeArmyCaches(world, army.Id);
+            var receiver = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            receiver.MedicalSkillBasisPoints = 7_500;
+            receiver.ProfessionalSkills.Medicine = 7_500;
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, receiver, site.LocationId);
+            var evacuationSystem = new MilitaryMedicalEvacuationSystem();
+            var evacuation = evacuationSystem.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patient.Id),
+                team.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId(site.LocationId),
+                new StableId(receiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 28);
+            evacuationSystem.Receive(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(receiver.Id));
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+
+            var stabilization = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+
+            Assert.That(stabilization.StageIndex, Is.Zero);
+            Assert.That(stabilization.TreatmentProtocolId,
+                Is.EqualTo(MilitaryRearMedicalTreatmentProtocolIds
+                    .FieldStabilization));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.InTreatment));
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Admitted));
+            Assert.That(world.People.Find(item =>
+                    item.Id == patient.PersonId).HealthBasisPoints,
+                Is.EqualTo(MilitaryMedicalRules
+                    .FieldStabilizationHealthBasisPoints));
+
+            var recovery = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+
+            Assert.That(recovery.StageIndex, Is.EqualTo(1));
+            Assert.That(recovery.TreatmentProtocolId,
+                Is.EqualTo(MilitaryRearMedicalTreatmentProtocolIds
+                    .FieldRecovery));
+            Assert.That(admission.CompletedTreatmentStages, Is.EqualTo(2));
+            Assert.That(admission.TreatmentIds,
+                Is.EqualTo(new[] { stabilization.Id, recovery.Id }));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.ReadyForReturn));
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(world.People.Find(item =>
+                    item.Id == patient.PersonId).HealthBasisPoints,
+                Is.EqualTo(MilitaryMedicalRules.ReturnToDutyHealthBasisPoints));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .CompletedTreatmentStages, Is.EqualTo(2));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MilitaryFieldHospital_TamperedConstructionSourceIsRejected()
+        {
+            var world = BuildFieldHospitalWorld(
+                out var army,
+                out var project,
+                out var site,
+                out var materialContainer);
+            world.InventoryTransactions.Find(item =>
+                    item.Id == project.InventoryTransactionId)
+                .SourceMilitaryFieldHospitalConstructionProjectId =
+                    string.Empty;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyWithoutFabricatingFieldHospitals()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                3,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+            var treatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 50");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryFieldHospitalConstructionProjects,
+                Is.Empty);
+            Assert.That(loaded.MilitaryFieldHospitalConstructionWork, Is.Empty);
+            Assert.That(loaded.MilitaryFieldHospitalMaintenance, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .RequiredTreatmentStages, Is.EqualTo(1));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0].TreatmentIds,
+                Is.EqualTo(new[] { treatment.Id }));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ComplexMilitaryInjury_InfectionAddsFrozenControlStage()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                8,
+                out var admission,
+                out var injury,
+                out var site);
+            var medicine = world.ProductBatches.Find(item =>
+                item.InventoryContainerId == site.MedicineInventoryContainerId);
+            var medicineBefore = medicine.Quantity;
+            var rear = new MilitaryRearMedicalSystem();
+
+            var stabilization = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var surgery = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var infectionControl = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+
+            Assert.That(injury.InjuryProfileId,
+                Is.EqualTo(MilitaryInjuryProfileIds.Penetrating));
+            Assert.That(injury.InfectionRiskBasisPoints,
+                Is.GreaterThanOrEqualTo(
+                    MilitaryMedicalRules.InfectionRiskThresholdBasisPoints));
+            Assert.That(admission.TreatmentPlanProtocolIds,
+                Is.EqualTo(new[]
+                {
+                    MilitaryRearMedicalTreatmentProtocolIds
+                        .FieldStabilization,
+                    MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery,
+                    MilitaryRearMedicalTreatmentProtocolIds.InfectionControl,
+                    MilitaryRearMedicalTreatmentProtocolIds.FieldRecovery
+                }));
+            Assert.That(stabilization.StageIndex, Is.Zero);
+            Assert.That(surgery.StageIndex, Is.EqualTo(1));
+            Assert.That(infectionControl.StageIndex, Is.EqualTo(2));
+            Assert.That(infectionControl.MedicineUnitsConsumed,
+                Is.EqualTo(MilitaryMedicalRules
+                    .InfectionControlMedicineUnits));
+            Assert.That(infectionControl.WorkMinutes,
+                Is.EqualTo(MilitaryMedicalRules
+                    .InfectionControlWorkMinutes));
+            Assert.That(injury.InfectionStatus,
+                Is.EqualTo(MilitaryInfectionStatus.Controlled));
+            Assert.That(injury.InfectionControlTreatmentId,
+                Is.EqualTo(infectionControl.Id));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.InTreatment));
+
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            var recovery = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+
+            Assert.That(recovery.StageIndex, Is.EqualTo(3));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.ReadyForReturn));
+            Assert.That(admission.DischargePolicyId, Is.EqualTo(
+                MilitaryRearMedicalDischargePolicyIds
+                    .MedicalRetirementAtCareSite));
+            Assert.That(injury.PermanentOutcomeId, Is.EqualTo(
+                MilitaryInjuryOutcomeIds.PermanentMobilityImpairment));
+            Assert.That(medicine.Quantity, Is.EqualTo(medicineBefore - 7));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryInjuryEpisodes[0].InfectionStatus,
+                Is.EqualTo(MilitaryInfectionStatus.Controlled));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .TreatmentPlanProtocolIds, Is.EqualTo(
+                    admission.TreatmentPlanProtocolIds));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ComplexMilitaryInjury_InsufficientInfectionMedicineIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                5,
+                out var admission,
+                out var injury,
+                out var site);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                rear.TreatInpatient(world, new StableId(admission.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+            Assert.That(injury.InfectionStatus,
+                Is.EqualTo(MilitaryInfectionStatus.Active));
+        }
+
+        [Test]
+        public void ComplexMilitaryInjury_TamperedFrozenPlanIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                6,
+                out var admission,
+                out var injury,
+                out var site);
+            admission.TreatmentPlanProtocolIds[2] =
+                MilitaryRearMedicalTreatmentProtocolIds.FieldRecovery;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void ComplexMilitaryInjury_DataProfileNeedsNoSchemaChange()
+        {
+            var schemaBefore = WorldState.CurrentSchemaVersion;
+            var world = BuildInfectedFieldHospitalAdmission(
+                6,
+                out var admission,
+                out var injury,
+                out var site,
+                new MilitaryInjuryProfileDefinitionState
+                {
+                    Id = "mod.example.injury_profile.arrow_wound",
+                    DisplayName = "箭创",
+                    MinimumAdmissionHealthBasisPoints = 0,
+                    MaximumAdmissionHealthBasisPoints = 2_500,
+                    SelectionPriority = 200
+                });
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(schemaBefore));
+            Assert.That(injury.InjuryProfileId,
+                Is.EqualTo("mod.example.injury_profile.arrow_wound"));
+            world.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyOneWithoutInventingInjury()
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                3,
+                out var army,
+                out var patientService,
+                out var teamServices,
+                out var receiver,
+                out var site);
+            var evacuation = DispatchAndReceiveEvacuation(
+                world, army, patientService, teamServices, receiver);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var admission = rear.Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 51");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryInjuryEpisodes, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .InjuryEpisodeId, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .TreatmentPlanProtocolIds, Is.EqualTo(new[]
+                {
+                    MilitaryRearMedicalTreatmentProtocolIds
+                        .InpatientHerbalRecovery
+                }));
+            Assert.That(loaded.MilitaryInjuryContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void TraumaSurgery_PermanentImpairmentRetiresPatientAndReturnsTeam()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var patient = world.People.Find(item =>
+                item.Id == admission.PatientPersonId);
+            var patientService = world.MilitaryServices.Find(item =>
+                item.Id == admission.PatientMilitaryServiceId);
+            var rear = new MilitaryRearMedicalSystem();
+
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            var surgery = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            rear.TreatInpatient(world, new StableId(admission.Id));
+
+            Assert.That(surgery.TreatmentProtocolId, Is.EqualTo(
+                MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery));
+            Assert.That(surgery.MedicineUnitsConsumed, Is.EqualTo(3));
+            Assert.That(surgery.WorkMinutes, Is.EqualTo(240));
+            Assert.That(injury.SurgeryTreatmentId, Is.EqualTo(surgery.Id));
+            Assert.That(injury.PermanentOutcomeId, Is.EqualTo(
+                MilitaryInjuryOutcomeIds.PermanentMobilityImpairment));
+            Assert.That(injury.LaborCapacityBeforeBasisPoints,
+                Is.EqualTo(10_000));
+            Assert.That(injury.LaborCapacityAfterBasisPoints,
+                Is.EqualTo(7_000));
+            Assert.That(patient.LaborCapacityBasisPoints, Is.EqualTo(7_000));
+            Assert.That(patient.PermanentLaborCapacityPenaltyBasisPoints,
+                Is.EqualTo(3_000));
+
+            rear.StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.zhuo_zhongshan"));
+            Assert.That(evacuation.PatientReturnJourneyId, Is.Empty);
+            Assert.That(patient.LocationId, Is.EqualTo(site.LocationId));
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Retired));
+            Assert.That(patient.LocationId, Is.EqualTo(site.LocationId));
+            for (var i = 0; i < evacuation.TeamMembers.Count; i++)
+            {
+                var memberService = world.MilitaryServices.Find(item =>
+                    item.Id == evacuation.TeamMembers[i].MilitaryServiceId);
+                Assert.That(memberService.Status,
+                    Is.EqualTo(MilitaryServiceStatus.Active));
+            }
+            world.Validate();
+        }
+
+        [Test]
+        public void TraumaSurgery_UnqualifiedPhysicianIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            var physician = world.People.Find(item =>
+                item.Id == admission.PhysicianPersonId);
+            physician.MedicalSkillBasisPoints = 4_500;
+            physician.ProfessionalSkills.Medicine = 4_500;
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                rear.TreatInpatient(world, new StableId(admission.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+            Assert.That(injury.SurgeryTreatmentId, Is.Empty);
+        }
+
+        [Test]
+        public void TraumaSurgery_TamperedPermanentOutcomeIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            rear.TreatInpatient(world, new StableId(admission.Id));
+            injury.PermanentLaborCapacityPenaltyBasisPoints = 2_999;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void TraumaSurgery_DataProcedureNeedsNoSchemaChange()
+        {
+            var schemaBefore = WorldState.CurrentSchemaVersion;
+            var procedure = new MilitarySurgicalProcedureDefinitionState
+            {
+                Id = "mod.example.surgical_procedure.arrow_extraction",
+                DisplayName = "箭镞取出",
+                MinimumSeverityBasisPoints = 5_000,
+                MinimumPhysicianSkillBasisPoints = 5_500,
+                WorkMinutes = 200,
+                MedicineUnits = 2,
+                TargetHealthBasisPoints = 4_800,
+                PermanentImpairmentSeverityBasisPoints = 8_500,
+                PermanentImpairmentLaborPenaltyBasisPoints = 2_500
+            };
+            var profile = new MilitaryInjuryProfileDefinitionState
+            {
+                Id = "mod.example.injury_profile.arrow_wound.surgical",
+                DisplayName = "箭创",
+                MinimumAdmissionHealthBasisPoints = 0,
+                MaximumAdmissionHealthBasisPoints = 2_500,
+                SelectionPriority = 300,
+                SurgicalProcedureId = procedure.Id
+            };
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site,
+                profile,
+                procedure);
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(schemaBefore));
+            Assert.That(injury.InjuryProfileId, Is.EqualTo(profile.Id));
+            Assert.That(injury.SurgicalProcedureId, Is.EqualTo(procedure.Id));
+            Assert.That(admission.TreatmentPlanProtocolIds, Does.Contain(
+                MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery));
+            world.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyTwoWithoutInventingSurgery()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            injury.SurgicalProcedureId = string.Empty;
+            admission.TreatmentPlanProtocolIds.RemoveAt(1);
+            admission.RequiredTreatmentStages--;
+            world.Validate();
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 52");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+            var loadedInjury = loaded.MilitaryInjuryEpisodes[0];
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitarySurgicalProcedures, Has.Count.EqualTo(1));
+            Assert.That(loadedInjury.SurgicalProcedureId, Is.Empty);
+            Assert.That(loadedInjury.SurgeryTreatmentId, Is.Empty);
+            Assert.That(loadedInjury.PermanentOutcomeId, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .TreatmentPlanProtocolIds, Does.Not.Contain(
+                    MilitaryRearMedicalTreatmentProtocolIds.TraumaSurgery));
+            Assert.That(loaded.MilitaryMedicalEvacuations[0]
+                .PatientReturnPolicyId, Is.EqualTo(
+                    MilitaryMedicalEvacuationPatientReturnPolicyIds
+                        .ReturnWithTeam));
+            Assert.That(loaded.MilitarySurgeryContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MedicalTransfer_ReservesBedMedicineAndContinuesFrozenCare()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var frozenPlan = new List<string>(
+                admission.TreatmentPlanProtocolIds);
+            var batch = world.ProductBatches.Find(item =>
+                item.InventoryContainerId ==
+                    destinationSite.MedicineInventoryContainerId &&
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId);
+            var openingQuantity = batch.Quantity;
+            var transferSystem = new MilitaryMedicalTransferSystem();
+
+            var transfer = transferSystem.Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+
+            Assert.That(transfer.ReservedMedicineUnits, Is.EqualTo(7));
+            Assert.That(batch.ReservedQuantity, Is.EqualTo(7));
+            Assert.That(world.Journeys.FindAll(item =>
+                item.Id == transfer.PatientJourneyId ||
+                transfer.TeamMembers.Exists(member =>
+                    member.JourneyId == item.Id)), Has.Count.EqualTo(3));
+            Assert.That(admission.RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(evacuation.CurrentCareLocationId,
+                Is.EqualTo(sourceSite.LocationId));
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            Assert.That(transfer.Status,
+                Is.EqualTo(MilitaryMedicalTransferStatus.AwaitingReception));
+            transferSystem.Receive(
+                world,
+                new StableId(transfer.Id),
+                new StableId(receiver.Id));
+
+            Assert.That(admission.RearMedicalSiteId,
+                Is.EqualTo(destinationSite.Id));
+            Assert.That(admission.PhysicianPersonId, Is.EqualTo(receiver.Id));
+            Assert.That(evacuation.CurrentCareLocationId,
+                Is.EqualTo(destinationSite.LocationId));
+            Assert.That(admission.InjuryEpisodeId, Is.EqualTo(injury.Id));
+            Assert.That(admission.TreatmentPlanProtocolIds,
+                Is.EqualTo(frozenPlan));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedAdmission = loaded.MilitaryRearMedicalAdmissions.Find(
+                item => item.Id == admission.Id);
+            var loadedTransfer = loaded.MilitaryMedicalTransfers.Find(item =>
+                item.Id == transfer.Id);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.TreatInpatient(loaded, new StableId(loadedAdmission.Id));
+            rear.TreatInpatient(loaded, new StableId(loadedAdmission.Id));
+            rear.TreatInpatient(loaded, new StableId(loadedAdmission.Id));
+            new WorldSimulator(loaded.MasterSeed).AdvanceDays(loaded, 1);
+            rear.TreatInpatient(loaded, new StableId(loadedAdmission.Id));
+
+            var loadedBatch = loaded.ProductBatches.Find(item =>
+                item.Id == batch.Id);
+            Assert.That(loadedTransfer.ConsumedReservedMedicineUnits,
+                Is.EqualTo(7));
+            Assert.That(loadedBatch.ReservedQuantity, Is.Zero);
+            Assert.That(loadedBatch.Quantity,
+                Is.EqualTo(openingQuantity - 7));
+            Assert.That(loadedAdmission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.ReadyForReturn));
+            var loadedEvacuation = loaded.MilitaryMedicalEvacuations.Find(
+                item => item.Id == loadedAdmission.EvacuationId);
+            var loadedArmy = loaded.Armies.Find(item =>
+                item.Id == loadedEvacuation.SourceArmyId);
+            RelocateSourceArmyWithoutEvacuationParty(
+                loaded, loadedArmy, "location.xiaquyang");
+            rear.StartReturn(
+                loaded,
+                new StableId(loadedEvacuation.Id),
+                new StableId("route.anping_xiaquyang"));
+            new WorldSimulator(loaded.MasterSeed).AdvanceSegments(loaded, 20);
+            Assert.That(loadedEvacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(loaded.MilitaryServices.Find(item =>
+                    item.Id == loadedAdmission.PatientMilitaryServiceId).Status,
+                Is.EqualTo(MilitaryServiceStatus.Retired));
+            for (var i = 0; i < loadedEvacuation.TeamMembers.Count; i++)
+            {
+                Assert.That(loaded.MilitaryServices.Find(item =>
+                        item.Id == loadedEvacuation.TeamMembers[i]
+                            .MilitaryServiceId).Status,
+                    Is.EqualTo(MilitaryServiceStatus.Active));
+            }
+            loaded.Validate();
+        }
+
+        [Test]
+        public void MedicalTransfer_InsufficientDestinationMedicineIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 6,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryMedicalTransferSystem().Dispatch(
+                    world,
+                    new StableId(world.Armies.Find(item =>
+                        item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                    new StableId(admission.Id),
+                    new StableId(destinationSite.Id),
+                    new StableId("route.zhongshan_anping"),
+                    new StableId(receiver.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MedicalTransfer_TamperedReservationIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            world.InventoryTransactions.Find(item =>
+                item.Id == transfer.ReservationInventoryTransactionId)
+                .Lines[0].ReservedQuantityDelta--;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyThreeWithoutInventingTransfer()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 53");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryMedicalTransfers, Is.Empty);
+            Assert.That(loaded.MilitaryMedicalTransferContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .MedicalTransferId, Is.Empty);
+            Assert.That(loaded.MilitaryMedicalEvacuations[0]
+                .CurrentCareLocationId, Is.EqualTo(
+                    loaded.MilitaryMedicalEvacuations[0]
+                        .DestinationLocationId));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PostTreatmentMedicalTransfer_PreservesSourceCareAndCompletesRemainingPlan()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var sourcePhysicianId = admission.PhysicianPersonId;
+            var rear = new MilitaryRearMedicalSystem();
+            var sourceTreatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var sourceTransaction = world.InventoryTransactions.Find(item =>
+                item.Id == sourceTreatment.InventoryTransactionId);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 6,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var transferSystem = new MilitaryMedicalTransferSystem();
+
+            var transfer = transferSystem.Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+
+            Assert.That(transfer.CompletedTreatmentStagesAtDispatch,
+                Is.EqualTo(1));
+            Assert.That(transfer.ReservedMedicineUnits, Is.EqualTo(6));
+            Assert.That(sourceTreatment.RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(sourceTreatment.PhysicianPersonId,
+                Is.EqualTo(sourcePhysicianId));
+            Assert.That(sourceTransaction.Lines[0].ReservedQuantityDelta,
+                Is.Zero);
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transferSystem.Receive(
+                world,
+                new StableId(transfer.Id),
+                new StableId(receiver.Id));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedAdmission = loaded.MilitaryRearMedicalAdmissions.Find(
+                item => item.Id == admission.Id);
+            var loadedTransfer = loaded.MilitaryMedicalTransfers.Find(item =>
+                item.Id == transfer.Id);
+            var loadedRear = new MilitaryRearMedicalSystem();
+
+            loadedRear.TreatInpatient(
+                loaded, new StableId(loadedAdmission.Id));
+            loadedRear.TreatInpatient(
+                loaded, new StableId(loadedAdmission.Id));
+            new WorldSimulator(loaded.MasterSeed).AdvanceDays(loaded, 1);
+            loadedRear.TreatInpatient(
+                loaded, new StableId(loadedAdmission.Id));
+
+            Assert.That(loadedAdmission.CompletedTreatmentStages,
+                Is.EqualTo(loadedAdmission.RequiredTreatmentStages));
+            Assert.That(loadedTransfer.ConsumedReservedMedicineUnits,
+                Is.EqualTo(6));
+            var loadedReservedBatch = loaded.ProductBatches.Find(item =>
+                item.Id == loadedTransfer.ReservedMedicineBatchId);
+            Assert.That(loadedReservedBatch.ReservedQuantity, Is.Zero);
+            var priorTreatment = loaded.MilitaryRearMedicalTreatments.Find(
+                item => item.AdmissionId == loadedAdmission.Id &&
+                    item.StageIndex == 0);
+            Assert.That(priorTreatment.RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(priorTreatment.PhysicianPersonId,
+                Is.EqualTo(sourcePhysicianId));
+            var destinationTreatments = loaded.MilitaryRearMedicalTreatments
+                .FindAll(item => item.AdmissionId == loadedAdmission.Id &&
+                    item.StageIndex >=
+                        loadedTransfer.CompletedTreatmentStagesAtDispatch);
+            Assert.That(destinationTreatments, Has.Count.EqualTo(3));
+            Assert.That(destinationTreatments.TrueForAll(item =>
+                item.RearMedicalSiteId == destinationSite.Id &&
+                item.PhysicianPersonId == receiver.Id &&
+                item.SourceMedicineBatchId ==
+                    loadedTransfer.ReservedMedicineBatchId), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PostTreatmentMedicalTransfer_TransitDeathKeepsPriorCareAndReleasesRemainingReservation()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var sourceTreatment = new MilitaryRearMedicalSystem()
+                .TreatInpatient(world, new StableId(admission.Id));
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 6,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+
+            new MilitaryWoundDeathSystem().ResolveMedicalTransferDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(world
+                    .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            Assert.That(transfer.CompletedTreatmentStagesAtDispatch,
+                Is.EqualTo(1));
+            Assert.That(transfer.ConsumedReservedMedicineUnits, Is.Zero);
+            Assert.That(transfer.ReleasedReservedMedicineUnits,
+                Is.EqualTo(6));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == transfer.ReservedMedicineBatchId)
+                .ReservedQuantity, Is.Zero);
+            Assert.That(world.MilitaryRearMedicalTreatments.Find(item =>
+                item.Id == sourceTreatment.Id).RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(world.MilitaryMedicalTransferDeathClosures[0]
+                .ReleasedReservedMedicineUnits, Is.EqualTo(6));
+            world.Validate();
+        }
+
+        [Test]
+        public void PostTreatmentMedicalTransfer_ActivationBoundaryIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            new MilitaryRearMedicalSystem().TreatInpatient(
+                world, new StableId(admission.Id));
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 6,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            world.MilitaryPostTreatmentTransferContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryMedicalTransferSystem().Dispatch(
+                    world,
+                    new StableId(world.Armies.Find(item =>
+                        item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                    new StableId(admission.Id),
+                    new StableId(destinationSite.Id),
+                    new StableId("route.zhongshan_anping"),
+                    new StableId(receiver.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PostTreatmentMedicalTransfer_InsufficientRemainingMedicineIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            new MilitaryRearMedicalSystem().TreatInpatient(
+                world, new StableId(admission.Id));
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 5,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryMedicalTransferSystem().Dispatch(
+                    world,
+                    new StableId(world.Armies.Find(item =>
+                        item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                    new StableId(admission.Id),
+                    new StableId(destinationSite.Id),
+                    new StableId("route.zhongshan_anping"),
+                    new StableId(receiver.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PostTreatmentMedicalTransfer_TamperedDispatchStageIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            new MilitaryRearMedicalSystem().TreatInpatient(
+                world, new StableId(admission.Id));
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 6,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+
+            transfer.CompletedTreatmentStagesAtDispatch = 0;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixtyTwoWithoutInventingPostTreatmentTransfer()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 7,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 62");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryPostTreatmentTransferContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryMedicalTransfers, Has.Count.EqualTo(1));
+            Assert.That(loaded.MilitaryMedicalTransfers[0]
+                .CompletedTreatmentStagesAtDispatch, Is.Zero);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void RepeatedMedicalTransfer_ClosesEachReservationAndPreservesSegmentResponsibility()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var rear = new MilitaryRearMedicalSystem();
+            var sourceTreatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfers = new MilitaryMedicalTransferSystem();
+            var first = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(first.Id),
+                new StableId(firstReceiver.Id));
+            var firstSiteTreatment = rear.TreatInpatient(
+                world, new StableId(admission.Id));
+            var secondSite = BuildSecondMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 5,
+                out var secondReceiver);
+
+            var second = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(secondSite.Id),
+                new StableId("route.anping_xiaquyang"),
+                new StableId(secondReceiver.Id));
+
+            Assert.That(first.SequenceIndex, Is.Zero);
+            Assert.That(first.NextMedicalTransferId, Is.EqualTo(second.Id));
+            Assert.That(second.SequenceIndex, Is.EqualTo(1));
+            Assert.That(second.PreviousMedicalTransferId, Is.EqualTo(first.Id));
+            Assert.That(admission.MedicalTransferId, Is.EqualTo(second.Id));
+            Assert.That(first.ConsumedReservedMedicineUnits, Is.EqualTo(3));
+            Assert.That(first.ReleasedReservedMedicineUnits, Is.EqualTo(3));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == first.ReservedMedicineBatchId).ReservedQuantity,
+                Is.Zero);
+            Assert.That(second.ReservedMedicineUnits, Is.EqualTo(3));
+
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(second.Id),
+                new StableId(secondReceiver.Id));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            var loadedAdmission = loaded.MilitaryRearMedicalAdmissions.Find(
+                item => item.Id == admission.Id);
+            var loadedRear = new MilitaryRearMedicalSystem();
+            loadedRear.TreatInpatient(
+                loaded, new StableId(loadedAdmission.Id));
+            loadedRear.TreatInpatient(
+                loaded, new StableId(loadedAdmission.Id));
+
+            Assert.That(loadedAdmission.CompletedTreatmentStages,
+                Is.EqualTo(loadedAdmission.RequiredTreatmentStages));
+            var loadedSecond = loaded.MilitaryMedicalTransfers.Find(item =>
+                item.Id == second.Id);
+            Assert.That(loadedSecond.ConsumedReservedMedicineUnits,
+                Is.EqualTo(3));
+            Assert.That(loaded.MilitaryRearMedicalTreatments.Find(item =>
+                item.Id == sourceTreatment.Id).RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(loaded.MilitaryRearMedicalTreatments.Find(item =>
+                item.Id == firstSiteTreatment.Id).RearMedicalSiteId,
+                Is.EqualTo(firstSite.Id));
+            Assert.That(loaded.MilitaryRearMedicalTreatments.FindAll(item =>
+                item.AdmissionId == admission.Id && item.StageIndex >= 2)
+                .TrueForAll(item =>
+                    item.RearMedicalSiteId == secondSite.Id &&
+                    item.PhysicianPersonId == secondReceiver.Id &&
+                    item.SourceMedicineBatchId ==
+                        loadedSecond.ReservedMedicineBatchId), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void RepeatedMedicalTransfer_InsufficientNextMedicineIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfers = new MilitaryMedicalTransferSystem();
+            var first = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(first.Id),
+                new StableId(firstReceiver.Id));
+            var secondSite = BuildSecondMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 5,
+                out var secondReceiver);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() => transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(secondSite.Id),
+                new StableId("route.anping_xiaquyang"),
+                new StableId(secondReceiver.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+            Assert.That(first.NextMedicalTransferId, Is.Empty);
+            Assert.That(first.ReleasedReservedMedicineUnits, Is.Zero);
+        }
+
+        [Test]
+        public void RepeatedMedicalTransfer_ActivationBoundaryIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfers = new MilitaryMedicalTransferSystem();
+            var first = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(first.Id),
+                new StableId(firstReceiver.Id));
+            var secondSite = BuildSecondMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var secondReceiver);
+            world.MilitaryRepeatedMedicalTransferContractActivationDay =
+                checked(world.AbsoluteDay + 1);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() => transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(secondSite.Id),
+                new StableId("route.anping_xiaquyang"),
+                new StableId(secondReceiver.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void RepeatedMedicalTransfer_TamperedResponsibilityChainIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfers = new MilitaryMedicalTransferSystem();
+            var first = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(first.Id),
+                new StableId(firstReceiver.Id));
+            var secondSite = BuildSecondMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var secondReceiver);
+            var second = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(secondSite.Id),
+                new StableId("route.anping_xiaquyang"),
+                new StableId(secondReceiver.Id));
+
+            second.PreviousMedicalTransferId = string.Empty;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void RepeatedMedicalTransfer_CurrentLegDeathPreservesEarlierCareAndClosesReservations()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var sourceTreatment = new MilitaryRearMedicalSystem()
+                .TreatInpatient(world, new StableId(admission.Id));
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfers = new MilitaryMedicalTransferSystem();
+            var first = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transfers.Receive(
+                world, new StableId(first.Id),
+                new StableId(firstReceiver.Id));
+            var secondSite = BuildSecondMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var secondReceiver);
+            var second = transfers.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(secondSite.Id),
+                new StableId("route.anping_xiaquyang"),
+                new StableId(secondReceiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                firstSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+
+            new MilitaryWoundDeathSystem().ResolveMedicalTransferDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(world
+                    .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            Assert.That(first.ReleasedReservedMedicineUnits,
+                Is.EqualTo(first.ReservedMedicineUnits));
+            Assert.That(second.ReleasedReservedMedicineUnits,
+                Is.EqualTo(second.ReservedMedicineUnits));
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == first.ReservedMedicineBatchId).ReservedQuantity,
+                Is.Zero);
+            Assert.That(world.ProductBatches.Find(item =>
+                item.Id == second.ReservedMedicineBatchId).ReservedQuantity,
+                Is.Zero);
+            Assert.That(world.MilitaryRearMedicalTreatments.Find(item =>
+                item.Id == sourceTreatment.Id).RearMedicalSiteId,
+                Is.EqualTo(sourceSite.Id));
+            Assert.That(world.MilitaryMedicalTransferDeathClosures[0]
+                .MedicalTransferId, Is.EqualTo(second.Id));
+            world.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixtyThreeWithoutInventingRepeatedTransfer()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var firstSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 8,
+                out var firstReceiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(world.Armies.Find(item =>
+                    item.Id == evacuation.SourceArmyId).CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(firstSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(firstReceiver.Id));
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 63");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryMedicalTransfers, Has.Count.EqualTo(1));
+            Assert.That(loaded.MilitaryMedicalTransfers[0].SequenceIndex,
+                Is.Zero);
+            Assert.That(loaded.MilitaryMedicalTransfers[0]
+                .PreviousMedicalTransferId, Is.Empty);
+            Assert.That(loaded.MilitaryMedicalTransfers[0]
+                .NextMedicalTransferId, Is.Empty);
+            Assert.That(loaded.MilitaryRepeatedMedicalTransferContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_ClosesPermanentPersonInheritanceAndCompensation()
+        {
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var familyBefore = family.Wealth;
+            var patientWealthBefore = patient.Wealth;
+            var treasuryBefore = organization.Treasury;
+            var populationBefore = world.PopulationTransactions.FindAll(
+                item => item.Type == PopulationTransactionType.Death).Count;
+            var policy = world.MilitaryWoundDeathPolicies[0];
+            var expectedCompensation = policy.BaseCompensationMoney +
+                policy.CompensationPerRankMoney * service.Rank;
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolvePostTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(policy.Id));
+
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patient.Wealth, Is.Zero);
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(family.HeadPersonId, Is.EqualTo(successor.Id));
+            Assert.That(family.Wealth, Is.EqualTo(
+                familyBefore + patientWealthBefore + expectedCompensation));
+            Assert.That(organization.Treasury, Is.EqualTo(
+                treasuryBefore - expectedCompensation));
+            Assert.That(death.InjuryEpisodeId, Is.EqualTo(injury.Id));
+            Assert.That(world.MilitaryFamilyInheritances, Has.Count.EqualTo(1));
+            Assert.That(world.MilitarySurvivorCompensations,
+                Has.Count.EqualTo(1));
+            Assert.That(world.PopulationTransactions.FindAll(
+                    item => item.Type == PopulationTransactionType.Death).Count,
+                Is.EqualTo(populationBefore + 1));
+            Assert.That(world.LifeEvents.Find(item =>
+                item.Id == death.DeathLifeEventId), Is.Not.Null);
+            Assert.That(world.LifeEvents.Find(item =>
+                item.Id == death.SuccessionLifeEventId), Is.Not.Null);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryWoundDeaths, Has.Count.EqualTo(1));
+            Assert.That(loaded.MilitaryFamilyInheritances,
+                Has.Count.EqualTo(1));
+            Assert.That(loaded.MilitarySurvivorCompensations,
+                Has.Count.EqualTo(1));
+            Assert.That(loaded.People.Find(item => item.Id == patient.Id)
+                .IsAlive, Is.False);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_InsufficientTreasuryIsAtomic()
+        {
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var policy = world.MilitaryWoundDeathPolicies[0];
+            organization.Treasury = policy.BaseCompensationMoney +
+                policy.CompensationPerRankMoney * service.Rank - 1;
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolvePostTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(policy.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void WoundDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                false,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var policy = world.MilitaryWoundDeathPolicies[0];
+            policy.MinimumDaysAfterCareCompletion = 10;
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolvePostTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(policy.Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void WoundDeath_TamperedCompensationIsRejected()
+        {
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var policy = world.MilitaryWoundDeathPolicies[0];
+            new MilitaryWoundDeathSystem().ResolvePostTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(policy.Id));
+            world.MilitarySurvivorCompensations[0].FamilyWealthAfter--;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void WoundDeath_DataPolicyNeedsNoSchemaChange()
+        {
+            var schemaBefore = WorldState.CurrentSchemaVersion;
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var policy = new MilitaryWoundDeathPolicyDefinitionState
+            {
+                Id = "mod.example.wound_death_policy.veteran_compensation",
+                DisplayName = "重伤老卒抚恤",
+                MinimumSeverityBasisPoints = 8_000,
+                MaximumPostTreatmentHealthBasisPoints = 6_000,
+                MinimumDaysAfterCareCompletion = 1,
+                BaseCompensationMoney = 333,
+                CompensationPerRankMoney = 7
+            };
+            world.MilitaryWoundDeathPolicies.Add(policy);
+
+            new MilitaryWoundDeathSystem().ResolvePostTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(policy.Id));
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(schemaBefore));
+            Assert.That(world.MilitarySurvivorCompensations[0].PolicyId,
+                Is.EqualTo(policy.Id));
+            Assert.That(world.MilitarySurvivorCompensations[0].Amount,
+                Is.EqualTo(333 + 7 * service.Rank));
+            world.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyFourWithoutInventingWoundDeath()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 54");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryWoundDeathPolicies,
+                Has.Count.EqualTo(
+                    MilitaryWoundDeathPolicyCatalog.CreateCore().Count));
+            Assert.That(loaded.MilitaryWoundDeathPolicies.Exists(item =>
+                item.Id == MilitaryWoundDeathPolicyIds
+                    .SevereOriginalEvacuationComplication), Is.True);
+            Assert.That(loaded.MilitaryWoundDeathPolicies.Exists(item =>
+                item.Id == MilitaryWoundDeathPolicyIds
+                    .SevereReturnJourneyComplication), Is.True);
+            Assert.That(loaded.MilitaryWoundDeathPolicies.Exists(item =>
+                item.Id == MilitaryWoundDeathPolicyIds
+                    .SevereAwaitingTeamRejoinComplication), Is.True);
+            Assert.That(loaded.MilitaryWoundDeaths, Is.Empty);
+            Assert.That(loaded.MilitaryFamilyInheritances, Is.Empty);
+            Assert.That(loaded.MilitarySurvivorCompensations, Is.Empty);
+            Assert.That(loaded.MilitaryWoundDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_ReadyForReturnDeathKeepsBodyAndReturnsTeam()
+        {
+            var world = BuildReadyForReturnWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var careLocationId = evacuation.CurrentCareLocationId;
+            var policy = world.MilitaryWoundDeathPolicies[0];
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveReadyForReturnDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(policy.Id));
+
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patient.LocationId, Is.EqualTo(careLocationId));
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds.ReadyForReturnAtCareSite));
+            Assert.That(admission.DischargePolicyId, Is.EqualTo(
+                MilitaryRearMedicalDischargePolicyIds.DeathAtCareSite));
+            Assert.That(evacuation.PatientReturnPolicyId, Is.EqualTo(
+                MilitaryMedicalEvacuationPatientReturnPolicyIds
+                    .RemainAtCareSiteAfterDeath));
+            Assert.That(world.MilitaryMedicalDeathResponsibilities,
+                Has.Count.EqualTo(1));
+            var responsibility =
+                world.MilitaryMedicalDeathResponsibilities[0];
+            Assert.That(responsibility.WoundDeathId, Is.EqualTo(death.Id));
+            Assert.That(responsibility.RearMedicalSiteId,
+                Is.EqualTo(admission.RearMedicalSiteId));
+            Assert.That(responsibility.CareOrganizationId,
+                Is.EqualTo(organization.Id));
+            Assert.That(responsibility.ResponsiblePhysicianPersonId,
+                Is.EqualTo(admission.PhysicianPersonId));
+
+            new MilitaryRearMedicalSystem().StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.zhuo_zhongshan"));
+
+            Assert.That(evacuation.PatientReturnJourneyId, Is.Empty);
+            Assert.That(evacuation.TeamMembers, Has.All.Matches<
+                MilitaryMedicalEvacuationTeamMemberState>(item =>
+                    !string.IsNullOrEmpty(item.ReturnJourneyId)));
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                    MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(patient.LocationId, Is.EqualTo(careLocationId));
+            for (var i = 0; i < evacuation.TeamMembers.Count; i++)
+            {
+                var member = evacuation.TeamMembers[i];
+                Assert.That(world.MilitaryServices.Find(item =>
+                    item.Id == member.MilitaryServiceId).Status,
+                    Is.EqualTo(MilitaryServiceStatus.Active));
+            }
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryMedicalDeathResponsibilities,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_UnfinishedTreatmentDeathIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var patient = world.People.Find(item =>
+                item.Id == admission.PatientPersonId);
+            var successor = world.People.Find(item =>
+                item.Id == evacuation.TeamMembers[0].PersonId);
+            patient.FamilyId = "family.test.unfinished_wound_death";
+            successor.FamilyId = patient.FamilyId;
+            world.Families.Add(new FamilyState
+            {
+                Id = patient.FamilyId,
+                DisplayName = "Unfinished Treatment Family",
+                HeadPersonId = patient.Id,
+                Wealth = 1_000,
+                LocationId = site.LocationId,
+                MemberIds = new List<string> { patient.Id, successor.Id }
+            });
+            world.Validate();
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolveReadyForReturnDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void WoundDeath_ReadyForReturnWaitingPeriodIsAtomic()
+        {
+            var world = BuildReadyForReturnWoundDeathWorld(
+                false,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolveReadyForReturnDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void WoundDeath_TamperedMedicalResponsibilityIsRejected()
+        {
+            var world = BuildReadyForReturnWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            new MilitaryWoundDeathSystem().ResolveReadyForReturnDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id));
+            world.MilitaryMedicalDeathResponsibilities[0]
+                .ResponsiblePhysicianPersonId = successor.Id;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyFiveWoundDeathContext()
+        {
+            var world = BuildCompletedRetiredWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            new MilitaryWoundDeathSystem().ResolvePostTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id));
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace(
+                    "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 55")
+                .Replace(
+                    "\"DeathContextId\": \"" +
+                    MilitaryWoundDeathContextIds
+                        .PostReturnMedicalRetirement + "\"",
+                    "\"DeathContextId\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryWoundDeaths[0].DeathContextId,
+                Is.EqualTo(
+                    MilitaryWoundDeathContextIds.PostReturnMedicalRetirement));
+            Assert.That(loaded.MilitaryWoundDeaths[0].MedicalResponsibilityId,
+                Is.Empty);
+            Assert.That(loaded.MilitaryMedicalDeathResponsibilities, Is.Empty);
+            Assert.That(
+                loaded.MilitaryMedicalDeathResponsibilityContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_InTreatmentDeathClosesCareAndReturnsTeam()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                site,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveInTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                    new StableId(world
+                        .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            var closure = world.MilitaryInpatientDeathClosures[0];
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds.InTreatmentAtCareSite));
+            Assert.That(closure.OpeningHealthBasisPoints,
+                Is.EqualTo(injury.AdmissionHealthBasisPoints));
+            Assert.That(closure.ClosingHealthBasisPoints,
+                Is.EqualTo(death.HealthAtDeathBasisPoints));
+            Assert.That(closure.CompletedTreatmentStagesAtDeath, Is.Zero);
+            Assert.That(closure.RequiredTreatmentStagesAtDeath,
+                Is.EqualTo(admission.RequiredTreatmentStages));
+            Assert.That(closure.NextTreatmentProtocolId,
+                Is.EqualTo(admission.TreatmentPlanProtocolIds[0]));
+            Assert.That(admission.Status,
+                Is.EqualTo(MilitaryRearMedicalAdmissionStatus.Discharged));
+            Assert.That(admission.DischargedDay, Is.EqualTo(death.Day));
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(patient.LocationId, Is.EqualTo(site.LocationId));
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(world.MilitaryMedicalDeathResponsibilities,
+                Has.Count.EqualTo(1));
+
+            new MilitaryRearMedicalSystem().StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.zhuo_zhongshan"));
+            Assert.That(evacuation.PatientReturnJourneyId, Is.Empty);
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                    MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            Assert.That(evacuation.Status,
+                Is.EqualTo(MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(patient.LocationId, Is.EqualTo(site.LocationId));
+            for (var i = 0; i < evacuation.TeamMembers.Count; i++)
+            {
+                Assert.That(world.MilitaryServices.Find(item =>
+                    item.Id == evacuation.TeamMembers[i]
+                        .MilitaryServiceId).Status,
+                    Is.EqualTo(MilitaryServiceStatus.Active));
+            }
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryInpatientDeathClosures,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_InTreatmentDeathReleasesOnlyUnusedTransferMedicine()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transferSystem = new MilitaryMedicalTransferSystem();
+            var transfer = transferSystem.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            transferSystem.Receive(
+                world,
+                new StableId(transfer.Id),
+                new StableId(receiver.Id));
+            new MilitaryRearMedicalSystem().TreatInpatient(
+                world, new StableId(admission.Id));
+            var batch = world.ProductBatches.Find(item =>
+                item.Id == transfer.ReservedMedicineBatchId);
+            var quantityAfterTreatment = batch.Quantity;
+            var reservedBeforeDeath = batch.ReservedQuantity;
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                destinationSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+
+            new MilitaryWoundDeathSystem().ResolveInTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(world
+                    .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            var closure = world.MilitaryInpatientDeathClosures[0];
+            Assert.That(transfer.ConsumedReservedMedicineUnits, Is.EqualTo(1));
+            Assert.That(closure.ReleasedReservedMedicineUnits,
+                Is.EqualTo(reservedBeforeDeath));
+            Assert.That(transfer.ReleasedReservedMedicineUnits,
+                Is.EqualTo(reservedBeforeDeath));
+            Assert.That(batch.Quantity, Is.EqualTo(quantityAfterTreatment));
+            Assert.That(batch.ReservedQuantity, Is.Zero);
+            var release = world.InventoryTransactions.Find(item =>
+                item.Id == closure.ReservationReleaseInventoryTransactionId);
+            Assert.That(release.Type, Is.EqualTo(
+                InventoryTransactionType
+                    .MilitaryMedicalTransferMedicineReleased));
+            Assert.That(release.Lines[0].QuantityDelta, Is.Zero);
+            Assert.That(release.Lines[0].ReservedQuantityDelta,
+                Is.EqualTo(-reservedBeforeDeath));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            loaded.Validate();
+            loaded.InventoryTransactions.Find(item =>
+                    item.Id == closure.ReservationReleaseInventoryTransactionId)
+                .Lines[0].ReservedQuantityDelta++;
+            Assert.Throws<InvalidOperationException>(() => loaded.Validate());
+        }
+
+        [Test]
+        public void WoundDeath_InTreatmentWaitingPeriodIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                site,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolveInTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                    new StableId(world
+                        .MilitaryInpatientDeteriorationPolicies[0].Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void InpatientDeath_ActiveMedicalTransferIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem().ResolveInTreatmentDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                    new StableId(world
+                        .MilitaryInpatientDeteriorationPolicies[0].Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void InpatientDeath_DataPolicyNeedsNoSchemaChange()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                site,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            var schemaBefore = world.SchemaVersion;
+            var policy = new
+                MilitaryInpatientDeteriorationPolicyDefinitionState
+            {
+                Id = "mod.example.inpatient_deterioration.severe_fever",
+                DisplayName = "高热恶化",
+                MinimumSeverityBasisPoints = 8_000,
+                MinimumDaysAfterAdmission = 1,
+                HealthLossBasisPoints = 500,
+                MaximumClosingHealthBasisPoints = 1_000
+            };
+            world.MilitaryInpatientDeteriorationPolicies.Add(policy);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+
+            new MilitaryWoundDeathSystem().ResolveInTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(policy.Id));
+
+            Assert.That(world.SchemaVersion, Is.EqualTo(schemaBefore));
+            Assert.That(world.MilitaryInpatientDeathClosures[0]
+                .DeteriorationPolicyId, Is.EqualTo(policy.Id));
+            world.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_TamperedInpatientClosureIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var site);
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                site,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            new MilitaryWoundDeathSystem().ResolveInTreatmentDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(world
+                    .MilitaryInpatientDeteriorationPolicies[0].Id));
+            world.MilitaryInpatientDeathClosures[0]
+                .OpeningHealthBasisPoints++;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftySixWithoutInventingInpatientDeath()
+        {
+            var world = BuildReadyForReturnWoundDeathWorld(
+                true,
+                out var admission,
+                out var injury,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out var army);
+            new MilitaryWoundDeathSystem().ResolveReadyForReturnDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id));
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 56");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryInpatientDeteriorationPolicies,
+                Has.Count.EqualTo(1));
+            Assert.That(loaded.MilitaryInpatientDeathClosures, Is.Empty);
+            Assert.That(loaded.MilitaryWoundDeaths[0]
+                .InpatientDeathClosureId, Is.Empty);
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .InpatientDeathClosureId, Is.Empty);
+            Assert.That(loaded.MilitaryInpatientDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_DuringMedicalTransferReleasesResourcesAndCarriesCorpse()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            var patientJourney = world.Journeys.Find(item =>
+                item.Id == transfer.PatientJourneyId);
+            Assert.That(patientJourney, Is.Not.Null);
+            var remainingAtDeath = patientJourney.RemainingKilometers;
+            var medicineBatch = world.ProductBatches.Find(item =>
+                item.Id == transfer.ReservedMedicineBatchId);
+            var medicineQuantity = medicineBatch.Quantity;
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveMedicalTransferDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                    new StableId(world
+                        .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            var closure = world.MilitaryMedicalTransferDeathClosures[0];
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds.DuringCrossFacilityTransfer));
+            Assert.That(closure.OccurredInTransit, Is.True);
+            Assert.That(closure.RemainingKilometersAtDeath,
+                Is.EqualTo(remainingAtDeath));
+            Assert.That(transfer.Status, Is.EqualTo(
+                MilitaryMedicalTransferStatus.DeceasedInTransit));
+            Assert.That(world.Journeys.Find(item =>
+                item.Id == transfer.PatientJourneyId), Is.Not.Null);
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patient.Provisions, Is.GreaterThanOrEqualTo(0));
+            var corpseProvisions = patient.Provisions;
+            Assert.That(medicineBatch.Quantity, Is.EqualTo(medicineQuantity));
+            Assert.That(medicineBatch.ReservedQuantity, Is.Zero);
+            Assert.That(transfer.ReleasedReservedMedicineUnits,
+                Is.EqualTo(transfer.ReservedMedicineUnits));
+            Assert.That(admission.Status, Is.EqualTo(
+                MilitaryRearMedicalAdmissionStatus.Discharged));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Admitted));
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && transfer.Status !=
+                     MilitaryMedicalTransferStatus.ClosedAfterPatientDeath;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            Assert.That(transfer.Status, Is.EqualTo(
+                MilitaryMedicalTransferStatus.ClosedAfterPatientDeath));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(patient.LocationId,
+                Is.EqualTo(destinationSite.LocationId));
+            Assert.That(patient.Provisions, Is.EqualTo(corpseProvisions));
+
+            RelocateSourceArmyWithoutEvacuationParty(
+                world, army, "location.xiaquyang");
+            new MilitaryRearMedicalSystem().StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.anping_xiaquyang"));
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(service.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(patient.LocationId,
+                Is.EqualTo(destinationSite.LocationId));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryMedicalTransferDeathClosures,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_AwaitingTransferReceptionClosesWithoutHandoff()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var transfer = new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 20);
+            Assert.That(transfer.Status, Is.EqualTo(
+                MilitaryMedicalTransferStatus.AwaitingReception));
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveMedicalTransferDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                    new StableId(world
+                        .MilitaryInpatientDeteriorationPolicies[0].Id));
+
+            var closure = world.MilitaryMedicalTransferDeathClosures[0];
+            Assert.That(closure.OccurredInTransit, Is.False);
+            Assert.That(closure.RemainingKilometersAtDeath, Is.Zero);
+            Assert.That(transfer.Status, Is.EqualTo(
+                MilitaryMedicalTransferStatus.ClosedAfterPatientDeath));
+            Assert.That(string.IsNullOrEmpty(transfer.ReceivingPersonId),
+                Is.True);
+            Assert.That(transfer.ResponsibilityTransferredDay, Is.EqualTo(-1));
+            Assert.That(admission.PhysicianPersonId,
+                Is.EqualTo(transfer.SourcePhysicianPersonId));
+            Assert.That(admission.RearMedicalSiteId,
+                Is.EqualTo(destinationSite.Id));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(death.DeathLocationId,
+                Is.EqualTo(destinationSite.LocationId));
+            world.Validate();
+        }
+
+        [Test]
+        public void MedicalTransferDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolveMedicalTransferDeath(
+                        world,
+                        new StableId(admission.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                        new StableId(world
+                            .MilitaryInpatientDeteriorationPolicies[0].Id)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void MedicalTransferDeath_TamperedTransitClosureIsRejected()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var destinationSite = BuildMedicalTransferDestination(
+                world, sourceSite.OwnerOrganizationId, 2, 10,
+                out var receiver);
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            var army = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            new MilitaryMedicalTransferSystem().Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(admission.Id),
+                new StableId(destinationSite.Id),
+                new StableId("route.zhongshan_anping"),
+                new StableId(receiver.Id));
+            AttachInpatientWoundDeathFamily(
+                world,
+                admission,
+                sourceSite,
+                out var patient,
+                out var successor,
+                out var family,
+                out var organization,
+                out var service,
+                out army);
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            new MilitaryWoundDeathSystem().ResolveMedicalTransferDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(world.MilitaryWoundDeathPolicies[0].Id),
+                new StableId(world
+                    .MilitaryInpatientDeteriorationPolicies[0].Id));
+            world.MilitaryMedicalTransferDeathClosures[0]
+                .RouteId = "route.tampered";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftySevenWithoutInventingTransferDeath()
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var admission,
+                out var injury,
+                out var sourceSite);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 57");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryMedicalTransferDeathClosures,
+                Is.Empty);
+            Assert.That(loaded.MilitaryMedicalTransferDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryRearMedicalAdmissions[0]
+                .MedicalTransferDeathClosureId, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_DuringOriginalEvacuationCarriesCorpseAndReturnsTeam()
+        {
+            var world = BuildOriginalEvacuationDeathWorld(
+                false,
+                true,
+                out var evacuation,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var patientJourney = world.Journeys.Find(item =>
+                item.Id == evacuation.PatientJourneyId);
+            Assert.That(patientJourney, Is.Not.Null);
+            var remainingAtDeath = patientJourney.RemainingKilometers;
+            var corpseProvisions = patient.Provisions;
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveOriginalEvacuationDeath(
+                    world,
+                    new StableId(evacuation.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereOriginalEvacuationComplication),
+                    new StableId(
+                        MilitaryOriginalEvacuationDeteriorationPolicyIds
+                            .SevereUntreatedTransitComplication));
+
+            var closure = world
+                .MilitaryOriginalEvacuationDeathClosures[0];
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds.DuringOriginalEvacuation));
+            Assert.That(closure.OccurredInTransit, Is.True);
+            Assert.That(closure.RemainingKilometersAtDeath,
+                Is.EqualTo(remainingAtDeath));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.DeceasedInTransit));
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(world.MilitaryRearMedicalAdmissions, Is.Empty);
+            Assert.That(world.MilitaryInjuryEpisodes, Is.Empty);
+            Assert.That(world.MilitaryMedicalDeathResponsibilities[0]
+                .SourceArmyId, Is.EqualTo(army.Id));
+            Assert.That(world.MilitaryMedicalDeathResponsibilities[0]
+                .ResponsiblePhysicianPersonId, Is.Empty);
+            Assert.That(string.IsNullOrEmpty(
+                evacuation.ReceivingPersonId), Is.True);
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && evacuation.Status ==
+                     MilitaryMedicalEvacuationStatus.DeceasedInTransit;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(patient.LocationId,
+                Is.EqualTo(evacuation.DestinationLocationId));
+            Assert.That(patient.Provisions, Is.EqualTo(corpseProvisions));
+            Assert.That(receiver.Id,
+                Is.EqualTo(evacuation.DesignatedReceivingPersonId));
+            Assert.That(string.IsNullOrEmpty(
+                evacuation.ReceivingPersonId), Is.True);
+
+            new MilitaryRearMedicalSystem().StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(evacuation.RouteId));
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(teamServices.TrueForAll(item =>
+                item.Status == MilitaryServiceStatus.Active), Is.True);
+            Assert.That(patient.LocationId,
+                Is.EqualTo(evacuation.DestinationLocationId));
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryOriginalEvacuationDeathClosures,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void WoundDeath_AwaitingOriginalEvacuationReceptionDoesNotHandoff()
+        {
+            var world = BuildOriginalEvacuationDeathWorld(
+                true,
+                true,
+                out var evacuation,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.AwaitingReception));
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolveOriginalEvacuationDeath(
+                    world,
+                    new StableId(evacuation.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereOriginalEvacuationComplication),
+                    new StableId(
+                        MilitaryOriginalEvacuationDeteriorationPolicyIds
+                            .SevereUntreatedTransitComplication));
+
+            var closure = world
+                .MilitaryOriginalEvacuationDeathClosures[0];
+            Assert.That(closure.OccurredInTransit, Is.False);
+            Assert.That(closure.RemainingKilometersAtDeath, Is.Zero);
+            Assert.That(death.DeathLocationId,
+                Is.EqualTo(evacuation.DestinationLocationId));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.ReadyForReturn));
+            Assert.That(string.IsNullOrEmpty(
+                evacuation.ReceivingPersonId), Is.True);
+            Assert.That(evacuation.ReceivedDay, Is.EqualTo(-1));
+            Assert.That(world.MilitaryRearMedicalAdmissions, Is.Empty);
+            Assert.That(world.MilitaryInjuryEpisodes, Is.Empty);
+            Assert.That(world.MilitaryMedicalDeathResponsibilities[0]
+                .ResponsiblePhysicianPersonId, Is.EqualTo(string.Empty));
+            world.Validate();
+        }
+
+        [Test]
+        public void OriginalEvacuationDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildOriginalEvacuationDeathWorld(
+                false,
+                false,
+                out var evacuation,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolveOriginalEvacuationDeath(
+                        world,
+                        new StableId(evacuation.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryWoundDeathPolicyIds
+                            .SevereOriginalEvacuationComplication),
+                        new StableId(
+                            MilitaryOriginalEvacuationDeteriorationPolicyIds
+                                .SevereUntreatedTransitComplication)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void OriginalEvacuationDeath_TamperedClosureIsRejected()
+        {
+            var world = BuildOriginalEvacuationDeathWorld(
+                false,
+                true,
+                out var evacuation,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices,
+                out var receiver);
+            new MilitaryWoundDeathSystem().ResolveOriginalEvacuationDeath(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(MilitaryWoundDeathPolicyIds
+                    .SevereOriginalEvacuationComplication),
+                new StableId(
+                    MilitaryOriginalEvacuationDeteriorationPolicyIds
+                        .SevereUntreatedTransitComplication));
+            world.MilitaryOriginalEvacuationDeathClosures[0]
+                .RouteId = "route.tampered";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyEightWithoutInventingOriginalEvacuationDeath()
+        {
+            var world = PrototypeWorldFactory.Create184World(184_059);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 58");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryOriginalEvacuationDeathClosures,
+                Is.Empty);
+            Assert.That(loaded
+                .MilitaryOriginalEvacuationDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded
+                .MilitaryOriginalEvacuationDeteriorationPolicies,
+                Is.Not.Empty);
+            Assert.That(loaded.MilitaryMedicalEvacuations.TrueForAll(item =>
+                string.IsNullOrEmpty(
+                    item.OriginalEvacuationDeathClosureId)), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PatientReturnDeath_ReturnsCorpseAndClosesRejoin()
+        {
+            var world = BuildPatientReturnDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            var journey = world.Journeys.Find(item =>
+                item.Id == evacuation.PatientReturnJourneyId);
+            var remainingAtDeath = journey.RemainingKilometers;
+            var provisionsAtDeath = patient.Provisions;
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolvePatientReturnJourneyDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereReturnJourneyComplication),
+                    new StableId(
+                        MilitaryPatientReturnDeteriorationPolicyIds
+                            .SevereTravelRelapse));
+
+            var closure = world.MilitaryPatientReturnDeathClosures[0];
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds.DuringPatientReturnJourney));
+            Assert.That(closure.RemainingKilometersAtDeath,
+                Is.EqualTo(remainingAtDeath));
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus
+                    .PatientDeceasedReturningToArmy));
+            Assert.That(evacuation.PatientReturnPolicyId, Is.EqualTo(
+                MilitaryMedicalEvacuationPatientReturnPolicyIds
+                    .ReturnCorpseWithTeam));
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(world.MilitaryMedicalDeathResponsibilities[0]
+                .ResponsibilityPolicyId, Is.EqualTo(
+                    MilitaryMedicalDeathResponsibilityPolicyIds
+                        .LastCareTeamDuringAuthorizedReturn));
+
+            var frozenSnapshot = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() =>
+                new ArmySystem().StartMarch(
+                    world,
+                    new StableId(army.CommanderPersonId),
+                    new StableId(army.Id),
+                    new StableId("route.zhuo_zhongshan"),
+                    new StableId("location.zhuo")));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(frozenSnapshot));
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            simulator.AdvanceSegments(world, 1);
+            Assert.That(patient.Provisions, Is.EqualTo(provisionsAtDeath));
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(admission.Status, Is.EqualTo(
+                MilitaryRearMedicalAdmissionStatus.Completed));
+            Assert.That(patient.LocationId, Is.EqualTo(army.LocationId));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(teamServices.TrueForAll(item =>
+                item.Status == MilitaryServiceStatus.Active), Is.True);
+            Assert.That(patient.Provisions, Is.EqualTo(provisionsAtDeath));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryPatientReturnDeathClosures,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PatientReturnDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildPatientReturnDeathWorld(
+                false,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolvePatientReturnJourneyDeath(
+                        world,
+                        new StableId(admission.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryWoundDeathPolicyIds
+                            .SevereReturnJourneyComplication),
+                        new StableId(
+                            MilitaryPatientReturnDeteriorationPolicyIds
+                                .SevereTravelRelapse)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PatientReturnDeath_TamperedClosureIsRejected()
+        {
+            var world = BuildPatientReturnDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            new MilitaryWoundDeathSystem().ResolvePatientReturnJourneyDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(MilitaryWoundDeathPolicyIds
+                    .SevereReturnJourneyComplication),
+                new StableId(
+                    MilitaryPatientReturnDeteriorationPolicyIds
+                        .SevereTravelRelapse));
+            world.MilitaryPatientReturnDeathClosures[0]
+                .ReturnRouteId = "route.tampered";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void PatientReturnDeath_RejectsMissingPatientJourneyAtomically()
+        {
+            var world = BuildPatientReturnDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            world.Journeys.RemoveAll(item =>
+                item.Id == evacuation.PatientReturnJourneyId);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolvePatientReturnJourneyDeath(
+                        world,
+                        new StableId(admission.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryWoundDeathPolicyIds
+                            .SevereReturnJourneyComplication),
+                        new StableId(
+                            MilitaryPatientReturnDeteriorationPolicyIds
+                                .SevereTravelRelapse)));
+            Assert.That(world.MilitaryWoundDeaths, Is.Empty);
+            Assert.That(patient.IsAlive, Is.True);
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFiftyNineWithoutInventingPatientReturnDeath()
+        {
+            var world = PrototypeWorldFactory.Create184World(184_060);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 59");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryPatientReturnDeathClosures,
+                Is.Empty);
+            Assert.That(loaded
+                .MilitaryPatientReturnDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryPatientReturnDeteriorationPolicies,
+                Is.Not.Empty);
+            Assert.That(loaded.MilitaryMedicalEvacuations.TrueForAll(item =>
+                string.IsNullOrEmpty(
+                    item.PatientReturnDeathClosureId)), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PatientArrivalWaitingTeamDeath_LeavesCorpseAndClosesAfterTeamRejoin()
+        {
+            var world = BuildPatientArrivalWaitingTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            var patientReturnJourneyId = evacuation.PatientReturnJourneyId;
+
+            var death = new MilitaryWoundDeathSystem()
+                .ResolvePatientArrivalWaitingTeamDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereAwaitingTeamRejoinComplication),
+                    new StableId(
+                        MilitaryPatientReturnDeteriorationPolicyIds
+                            .SeverePostJourneyRelapse));
+
+            var closure = world.MilitaryPatientReturnDeathClosures[0];
+            Assert.That(death.DeathContextId, Is.EqualTo(
+                MilitaryWoundDeathContextIds
+                    .AwaitingReturnTeamRejoinAtArmy));
+            Assert.That(death.DeathLocationId, Is.EqualTo(army.LocationId));
+            Assert.That(closure.PatientJourneyCompletedBeforeDeath, Is.True);
+            Assert.That(closure.RemainingKilometersAtDeath, Is.Zero);
+            Assert.That(closure.TeamJourneySnapshotsAtDeath,
+                Has.Count.EqualTo(evacuation.TeamMembers.Count));
+            Assert.That(closure.TeamJourneySnapshotsAtDeath.Exists(item =>
+                item.RemainingKilometersAtDeath > 0), Is.True);
+            Assert.That(world.Journeys.Exists(item =>
+                item.Id == patientReturnJourneyId), Is.False);
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus
+                    .PatientDeceasedAwaitingTeamRejoin));
+            Assert.That(evacuation.PatientReturnPolicyId, Is.EqualTo(
+                MilitaryMedicalEvacuationPatientReturnPolicyIds
+                    .CorpseAtArmyAwaitingTeamRejoin));
+            Assert.That(patient.LocationId, Is.EqualTo(army.LocationId));
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+
+            var frozenSnapshot = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() =>
+                new ArmySystem().StartMarch(
+                    world,
+                    new StableId(army.CommanderPersonId),
+                    new StableId(army.Id),
+                    new StableId("route.zhuo_zhongshan"),
+                    new StableId("location.zhuo")));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(frozenSnapshot));
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 20 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(admission.Status, Is.EqualTo(
+                MilitaryRearMedicalAdmissionStatus.Completed));
+            Assert.That(patient.LocationId, Is.EqualTo(army.LocationId));
+            Assert.That(patientService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(teamServices.TrueForAll(item =>
+                item.Status == MilitaryServiceStatus.Active), Is.True);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryPatientReturnDeathClosures,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void PatientArrivalWaitingTeamDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildPatientArrivalWaitingTeamDeathWorld(
+                false,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolvePatientArrivalWaitingTeamDeath(
+                        world,
+                        new StableId(admission.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryWoundDeathPolicyIds
+                            .SevereAwaitingTeamRejoinComplication),
+                        new StableId(
+                            MilitaryPatientReturnDeteriorationPolicyIds
+                                .SeverePostJourneyRelapse)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PatientArrivalWaitingTeamDeath_RejectsNoOutstandingTeamJourneyAtomically()
+        {
+            var world = BuildPatientArrivalWaitingTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            var population = new PopulationLedgerSystem();
+            for (var i = 0; i < evacuation.TeamMembers.Count; i++)
+            {
+                var member = evacuation.TeamMembers[i];
+                world.Journeys.RemoveAll(item =>
+                    item.Id == member.ReturnJourneyId);
+                population.MoveIndependentPerson(
+                    world,
+                    world.People.Find(item => item.Id == member.PersonId),
+                    evacuation.ReturnDestinationLocationId,
+                    false);
+            }
+            world.Validate();
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryWoundDeathSystem()
+                    .ResolvePatientArrivalWaitingTeamDeath(
+                        world,
+                        new StableId(admission.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryWoundDeathPolicyIds
+                            .SevereAwaitingTeamRejoinComplication),
+                        new StableId(
+                            MilitaryPatientReturnDeteriorationPolicyIds
+                                .SeverePostJourneyRelapse)));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PatientArrivalWaitingTeamDeath_TamperedTeamSnapshotIsRejected()
+        {
+            var world = BuildPatientArrivalWaitingTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            new MilitaryWoundDeathSystem()
+                .ResolvePatientArrivalWaitingTeamDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereAwaitingTeamRejoinComplication),
+                    new StableId(
+                        MilitaryPatientReturnDeteriorationPolicyIds
+                            .SeverePostJourneyRelapse));
+            world.MilitaryPatientReturnDeathClosures[0]
+                .TeamJourneySnapshotsAtDeath[0].ReturnJourneyId =
+                    "journey.tampered";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixtyWithoutInventingPatientArrivalWaitingTeamDeath()
+        {
+            var world = PrototypeWorldFactory.Create184World(184_061);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 60");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryPatientReturnDeathClosures, Is.Empty);
+            Assert.That(loaded
+                .MilitaryPatientArrivalWaitingTeamDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryWoundDeathPolicies.Exists(item =>
+                item.Id == MilitaryWoundDeathPolicyIds
+                    .SevereAwaitingTeamRejoinComplication), Is.True);
+            Assert.That(loaded
+                .MilitaryPatientReturnDeteriorationPolicies.Exists(item =>
+                    item.Id == MilitaryPatientReturnDeteriorationPolicyIds
+                        .SeverePostJourneyRelapse), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ReturnTeamDeath_LivingPatientCompletesCorpseAndSurvivorRejoin()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            var provisionsBefore = deceasedMember.Provisions;
+
+            var death = new MilitaryReturnTeamDeathSystem()
+                .ResolveReturnJourneyDeath(
+                    world,
+                    new StableId(evacuation.Id),
+                    new StableId(deceasedMember.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryReturnTeamDeathPolicyIds
+                        .ReturnJourneyFatality));
+
+            Assert.That(death.RemainingKilometersAtDeath,
+                Is.GreaterThan(0));
+            Assert.That(death.CorpseArrivedDay, Is.EqualTo(-1));
+            Assert.That(deceasedMember.IsAlive, Is.False);
+            Assert.That(deceasedService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(world.Journeys.Exists(item =>
+                item.Id == death.ReturnJourneyId), Is.True);
+            Assert.That(world.MilitaryFamilyInheritances.Exists(item =>
+                item.ReturnTeamDeathId == death.Id &&
+                string.IsNullOrEmpty(item.WoundDeathId)), Is.True);
+            Assert.That(world.MilitarySurvivorCompensations.Exists(item =>
+                item.ReturnTeamDeathId == death.Id &&
+                string.IsNullOrEmpty(item.WoundDeathId)), Is.True);
+            new TravelSystem().ConsumeDailyTravelProvisions(world);
+            Assert.That(deceasedMember.Provisions,
+                Is.EqualTo(provisionsBefore));
+            world.Validate();
+
+            var frozen = WorldSnapshotSerializer.Serialize(world);
+            Assert.Throws<InvalidOperationException>(() =>
+                new ArmySystem().StartMarch(
+                    world,
+                    new StableId(army.CommanderPersonId),
+                    new StableId(army.Id),
+                    new StableId("route.zhuo_zhongshan"),
+                    new StableId("location.zhuo")));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(frozen));
+
+            var simulator = new WorldSimulator(world.MasterSeed);
+            world.Journeys.Find(item =>
+                item.Id == death.ReturnJourneyId).RemainingKilometers =
+                    TravelSystem.KilometersPerSegment(TravelMode.Foot);
+            world.Journeys.Find(item =>
+                item.Id == evacuation.PatientReturnJourneyId)
+                    .RemainingKilometers = checked(
+                        TravelSystem.KilometersPerSegment(TravelMode.Foot) * 2);
+            for (var i = 1; i < evacuation.TeamMembers.Count; i++)
+            {
+                world.Journeys.Find(item =>
+                    item.Id == evacuation.TeamMembers[i].ReturnJourneyId)
+                        .RemainingKilometers = checked(
+                            TravelSystem.KilometersPerSegment(TravelMode.Foot) *
+                            2);
+            }
+            simulator.AdvanceSegments(world, 1);
+            Assert.That(death.CorpseArrivedDay,
+                Is.EqualTo(world.AbsoluteDay));
+            Assert.That(evacuation.Status, Is.Not.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            for (var i = 0;
+                 i < 20 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus.Completed));
+            Assert.That(admission.Status, Is.EqualTo(
+                MilitaryRearMedicalAdmissionStatus.Completed));
+            Assert.That(patient.IsAlive, Is.True);
+            Assert.That(deceasedMember.LocationId,
+                Is.EqualTo(army.LocationId));
+            Assert.That(death.CorpseArrivedDay,
+                Is.GreaterThanOrEqualTo(death.Day));
+            Assert.That(deceasedService.Status,
+                Is.EqualTo(MilitaryServiceStatus.Dead));
+            Assert.That(teamServices.FindAll(item =>
+                item.Id != deceasedService.Id).TrueForAll(item =>
+                    item.Status == MilitaryServiceStatus.Active), Is.True);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.MilitaryReturnTeamDeaths,
+                Has.Count.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void ReturnTeamDeath_PatientCorpseJourneyKeepsBothDeaths()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            new MilitaryWoundDeathSystem().ResolvePatientReturnJourneyDeath(
+                world,
+                new StableId(admission.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(MilitaryWoundDeathPolicyIds
+                    .SevereReturnJourneyComplication),
+                new StableId(MilitaryPatientReturnDeteriorationPolicyIds
+                    .SevereTravelRelapse));
+
+            var teamDeath = new MilitaryReturnTeamDeathSystem()
+                .ResolveReturnJourneyDeath(
+                    world,
+                    new StableId(evacuation.Id),
+                    new StableId(deceasedMember.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryReturnTeamDeathPolicyIds
+                        .ReturnJourneyFatality));
+
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(deceasedMember.IsAlive, Is.False);
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus
+                    .PatientDeceasedReturningToArmy));
+            Assert.That(world.MilitaryWoundDeaths, Has.Count.EqualTo(1));
+            Assert.That(world.MilitaryReturnTeamDeaths,
+                Has.Count.EqualTo(1));
+            Assert.That(teamDeath.EvacuationId, Is.EqualTo(evacuation.Id));
+            world.Validate();
+        }
+
+        [Test]
+        public void ReturnTeamDeath_AwaitingTeamPatientDeathKeepsBothDeaths()
+        {
+            var world = BuildPatientArrivalWaitingTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var injury,
+                out var army,
+                out var patient,
+                out var patientService,
+                out var teamServices);
+            AddReturnTeamMembersToPatientFamily(
+                world, evacuation, patient.FamilyId);
+            new MilitaryWoundDeathSystem()
+                .ResolvePatientArrivalWaitingTeamDeath(
+                    world,
+                    new StableId(admission.Id),
+                    new StableId(army.CommanderPersonId),
+                    new StableId(MilitaryWoundDeathPolicyIds
+                        .SevereAwaitingTeamRejoinComplication),
+                    new StableId(
+                        MilitaryPatientReturnDeteriorationPolicyIds
+                            .SeverePostJourneyRelapse));
+            var deceasedMember = world.People.Find(item =>
+                item.Id == evacuation.TeamMembers[0].PersonId);
+
+            new MilitaryReturnTeamDeathSystem().ResolveReturnJourneyDeath(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(deceasedMember.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(MilitaryReturnTeamDeathPolicyIds
+                    .ReturnJourneyFatality));
+
+            Assert.That(evacuation.Status, Is.EqualTo(
+                MilitaryMedicalEvacuationStatus
+                    .PatientDeceasedAwaitingTeamRejoin));
+            Assert.That(patient.LocationId, Is.EqualTo(army.LocationId));
+            Assert.That(patient.IsAlive, Is.False);
+            Assert.That(deceasedMember.IsAlive, Is.False);
+            Assert.That(world.MilitaryWoundDeaths, Has.Count.EqualTo(1));
+            Assert.That(world.MilitaryReturnTeamDeaths,
+                Has.Count.EqualTo(1));
+            world.Validate();
+        }
+
+        [Test]
+        public void ReturnTeamDeath_WaitingPeriodIsAtomic()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                false,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryReturnTeamDeathSystem()
+                    .ResolveReturnJourneyDeath(
+                        world,
+                        new StableId(evacuation.Id),
+                        new StableId(deceasedMember.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryReturnTeamDeathPolicyIds
+                            .ReturnJourneyFatality)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void ReturnTeamDeath_MissingJourneyIsAtomic()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var journeyIndex = world.Journeys.FindIndex(item =>
+                item.Id == evacuation.TeamMembers[0].ReturnJourneyId);
+            var removedJourney = world.Journeys[journeyIndex];
+            world.Journeys.RemoveAt(journeyIndex);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryReturnTeamDeathSystem()
+                    .ResolveReturnJourneyDeath(
+                        world,
+                        new StableId(evacuation.Id),
+                        new StableId(deceasedMember.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryReturnTeamDeathPolicyIds
+                            .ReturnJourneyFatality)));
+
+            world.Journeys.Insert(journeyIndex, removedJourney);
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void ReturnTeamDeath_TamperedRouteIsRejected()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            new MilitaryReturnTeamDeathSystem().ResolveReturnJourneyDeath(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(deceasedMember.Id),
+                new StableId(army.CommanderPersonId),
+                new StableId(MilitaryReturnTeamDeathPolicyIds
+                    .ReturnJourneyFatality));
+            world.MilitaryReturnTeamDeaths[0].ReturnRouteId =
+                "route.tampered";
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void ReturnTeamDeath_InsufficientTreasuryIsAtomic()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            world.Organizations.Find(item =>
+                item.Id == army.OrganizationId).Treasury = 0;
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryReturnTeamDeathSystem()
+                    .ResolveReturnJourneyDeath(
+                        world,
+                        new StableId(evacuation.Id),
+                        new StableId(deceasedMember.Id),
+                        new StableId(army.CommanderPersonId),
+                        new StableId(MilitaryReturnTeamDeathPolicyIds
+                            .ReturnJourneyFatality)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void ReturnTeamDeath_InsufficientAuthorityIsAtomic()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            var unauthorizedPerson = world.People.Find(item =>
+                item.Id == evacuation.TeamMembers[1].PersonId);
+            var before = WorldSnapshotSerializer.Serialize(world);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                new MilitaryReturnTeamDeathSystem()
+                    .ResolveReturnJourneyDeath(
+                        world,
+                        new StableId(evacuation.Id),
+                        new StableId(deceasedMember.Id),
+                        new StableId(unauthorizedPerson.Id),
+                        new StableId(MilitaryReturnTeamDeathPolicyIds
+                            .ReturnJourneyFatality)));
+
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionSixtyOneWithoutInventingReturnTeamDeath()
+        {
+            var world = BuildReturnTeamDeathWorld(
+                true,
+                out var evacuation,
+                out var admission,
+                out var army,
+                out var patient,
+                out var deceasedMember,
+                out var deceasedService,
+                out var teamServices);
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 61");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.MilitaryReturnTeamDeaths, Is.Empty);
+            Assert.That(loaded.MilitaryReturnTeamDeathPolicies.Exists(item =>
+                item.Id == MilitaryReturnTeamDeathPolicyIds
+                    .ReturnJourneyFatality), Is.True);
+            Assert.That(loaded.MilitaryReturnTeamDeathContractActivationDay,
+                Is.EqualTo(loaded.AbsoluteDay + 1));
+            Assert.That(loaded.MilitaryMedicalEvacuations.TrueForAll(item =>
+                item.TeamMembers.TrueForAll(member =>
+                    string.IsNullOrEmpty(member.ReturnDeathId))), Is.True);
+            Assert.That(loaded.MilitaryFamilyInheritances.TrueForAll(item =>
+                string.IsNullOrEmpty(item.ReturnTeamDeathId)), Is.True);
+            Assert.That(loaded.MilitarySurvivorCompensations.TrueForAll(item =>
+                string.IsNullOrEmpty(item.ReturnTeamDeathId)), Is.True);
+            loaded.Validate();
         }
 
         [Test]
@@ -1218,21 +5434,27 @@ namespace Mandate.Tests
                 StartingIdentity.Soldier,
                 StartingIdentity.CountyClerk,
                 StartingIdentity.Merchant,
-                StartingIdentity.Physician
+                StartingIdentity.Physician,
+                StartingIdentity.Farmer,
+                StartingIdentity.Scholar
             };
             var expectedLocations = new[]
             {
                 "location.zhongshan",
                 "location.zhuo",
                 "location.zhongshan",
-                "location.guangzong"
+                "location.guangzong",
+                "location.zhuo",
+                "location.zhuo"
             };
             var expectedPositions = new[]
             {
                 "position.youzhou_soldier",
                 "position.zhuo_county_clerk",
                 "position.zhongshan_trader",
-                "position.guangzong_physician"
+                "position.guangzong_physician",
+                "position.zhuo_farmer",
+                "position.zhuo_scholar"
             };
 
             for (var i = 0; i < identities.Length; i++)
@@ -1299,6 +5521,500 @@ namespace Mandate.Tests
                     184));
             Assert.Throws<InvalidOperationException>(
                 () => service.CreateExisting184World("person.missing", 184));
+        }
+
+        [Test]
+        public void M26_NewGame_BackgroundAndLocationCreateConcreteHousehold()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "异乡行商",
+                    Age = 24,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Merchant,
+                    BackgroundId = StartingBackgroundIds.SupportedHousehold,
+                    StartingLocationId = "location.zhuo"
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var family = world.Families.Find(item => item.Id == player.FamilyId);
+
+            Assert.That(player.LocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(player.BirthLocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(player.Wealth, Is.GreaterThan(2_000));
+            Assert.That(family.LocationId, Is.EqualTo("location.zhuo"));
+            Assert.That(family.MemberIds, Does.Contain(player.Id));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_NewGame_ExistingFarmerKeepsOriginalWorldFacts()
+        {
+            var baseline = PrototypeWorldFactory.Create184World(184);
+            var count = baseline.People.Count;
+            var baselineFamily = baseline.Families.Find(item =>
+                item.Id == "family.zhuo_farm_household");
+            var world = new NewGameSetupService().CreateExisting184World(
+                "person.generated.farmer_001",
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var family = world.Families.Find(item => item.Id == player.FamilyId);
+
+            Assert.That(world.People.Count, Is.EqualTo(count));
+            Assert.That(family, Is.Not.Null);
+            Assert.That(family.LocationId, Is.EqualTo(baselineFamily.LocationId));
+            Assert.That(family.VillageId, Is.EqualTo(baselineFamily.VillageId));
+            Assert.That(family.Grain, Is.EqualTo(baselineFamily.Grain));
+            Assert.That(family.SeedGrain, Is.EqualTo(baselineFamily.SeedGrain));
+            Assert.That(family.FarmlandUnits,
+                Is.EqualTo(baselineFamily.FarmlandUnits));
+            Assert.That(world.Villages.Count, Is.EqualTo(baseline.Villages.Count));
+            Assert.That(world.VillageFacilities.Count,
+                Is.EqualTo(baseline.VillageFacilities.Count));
+            Assert.That(world.Memberships.Count,
+                Is.EqualTo(baseline.Memberships.Count));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_NewGame_SoldierOnlyAcceptsRealArmyStartingLocation()
+        {
+            var service = new NewGameSetupService();
+            var preview = PrototypeWorldFactory.Create184World(184);
+            var army = preview.Armies.Find(item =>
+                item.Id == "army.youzhou_reinforcement");
+            var legal = service.GetLegalStartingLocationIds(
+                preview, StartingIdentity.Soldier);
+
+            Assert.That(legal, Is.EqualTo(new[] { army.LocationId }));
+            Assert.Throws<ArgumentException>(() => service.CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "错地新卒",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier,
+                    StartingLocationId = "location.guangzong"
+                },
+                184));
+
+            var world = service.CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "集结新卒",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier,
+                    StartingLocationId = army.LocationId
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            Assert.That(player.LocationId, Is.EqualTo(army.LocationId));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_FarmerCreatesFormalSeasonOrder()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "春耕者",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Farmer
+                },
+                184);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var result = actions.Execute(
+                world, world.PlayerPersonId, PlayerActionIds.FarmStart);
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.DaysAdvanced, Is.EqualTo(1));
+            Assert.That(world.AgricultureWorkOrders.Exists(item =>
+                item.ManagerPersonId == world.PlayerPersonId &&
+                item.ControlMode == ProductionControlMode.PersonalLabor &&
+                item.Status == ProductionOrderStatus.Active), Is.True);
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_FarmerCompletesHarvestAndBatchBridge()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "麦收者",
+                    Age = 22,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Farmer
+                },
+                184);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+            actions.Execute(world, world.PlayerPersonId, PlayerActionIds.FarmStart);
+
+            var result = actions.Execute(
+                world, world.PlayerPersonId, PlayerActionIds.FarmComplete);
+            var order = world.AgricultureWorkOrders.Find(item =>
+                item.ManagerPersonId == world.PlayerPersonId);
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(order.Status, Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(order.StoredQuantity, Is.GreaterThan(0));
+            Assert.That(world.InventoryTransactions.Exists(item =>
+                item.SourceWorkOrderId == order.Id), Is.True);
+            Assert.That(world.ProductBatches.Exists(item =>
+                item.SourceTransactionId != string.Empty &&
+                item.OwnerFamilyId == order.FamilyId), Is.True);
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_MerchantBuyAndSellUseWorldMarketLedger()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "布商",
+                    Age = 26,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Merchant
+                },
+                184);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var buy = actions.Execute(
+                world, world.PlayerPersonId, PlayerActionIds.TradeBuy);
+            var sell = actions.Execute(
+                world, world.PlayerPersonId, PlayerActionIds.TradeSell);
+
+            Assert.That(buy.Success, Is.True);
+            Assert.That(sell.Success, Is.True);
+            Assert.That(world.TradeRecords.Count, Is.EqualTo(2));
+            Assert.That(world.TradeRecords[0].IsPurchase, Is.True);
+            Assert.That(world.TradeRecords[1].IsPurchase, Is.False);
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_MerchantBuyAvailabilityUsesLiveMarketCost()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "试价布商",
+                    Age = 26,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.Merchant,
+                    StartingLocationId = "location.guangzong"
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            player.Wealth = 420;
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var option = actions.QueryActions(world, player.Id).Single(item =>
+                item.Id == PlayerActionIds.TradeBuy);
+            var rejected = actions.Execute(
+                world, player.Id, PlayerActionIds.TradeBuy);
+
+            Assert.That(option.IsAvailable, Is.False);
+            Assert.That(option.UnavailableReason, Does.Contain("440"));
+            Assert.That(rejected.Success, Is.False);
+            Assert.That(rejected.DaysAdvanced, Is.EqualTo(0));
+            Assert.That(world.TradeRecords, Is.Empty);
+
+            player.Wealth = 440;
+            option = actions.QueryActions(world, player.Id).Single(item =>
+                item.Id == PlayerActionIds.TradeBuy);
+            Assert.That(option.IsAvailable, Is.True);
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_ScholarStudyChangesSkillAndWorldTime()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "乡学士人",
+                    Age = 19,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Scholar
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var result = actions.Execute(
+                world, player.Id, PlayerActionIds.Study);
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.DaysAdvanced, Is.EqualTo(30));
+            var record = world.LearningRecords.Find(item =>
+                item.StudentPersonId == player.Id);
+            Assert.That(record, Is.Not.Null);
+            Assert.That(record.SkillGain, Is.GreaterThan(0));
+            Assert.That(record.SkillAfter, Is.GreaterThan(record.SkillBefore));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_TaskConstructionAndHomeCareShareWorldFacts()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "涿县书佐",
+                    Age = 28,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.CountyClerk
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            Assert.That(actions.Execute(
+                world, player.Id, PlayerActionIds.AcceptTask).Success, Is.True);
+            Assert.That(actions.Execute(
+                world, player.Id, PlayerActionIds.WorkTask).Success, Is.True);
+            Assert.That(actions.Execute(
+                world, player.Id, PlayerActionIds.AbandonTask).Success, Is.True);
+            Assert.That(world.Tasks[0].Status, Is.EqualTo(TaskStatus.Abandoned));
+
+            for (var i = 0; i < 4 &&
+                 !world.ConstructionProjects.Exists(item => item.IsCompleted); i++)
+            {
+                Assert.That(actions.Execute(
+                    world, player.Id, PlayerActionIds.Construction).Success,
+                    Is.True);
+            }
+            var completed = world.ConstructionProjects.Find(
+                item => item.IsCompleted);
+            Assert.That(completed, Is.Not.Null);
+            Assert.That(
+                world.Locations.Find(item => item.Id == player.LocationId).Features &
+                completed.TargetFeature,
+                Is.EqualTo(completed.TargetFeature));
+
+            player.HealthBasisPoints = 6_000;
+            var provisions = player.Provisions;
+            var care = actions.Execute(
+                world, player.Id, PlayerActionIds.HomeRest);
+            Assert.That(care.Success, Is.True);
+            Assert.That(care.DaysAdvanced, Is.EqualTo(7));
+            Assert.That(player.Provisions, Is.EqualTo(provisions - 2));
+            Assert.That(player.HealthBasisPoints, Is.GreaterThan(6_000));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_SoldierMarchesAndResolvesLocalBattle()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "幽州新卒",
+                    Age = 21,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            Assert.That(actions.Execute(
+                world, player.Id, PlayerActionIds.ArmyAdvance).Success, Is.True);
+            Assert.That(player.LocationId, Is.EqualTo("location.anping"));
+            Assert.That(actions.Execute(
+                world, player.Id, PlayerActionIds.ArmyAdvance).Success, Is.True);
+            Assert.That(player.LocationId, Is.EqualTo("location.guangzong"));
+            var battle = actions.Execute(
+                world, player.Id, PlayerActionIds.Battle);
+
+            Assert.That(battle.Success, Is.True);
+            Assert.That(world.Battles.Count, Is.EqualTo(1));
+            Assert.That(world.Battles[0].LocationId,
+                Is.EqualTo("location.guangzong"));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_EventChoicePersistsAcrossSnapshot()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "乡里善人",
+                    Age = 31,
+                    Gender = PersonGender.Female,
+                    Identity = StartingIdentity.CountyClerk
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var provisions = player.Provisions;
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var result = actions.Execute(
+                world, player.Id, PlayerActionIds.LocalReliefHelp);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(player.Provisions, Is.EqualTo(provisions - 2));
+            Assert.That(loaded.LifeEvents.Exists(item =>
+                item.Id == result.WorldEventId), Is.True);
+            Assert.That(new PlayerActionService(
+                    new WorldSimulator(loaded.MasterSeed))
+                .QueryActions(loaded, loaded.PlayerPersonId)
+                .Any(item => item.Id == PlayerActionIds.LocalReliefHelp),
+                Is.False);
+            Assert.DoesNotThrow(loaded.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_HistoricalRumorRequiresRelevantLocation()
+        {
+            var service = new NewGameSetupService();
+            var remote = service.CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "涿县书佐",
+                    Age = 30,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.CountyClerk,
+                    StartingLocationId = "location.zhuo"
+                },
+                184);
+            remote.AbsoluteDay = 10;
+            var remoteActions = new PlayerActionService(
+                new WorldSimulator(remote.MasterSeed));
+            Assert.That(remoteActions.QueryActions(
+                    remote, remote.PlayerPersonId).Any(item =>
+                        item.Id == PlayerActionIds.HistoricalReport),
+                Is.False);
+
+            var local = service.CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "广宗访客",
+                    Age = 30,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.CountyClerk,
+                    StartingLocationId = "location.guangzong"
+                },
+                184);
+            local.AbsoluteDay = 10;
+            var localActions = new PlayerActionService(
+                new WorldSimulator(local.MasterSeed));
+            Assert.That(localActions.QueryActions(
+                    local, local.PlayerPersonId).Any(item =>
+                        item.Id == PlayerActionIds.HistoricalReport),
+                Is.True);
+        }
+
+        [Test]
+        public void M26_PlayerAction_FieldCareFailsWithoutPhysicianAndConsumesNoDay()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "待治新卒",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var service = world.MilitaryServices.Find(item =>
+                item.PersonId == player.Id);
+            service.Status = MilitaryServiceStatus.Wounded;
+            player.HealthBasisPoints = 4_000;
+            for (var personIndex = 0;
+                 personIndex < world.People.Count;
+                 personIndex++)
+            {
+                world.People[personIndex].MedicalSkillBasisPoints = 0;
+                world.People[personIndex].ProfessionalSkills.Medicine = 0;
+            }
+            new MilitaryServiceSystem().SynchronizeArmyCaches(
+                world, service.ArmyId);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var option = actions.QueryActions(world, player.Id).Single(item =>
+                item.Id == PlayerActionIds.FieldCare);
+            var result = actions.Execute(
+                world, player.Id, PlayerActionIds.FieldCare);
+
+            Assert.That(option.IsAvailable, Is.False);
+            Assert.That(option.UnavailableReason, Does.Contain("医者"));
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.DaysAdvanced, Is.EqualTo(0));
+            Assert.That(world.AbsoluteDay, Is.EqualTo(0));
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Wounded));
+            Assert.DoesNotThrow(world.Validate);
+        }
+
+        [Test]
+        public void M26_PlayerAction_FieldCareTargetsControlledPerson()
+        {
+            var world = new NewGameSetupService().CreateCustom184World(
+                new NewGameCharacterRequest
+                {
+                    DisplayName = "受伤新卒",
+                    Age = 20,
+                    Gender = PersonGender.Male,
+                    Identity = StartingIdentity.Soldier
+                },
+                184);
+            var player = world.People.Find(item => item.Id == world.PlayerPersonId);
+            var service = world.MilitaryServices.Find(item =>
+                item.PersonId == player.Id);
+            var army = world.Armies.Find(item => item.Id == service.ArmyId);
+            var other = world.MilitaryServices.Find(item =>
+                item.ArmyId == army.Id &&
+                item.PersonId != player.Id &&
+                item.PersonId != army.CommanderPersonId &&
+                item.Status == MilitaryServiceStatus.Active);
+            var otherPerson = world.People.Find(item => item.Id == other.PersonId);
+            service.Status = MilitaryServiceStatus.Wounded;
+            player.HealthBasisPoints = 4_000;
+            other.Status = MilitaryServiceStatus.Wounded;
+            otherPerson.HealthBasisPoints = 4_000;
+            new MilitaryServiceSystem().SynchronizeArmyCaches(world, army.Id);
+
+            var physician = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, physician, army.LocationId, false);
+            var actions = new PlayerActionService(
+                new WorldSimulator(world.MasterSeed));
+
+            var option = actions.QueryActions(world, player.Id).Single(item =>
+                item.Id == PlayerActionIds.FieldCare);
+            Assert.That(option.IsAvailable, Is.True,
+                option.UnavailableReason);
+            var result = actions.Execute(
+                world, player.Id, PlayerActionIds.FieldCare);
+
+            Assert.That(result.Success, Is.True, result.Summary);
+            Assert.That(result.DaysAdvanced, Is.EqualTo(1));
+            Assert.That(world.MilitaryMedicalCases.Exists(item =>
+                item.PatientPersonId == player.Id), Is.True);
+            Assert.That(service.Status, Is.EqualTo(MilitaryServiceStatus.Active));
+            Assert.That(player.HealthBasisPoints, Is.GreaterThan(4_000));
+            Assert.DoesNotThrow(world.Validate);
         }
 
         [Test]
@@ -3711,7 +8427,10 @@ namespace Mandate.Tests
             Assert.That(types, Does.Contain(VillageLedgerEntryType.Levy));
             Assert.That(types, Does.Contain(VillageLedgerEntryType.Marriage));
             Assert.That(types, Does.Contain(VillageLedgerEntryType.Migration));
-            Assert.That(types, Does.Contain(VillageLedgerEntryType.MedicalCare));
+            Assert.That(world.ProductBatches.Exists(item =>
+                    item.ProductDefinitionId ==
+                        CoreProductionContent.HerbalMedicineMaterialProductId),
+                Is.True);
             Assert.That(
                 world.LifeEvents.Exists(item => item.Type == LifeEventType.Birth),
                 Is.True);
@@ -3896,10 +8615,10 @@ namespace Mandate.Tests
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
             Assert.That(fromResource.QualityDimensionCount, Is.EqualTo(9));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(29));
-            Assert.That(fromResource.RecipeCount, Is.EqualTo(15));
-            Assert.That(fromResource.MethodCount, Is.EqualTo(13));
-            Assert.That(fromResource.SkillCount, Is.EqualTo(8));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(32));
+            Assert.That(fromResource.RecipeCount, Is.EqualTo(16));
+            Assert.That(fromResource.MethodCount, Is.EqualTo(14));
+            Assert.That(fromResource.SkillCount, Is.EqualTo(9));
             Assert.That(fromResource.KnowledgeCount, Is.EqualTo(1));
             Assert.That(fromResource.TechnologyCount, Is.EqualTo(3));
             Assert.That(
@@ -3976,10 +8695,10 @@ namespace Mandate.Tests
 
             Assert.That(registry.CropCount, Is.EqualTo(5));
             Assert.That(registry.CropVarietyCount, Is.EqualTo(5));
-            Assert.That(registry.ProductCount, Is.EqualTo(37));
+            Assert.That(registry.ProductCount, Is.EqualTo(40));
             Assert.That(registry.FoodCount, Is.EqualTo(6));
-            Assert.That(registry.RecipeCount, Is.EqualTo(19));
-            Assert.That(registry.MethodCount, Is.EqualTo(17));
+            Assert.That(registry.RecipeCount, Is.EqualTo(20));
+            Assert.That(registry.MethodCount, Is.EqualTo(18));
             Assert.That(
                 registry.GetFood("product.soybean").NutritionBasisPoints,
                 Is.EqualTo(12_500));
@@ -4600,6 +9319,7 @@ namespace Mandate.Tests
             var originalGrain = family.Grain;
             var originalSeed = family.SeedGrain;
             var originalPhysical = storage.InventoryUnits;
+            var openingTransactionCount = world.InventoryTransactions.Count;
             var system = new ProductInventorySystem();
 
             var grain = system.ConvertLegacyBalanceToBatch(
@@ -4624,7 +9344,8 @@ namespace Mandate.Tests
             Assert.That(seed.Quantity, Is.EqualTo(2));
             Assert.That(seed.SeedVigorBasisPoints, Is.GreaterThan(0));
             Assert.That(storage.InventoryUnits, Is.EqualTo(originalPhysical));
-            Assert.That(world.InventoryTransactions.Count, Is.EqualTo(2));
+            Assert.That(world.InventoryTransactions.Count,
+                Is.EqualTo(openingTransactionCount + 2));
             world.Validate();
         }
 
@@ -6029,6 +10750,1570 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void HouseholdReliefPickup_MonthlyShortfallDeliversConcreteFoodOnce()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1601);
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+
+            Assert.That(fixture.World.HouseholdReliefPickups, Is.Not.Empty);
+            Assert.That(
+                fixture.World.HouseholdReliefConsumptions.Count,
+                Is.EqualTo(fixture.World.HouseholdReliefPickups.Count));
+            var requests = new List<HouseholdReliefPickupState>(
+                fixture.World.HouseholdReliefPickups);
+            requests.Sort(CompareHouseholdReliefPickupPriority);
+            var request = requests[0];
+            var openingFamilyFood = TotalFamilyFood(
+                fixture.World, request.FamilyId);
+            TransferCountyFoodToVillage(
+                fixture.World, fixture.Content, 1);
+            var pickupScheduler = new HouseholdReliefPickupCommandScheduler(
+                new HouseholdReliefPickupSystem(fixture.Content));
+            var pickupRuntime = new WorldCommandRuntime();
+            pickupRuntime.RegisterHandler(
+                pickupScheduler.CreateCommandHandler());
+
+            Assert.That(
+                pickupScheduler.EnsureDueCommands(
+                    fixture.World, pickupRuntime),
+                Is.EqualTo(1));
+            var report = pickupRuntime.ProcessDue(fixture.World);
+            var repeated = pickupRuntime.ProcessDue(fixture.World);
+
+            Assert.That(report.CommittedTransactions, Is.EqualTo(1));
+            Assert.That(report.PublishedEvents, Is.EqualTo(1));
+            Assert.That(repeated.ProcessedCommands, Is.Zero);
+            Assert.That(request.DeliveredPhysicalQuantity, Is.EqualTo(1));
+            Assert.That(request.DeliveredNutritionBasisUnits, Is.GreaterThan(0));
+            Assert.That(request.InventoryTransactionIds, Has.Count.EqualTo(1));
+            Assert.That(TotalFamilyFood(fixture.World, request.FamilyId),
+                Is.EqualTo(openingFamilyFood + 1));
+            Assert.That(fixture.World.InventoryTransactions.Find(item =>
+                    item.Id == request.InventoryTransactionIds[0]).Type,
+                Is.EqualTo(
+                    InventoryTransactionType.FoodVillageReliefTransferred));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content),
+                fixture.Content);
+            Assert.That(loaded.HouseholdReliefPickups.Find(item =>
+                    item.Id == request.Id).DeliveredPhysicalQuantity,
+                Is.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPickup_BlockedHouseholdCreatesNoEmptyCommand()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1602);
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+            TransferCountyFoodToVillage(
+                fixture.World, fixture.Content, 1);
+            for (var i = 0;
+                 i < fixture.World.HouseholdReliefPickups.Count;
+                 i++)
+            {
+                var request = fixture.World.HouseholdReliefPickups[i];
+                var storage = fixture.World.VillageFacilities.Find(item =>
+                    item.Kind == VillageFacilityKind.HouseholdGranary &&
+                    item.OwnerFamilyId == request.FamilyId);
+                storage.Capacity = (int)storage.InventoryUnits;
+            }
+            var scheduler = new HouseholdReliefPickupCommandScheduler(
+                new HouseholdReliefPickupSystem(fixture.Content));
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(scheduler.CreateCommandHandler());
+
+            Assert.That(
+                scheduler.EnsureDueCommands(fixture.World, runtime),
+                Is.Zero);
+            Assert.That(fixture.World.PersistentWorldCommands.Exists(item =>
+                item.CommandTypeId ==
+                    HouseholdReliefPickupCommandScheduler.CommandTypeId),
+                Is.False);
+            Assert.That(fixture.World.HouseholdReliefPickups.TrueForAll(item =>
+                item.Status == HouseholdReliefPickupStatus.Waiting), Is.True);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPickup_WorldSimulatorRunsSegmentPipelineDeterministically()
+        {
+            var left = PrepareFormalHouseholdFoodCommandWorld(25_1603);
+            var right = PrepareFormalHouseholdFoodCommandWorld(25_1603);
+            SeedMonthlyShortfallAndVillageFood(left, 2);
+            SeedMonthlyShortfallAndVillageFood(right, 2);
+
+            new WorldSimulator(left.World.MasterSeed, left.Content)
+                .AdvanceSegments(left.World, 1);
+            new WorldSimulator(right.World.MasterSeed, right.Content)
+                .AdvanceSegments(right.World, 1);
+
+            Assert.That(left.World.HouseholdReliefPickups.Exists(item =>
+                item.DeliveredPhysicalQuantity > 0), Is.True);
+            Assert.That(left.World.HouseholdReliefConsumptions.Exists(item =>
+                item.ConsumedPhysicalQuantity > 0), Is.True);
+            Assert.That(left.World.PersistentWorldCommands.Exists(item =>
+                item.CommandTypeId ==
+                    HouseholdReliefPickupCommandScheduler.CommandTypeId &&
+                item.Status == PersistentWorldCommandStatus.Completed),
+                Is.True);
+            Assert.That(left.World.PersistentWorldCommands.Exists(item =>
+                item.CommandTypeId ==
+                    HouseholdReliefConsumptionCommandScheduler.CommandTypeId &&
+                item.Status == PersistentWorldCommandStatus.Completed),
+                Is.True);
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(right.World, right.Content),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(
+                    left.World, left.Content)));
+        }
+
+        [Test]
+        public void HouseholdReliefPickup_ValidationRejectsTamperedReceipt()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1604);
+            SeedMonthlyShortfallAndVillageFood(fixture, 1);
+            new WorldSimulator(fixture.World.MasterSeed, fixture.Content)
+                .AdvanceSegments(fixture.World, 1);
+            var request = fixture.World.HouseholdReliefPickups.Find(item =>
+                item.DeliveredPhysicalQuantity > 0);
+            request.DeliveredPhysicalQuantity++;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                fixture.World.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThirtySevenToEmptyHouseholdReliefPickups()
+        {
+            var content = LoadHanFoodProductionContent();
+            var world = VillagePrototypeFactory.Create(200, 25_1605);
+            world.ProductionContentManifest = content.CreateManifest();
+            var json = WorldSnapshotSerializer.Serialize(world, content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 37")
+                .Replace(
+                    "\"HouseholdReliefPickups\": []",
+                    "\"HouseholdReliefPickups\": null")
+                .Replace(
+                    "\"HouseholdReliefConsumptions\": []",
+                    "\"HouseholdReliefConsumptions\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json, content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.HouseholdReliefPickups, Is.Empty);
+            Assert.That(loaded.HouseholdReliefConsumptions, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefConsumption_PickupDoesNotHealUntilTracedFoodIsEaten()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1701);
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+
+            var orderedPickups = new List<HouseholdReliefPickupState>(
+                fixture.World.HouseholdReliefPickups);
+            orderedPickups.Sort(CompareHouseholdReliefPickupPriority);
+            var pickup = orderedPickups[0];
+            var claim = fixture.World.HouseholdReliefConsumptions.Find(item =>
+                item.PickupId == pickup.Id);
+            var affected = claim.AffectedPeople[0];
+            var person = fixture.World.People.Find(item =>
+                item.Id == affected.PersonId);
+            var healthAfterShortfall = person.HealthBasisPoints;
+            var livelihoodAfterShortfall = person.Needs.Livelihood;
+            var physicalFood =
+                (pickup.RequestedNutritionBasisUnits + 9_799L) / 9_800L + 1;
+            TransferCountyFoodToVillage(
+                fixture.World, fixture.Content, physicalFood);
+
+            var pickupScheduler = new HouseholdReliefPickupCommandScheduler(
+                new HouseholdReliefPickupSystem(fixture.Content));
+            var pickupRuntime = new WorldCommandRuntime();
+            pickupRuntime.RegisterHandler(
+                pickupScheduler.CreateCommandHandler());
+            pickupScheduler.EnsureDueCommands(
+                fixture.World, pickupRuntime);
+            pickupRuntime.ProcessDue(fixture.World);
+
+            Assert.That(claim.ConsumedPhysicalQuantity, Is.Zero);
+            Assert.That(person.HealthBasisPoints,
+                Is.EqualTo(healthAfterShortfall));
+            Assert.That(person.Needs.Livelihood,
+                Is.EqualTo(livelihoodAfterShortfall));
+            var foodAfterPickup = TotalFamilyFood(
+                fixture.World, claim.FamilyId);
+
+            var consumptionScheduler =
+                new HouseholdReliefConsumptionCommandScheduler(
+                    new HouseholdReliefConsumptionSystem(fixture.Content));
+            var consumptionRuntime = new WorldCommandRuntime();
+            consumptionRuntime.RegisterHandler(
+                consumptionScheduler.CreateCommandHandler());
+            Assert.That(
+                consumptionScheduler.EnsureDueCommands(
+                    fixture.World, consumptionRuntime),
+                Is.EqualTo(1));
+            var report = consumptionRuntime.ProcessDue(fixture.World);
+            var repeated = consumptionRuntime.ProcessDue(fixture.World);
+
+            Assert.That(report.CommittedTransactions, Is.EqualTo(1));
+            Assert.That(repeated.ProcessedCommands, Is.Zero);
+            Assert.That(claim.Status,
+                Is.EqualTo(HouseholdReliefConsumptionStatus.Fulfilled));
+            Assert.That(claim.ConsumedPhysicalQuantity, Is.GreaterThan(0));
+            long affectedConsumedNutrition = 0;
+            for (var affectedIndex = 0;
+                 affectedIndex < claim.AffectedPeople.Count;
+                 affectedIndex++)
+            {
+                affectedConsumedNutrition = checked(
+                    affectedConsumedNutrition +
+                    claim.AffectedPeople[affectedIndex]
+                        .ConsumedNutritionBasisUnits);
+            }
+            Assert.That(
+                affectedConsumedNutrition +
+                claim.PreparedNutritionBasisUnits,
+                Is.EqualTo(claim.ConsumedNutritionBasisUnits));
+            Assert.That(
+                TotalFamilyFood(fixture.World, claim.FamilyId),
+                Is.LessThan(foodAfterPickup));
+            Assert.That(person.HealthBasisPoints,
+                Is.EqualTo(
+                    healthAfterShortfall +
+                    affected.AppliedHealthDamageBasisPoints),
+                $"person={affected.PersonId} allocated=" +
+                $"{affected.AllocatedNutritionBasisUnits} consumed=" +
+                $"{affected.ConsumedNutritionBasisUnits} recovered=" +
+                $"{affected.RecoveredHealthBasisPoints} applied=" +
+                $"{affected.AppliedHealthDamageBasisPoints}");
+            Assert.That(person.Needs.Livelihood,
+                Is.EqualTo(
+                    livelihoodAfterShortfall -
+                    affected.AppliedLivelihoodPressureBasisPoints),
+                $"person={affected.PersonId} allocated=" +
+                $"{affected.AllocatedNutritionBasisUnits} consumed=" +
+                $"{affected.ConsumedNutritionBasisUnits} recovered=" +
+                $"{affected.RecoveredLivelihoodBasisPoints} applied=" +
+                $"{affected.AppliedLivelihoodPressureBasisPoints} opening=" +
+                $"{livelihoodAfterShortfall}");
+            Assert.That(claim.InventoryTransactionIds, Is.Not.Empty);
+            var consumptionTransaction =
+                fixture.World.InventoryTransactions.Find(item =>
+                    item.Id == claim.InventoryTransactionIds[0]);
+            Assert.That(
+                consumptionTransaction.SourceHouseholdReliefConsumptionId,
+                Is.EqualTo(claim.Id));
+            Assert.That(consumptionTransaction.Lines.TrueForAll(line =>
+            {
+                var batch = fixture.World.ProductBatches.Find(item =>
+                    item.Id == line.BatchId);
+                return line.QuantityDelta >= 0 ||
+                    pickup.InventoryTransactionIds.Contains(
+                        batch.SourceTransactionId);
+            }), Is.True);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content),
+                fixture.Content);
+            Assert.That(loaded.HouseholdReliefConsumptions.Find(item =>
+                    item.Id == claim.Id).ConsumedPhysicalQuantity,
+                Is.EqualTo(claim.ConsumedPhysicalQuantity));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefConsumption_DoesNotHealAffectedPersonAwayOnLevy()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1702);
+            var village = fixture.World.Villages[0];
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+            var orderedPickups = new List<HouseholdReliefPickupState>(
+                fixture.World.HouseholdReliefPickups);
+            orderedPickups.Sort(CompareHouseholdReliefPickupPriority);
+            HouseholdReliefConsumptionState target = null;
+            for (var i = 0; i < orderedPickups.Count && target == null; i++)
+            {
+                var candidate = fixture.World.HouseholdReliefConsumptions.Find(
+                    item => item.PickupId == orderedPickups[i].Id);
+                if (candidate != null && candidate.AffectedPeople.Count >= 2)
+                {
+                    target = candidate;
+                }
+            }
+            Assert.That(target, Is.Not.Null, "multi-person relief claim");
+            var excludedAffected = target.AffectedPeople[1];
+            var excluded = fixture.World.People.Find(item =>
+                item.Id == excludedAffected.PersonId);
+            var originalDuty = excluded.LocalDuty;
+            excluded.LocalDuty = LocalDutyKind.Levy;
+            var openingHealth = excluded.HealthBasisPoints;
+            var openingLivelihood = excluded.Needs.Livelihood;
+            long nutritionThroughTarget = 0;
+            for (var i = 0; i < orderedPickups.Count; i++)
+            {
+                nutritionThroughTarget = checked(
+                    nutritionThroughTarget +
+                    orderedPickups[i].RequestedNutritionBasisUnits);
+                if (orderedPickups[i].FamilyId == target.FamilyId)
+                {
+                    break;
+                }
+            }
+            TransferCountyFoodToVillage(
+                fixture.World,
+                fixture.Content,
+                (nutritionThroughTarget + 9_799L) / 9_800L + 1);
+            var pickup = new HouseholdReliefPickupSystem(fixture.Content);
+            pickup.Resolve(fixture.World, village.Id);
+            var consumption = new HouseholdReliefConsumptionSystem(
+                fixture.Content);
+            consumption.Resolve(fixture.World, village.Id);
+
+            Assert.That(target.ConsumedPhysicalQuantity, Is.GreaterThan(0));
+            Assert.That(excluded.HealthBasisPoints, Is.EqualTo(openingHealth));
+            Assert.That(excluded.Needs.Livelihood,
+                Is.EqualTo(openingLivelihood));
+            Assert.That(excludedAffected.ConsumedNutritionBasisUnits,
+                Is.Zero);
+            Assert.That(target.RemainingNutritionBasisUnits,
+                Is.EqualTo(excludedAffected.AllocatedNutritionBasisUnits));
+            Assert.That(target.Status,
+                Is.EqualTo(
+                    HouseholdReliefConsumptionStatus.PartiallyConsumed));
+
+            excluded.LocalDuty = originalDuty;
+            consumption.Resolve(fixture.World, village.Id);
+
+            Assert.That(target.Status,
+                Is.EqualTo(HouseholdReliefConsumptionStatus.Fulfilled));
+            Assert.That(excludedAffected.ConsumedNutritionBasisUnits,
+                Is.GreaterThanOrEqualTo(
+                    excludedAffected.AllocatedNutritionBasisUnits));
+            Assert.That(excluded.HealthBasisPoints,
+                Is.EqualTo(
+                    openingHealth +
+                    excludedAffected.AppliedHealthDamageBasisPoints));
+            Assert.That(excluded.Needs.Livelihood,
+                Is.EqualTo(
+                    openingLivelihood -
+                    excludedAffected.AppliedLivelihoodPressureBasisPoints));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefAllocation_MonthlyShortfallClosesExactPersonQuotas()
+        {
+            var left = PrepareFormalHouseholdFoodCommandWorld(25_1801);
+            var right = PrepareFormalHouseholdFoodCommandWorld(25_1801);
+            var fixtures = new[] { left, right };
+            for (var fixtureIndex = 0;
+                 fixtureIndex < fixtures.Length;
+                 fixtureIndex++)
+            {
+                var runtime = new WorldCommandRuntime();
+                runtime.RegisterHandler(
+                    fixtures[fixtureIndex].Scheduler.CreateCommandHandler());
+                fixtures[fixtureIndex].Scheduler.EnsureDueCommands(
+                    fixtures[fixtureIndex].World, runtime);
+                runtime.ProcessDue(fixtures[fixtureIndex].World);
+                Assert.That(
+                    fixtures[fixtureIndex].World.HouseholdReliefConsumptions,
+                    Is.Not.Empty);
+                for (var claimIndex = 0;
+                     claimIndex < fixtures[fixtureIndex].World
+                        .HouseholdReliefConsumptions.Count;
+                     claimIndex++)
+                {
+                    var claim = fixtures[fixtureIndex].World
+                        .HouseholdReliefConsumptions[claimIndex];
+                    Assert.That(claim.AllocationPolicyId,
+                        Is.EqualTo(
+                            HouseholdReliefAllocationPolicyIds
+                                .ProportionalIndividualNeed));
+                    long allocated = 0;
+                    for (var affectedIndex = 0;
+                         affectedIndex < claim.AffectedPeople.Count;
+                         affectedIndex++)
+                    {
+                        var affected = claim.AffectedPeople[affectedIndex];
+                        Assert.That(affected.RequiredNutritionBasisUnits,
+                            Is.EqualTo(20_000L).Or.EqualTo(30_000L));
+                        Assert.That(affected.AllocatedNutritionBasisUnits,
+                            Is.GreaterThanOrEqualTo(0));
+                        Assert.That(affected.ConsumedNutritionBasisUnits,
+                            Is.Zero);
+                        allocated = checked(
+                            allocated +
+                            affected.AllocatedNutritionBasisUnits);
+                    }
+                    Assert.That(allocated,
+                        Is.EqualTo(claim.RequestedNutritionBasisUnits));
+                }
+                fixtures[fixtureIndex].World.Validate();
+            }
+
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(right.World, right.Content),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(
+                    left.World, left.Content)));
+        }
+
+        [Test]
+        public void HouseholdReliefAllocation_ValidationRejectsUnclosedPersonQuota()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1802);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            fixture.World.HouseholdReliefConsumptions[0]
+                .AffectedPeople[0].AllocatedNutritionBasisUnits++;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                fixture.World.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThirtyNineToLegacySharedReliefAllocation()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1803);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var json = WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 39");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                json, fixture.Content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.HouseholdReliefConsumptions, Is.Not.Empty);
+            for (var claimIndex = 0;
+                 claimIndex < loaded.HouseholdReliefConsumptions.Count;
+                 claimIndex++)
+            {
+                var claim = loaded.HouseholdReliefConsumptions[claimIndex];
+                Assert.That(claim.AllocationPolicyId,
+                    Is.EqualTo(
+                        HouseholdReliefAllocationPolicyIds
+                            .LegacyHouseholdShared));
+                for (var affectedIndex = 0;
+                     affectedIndex < claim.AffectedPeople.Count;
+                     affectedIndex++)
+                {
+                    var affected = claim.AffectedPeople[affectedIndex];
+                    Assert.That(affected.RequiredNutritionBasisUnits,
+                        Is.EqualTo(-1));
+                    Assert.That(affected.AllocatedNutritionBasisUnits,
+                        Is.EqualTo(-1));
+                    Assert.That(affected.ConsumedNutritionBasisUnits,
+                        Is.EqualTo(-1));
+                }
+            }
+            loaded.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThirtyEightWithoutInventingReliefRecovery()
+        {
+            var content = LoadHanFoodProductionContent();
+            var world = VillagePrototypeFactory.Create(200, 25_1703);
+            world.ProductionContentManifest = content.CreateManifest();
+            var json = WorldSnapshotSerializer.Serialize(world, content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 38")
+                .Replace(
+                    "\"HouseholdReliefConsumptions\": []",
+                    "\"HouseholdReliefConsumptions\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json, content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.HouseholdReliefConsumptions, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPriority_ScarceFoodServesMoreSevereHouseholdFirst()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1901);
+            var village = fixture.World.Villages[0];
+            FamilyState partiallyFedFamily = null;
+            for (var householdIndex = village.HouseholdIds.Count - 1;
+                 householdIndex >= 0 && partiallyFedFamily == null;
+                 householdIndex--)
+            {
+                var candidateId = village.HouseholdIds[householdIndex];
+                partiallyFedFamily = fixture.World.Families.Find(item =>
+                    item.Id == candidateId &&
+                    item.MemberIds.Exists(personId =>
+                        fixture.World.People.Exists(person =>
+                            person.Id == personId &&
+                            person.IsAlive &&
+                            person.LocationId == village.LocationId &&
+                            person.LocalDuty != LocalDutyKind.Levy)));
+            }
+            Assert.That(partiallyFedFamily, Is.Not.Null,
+                "Selected household must exist.");
+            var storage = fixture.World.VillageFacilities.Find(item =>
+                item.VillageId == village.Id &&
+                item.Kind == VillageFacilityKind.HouseholdGranary &&
+                item.OwnerFamilyId == partiallyFedFamily.Id);
+            Assert.That(storage, Is.Not.Null,
+                "Selected household granary must exist.");
+            TransferCountyFoodToVillage(fixture.World, fixture.Content, 1);
+            new FoodInventorySystem(fixture.Content)
+                .TransferContainerToFamilyByNutrition(
+                    fixture.World,
+                    village.PublicGranaryInventoryContainerId,
+                    partiallyFedFamily.Id,
+                    storage.Id,
+                    partiallyFedFamily.HeadPersonId,
+                    1,
+                    InventoryTransactionType.FoodVillageReliefTransferred,
+                    village.Id);
+
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+            var lowerSeverity = fixture.World.HouseholdReliefPickups.Find(item =>
+                item.FamilyId == partiallyFedFamily.Id);
+            Assert.That(lowerSeverity, Is.Not.Null,
+                "Partially fed household must still produce a shortfall.");
+            Assert.That(lowerSeverity.ShortfallSeverityBasisPoints,
+                Is.LessThan(10_000));
+
+            TransferCountyFoodToVillage(fixture.World, fixture.Content, 1);
+            var result = new HouseholdReliefPickupSystem(fixture.Content)
+                .Resolve(fixture.World, village.Id);
+            var served = fixture.World.HouseholdReliefPickups.Find(item =>
+                item.DeliveredPhysicalQuantity > 0);
+
+            Assert.That(result.DeliveredPhysicalQuantity, Is.EqualTo(1));
+            Assert.That(served, Is.Not.Null,
+                "Scarce relief must reach one waiting household.");
+            Assert.That(served.FamilyId,
+                Is.Not.EqualTo(partiallyFedFamily.Id));
+            Assert.That(served.ShortfallSeverityBasisPoints,
+                Is.GreaterThan(lowerSeverity.ShortfallSeverityBasisPoints));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPriority_RecordsCountyAuthoritySnapshotAndRoundTrips()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1902);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var village = fixture.World.Villages[0];
+            var organization = fixture.World.Organizations.Find(item =>
+                item.Id == village.HouseholdReliefAuthorityOrganizationId);
+            var pickup = fixture.World.HouseholdReliefPickups[0];
+
+            Assert.That(pickup.PriorityPolicyId,
+                Is.EqualTo(HouseholdReliefPriorityPolicyIds
+                    .NeedSeverityVulnerability));
+            Assert.That(pickup.AuthorizationPolicyId,
+                Is.EqualTo(HouseholdReliefAuthorizationPolicyIds
+                    .CountyGovernmentLeader));
+            Assert.That(pickup.AuthorizingOrganizationId,
+                Is.EqualTo(organization.Id));
+            Assert.That(pickup.AuthorizingPersonId,
+                Is.EqualTo(organization.LeaderPersonId));
+            Assert.That(pickup.AuthorizedDay, Is.EqualTo(30));
+            Assert.That(pickup.ShortfallSeverityBasisPoints,
+                Is.InRange(1, 10_000));
+            Assert.That(pickup.AffectedPersonCountAtAuthorization,
+                Is.GreaterThan(0));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content),
+                fixture.Content);
+            var loadedPickup = loaded.HouseholdReliefPickups.Find(item =>
+                item.Id == pickup.Id);
+            Assert.That(loadedPickup.AuthorizingOrganizationId,
+                Is.EqualTo(pickup.AuthorizingOrganizationId));
+            Assert.That(loadedPickup.AuthorizingPersonId,
+                Is.EqualTo(pickup.AuthorizingPersonId));
+            Assert.That(loadedPickup.ShortfallSeverityBasisPoints,
+                Is.EqualTo(pickup.ShortfallSeverityBasisPoints));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPriority_EmergencyPolicyDoesNotInventAuthority()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1903);
+            var village = fixture.World.Villages[0];
+            village.HouseholdReliefAuthorizationPolicyId =
+                HouseholdReliefAuthorizationPolicyIds.EmergencySystem;
+            village.HouseholdReliefAuthorityOrganizationId = string.Empty;
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+
+            Assert.That(fixture.World.HouseholdReliefPickups, Is.Not.Empty);
+            Assert.That(fixture.World.HouseholdReliefPickups.TrueForAll(item =>
+                item.AuthorizationPolicyId ==
+                    HouseholdReliefAuthorizationPolicyIds.EmergencySystem &&
+                string.IsNullOrEmpty(item.AuthorizingOrganizationId) &&
+                string.IsNullOrEmpty(item.AuthorizingPersonId)), Is.True);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefPriority_ValidationRejectsTamperedSeverity()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1904);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var pickup = fixture.World.HouseholdReliefPickups[0];
+            pickup.ShortfallSeverityBasisPoints =
+                pickup.ShortfallSeverityBasisPoints == 10_000
+                    ? 9_999
+                    : pickup.ShortfallSeverityBasisPoints + 1;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                fixture.World.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyWithoutInventingReliefPriorityAuthority()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1905);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var json = WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 40");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                json, fixture.Content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.Villages.TrueForAll(item =>
+                item.HouseholdReliefPriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds
+                        .NeedSeverityVulnerability), Is.True);
+            Assert.That(loaded.HouseholdReliefPickups, Is.Not.Empty);
+            Assert.That(loaded.HouseholdReliefPickups.TrueForAll(item =>
+                item.PriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds
+                        .LegacySettlementFamilyOrder &&
+                item.AuthorizationPolicyId ==
+                    HouseholdReliefAuthorizationPolicyIds.LegacySystem &&
+                string.IsNullOrEmpty(item.AuthorizingOrganizationId) &&
+                string.IsNullOrEmpty(item.AuthorizingPersonId) &&
+                item.AuthorizedDay == -1 &&
+                item.ShortfallSeverityBasisPoints == -1 &&
+                item.VulnerableAffectedPersonCount == -1 &&
+                item.AffectedPersonCountAtAuthorization == -1), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefConsumption_ValidationRejectsOverRecovery()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1704);
+            var monthlyRuntime = new WorldCommandRuntime();
+            monthlyRuntime.RegisterHandler(
+                fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(
+                fixture.World, monthlyRuntime);
+            monthlyRuntime.ProcessDue(fixture.World);
+            var affected = fixture.World.HouseholdReliefConsumptions[0]
+                .AffectedPeople[0];
+            affected.RecoveredHealthBasisPoints =
+                affected.AppliedHealthDamageBasisPoints + 1;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                fixture.World.Validate());
+        }
+
+        [Test]
+        public void HouseholdReliefConsumption_PartialFoodWaitsWithoutEmptyCommand()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_1705);
+            SeedMonthlyShortfallAndVillageFood(fixture, 1);
+            var pickup = new HouseholdReliefPickupSystem(fixture.Content);
+            pickup.Resolve(fixture.World, fixture.World.Villages[0].Id);
+            var claim = fixture.World.HouseholdReliefConsumptions.Find(item =>
+                item.PickupId == fixture.World.HouseholdReliefPickups.Find(
+                    request => request.DeliveredPhysicalQuantity > 0).Id);
+            var consumption = new HouseholdReliefConsumptionSystem(
+                fixture.Content);
+
+            var result = consumption.Resolve(
+                fixture.World, fixture.World.Villages[0].Id);
+            var consumedPhysical = claim.ConsumedPhysicalQuantity;
+            var healthRecovery = claim.AffectedPeople[0]
+                .RecoveredHealthBasisPoints;
+            var scheduler = new HouseholdReliefConsumptionCommandScheduler(
+                consumption);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(scheduler.CreateCommandHandler());
+
+            Assert.That(result.ConsumedPhysicalQuantity, Is.EqualTo(1));
+            Assert.That(claim.Status,
+                Is.EqualTo(
+                    HouseholdReliefConsumptionStatus.PartiallyConsumed));
+            Assert.That(claim.RemainingNutritionBasisUnits,
+                Is.GreaterThan(0));
+            Assert.That(
+                scheduler.EnsureDueCommands(fixture.World, runtime),
+                Is.Zero);
+            Assert.That(claim.ConsumedPhysicalQuantity,
+                Is.EqualTo(consumedPhysical));
+            Assert.That(claim.AffectedPeople[0].RecoveredHealthBasisPoints,
+                Is.EqualTo(healthRecovery));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefCare_DependentRecipientUsesStableFamilyCaregiverAndRoundTrips()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_2001);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var village = fixture.World.Villages[0];
+            HouseholdReliefConsumptionState targetClaim = null;
+            HouseholdReliefAffectedPersonState targetAffected = null;
+            PersonState expectedCaregiver = null;
+            var orderedPickups = new List<HouseholdReliefPickupState>(
+                fixture.World.HouseholdReliefPickups);
+            orderedPickups.Sort(CompareHouseholdReliefPickupPriority);
+            for (var claimIndex = 0;
+                 claimIndex < orderedPickups.Count &&
+                 targetClaim == null;
+                 claimIndex++)
+            {
+                var claim = fixture.World.HouseholdReliefConsumptions.Find(
+                    item => item.PickupId == orderedPickups[claimIndex].Id);
+                var family = fixture.World.Families.Find(item =>
+                    item.Id == claim.FamilyId);
+                var memberIds = new List<string>(family.MemberIds);
+                memberIds.Sort(StringComparer.Ordinal);
+                for (var affectedIndex = 0;
+                     affectedIndex < claim.AffectedPeople.Count &&
+                     targetClaim == null;
+                     affectedIndex++)
+                {
+                    var affected = claim.AffectedPeople[affectedIndex];
+                    if (!affected.RequiresCaregiverDelivery ||
+                        affected.AllocatedNutritionBasisUnits <= 0)
+                    {
+                        continue;
+                    }
+                    for (var memberIndex = 0;
+                         memberIndex < memberIds.Count;
+                         memberIndex++)
+                    {
+                        var member = fixture.World.People.Find(item =>
+                            item.Id == memberIds[memberIndex]);
+                        var age = Math.Max(
+                            0L,
+                            (fixture.World.AbsoluteDay - member.BirthDay) /
+                            360L);
+                        if (member.Id != affected.PersonId &&
+                            member.IsAlive &&
+                            member.LocationId == village.LocationId &&
+                            member.LocalDuty != LocalDutyKind.Levy &&
+                            age >= 15L && age <= 60L)
+                        {
+                            targetClaim = claim;
+                            targetAffected = affected;
+                            expectedCaregiver = member;
+                            break;
+                        }
+                    }
+                }
+            }
+            Assert.That(targetClaim, Is.Not.Null,
+                "The prototype must include a dependent with a caregiver.");
+
+            long requiredNutrition = 0;
+            for (var i = 0; i < orderedPickups.Count; i++)
+            {
+                requiredNutrition = checked(
+                    requiredNutrition + orderedPickups[i]
+                        .RequestedNutritionBasisUnits);
+                if (orderedPickups[i].Id == targetClaim.PickupId)
+                {
+                    break;
+                }
+            }
+            TransferCountyFoodToVillage(
+                fixture.World,
+                fixture.Content,
+                (requiredNutrition + 9_799L) / 9_800L + 1);
+            new HouseholdReliefPickupSystem(fixture.Content).Resolve(
+                fixture.World, village.Id);
+            var targetNutritionProfile = fixture.World.PersonNutritionProfiles
+                .Find(item => item.PersonId == targetAffected.PersonId);
+            var openingNutritionDebt =
+                targetNutritionProfile.NutritionDebtBasisUnits;
+            new HouseholdReliefConsumptionSystem(fixture.Content).Resolve(
+                fixture.World, village.Id);
+
+            Assert.That(targetAffected.ConsumedNutritionBasisUnits,
+                Is.GreaterThan(0));
+            var deliveries = fixture.World.HouseholdReliefCareDeliveries
+                .FindAll(item =>
+                    item.HouseholdReliefConsumptionId == targetClaim.Id &&
+                    item.RecipientPersonId == targetAffected.PersonId);
+            Assert.That(deliveries, Is.Not.Empty);
+            Assert.That(deliveries.TrueForAll(item =>
+                item.CaregiverPersonId == expectedCaregiver.Id), Is.True);
+            var traced = deliveries.Find(item =>
+                item.SourceKindId ==
+                    HouseholdReliefCareDeliverySourceIds
+                        .TracedFoodTransaction);
+            Assert.That(traced, Is.Not.Null);
+            var transaction = fixture.World.InventoryTransactions.Find(item =>
+                item.Id == traced.SourceInventoryTransactionId);
+            Assert.That(transaction.ActorPersonId,
+                Is.EqualTo(expectedCaregiver.Id));
+            Assert.That(transaction.HouseholdReliefRecipientPersonId,
+                Is.EqualTo(targetAffected.PersonId));
+            Assert.That(targetNutritionProfile.NutritionDebtBasisUnits,
+                Is.EqualTo(openingNutritionDebt - Math.Min(
+                    openingNutritionDebt,
+                    targetAffected.ConsumedNutritionBasisUnits)));
+            Assert.That(fixture.World.PersonNutritionLedgerEntries.Exists(item =>
+                item.Kind == NutritionLedgerEntryKind.ReliefNutritionCredit &&
+                item.PersonId == targetAffected.PersonId &&
+                item.SourceHouseholdReliefConsumptionId == targetClaim.Id),
+                Is.True);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content),
+                fixture.Content);
+            Assert.That(loaded.HouseholdReliefCareDeliveries.Find(item =>
+                    item.Id == traced.Id).CaregiverPersonId,
+                Is.EqualTo(expectedCaregiver.Id));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void LongTermNutrition_TwoDeficitMonthsCreateDeterministicIllnessAndRoundTrip()
+        {
+            var first = BuildMinimalWorld();
+            var second = BuildMinimalWorld();
+            ResolveTwoNutritionDeficitMonths(first, "person.liu_bei");
+            ResolveTwoNutritionDeficitMonths(second, "person.liu_bei");
+
+            var profile = first.PersonNutritionProfiles[0];
+            var episode = first.NutritionConditionEpisodes[0];
+            Assert.That(profile.NutritionDebtBasisUnits, Is.EqualTo(60_000));
+            Assert.That(profile.DiseaseRiskBasisPoints, Is.EqualTo(8_500));
+            Assert.That(profile.ConsecutiveDeficitMonths, Is.EqualTo(2));
+            Assert.That(profile.ActiveConditionEpisodeId,
+                Is.EqualTo(episode.Id));
+            Assert.That(episode.ConditionId,
+                Is.EqualTo(NutritionConditionIds.MalnutritionIllness));
+            Assert.That(episode.AppliedHealthDamageBasisPoints,
+                Is.EqualTo(425));
+            Assert.That(first.People.Find(item =>
+                item.Id == profile.PersonId).HealthBasisPoints,
+                Is.EqualTo(9_575));
+            Assert.That(WorldSnapshotSerializer.Serialize(second),
+                Is.EqualTo(WorldSnapshotSerializer.Serialize(first)));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(first));
+            Assert.That(loaded.PersonNutritionProfiles[0]
+                .NutritionDebtBasisUnits, Is.EqualTo(60_000));
+            Assert.That(loaded.NutritionConditionEpisodes[0]
+                .AppliedHealthDamageBasisPoints, Is.EqualTo(425));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void LongTermNutrition_AdequateMonthsRepayDebtAndResolveEpisode()
+        {
+            var world = BuildMinimalWorld();
+            ResolveTwoNutritionDeficitMonths(world, "person.liu_bei");
+            var system = new LongTermNutritionSystem();
+            for (var day = 90L; day <= 180L; day += 30L)
+            {
+                world.AbsoluteDay = day;
+                system.RecordMonthlySettlement(
+                    world,
+                    day,
+                    new List<FormalHouseholdFoodPersonSettlementResult>
+                    {
+                        new FormalHouseholdFoodPersonSettlementResult
+                        {
+                            PersonId = "person.liu_bei",
+                            RequiredNutritionBasisUnits = 30_000
+                        }
+                    });
+            }
+
+            var profile = world.PersonNutritionProfiles[0];
+            var episode = world.NutritionConditionEpisodes[0];
+            Assert.That(profile.NutritionDebtBasisUnits, Is.Zero);
+            Assert.That(profile.DiseaseRiskBasisPoints, Is.Zero);
+            Assert.That(profile.ConsecutiveAdequateMonths, Is.EqualTo(4));
+            Assert.That(profile.ActiveConditionEpisodeId, Is.Empty);
+            Assert.That(episode.EndDay, Is.EqualTo(180));
+            Assert.That(episode.RecoveredHealthBasisPoints,
+                Is.EqualTo(episode.AppliedHealthDamageBasisPoints));
+            Assert.That(world.People.Find(item =>
+                item.Id == profile.PersonId).HealthBasisPoints,
+                Is.EqualTo(10_000));
+            world.Validate();
+        }
+
+        [Test]
+        public void LongTermNutrition_ValidationRejectsTamperedDebtClosure()
+        {
+            var world = BuildMinimalWorld();
+            ResolveTwoNutritionDeficitMonths(world, "person.liu_bei");
+            world.PersonNutritionLedgerEntries[1]
+                .ClosingNutritionDebtBasisUnits++;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyTwoWithoutInventingNutritionHistory()
+        {
+            var world = BuildMinimalWorld();
+            ResolveTwoNutritionDeficitMonths(world, "person.liu_bei");
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 42");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.PersonNutritionProfiles, Is.Empty);
+            Assert.That(loaded.PersonNutritionLedgerEntries, Is.Empty);
+            Assert.That(loaded.NutritionConditionEpisodes, Is.Empty);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_DiagnosisPersistsWithoutMedicineAndDoesNotHeal()
+        {
+            var world = BuildCivilianMedicalWorld(false, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var episode = world.NutritionConditionEpisodes[0];
+            var openingHealth = patient.HealthBasisPoints;
+            var openingDebt = world.PersonNutritionProfiles[0]
+                .NutritionDebtBasisUnits;
+            var system = new CivilianMedicalSystem();
+
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world, episode.Id, physician.Id, patient.Id);
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(diagnosis.Success, Is.True);
+            Assert.That(treatment.Success, Is.False);
+            Assert.That(world.CivilianMedicalCases.Count, Is.EqualTo(1));
+            Assert.That(world.CivilianMedicalTreatments, Is.Empty);
+            Assert.That(patient.HealthBasisPoints, Is.EqualTo(openingHealth));
+            Assert.That(world.PersonNutritionProfiles[0]
+                .NutritionDebtBasisUnits, Is.EqualTo(openingDebt));
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_TreatmentConsumesBatchWithoutRepayingDebtAndRoundTrips()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var profile = world.PersonNutritionProfiles[0];
+            var episode = world.NutritionConditionEpisodes[0];
+            var medicine = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.HerbalMedicineMaterialProductId);
+            var openingQuantity = medicine.Quantity;
+            var openingHealth = patient.HealthBasisPoints;
+            var openingDebt = profile.NutritionDebtBasisUnits;
+            var openingRisk = profile.DiseaseRiskBasisPoints;
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world, episode.Id, physician.Id, patient.Id);
+
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(treatment.Success, Is.True);
+            Assert.That(medicine.Quantity,
+                Is.EqualTo(openingQuantity - 1));
+            Assert.That(patient.HealthBasisPoints,
+                Is.EqualTo(openingHealth +
+                    treatment.RecoveredHealthBasisPoints));
+            Assert.That(profile.NutritionDebtBasisUnits,
+                Is.EqualTo(openingDebt));
+            Assert.That(profile.DiseaseRiskBasisPoints,
+                Is.EqualTo(openingRisk));
+            Assert.That(world.InventoryTransactions.Exists(item =>
+                    item.Id == treatment.InventoryTransactionId &&
+                    item.Type ==
+                        InventoryTransactionType.MedicalTreatmentConsumed),
+                Is.True);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.CivilianMedicalCases.Count, Is.EqualTo(1));
+            Assert.That(loaded.CivilianMedicalTreatments.Count, Is.EqualTo(1));
+            Assert.That(loaded.CivilianMedicalTreatments[0]
+                .OpeningNutritionDebtBasisUnits,
+                Is.EqualTo(loaded.CivilianMedicalTreatments[0]
+                    .ClosingNutritionDebtBasisUnits));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_MinorRequiresHouseholdAdultAuthorization()
+        {
+            var world = BuildCivilianMedicalWorld(false, true);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var episode = world.NutritionConditionEpisodes[0];
+            var system = new CivilianMedicalSystem();
+
+            var rejected = system.DiagnoseNutritionCondition(
+                world, episode.Id, physician.Id, patient.Id);
+            var accepted = system.DiagnoseNutritionCondition(
+                world, episode.Id, physician.Id, physician.Id);
+
+            Assert.That(rejected.Success, Is.False);
+            Assert.That(accepted.Success, Is.True);
+            Assert.That(world.CivilianMedicalCases[0].AuthorizationPolicyId,
+                Is.EqualTo(CivilianMedicalAuthorizationPolicyIds
+                    .HouseholdAdultCaregiver));
+            Assert.That(world.CivilianMedicalCases[0].AuthorizingPersonId,
+                Is.EqualTo(physician.Id));
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_ValidationRejectsTamperedTreatmentClosure()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+            system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+            world.CivilianMedicalTreatments[0]
+                .ClosingNutritionDebtBasisUnits++;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyThreeWithoutInventingMedicalHistory()
+        {
+            var world = BuildMinimalWorld();
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 43");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.CivilianMedicalCases, Is.Empty);
+            Assert.That(loaded.CivilianMedicalTreatments, Is.Empty);
+            Assert.That(loaded.ProductionContentManifest.Packages[0].Version,
+                Is.EqualTo("11.0.0"));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_FormalServiceCreatesPrescriptionWorkAndSkillAudit()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var skillBefore = physician.ProfessionalSkills.Medicine;
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(treatment.Success, Is.True);
+            Assert.That(world.CivilianMedicalPrescriptions.Count,
+                Is.EqualTo(1));
+            Assert.That(world.CivilianMedicalServices.Count, Is.EqualTo(1));
+            var prescription = world.CivilianMedicalPrescriptions[0];
+            var service = world.CivilianMedicalServices[0];
+            Assert.That(prescription.Items.Count, Is.EqualTo(1));
+            Assert.That(prescription.Items[0].ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent
+                    .HerbalMedicineMaterialProductId));
+            Assert.That(service.TreatmentId, Is.EqualTo(treatment.TreatmentId));
+            Assert.That(service.WorkMinutes,
+                Is.EqualTo(CivilianMedicalRules.TreatmentWorkMinutes));
+            Assert.That(service.TotalFee, Is.EqualTo(0));
+            Assert.That(service.PaymentPolicyId,
+                Is.EqualTo(CivilianMedicalPaymentPolicyIds
+                    .SameHouseholdCare));
+            Assert.That(physician.ProfessionalSkills.Medicine,
+                Is.GreaterThan(skillBefore));
+            Assert.That(service.PhysicianMedicalSkillAfterBasisPoints,
+                Is.EqualTo(physician.ProfessionalSkills.Medicine));
+            Assert.That(world.CivilianMedicalCases[0].Status,
+                Is.EqualTo(CivilianMedicalCaseStatus.Closed));
+            Assert.That(world.CivilianMedicalCases[0].ClosureReasonId,
+                Is.EqualTo(CivilianMedicalCaseClosureReasonIds
+                    .InjuryRecovered));
+            Assert.That(prescription.IsActive, Is.False);
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.CivilianMedicalPrescriptions.Count,
+                Is.EqualTo(1));
+            Assert.That(loaded.CivilianMedicalServices.Count, Is.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_CrossHouseholdFeeClosesWithoutCreatingMoney()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var payer = MoveMedicalPatientToSeparateHousehold(world, 1_000);
+            var payee = world.Families.Find(item => item.Id == physician.FamilyId);
+            var payerBefore = payer.Wealth;
+            var payeeBefore = payee.Wealth;
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(treatment.Success, Is.True);
+            Assert.That(treatment.FeePaid,
+                Is.EqualTo(CivilianMedicalRules.RecommendedTreatmentFee(7_500)));
+            Assert.That(payer.Wealth, Is.EqualTo(payerBefore - treatment.FeePaid));
+            Assert.That(payee.Wealth, Is.EqualTo(payeeBefore + treatment.FeePaid));
+            Assert.That(payer.Wealth + payee.Wealth,
+                Is.EqualTo(payerBefore + payeeBefore));
+            Assert.That(world.CivilianMedicalServices[0].PaymentPolicyId,
+                Is.EqualTo(CivilianMedicalPaymentPolicyIds.HouseholdDirect));
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_InsufficientFundsPreservesPrescriptionWithoutPartialTreatment()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var payer = MoveMedicalPatientToSeparateHousehold(world, 1);
+            var payee = world.Families.Find(item => item.Id == physician.FamilyId);
+            var medicine = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.HerbalMedicineMaterialProductId);
+            var healthBefore = patient.HealthBasisPoints;
+            var skillBefore = physician.ProfessionalSkills.Medicine;
+            var medicineBefore = medicine.Quantity;
+            var payerBefore = payer.Wealth;
+            var payeeBefore = payee.Wealth;
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(treatment.Success, Is.False);
+            Assert.That(world.CivilianMedicalPrescriptions.Count,
+                Is.EqualTo(1));
+            Assert.That(world.CivilianMedicalServices, Is.Empty);
+            Assert.That(world.CivilianMedicalTreatments, Is.Empty);
+            Assert.That(patient.HealthBasisPoints, Is.EqualTo(healthBefore));
+            Assert.That(physician.ProfessionalSkills.Medicine,
+                Is.EqualTo(skillBefore));
+            Assert.That(medicine.Quantity, Is.EqualTo(medicineBefore));
+            Assert.That(payer.Wealth, Is.EqualTo(payerBefore));
+            Assert.That(payee.Wealth, Is.EqualTo(payeeBefore));
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_DailyWorkLimitDefersFifthPatientUntilNextDay()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var patientIds = new List<string> { "person.liu_bei" };
+            for (var i = 1; i <= 4; i++)
+            {
+                patientIds.Add(AddCivilianMedicalPatient(world, i));
+            }
+            var system = new CivilianMedicalSystem();
+            CivilianMedicalTreatmentResult fifth = null;
+            for (var i = 0; i < patientIds.Count; i++)
+            {
+                var patient = world.People.Find(item => item.Id == patientIds[i]);
+                var episode = world.NutritionConditionEpisodes.Find(item =>
+                    item.PersonId == patient.Id);
+                var diagnosis = system.DiagnoseNutritionCondition(
+                    world, episode.Id, physician.Id, patient.Id);
+                var treatment = system.TreatNutritionCondition(
+                    world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+                if (i < 4)
+                {
+                    Assert.That(treatment.Success, Is.True, patient.Id);
+                }
+                else
+                {
+                    fifth = treatment;
+                }
+            }
+
+            Assert.That(fifth, Is.Not.Null);
+            Assert.That(fifth.Success, Is.False);
+            Assert.That(world.CivilianMedicalServices.Count, Is.EqualTo(4));
+            var workMinutes = 0;
+            for (var i = 0; i < world.CivilianMedicalServices.Count; i++)
+            {
+                var service = world.CivilianMedicalServices[i];
+                if (service.Day == world.AbsoluteDay &&
+                    service.PhysicianPersonId == physician.Id)
+                {
+                    workMinutes += service.WorkMinutes;
+                }
+            }
+            Assert.That(workMinutes,
+                Is.EqualTo(CivilianMedicalRules
+                    .MaximumDailyPhysicianWorkMinutes));
+
+            world.AbsoluteDay++;
+            var deferredCase = world.CivilianMedicalCases.Find(item =>
+                item.PatientPersonId == patientIds[4]);
+            var deferred = system.TreatNutritionCondition(
+                world,
+                deferredCase.Id,
+                physician.Id,
+                patientIds[4]);
+            Assert.That(deferred.Success, Is.True);
+            Assert.That(world.CivilianMedicalServices.Count, Is.EqualTo(5));
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_PatientDeathClosesCaseAndRejectsTreatment()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+            patient.IsAlive = false;
+
+            var closed = system.ReconcileCasesForResidents(
+                world,
+                new HashSet<string>(StringComparer.Ordinal) { patient.Id });
+            var treatment = system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+
+            Assert.That(closed, Is.EqualTo(1));
+            Assert.That(treatment.Success, Is.False);
+            Assert.That(world.CivilianMedicalCases[0].ClosureReasonId,
+                Is.EqualTo(CivilianMedicalCaseClosureReasonIds.PatientDied));
+            Assert.That(world.CivilianMedicalPrescriptions[0].IsActive,
+                Is.False);
+            Assert.That(world.CivilianMedicalServices, Is.Empty);
+            world.Validate();
+        }
+
+        [Test]
+        public void CivilianMedical_ValidationRejectsTamperedServiceFeeClosure()
+        {
+            var world = BuildCivilianMedicalWorld(true, false);
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            var system = new CivilianMedicalSystem();
+            var diagnosis = system.DiagnoseNutritionCondition(
+                world,
+                world.NutritionConditionEpisodes[0].Id,
+                physician.Id,
+                patient.Id);
+            system.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+            world.CivilianMedicalServices[0].TotalFee++;
+
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyFiveWithoutInventingMedicalServiceHistory()
+        {
+            var world = BuildMinimalWorld();
+            world.AbsoluteDay = 80;
+            var json = WorldSnapshotSerializer.Serialize(world)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 45");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.CivilianMedicalPrescriptions, Is.Empty);
+            Assert.That(loaded.CivilianMedicalServices, Is.Empty);
+            Assert.That(loaded.CivilianMedicalServiceContractActivationDay,
+                Is.EqualTo(81));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefCare_NoEligibleCaregiverPreservesDependentShare()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_2002);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var village = fixture.World.Villages[0];
+            var orderedPickups = new List<HouseholdReliefPickupState>(
+                fixture.World.HouseholdReliefPickups);
+            orderedPickups.Sort(CompareHouseholdReliefPickupPriority);
+            HouseholdReliefConsumptionState claim = null;
+            for (var i = 0; i < orderedPickups.Count && claim == null; i++)
+            {
+                var candidate = fixture.World.HouseholdReliefConsumptions.Find(
+                    item => item.PickupId == orderedPickups[i].Id);
+                if (candidate.AffectedPeople.Exists(affected =>
+                        affected.RequiresCaregiverDelivery &&
+                        affected.AllocatedNutritionBasisUnits > 0))
+                {
+                    claim = candidate;
+                }
+            }
+            Assert.That(claim, Is.Not.Null, "dependent relief claim");
+            var dependent = claim.AffectedPeople.Find(item =>
+                item.RequiresCaregiverDelivery &&
+                item.AllocatedNutritionBasisUnits > 0);
+            var family = fixture.World.Families.Find(item =>
+                item.Id == claim.FamilyId);
+            var duties = new Dictionary<string, LocalDutyKind>();
+            for (var i = 0; i < family.MemberIds.Count; i++)
+            {
+                var member = fixture.World.People.Find(item =>
+                    item.Id == family.MemberIds[i]);
+                if (member.Id == dependent.PersonId)
+                {
+                    continue;
+                }
+                duties.Add(member.Id, member.LocalDuty);
+                member.LocalDuty = LocalDutyKind.Levy;
+            }
+
+            long requiredNutrition = 0;
+            for (var i = 0; i < orderedPickups.Count; i++)
+            {
+                requiredNutrition = checked(
+                    requiredNutrition + orderedPickups[i]
+                        .RequestedNutritionBasisUnits);
+                if (orderedPickups[i].Id == claim.PickupId)
+                {
+                    break;
+                }
+            }
+            TransferCountyFoodToVillage(
+                fixture.World,
+                fixture.Content,
+                (requiredNutrition + 9_799L) / 9_800L + 1);
+            new HouseholdReliefPickupSystem(fixture.Content).Resolve(
+                fixture.World, village.Id);
+            var health = fixture.World.People.Find(item =>
+                item.Id == dependent.PersonId).HealthBasisPoints;
+            new HouseholdReliefConsumptionSystem(fixture.Content).Resolve(
+                fixture.World, village.Id);
+
+            Assert.That(dependent.ConsumedNutritionBasisUnits, Is.Zero);
+            Assert.That(claim.RemainingNutritionBasisUnits,
+                Is.GreaterThanOrEqualTo(
+                    dependent.AllocatedNutritionBasisUnits));
+            Assert.That(fixture.World.HouseholdReliefCareDeliveries.Exists(
+                item => item.RecipientPersonId == dependent.PersonId),
+                Is.False);
+            Assert.That(fixture.World.InventoryTransactions.Exists(item =>
+                item.HouseholdReliefRecipientPersonId == dependent.PersonId),
+                Is.False);
+            Assert.That(fixture.World.People.Find(item =>
+                item.Id == dependent.PersonId).HealthBasisPoints,
+                Is.EqualTo(health));
+
+            foreach (var pair in duties)
+                fixture.World.People.Find(item => item.Id == pair.Key)
+                    .LocalDuty = pair.Value;
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void HouseholdReliefCare_ValidationRejectsRecipientAsCaregiver()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_2003);
+            SeedMonthlyShortfallAndVillageFood(fixture, 100);
+            new HouseholdReliefPickupSystem(fixture.Content).Resolve(
+                fixture.World, fixture.World.Villages[0].Id);
+            new HouseholdReliefConsumptionSystem(fixture.Content).Resolve(
+                fixture.World, fixture.World.Villages[0].Id);
+            var delivery = fixture.World.HouseholdReliefCareDeliveries[0];
+            delivery.CaregiverPersonId = delivery.RecipientPersonId;
+
+            Assert.Throws<InvalidOperationException>(() =>
+                fixture.World.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyOneWithoutInventingCareDelivery()
+        {
+            var fixture = PrepareFormalHouseholdFoodCommandWorld(25_2004);
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            var json = WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 41")
+                .Replace(
+                    "\"HouseholdReliefCareDeliveries\": []",
+                    "\"HouseholdReliefCareDeliveries\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                json, fixture.Content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.HouseholdReliefCareDeliveries, Is.Empty);
+            Assert.That(loaded.HouseholdReliefConsumptions.TrueForAll(claim =>
+                claim.CareDeliveryPolicyId ==
+                    HouseholdReliefCareDeliveryPolicyIds.LegacySelfService &&
+                claim.AffectedPeople.TrueForAll(affected =>
+                    !affected.RequiresCaregiverDelivery)), Is.True);
+            Assert.That(loaded.InventoryTransactions.TrueForAll(item =>
+                string.IsNullOrEmpty(
+                    item.HouseholdReliefRecipientPersonId)), Is.True);
+
+            var orderedPickups = new List<HouseholdReliefPickupState>(
+                loaded.HouseholdReliefPickups);
+            orderedPickups.Sort(CompareHouseholdReliefPickupPriority);
+            TransferCountyFoodToVillage(
+                loaded,
+                fixture.Content,
+                (orderedPickups[0].RequestedNutritionBasisUnits + 9_799L) /
+                    9_800L + 1);
+            new HouseholdReliefPickupSystem(fixture.Content).Resolve(
+                loaded, loaded.Villages[0].Id);
+            var served = loaded.HouseholdReliefPickups.Find(item =>
+                item.DeliveredPhysicalQuantity > 0);
+            new HouseholdReliefConsumptionSystem(fixture.Content).Resolve(
+                loaded, loaded.Villages[0].Id);
+            var continued = loaded.HouseholdReliefConsumptions.Find(item =>
+                item.PickupId == served.Id);
+            Assert.That(continued.ConsumedPhysicalQuantity,
+                Is.GreaterThan(0));
+            Assert.That(continued.InventoryTransactionIds.TrueForAll(id =>
+                string.IsNullOrEmpty(loaded.InventoryTransactions.Find(
+                    item => item.Id == id)
+                    .HouseholdReliefRecipientPersonId)), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
         public void FormalPublicFoodCommand_PersistedWorkTaxesRemitsRelievesOnce()
         {
             var fixture = PrepareFormalPublicFoodCommandWorld(25_1101);
@@ -6833,6 +13118,165 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void FoodStorageLoss_DueStaticBatchCreatesAuditedInventoryLoss()
+        {
+            var fixture = PrepareFoodStorageLossWorld(25_1501);
+            var batch = fixture.World.ProductBatches.Find(item =>
+                !string.IsNullOrEmpty(item.OwnerFamilyId) &&
+                !string.IsNullOrEmpty(item.StorageFacilityId) &&
+                item.Quantity > 0);
+            batch.NextFoodStorageAssessmentDay = fixture.World.AbsoluteDay;
+            var quantityBefore = batch.Quantity;
+            var freshnessBefore = batch.FreshnessBasisPoints;
+
+            ResolveFoodStorageLoss(fixture.World, fixture.Content);
+
+            var loss = fixture.World.FoodStorageLosses.Find(item =>
+                item.BatchId == batch.Id);
+            Assert.That(loss, Is.Not.Null);
+            Assert.That(loss.QuantityLost, Is.GreaterThan(0));
+            Assert.That(batch.Quantity,
+                Is.EqualTo(quantityBefore - loss.QuantityLost));
+            Assert.That(batch.FreshnessBasisPoints,
+                Is.LessThan(freshnessBefore));
+            Assert.That(batch.NextFoodStorageAssessmentDay,
+                Is.EqualTo(fixture.World.AbsoluteDay + 30));
+            Assert.That(fixture.World.InventoryTransactions.Exists(item =>
+                item.Id == loss.InventoryTransactionId &&
+                item.Type == InventoryTransactionType
+                    .FoodStorageNaturalLoss &&
+                item.Lines.Count == 1 &&
+                item.Lines[0].QuantityDelta == -loss.QuantityLost),
+                Is.True);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FoodStorageLoss_ProtectionAndReservationRemainAuthoritative()
+        {
+            var fixture = PrepareFoodStorageLossWorld(25_1502);
+            var batch = fixture.World.ProductBatches.Find(item =>
+                !string.IsNullOrEmpty(item.OwnerFamilyId) &&
+                !string.IsNullOrEmpty(item.StorageFacilityId) &&
+                item.Quantity >= 2);
+            var facility = fixture.World.VillageFacilities.Find(item =>
+                item.Id == batch.StorageFacilityId);
+            facility.FoodStorageProtectionBasisPoints = 0;
+            var market = new FormalCountyMarketSystem(fixture.Content);
+            var reserved = batch.Quantity - 1;
+            market.CreateSellOrder(
+                fixture.World,
+                fixture.World.CountyGovernances[0].Id,
+                batch.OwnerFamilyId,
+                batch.StorageFacilityId,
+                batch.ProductDefinitionId,
+                reserved,
+                9,
+                0,
+                fixture.World.AbsoluteDay + 5);
+            batch.NextFoodStorageAssessmentDay = fixture.World.AbsoluteDay;
+
+            ResolveFoodStorageLoss(fixture.World, fixture.Content);
+
+            var loss = fixture.World.FoodStorageLosses.Find(item =>
+                item.BatchId == batch.Id);
+            Assert.That(loss.QuantityLost, Is.EqualTo(1));
+            Assert.That(batch.Quantity, Is.EqualTo(reserved));
+            Assert.That(batch.ReservedQuantity, Is.EqualTo(reserved));
+            Assert.That(loss.ReservedQuantity, Is.EqualTo(reserved));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FoodStorageLoss_MovingCivilianCargoIsNotDoubleCharged()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_1503, 10);
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            var cargo = fixture.World.ProductBatches.Find(item =>
+                item.InventoryContainerId ==
+                    freight.TransportInventoryContainerId &&
+                item.Quantity > 0);
+            cargo.NextFoodStorageAssessmentDay = fixture.World.AbsoluteDay;
+
+            var scheduled = ResolveFoodStorageLoss(
+                fixture.World, fixture.Content);
+
+            Assert.That(scheduled, Is.Zero);
+            Assert.That(fixture.World.FoodStorageLosses.Exists(item =>
+                item.BatchId == cargo.Id), Is.False);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FoodStorageLoss_RoundTripAndRepeatedSchedulingAreIdempotent()
+        {
+            var fixture = PrepareFoodStorageLossWorld(25_1504);
+            var batch = fixture.World.ProductBatches.Find(item =>
+                !string.IsNullOrEmpty(item.OwnerFamilyId) &&
+                !string.IsNullOrEmpty(item.StorageFacilityId) &&
+                item.Quantity > 0);
+            batch.NextFoodStorageAssessmentDay = fixture.World.AbsoluteDay;
+            Assert.That(ResolveFoodStorageLoss(
+                fixture.World, fixture.Content), Is.EqualTo(1));
+            Assert.That(ResolveFoodStorageLoss(
+                fixture.World, fixture.Content), Is.Zero);
+
+            var json = WorldSnapshotSerializer.Serialize(
+                fixture.World, fixture.Content);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                json, fixture.Content);
+
+            Assert.That(WorldSnapshotSerializer.Serialize(
+                loaded, fixture.Content), Is.EqualTo(json));
+            Assert.That(loaded.FoodStorageLosses.Count, Is.EqualTo(1));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void FoodStorageLoss_TamperedAuditIsRejected()
+        {
+            var fixture = PrepareFoodStorageLossWorld(25_1505);
+            var batch = fixture.World.ProductBatches.Find(item =>
+                !string.IsNullOrEmpty(item.OwnerFamilyId) &&
+                !string.IsNullOrEmpty(item.StorageFacilityId) &&
+                item.Quantity > 0);
+            batch.NextFoodStorageAssessmentDay = fixture.World.AbsoluteDay;
+            ResolveFoodStorageLoss(fixture.World, fixture.Content);
+
+            fixture.World.FoodStorageLosses[0]
+                .EffectiveLossBasisPoints++;
+
+            Assert.Throws<InvalidOperationException>(
+                () => fixture.World.Validate());
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionThirtySixWithoutBackdatingStorageLoss()
+        {
+            var fixture = PrepareFoodStorageLossWorld(25_1506);
+            var json = WorldSnapshotSerializer.Serialize(
+                    fixture.World, fixture.Content)
+                .Replace(
+                    "\"SchemaVersion\": " +
+                        WorldState.CurrentSchemaVersion,
+                    "\"SchemaVersion\": 36")
+                .Replace("\"FoodStorageLosses\": []",
+                    "\"FoodStorageLosses\": null");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                json, fixture.Content);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.FoodStorageLosses, Is.Empty);
+            Assert.That(loaded.ProductBatches.TrueForAll(item =>
+                item.NextFoodStorageAssessmentDay ==
+                    loaded.AbsoluteDay + 30), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
         public void CivilianFreight_CrossCountyDeliveryKeepsCargoAndProvisionsSeparate()
         {
             var fixture = PrepareCivilianFreightWorld(25_501, 1_000);
@@ -7164,6 +13608,7 @@ namespace Mandate.Tests
         public void Processing_WheatToDryRationIsBalancedAndRoundTrips()
         {
             var world = VillagePrototypeFactory.Create(200, 22_002);
+            var openingTransactionCount = world.InventoryTransactions.Count;
             var family = world.Families[0];
             var storage = world.VillageFacilities.Find(
                 item => item.Kind == VillageFacilityKind.HouseholdGranary &&
@@ -7228,7 +13673,8 @@ namespace Mandate.Tests
             var loaded = WorldSnapshotSerializer.Deserialize(
                 WorldSnapshotSerializer.Serialize(world));
             Assert.That(loaded.ProcessingWorkOrders.Count, Is.EqualTo(2));
-            Assert.That(loaded.InventoryTransactions.Count, Is.EqualTo(5));
+            Assert.That(loaded.InventoryTransactions.Count,
+                Is.EqualTo(openingTransactionCount + 5));
             Assert.That(
                 loaded.ProductBatches.Find(
                     item => item.ProductDefinitionId ==
@@ -8725,6 +15171,294 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void HerbalSupply_FamilyExtractionAndProcessingAreTraceable()
+        {
+            var world = VillagePrototypeFactory.Create(200, 25_230_001UL);
+            var village = world.Villages[0];
+            var resource = world.ResourceBodies.Find(item =>
+                item.Id == HerbalMedicineSupplySystem.ResourceBodyId(
+                    village.Id));
+            var storage = world.VillageFacilities.Find(item =>
+                item.CapabilityTags.Contains(
+                    CoreProductionContent.HerbGatheringFacilityTag));
+            var family = world.Families.Find(item =>
+                item.Id == storage.OwnerFamilyId);
+            var worker = world.People.Find(item =>
+                item.FamilyId == family.Id && item.IsAlive &&
+                item.LaborCapacityBasisPoints > 0);
+            var extraction = new UpstreamResourceProductionSystem();
+            var remainingBefore = resource.RemainingQuantity;
+
+            var extractionOrder = extraction.CreateFamilyOrder(
+                world,
+                resource.Id,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                new[] { worker.Id },
+                ProductionControlMode.WorkOrder,
+                5);
+            world.AbsoluteDay = extractionOrder.FinishDay;
+            extraction.ResolveDueOrders(world);
+
+            var raw = world.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == extractionOrder.Id);
+            Assert.That(extractionOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(resource.RemainingQuantity,
+                Is.EqualTo(remainingBefore - 5));
+            Assert.That(raw.OwnerFamilyId, Is.EqualTo(family.Id));
+            Assert.That(raw.StorageFacilityId, Is.EqualTo(storage.Id));
+            Assert.That(raw.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.RawMedicinalPlantProductId));
+
+            var processing = new ProcessingProductionSystem();
+            var processingOrder = processing.CreateOrder(
+                world,
+                CoreProductionContent.DryMedicinalPlantsRecipeId,
+                CoreProductionContent.HerbalDryingMethodId,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                ProductionControlMode.WorkOrder,
+                5);
+            world.AbsoluteDay = processingOrder.FinishDay;
+            processing.ResolveDueOrders(world);
+
+            var medicine = world.ProductBatches.Find(item =>
+                item.SourceWorkOrderId == processingOrder.Id &&
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId);
+            Assert.That(processingOrder.Status,
+                Is.EqualTo(ProductionOrderStatus.Completed));
+            Assert.That(raw.Quantity, Is.Zero);
+            Assert.That(medicine.Quantity, Is.EqualTo(5));
+            Assert.That(medicine.UnitWeight, Is.EqualTo(raw.UnitWeight));
+            Assert.That(world.ResourceExtractionLedgerEntries.FindAll(item =>
+                item.ResourceExtractionOrderId == extractionOrder.Id).Count,
+                Is.EqualTo(2));
+            world.Validate();
+        }
+
+        [Test]
+        public void HerbalSupply_InvalidFacilityAndMixedOwnershipAreRejected()
+        {
+            var world = VillagePrototypeFactory.Create(200, 25_230_005UL);
+            var village = world.Villages[0];
+            var resource = world.ResourceBodies.Find(item =>
+                item.Id == HerbalMedicineSupplySystem.ResourceBodyId(
+                    village.Id));
+            var storage = world.VillageFacilities.Find(item =>
+                item.CapabilityTags.Contains(
+                    CoreProductionContent.HerbGatheringFacilityTag));
+            var family = world.Families.Find(item =>
+                item.Id == storage.OwnerFamilyId);
+            var worker = world.People.Find(item =>
+                item.FamilyId == family.Id && item.IsAlive &&
+                item.LaborCapacityBasisPoints > 0);
+            storage.CapabilityTags.Remove(
+                CoreProductionContent.HerbGatheringFacilityTag);
+            var before = WorldSnapshotSerializer.Serialize(world);
+            var extraction = new UpstreamResourceProductionSystem();
+
+            Assert.Throws<InvalidOperationException>(() =>
+                extraction.CreateFamilyOrder(
+                    world,
+                    resource.Id,
+                    family.Id,
+                    storage.Id,
+                    family.HeadPersonId,
+                    new[] { worker.Id },
+                    ProductionControlMode.WorkOrder,
+                    5));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(before));
+
+            storage.CapabilityTags.Add(
+                CoreProductionContent.HerbGatheringFacilityTag);
+            storage.CapabilityTags.Sort(StringComparer.Ordinal);
+            var order = extraction.CreateFamilyOrder(
+                world,
+                resource.Id,
+                family.Id,
+                storage.Id,
+                family.HeadPersonId,
+                new[] { worker.Id },
+                ProductionControlMode.WorkOrder,
+                5);
+            order.OwnerOrganizationId =
+                "organization.invalid_mixed_extraction_owner";
+            Assert.Throws<InvalidOperationException>(() => world.Validate());
+        }
+
+        [Test]
+        public void FormalMarket_TransfersHerbalMedicineBetweenFamilies()
+        {
+            var content = LoadHanFoodProductionContent();
+            var world = VillagePrototypeFactory.Create(200, 25_230_002UL);
+            var openingMedicine = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId);
+            world.InventoryTransactions.RemoveAll(item =>
+                item.Id == openingMedicine.SourceTransactionId);
+            world.ProductBatches.Remove(openingMedicine);
+            world.ProductionContentManifest = content.CreateManifest();
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(world);
+            var sellerStorage = world.VillageFacilities.Find(item =>
+                item.CapabilityTags.Contains(
+                    CoreProductionContent.HerbGatheringFacilityTag));
+            var seller = world.Families.Find(item =>
+                item.Id == sellerStorage.OwnerFamilyId);
+            var clinic = world.VillageFacilities.Find(item =>
+                item.Kind == VillageFacilityKind.Clinic);
+            var physician = world.People.Find(item =>
+                item.Id == clinic.ManagerPersonId);
+            var buyer = world.Families.Find(item =>
+                item.Id == physician.FamilyId);
+            var buyerStorage = world.VillageFacilities.Find(item =>
+                item.Kind == VillageFacilityKind.HouseholdGranary &&
+                item.OwnerFamilyId == buyer.Id);
+            buyerStorage.Capacity += 100;
+            buyer.Wealth = 10_000;
+            new ProductInventorySystem(content).CreateFamilyOpeningBatch(
+                world,
+                seller.Id,
+                sellerStorage.Id,
+                seller.HeadPersonId,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                5);
+            var sellerWealth = seller.Wealth;
+            var buyerWealth = buyer.Wealth;
+            var market = new FormalCountyMarketSystem(content);
+            market.CreateSellOrder(
+                world,
+                world.CountyGovernances[0].Id,
+                seller.Id,
+                sellerStorage.Id,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                5,
+                7,
+                0,
+                world.AbsoluteDay + 5);
+            market.CreateBuyOrder(
+                world,
+                world.CountyGovernances[0].Id,
+                buyer.Id,
+                buyerStorage.Id,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                5,
+                9,
+                0,
+                world.AbsoluteDay + 5);
+
+            market.ResolveDaily(world);
+
+            var delivered = world.ProductBatches.Find(item =>
+                item.OwnerFamilyId == buyer.Id &&
+                item.StorageFacilityId == buyerStorage.Id &&
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId);
+            Assert.That(delivered, Is.Not.Null);
+            Assert.That(delivered.Quantity, Is.EqualTo(5));
+            Assert.That(seller.Wealth, Is.EqualTo(sellerWealth + 35));
+            Assert.That(buyer.Wealth, Is.EqualTo(buyerWealth - 35));
+            Assert.That(world.InventoryTransactions.Exists(item =>
+                item.Type == InventoryTransactionType.FoodMarketTransferred &&
+                item.Lines.Exists(line =>
+                    line.ProductDefinitionId == CoreProductionContent
+                        .HerbalMedicineMaterialProductId)), Is.True);
+
+            var patient = world.People.Find(item =>
+                item.FamilyId == buyer.Id && item.Id != physician.Id);
+            patient.BirthDay = -7_200;
+            ResolveTwoNutritionDeficitMonths(world, patient.Id);
+            var episode = world.NutritionConditionEpisodes.Find(item =>
+                item.PersonId == patient.Id && item.EndDay == -1);
+            var medical = new CivilianMedicalSystem(content);
+            var diagnosis = medical.DiagnoseNutritionCondition(
+                world, episode.Id, physician.Id, patient.Id);
+            var treatment = medical.TreatNutritionCondition(
+                world, diagnosis.MedicalCaseId, physician.Id, patient.Id);
+            Assert.That(diagnosis.Success, Is.True);
+            Assert.That(treatment.Success, Is.True);
+            Assert.That(delivered.Quantity, Is.EqualTo(4));
+            world.Validate();
+        }
+
+        [Test]
+        public void Snapshot_MigratesVersionFortyFourWithoutFabricatingSupply()
+        {
+            var world = VillagePrototypeFactory.Create(200, 25_230_003UL);
+            for (var i = 0; i < world.VillageFacilities.Count; i++)
+            {
+                world.VillageFacilities[i].CapabilityTags.Clear();
+            }
+            var resourceCount = world.ResourceBodies.Count;
+            var extractionCount = world.ResourceExtractionOrders.Count;
+            var processingCount = world.ProcessingWorkOrders.Count;
+            var marketOrderCount = world.FormalMarketOrders.Count;
+            var transactionCount = world.InventoryTransactions.Count;
+            var json = WorldSnapshotSerializer.Serialize(world).Replace(
+                "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
+                "\"SchemaVersion\": 44");
+
+            var loaded = WorldSnapshotSerializer.Deserialize(json);
+
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(loaded.ResourceBodies.Count,
+                Is.EqualTo(resourceCount));
+            Assert.That(loaded.ResourceExtractionOrders.Count,
+                Is.EqualTo(extractionCount));
+            Assert.That(loaded.ProcessingWorkOrders.Count,
+                Is.EqualTo(processingCount));
+            Assert.That(loaded.FormalMarketOrders.Count,
+                Is.EqualTo(marketOrderCount));
+            Assert.That(loaded.InventoryTransactions.Count,
+                Is.EqualTo(transactionCount));
+            Assert.That(loaded.VillageFacilities.TrueForAll(item =>
+                item.CapabilityTags.Contains(
+                    VillageFacilityTags.FromKind(item.Kind))), Is.True);
+            loaded.Validate();
+        }
+
+        [Test]
+        public void HerbalSupply_AutomaticLoopIsDeterministicAndRestocksLocally()
+        {
+            var content = LoadHanFoodProductionContent();
+            var first = PrepareAutomaticHerbalSupplyWorld(
+                content, 25_230_004UL);
+            var second = PrepareAutomaticHerbalSupplyWorld(
+                content, 25_230_004UL);
+
+            new WorldSimulator(first.MasterSeed, content)
+                .AdvanceDays(first, 45);
+            new WorldSimulator(second.MasterSeed, content)
+                .AdvanceDays(second, 45);
+
+            var physician = first.People.Find(item =>
+                item.VillageOccupation == VillageOccupation.Physician);
+            Assert.That(first.FormalMarketTrades.Exists(item =>
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId), Is.True);
+            Assert.That(first.ProductBatches.Exists(item =>
+                item.OwnerFamilyId == physician.FamilyId &&
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId &&
+                item.Quantity > 0), Is.True);
+            Assert.That(first.ResourceExtractionOrders.TrueForAll(order =>
+                order.ResourceBodyId != HerbalMedicineSupplySystem
+                    .ResourceBodyId(first.Villages[0].Id) ||
+                !string.IsNullOrEmpty(order.OwnerFamilyId)), Is.True);
+            Assert.That(
+                WorldSnapshotSerializer.Serialize(first, content),
+                Is.EqualTo(
+                    WorldSnapshotSerializer.Serialize(second, content)));
+            first.Validate();
+        }
+
+        [Test]
         public void UpstreamProduction_ExtractsCarbonizesSmeltsAndMakesSpears()
         {
             var world = PrototypeWorldFactory.Create184World(184);
@@ -9100,7 +15834,14 @@ namespace Mandate.Tests
         {
             var world = PrototypeWorldFactory.Create184World(184);
 
-            Assert.That(world.InventoryContainers.Count, Is.EqualTo(2));
+            Assert.That(
+                world.InventoryContainers.Count,
+                Is.EqualTo(3 + world.Armies.Count));
+            Assert.That(
+                world.InventoryContainers.Exists(item =>
+                    item.Id == MerchantTownOperationSystem
+                        .ZhongshanWarehouseContainerId),
+                Is.True);
             Assert.That(
                 world.InventoryContainers.Exists(item =>
                     item.Id == MilitaryProcurementSystem.PrototypeContainerId),
@@ -12132,6 +18873,92 @@ namespace Mandate.Tests
             });
         }
 
+        private static void AddMilitaryMedicalLogisticsBatch(
+            WorldState world,
+            int quantity)
+        {
+            const string batchId =
+                "product_batch.logistics.merchant_medicine";
+            var transactionId =
+                "inventory_transaction." + batchId + ".opening";
+            var product = ProductionContentRegistry.CreateCore().GetProduct(
+                CoreProductionContent.HerbalMedicineMaterialProductId);
+            var container = world.InventoryContainers.Find(item =>
+                item.Id == MilitaryProcurementSystem.PrototypeContainerId);
+            var batch = new ProductBatchState
+            {
+                Id = batchId,
+                ProductDefinitionId = product.Id,
+                OwnerOrganizationId =
+                    "organization.zhongshan_merchants",
+                InventoryContainerId = container.Id,
+                OriginLocationId = "location.zhongshan",
+                SourceTransactionId = transactionId,
+                UnitId = product.UnitId,
+                UnitWeight = product.BaseWeight,
+                ProducedDay = world.AbsoluteDay,
+                Quantity = quantity,
+                QualityBasisPoints = 8_500,
+                FreshnessBasisPoints = 9_500,
+                QualityDimensions = ProductQualityRules.CreateUniform(
+                    product, 8_500)
+            };
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(new InventoryTransactionState
+            {
+                Id = transactionId,
+                Day = world.AbsoluteDay,
+                Type = InventoryTransactionType.OpeningBalance,
+                ActorPersonId = "person.zhang_shiping",
+                Summary = "Military medicine logistics test opening balance.",
+                Lines =
+                {
+                    new InventoryTransactionLineState
+                    {
+                        BatchId = batch.Id,
+                        ProductDefinitionId = batch.ProductDefinitionId,
+                        OwnerOrganizationId = batch.OwnerOrganizationId,
+                        InventoryContainerId = batch.InventoryContainerId,
+                        UnitId = batch.UnitId,
+                        QuantityDelta = quantity
+                    }
+                }
+            });
+            world.Validate();
+        }
+
+        private static MilitaryMedicalResupplyRequest
+            MedicalResupplyRequest(
+                int quantity,
+                long unitPrice,
+                bool autoDeliver)
+        {
+            return new MilitaryMedicalResupplyRequest
+            {
+                IssuerPersonId = new StableId("person.zou_jing"),
+                CarrierPersonId = new StableId("person.zhang_shiping"),
+                TargetArmyId = new StableId(
+                    "army.youzhou_reinforcement"),
+                SourceMedicineBatchId = new StableId(
+                    "product_batch.logistics.merchant_medicine"),
+                SourceProvisionBatchId =
+                    "product_batch.logistics.merchant_provisions",
+                RouteId = new StableId("route.zhongshan_anping"),
+                DestinationLocationId = new StableId("location.anping"),
+                AcquisitionMethodId = MilitarySupplyAcquisitionMethodIds
+                    .CommercialPurchase,
+                CarrierOrganizationId =
+                    "organization.zhongshan_merchants",
+                LossBearerOrganizationId =
+                    "organization.zhongshan_merchants",
+                MedicineQuantity = quantity,
+                ConvoyProvisionQuantity = 8,
+                DailyConvoyProvisionUse = 1,
+                UnitPrice = unitPrice,
+                AutoDeliverAtFinal = autoDeliver
+            };
+        }
+
         private static void ExecutePrototypeProcurement(WorldState world)
         {
             var armyId = new StableId("army.youzhou_reinforcement");
@@ -12801,6 +19628,108 @@ namespace Mandate.Tests
                     new FormalHouseholdFoodMonthlyCommandScheduler(
                         villageLife)
             };
+        }
+
+        private static void SeedMonthlyShortfallAndVillageFood(
+            FormalHouseholdFoodCommandFixture fixture,
+            long physicalQuantity)
+        {
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(fixture.Scheduler.CreateCommandHandler());
+            fixture.Scheduler.EnsureDueCommands(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            TransferCountyFoodToVillage(
+                fixture.World, fixture.Content, physicalQuantity);
+        }
+
+        private static int CompareHouseholdReliefPickupPriority(
+            HouseholdReliefPickupState left,
+            HouseholdReliefPickupState right)
+        {
+            var byDay = left.SettlementDay.CompareTo(right.SettlementDay);
+            if (byDay != 0)
+            {
+                return byDay;
+            }
+            var byVillage = string.CompareOrdinal(
+                left.VillageId, right.VillageId);
+            if (byVillage != 0)
+            {
+                return byVillage;
+            }
+            if (left.PriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability &&
+                right.PriorityPolicyId ==
+                    HouseholdReliefPriorityPolicyIds.NeedSeverityVulnerability)
+            {
+                var bySeverity = right.ShortfallSeverityBasisPoints.CompareTo(
+                    left.ShortfallSeverityBasisPoints);
+                if (bySeverity != 0)
+                {
+                    return bySeverity;
+                }
+                var byVulnerability =
+                    right.VulnerableAffectedPersonCount.CompareTo(
+                        left.VulnerableAffectedPersonCount);
+                if (byVulnerability != 0)
+                {
+                    return byVulnerability;
+                }
+                var byAffected =
+                    right.AffectedPersonCountAtAuthorization.CompareTo(
+                        left.AffectedPersonCountAtAuthorization);
+                if (byAffected != 0)
+                {
+                    return byAffected;
+                }
+            }
+            return string.CompareOrdinal(left.FamilyId, right.FamilyId);
+        }
+
+        private static void TransferCountyFoodToVillage(
+            WorldState world,
+            ProductionContentRegistry content,
+            long physicalQuantity)
+        {
+            var village = world.Villages[0];
+            var governance = world.CountyGovernances.Find(item =>
+                item.CountyLocationId == village.ParentLocationId);
+            var government = world.Organizations.Find(item =>
+                item.Id == governance.GovernmentOrganizationId);
+            var destination = world.InventoryContainers.Find(item =>
+                item.Id == village.PublicGranaryInventoryContainerId);
+            destination.CapacityWeight = checked(
+                destination.CapacityWeight + 100_000L);
+            var food = new FoodInventorySystem(content);
+            Assert.That(food.SummarizeContainer(
+                    world, governance.GranaryInventoryContainerId)
+                .PhysicalQuantity, Is.GreaterThanOrEqualTo(physicalQuantity));
+            var transfer = food.TransferContainerToContainer(
+                world,
+                governance.GranaryInventoryContainerId,
+                village.PublicGranaryInventoryContainerId,
+                government.LeaderPersonId,
+                physicalQuantity,
+                InventoryTransactionType.FoodCountyReliefTransferred,
+                village.Id,
+                governance.Id);
+            Assert.That(transfer.TransferredPhysicalQuantity,
+                Is.EqualTo(physicalQuantity));
+        }
+
+        private static long TotalFamilyFood(
+            WorldState world,
+            string familyId)
+        {
+            long total = 0;
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                if (world.ProductBatches[i].OwnerFamilyId == familyId)
+                {
+                    total = checked(total + world.ProductBatches[i].Quantity);
+                }
+            }
+            return total;
         }
 
         private static FormalPublicFoodCommandFixture
@@ -13532,6 +20461,39 @@ namespace Mandate.Tests
             };
         }
 
+        private static FoodStorageFixture PrepareFoodStorageLossWorld(
+            ulong seed)
+        {
+            var content = LoadHanFoodProductionContent();
+            var world = VillagePrototypeFactory.Create(200, seed);
+            world.ProductionContentManifest = content.CreateManifest();
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(world);
+            return new FoodStorageFixture
+            {
+                World = world,
+                Content = content
+            };
+        }
+
+        private static int ResolveFoodStorageLoss(
+            WorldState world,
+            ProductionContentRegistry content)
+        {
+            var scheduler = new FoodStorageLossCommandScheduler(
+                new FoodStorageLossSystem(content));
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(scheduler.CreateCommandHandler());
+            runtime.RegisterEventHandler(
+                scheduler.CreateProjectionHandler());
+            var scheduled = scheduler.EnsureDueCommands(world, runtime);
+            if (scheduled > 0)
+            {
+                runtime.ProcessDue(world);
+            }
+            return scheduled;
+        }
+
         private static FamilyState NewFreightFamily(
             PersonState head,
             string locationId,
@@ -13728,6 +20690,854 @@ namespace Mandate.Tests
                 new StableId("location.guangzong"));
             new WorldSimulator(world.MasterSeed).AdvanceDays(world, 8);
             return world;
+        }
+
+        private static WorldState BuildPatientReturnDeathWorld(
+            bool advancePastWaitingPeriod,
+            out MilitaryMedicalEvacuationState evacuation,
+            out MilitaryRearMedicalAdmissionState admission,
+            out MilitaryInjuryEpisodeState injury,
+            out ArmyState army,
+            out PersonState patient,
+            out MilitaryServiceState patientService,
+            out List<MilitaryServiceState> teamServices)
+        {
+            var world = BuildRearMedicalWorld(
+                1,
+                5,
+                out var localArmy,
+                out var localPatientService,
+                out var localTeamServices,
+                out var receiver,
+                out var site);
+            var localEvacuation = DispatchAndReceiveEvacuation(
+                world,
+                localArmy,
+                localPatientService,
+                localTeamServices,
+                receiver);
+            world.MilitarySurgeryContractActivationDay = checked(
+                world.AbsoluteDay + 1);
+            var rear = new MilitaryRearMedicalSystem();
+            var localAdmission = rear.Admit(
+                world,
+                new StableId(localEvacuation.Id),
+                new StableId(site.Id),
+                new StableId(receiver.Id));
+            rear.TreatInpatient(
+                world, new StableId(localAdmission.Id));
+            var localInjury = world.MilitaryInjuryEpisodes.Find(item =>
+                item.Id == localAdmission.InjuryEpisodeId);
+            var localPatient = world.People.Find(item =>
+                item.Id == localAdmission.PatientPersonId);
+            var successor = world.People.Find(item =>
+                item.Id == localEvacuation.TeamMembers[0].PersonId);
+            localPatient.FamilyId = "family.test.patient_return_death";
+            successor.FamilyId = localPatient.FamilyId;
+            localPatient.Wealth = 75;
+            world.Families.Add(new FamilyState
+            {
+                Id = localPatient.FamilyId,
+                DisplayName = "返军伤兵之家",
+                HeadPersonId = localPatient.Id,
+                Wealth = 1_000,
+                LocationId = site.LocationId,
+                MemberIds = new List<string>
+                {
+                    localPatient.Id,
+                    successor.Id
+                }
+            });
+            var simulator = new WorldSimulator(world.MasterSeed);
+            while (world.Segment != 3)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            rear.StartReturn(
+                world,
+                new StableId(localEvacuation.Id),
+                new StableId("route.zhongshan_anping"));
+            if (advancePastWaitingPeriod)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            world.Validate();
+
+            evacuation = localEvacuation;
+            admission = localAdmission;
+            injury = localInjury;
+            army = localArmy;
+            patient = localPatient;
+            patientService = localPatientService;
+            teamServices = localTeamServices;
+            return world;
+        }
+
+        private static WorldState BuildPatientArrivalWaitingTeamDeathWorld(
+            bool advancePastWaitingPeriod,
+            out MilitaryMedicalEvacuationState evacuation,
+            out MilitaryRearMedicalAdmissionState admission,
+            out MilitaryInjuryEpisodeState injury,
+            out ArmyState army,
+            out PersonState patient,
+            out MilitaryServiceState patientService,
+            out List<MilitaryServiceState> teamServices)
+        {
+            var world = BuildPatientReturnDeathWorld(
+                false,
+                out var localEvacuation,
+                out var localAdmission,
+                out var localInjury,
+                out var localArmy,
+                out var localPatient,
+                out var localPatientService,
+                out var localTeamServices);
+            var patientJourney = world.Journeys.Find(item =>
+                item.Id == localEvacuation.PatientReturnJourneyId);
+            patientJourney.RemainingKilometers =
+                TravelSystem.KilometersPerSegment(TravelMode.Foot);
+            for (var i = 0; i < localEvacuation.TeamMembers.Count; i++)
+            {
+                var teamJourney = world.Journeys.Find(item =>
+                    item.Id == localEvacuation.TeamMembers[i].ReturnJourneyId);
+                teamJourney.RemainingKilometers = checked(
+                    TravelSystem.KilometersPerSegment(TravelMode.Foot) * 2);
+            }
+
+            if (advancePastWaitingPeriod)
+            {
+                new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 1);
+            }
+            else
+            {
+                new TravelSystem().AdvanceJourneysOneSegment(world);
+            }
+            world.Validate();
+
+            evacuation = localEvacuation;
+            admission = localAdmission;
+            injury = localInjury;
+            army = localArmy;
+            patient = localPatient;
+            patientService = localPatientService;
+            teamServices = localTeamServices;
+            return world;
+        }
+
+        private static WorldState BuildReturnTeamDeathWorld(
+            bool advancePastWaitingPeriod,
+            out MilitaryMedicalEvacuationState evacuation,
+            out MilitaryRearMedicalAdmissionState admission,
+            out ArmyState army,
+            out PersonState patient,
+            out PersonState deceasedMember,
+            out MilitaryServiceState deceasedService,
+            out List<MilitaryServiceState> teamServices)
+        {
+            var world = BuildPatientReturnDeathWorld(
+                false,
+                out var localEvacuation,
+                out var localAdmission,
+                out var injury,
+                out var localArmy,
+                out var localPatient,
+                out var patientService,
+                out var localTeamServices);
+            AddReturnTeamMembersToPatientFamily(
+                world, localEvacuation, localPatient.FamilyId);
+            if (advancePastWaitingPeriod)
+            {
+                new WorldSimulator(world.MasterSeed)
+                    .AdvanceSegments(world, 1);
+            }
+            world.Validate();
+
+            evacuation = localEvacuation;
+            admission = localAdmission;
+            army = localArmy;
+            patient = localPatient;
+            var selectedService = localTeamServices[0];
+            deceasedMember = world.People.Find(item =>
+                item.Id == selectedService.PersonId);
+            deceasedService = selectedService;
+            teamServices = localTeamServices;
+            return world;
+        }
+
+        private static void AddReturnTeamMembersToPatientFamily(
+            WorldState world,
+            MilitaryMedicalEvacuationState evacuation,
+            string familyId)
+        {
+            var family = world.Families.Find(item => item.Id == familyId);
+            for (var i = 0; i < evacuation.TeamMembers.Count; i++)
+            {
+                var member = world.People.Find(item =>
+                    item.Id == evacuation.TeamMembers[i].PersonId);
+                member.FamilyId = family.Id;
+                if (!family.MemberIds.Contains(member.Id))
+                {
+                    family.MemberIds.Add(member.Id);
+                }
+            }
+        }
+
+        private static WorldState BuildOriginalEvacuationDeathWorld(
+            bool advanceToReception,
+            bool advancePastWaitingPeriod,
+            out MilitaryMedicalEvacuationState evacuation,
+            out ArmyState army,
+            out PersonState patient,
+            out MilitaryServiceState patientService,
+            out List<MilitaryServiceState> teamServices,
+            out PersonState receiver)
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out var localArmy,
+                out var localPatientService,
+                out var localTeamServices,
+                out var localReceiver);
+            var localPatient = world.People.Find(item =>
+                item.Id == localPatientService.PersonId);
+            var successor = world.People.Find(item =>
+                item.Id == localTeamServices[0].PersonId);
+            localPatient.HealthBasisPoints = 1_000;
+            localPatient.Wealth = 75;
+            localPatient.FamilyId =
+                "family.test.original_evacuation_death";
+            successor.FamilyId = localPatient.FamilyId;
+            world.Families.Add(new FamilyState
+            {
+                Id = localPatient.FamilyId,
+                DisplayName = "后送伤兵之家",
+                HeadPersonId = localPatient.Id,
+                Wealth = 1_000,
+                LocationId = localArmy.LocationId,
+                MemberIds = new List<string>
+                {
+                    localPatient.Id,
+                    successor.Id
+                }
+            });
+            var localEvacuation = new MilitaryMedicalEvacuationSystem()
+                .Dispatch(
+                    world,
+                    new StableId(localArmy.CommanderPersonId),
+                    new StableId(localPatientService.Id),
+                    localTeamServices.ConvertAll(item =>
+                        new StableId(item.Id)),
+                    new StableId("route.zhongshan_anping"),
+                    new StableId("location.anping"),
+                    new StableId(localReceiver.Id));
+            var simulator = new WorldSimulator(world.MasterSeed);
+            if (advancePastWaitingPeriod)
+            {
+                simulator.AdvanceDays(world, 1);
+            }
+            if (advanceToReception)
+            {
+                for (var i = 0;
+                     i < 40 && localEvacuation.Status ==
+                         MilitaryMedicalEvacuationStatus.InTransit;
+                     i++)
+                {
+                    simulator.AdvanceSegments(world, 1);
+                }
+            }
+            world.Validate();
+            evacuation = localEvacuation;
+            army = localArmy;
+            patient = localPatient;
+            patientService = localPatientService;
+            teamServices = localTeamServices;
+            receiver = localReceiver;
+            return world;
+        }
+
+        private static WorldState BuildMilitaryEvacuationWorld(
+            out ArmyState army,
+            out MilitaryServiceState patientService,
+            out List<MilitaryServiceState> teamServices,
+            out PersonState receiver)
+        {
+            var world = PrototypeWorldFactory.Create184World(184_049);
+            var sourceArmy = world.Armies.Find(item =>
+                item.Id == "army.youzhou_reinforcement");
+            var eligible = world.MilitaryServices.FindAll(item =>
+                item.ArmyId == sourceArmy.Id &&
+                item.Role == MilitaryServiceRole.Soldier &&
+                item.Status == MilitaryServiceStatus.Active);
+            eligible.Sort((left, right) =>
+                string.CompareOrdinal(left.Id, right.Id));
+            var woundedService = eligible[0];
+            woundedService.Status = MilitaryServiceStatus.Wounded;
+            woundedService.LastStatusChangeDay = world.AbsoluteDay;
+            world.People.Find(item =>
+                item.Id == woundedService.PersonId).HealthBasisPoints = 4_000;
+            var evacuationTeam = new List<MilitaryServiceState>
+            {
+                eligible[1],
+                eligible[2]
+            };
+            new MilitaryServiceSystem().SynchronizeArmyCaches(
+                world, sourceArmy.Id);
+
+            var receivingPhysician = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, receivingPhysician, "location.anping");
+            world.Validate();
+            army = sourceArmy;
+            patientService = woundedService;
+            teamServices = evacuationTeam;
+            receiver = receivingPhysician;
+            return world;
+        }
+
+        private static WorldState BuildRearMedicalWorld(
+            int bedCapacity,
+            int openingMedicineUnits,
+            out ArmyState army,
+            out MilitaryServiceState patientService,
+            out List<MilitaryServiceState> teamServices,
+            out PersonState receiver,
+            out MilitaryRearMedicalSiteState site)
+        {
+            var world = BuildMilitaryEvacuationWorld(
+                out army,
+                out patientService,
+                out teamServices,
+                out receiver);
+            world.Locations.Find(item => item.Id == "location.anping")
+                .Features |= LocationFeature.Clinic;
+            site = new MilitaryRearMedicalSystem().RegisterExistingClinic(
+                world,
+                new StableId("location.anping"),
+                new StableId("organization.guangzong_relief_camp"),
+                new StableId(receiver.Id),
+                bedCapacity,
+                openingMedicineUnits);
+            return world;
+        }
+
+        private static WorldState BuildFieldHospitalWorld(
+            out ArmyState army,
+            out MilitaryFieldHospitalConstructionProjectState project,
+            out MilitaryRearMedicalSiteState site,
+            out InventoryContainerState materialContainer)
+        {
+            var world = PrototypeWorldFactory.Create184World(184_050);
+            var localArmy = world.Armies.Find(item =>
+                item.Id == "army.youzhou_reinforcement");
+            var organization = world.Organizations.Find(item =>
+                item.Id == localArmy.OrganizationId);
+            organization.Treasury = 5_000;
+            materialContainer = new InventoryContainerState
+            {
+                Id = "inventory_container.field_hospital.materials",
+                KindId = "inventory_container.military_construction_store",
+                OwnerOrganizationId = organization.Id,
+                LocationId = localArmy.LocationId,
+                CapacityWeight = 1_000
+            };
+            world.InventoryContainers.Add(materialContainer);
+            AddOrganizationProductBatch(
+                world,
+                "product_batch.field_hospital.timber",
+                organization.Id,
+                materialContainer.Id,
+                localArmy.LocationId,
+                CoreProductionContent.TimberMaterialProductId,
+                30,
+                localArmy.CommanderPersonId);
+            AddOrganizationProductBatch(
+                world,
+                "product_batch.field_hospital.leather",
+                organization.Id,
+                materialContainer.Id,
+                localArmy.LocationId,
+                CoreProductionContent.LeatherMaterialProductId,
+                10,
+                localArmy.CommanderPersonId);
+            world.Validate();
+            var construction = new MilitaryFieldHospitalSystem();
+            var localProject = construction.StartProject(
+                world,
+                new StableId(localArmy.CommanderPersonId),
+                new StableId(localArmy.Id),
+                new StableId(localArmy.LocationId),
+                new StableId(localArmy.CommanderPersonId),
+                new StableId(materialContainer.Id));
+            construction.WorkOneDay(
+                world,
+                new StableId(localProject.Id),
+                new StableId(localArmy.CommanderPersonId));
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            construction.WorkOneDay(
+                world,
+                new StableId(localProject.Id),
+                new StableId(localArmy.CommanderPersonId));
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            construction.WorkOneDay(
+                world,
+                new StableId(localProject.Id),
+                new StableId(localArmy.CommanderPersonId));
+            site = world.MilitaryRearMedicalSites.Find(item =>
+                item.SourceConstructionProjectId == localProject.Id);
+            army = localArmy;
+            project = localProject;
+            world.Validate();
+            return world;
+        }
+
+        private static WorldState BuildInfectedFieldHospitalAdmission(
+            int medicineUnits,
+            out MilitaryRearMedicalAdmissionState admission,
+            out MilitaryInjuryEpisodeState injury,
+            out MilitaryRearMedicalSiteState site,
+            MilitaryInjuryProfileDefinitionState additionalProfile = null,
+            MilitarySurgicalProcedureDefinitionState additionalProcedure = null)
+        {
+            var world = BuildFieldHospitalWorld(
+                out var army,
+                out var project,
+                out var localSite,
+                out var materialContainer);
+            if (additionalProcedure != null)
+            {
+                world.MilitarySurgicalProcedures.Add(additionalProcedure);
+            }
+            if (additionalProfile != null)
+            {
+                world.MilitaryInjuryProfiles.Add(additionalProfile);
+            }
+            AddOrganizationProductBatch(
+                world,
+                "product_batch.complex_injury.medicine",
+                localSite.OwnerOrganizationId,
+                localSite.MedicineInventoryContainerId,
+                localSite.LocationId,
+                CoreProductionContent.HerbalMedicineMaterialProductId,
+                medicineUnits,
+                army.CommanderPersonId);
+            RelocateArmyForFieldHospitalTest(
+                world, army, "location.zhuo");
+            var eligible = world.MilitaryServices.FindAll(item =>
+                item.ArmyId == army.Id &&
+                item.Role == MilitaryServiceRole.Soldier &&
+                item.Status == MilitaryServiceStatus.Active);
+            eligible.Sort((left, right) =>
+                string.CompareOrdinal(left.Id, right.Id));
+            var patient = eligible[0];
+            patient.Status = MilitaryServiceStatus.Wounded;
+            patient.LastStatusChangeDay = world.AbsoluteDay;
+            world.People.Find(item => item.Id == patient.PersonId)
+                .HealthBasisPoints = 1_000;
+            var team = new List<MilitaryServiceState>
+            {
+                eligible[1],
+                eligible[2]
+            };
+            new MilitaryServiceSystem().SynchronizeArmyCaches(world, army.Id);
+            var receiver = world.People.Find(item =>
+                item.Id == "person.generated.physician_001");
+            receiver.MedicalSkillBasisPoints = 7_500;
+            receiver.ProfessionalSkills.Medicine = 7_500;
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, receiver, localSite.LocationId);
+            var evacuationSystem = new MilitaryMedicalEvacuationSystem();
+            var evacuation = evacuationSystem.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patient.Id),
+                team.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhuo_zhongshan"),
+                new StableId(localSite.LocationId),
+                new StableId(receiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 28);
+            evacuationSystem.Receive(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(receiver.Id));
+            var localAdmission = new MilitaryRearMedicalSystem().Admit(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(localSite.Id),
+                new StableId(receiver.Id));
+            var localInjury = world.MilitaryInjuryEpisodes.Find(item =>
+                item.Id == localAdmission.InjuryEpisodeId);
+            admission = localAdmission;
+            injury = localInjury;
+            site = localSite;
+            world.Validate();
+            return world;
+        }
+
+        private static WorldState BuildReadyForReturnWoundDeathWorld(
+            bool advancePastWaitingPeriod,
+            out MilitaryRearMedicalAdmissionState admission,
+            out MilitaryInjuryEpisodeState injury,
+            out PersonState patient,
+            out PersonState successor,
+            out FamilyState family,
+            out OrganizationState organization,
+            out MilitaryServiceState patientService,
+            out ArmyState army)
+        {
+            var world = BuildInfectedFieldHospitalAdmission(
+                10,
+                out var localAdmission,
+                out var localInjury,
+                out var site);
+            var rear = new MilitaryRearMedicalSystem();
+            rear.TreatInpatient(world, new StableId(localAdmission.Id));
+            rear.TreatInpatient(world, new StableId(localAdmission.Id));
+            rear.TreatInpatient(world, new StableId(localAdmission.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            rear.TreatInpatient(world, new StableId(localAdmission.Id));
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == localAdmission.EvacuationId);
+            var localArmy = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            var localPatient = world.People.Find(item =>
+                item.Id == localAdmission.PatientPersonId);
+            var localSuccessor = world.People.Find(item =>
+                item.Id == evacuation.TeamMembers[0].PersonId);
+            localPatient.FamilyId = "family.test.wound_death";
+            localSuccessor.FamilyId = localPatient.FamilyId;
+            localPatient.Wealth = 75;
+            var localFamily = new FamilyState
+            {
+                Id = localPatient.FamilyId,
+                DisplayName = "伤兵之家",
+                HeadPersonId = localPatient.Id,
+                Wealth = 1_000,
+                LocationId = site.LocationId,
+                MemberIds = new List<string>
+                {
+                    localPatient.Id,
+                    localSuccessor.Id
+                }
+            };
+            world.Families.Add(localFamily);
+            if (advancePastWaitingPeriod)
+            {
+                new WorldSimulator(world.MasterSeed).AdvanceDays(world, 1);
+            }
+            world.Validate();
+
+            admission = localAdmission;
+            injury = localInjury;
+            patient = localPatient;
+            successor = localSuccessor;
+            family = localFamily;
+            army = localArmy;
+            organization = world.Organizations.Find(item =>
+                item.Id == localArmy.OrganizationId);
+            patientService = world.MilitaryServices.Find(item =>
+                item.Id == localAdmission.PatientMilitaryServiceId);
+            return world;
+        }
+
+        private static void AttachInpatientWoundDeathFamily(
+            WorldState world,
+            MilitaryRearMedicalAdmissionState admission,
+            MilitaryRearMedicalSiteState site,
+            out PersonState patient,
+            out PersonState successor,
+            out FamilyState family,
+            out OrganizationState organization,
+            out MilitaryServiceState patientService,
+            out ArmyState army)
+        {
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == admission.EvacuationId);
+            patient = world.People.Find(item =>
+                item.Id == admission.PatientPersonId);
+            successor = world.People.Find(item =>
+                item.Id == evacuation.TeamMembers[0].PersonId);
+            patient.FamilyId = "family.test.inpatient_wound_death";
+            successor.FamilyId = patient.FamilyId;
+            patient.Wealth = 75;
+            family = new FamilyState
+            {
+                Id = patient.FamilyId,
+                DisplayName = "住院伤兵之家",
+                HeadPersonId = patient.Id,
+                Wealth = 1_000,
+                LocationId = site.LocationId,
+                MemberIds = new List<string>
+                {
+                    patient.Id,
+                    successor.Id
+                }
+            };
+            world.Families.Add(family);
+            var localArmy = world.Armies.Find(item =>
+                item.Id == evacuation.SourceArmyId);
+            organization = world.Organizations.Find(item =>
+                item.Id == localArmy.OrganizationId);
+            army = localArmy;
+            patientService = world.MilitaryServices.Find(item =>
+                item.Id == admission.PatientMilitaryServiceId);
+            world.Validate();
+        }
+
+        private static WorldState BuildCompletedRetiredWoundDeathWorld(
+            bool advancePastWaitingPeriod,
+            out MilitaryRearMedicalAdmissionState admission,
+            out MilitaryInjuryEpisodeState injury,
+            out PersonState patient,
+            out PersonState successor,
+            out FamilyState family,
+            out OrganizationState organization,
+            out MilitaryServiceState patientService,
+            out ArmyState army)
+        {
+            var world = BuildReadyForReturnWoundDeathWorld(
+                false,
+                out admission,
+                out injury,
+                out patient,
+                out successor,
+                out family,
+                out organization,
+                out patientService,
+                out army);
+            var localAdmission = admission;
+            var evacuation = world.MilitaryMedicalEvacuations.Find(item =>
+                item.Id == localAdmission.EvacuationId);
+            new MilitaryRearMedicalSystem().StartReturn(
+                world,
+                new StableId(evacuation.Id),
+                new StableId("route.zhuo_zhongshan"));
+            var simulator = new WorldSimulator(world.MasterSeed);
+            for (var i = 0;
+                 i < 40 && evacuation.Status !=
+                     MilitaryMedicalEvacuationStatus.Completed;
+                 i++)
+            {
+                simulator.AdvanceSegments(world, 1);
+            }
+            if (evacuation.Status !=
+                MilitaryMedicalEvacuationStatus.Completed)
+            {
+                throw new InvalidOperationException(
+                    "The wound-death fixture could not complete evacuation return.");
+            }
+            if (advancePastWaitingPeriod)
+            {
+                simulator.AdvanceDays(world, 1);
+            }
+            world.Validate();
+            return world;
+        }
+
+        private static MilitaryRearMedicalSiteState
+            BuildMedicalTransferDestination(
+                WorldState world,
+                string ownerOrganizationId,
+                int bedCapacity,
+                int openingMedicineUnits,
+                out PersonState receiver)
+        {
+            var targetLocation = world.Locations.Find(item =>
+                item.Id == "location.anping");
+            targetLocation.Features |= LocationFeature.Clinic;
+            receiver = world.People.Find(item =>
+                item.Id == "person.generated.farmer_001");
+            receiver.MedicalSkillBasisPoints = 7_500;
+            receiver.ProfessionalSkills.Medicine = 7_500;
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, receiver, targetLocation.Id);
+            var position = world.Positions.Find(item =>
+                item.OrganizationId == ownerOrganizationId);
+            world.Memberships.Add(new MembershipState
+            {
+                Id = "membership.medical_transfer.receiver",
+                PersonId = receiver.Id,
+                OrganizationId = ownerOrganizationId,
+                PositionId = position.Id,
+                JoinedDay = world.AbsoluteDay,
+                LoyaltyBasisPoints = 6_000
+            });
+            world.Validate();
+            return new MilitaryRearMedicalSystem().RegisterExistingClinic(
+                world,
+                new StableId(targetLocation.Id),
+                new StableId(ownerOrganizationId),
+                new StableId(receiver.Id),
+                bedCapacity,
+                openingMedicineUnits);
+        }
+
+        private static MilitaryRearMedicalSiteState
+            BuildSecondMedicalTransferDestination(
+                WorldState world,
+                string ownerOrganizationId,
+                int bedCapacity,
+                int openingMedicineUnits,
+                out PersonState receiver)
+        {
+            var targetLocation = world.Locations.Find(item =>
+                item.Id == "location.xiaquyang");
+            targetLocation.Features |= LocationFeature.Clinic;
+            receiver = world.People.Find(item =>
+                item.Id == "person.generated.farmer_002");
+            receiver.MedicalSkillBasisPoints = 7_500;
+            receiver.ProfessionalSkills.Medicine = 7_500;
+            new PopulationLedgerSystem().MoveIndependentPerson(
+                world, receiver, targetLocation.Id);
+            var position = world.Positions.Find(item =>
+                item.OrganizationId == ownerOrganizationId);
+            world.Memberships.Add(new MembershipState
+            {
+                Id = "membership.medical_transfer.second_receiver",
+                PersonId = receiver.Id,
+                OrganizationId = ownerOrganizationId,
+                PositionId = position.Id,
+                JoinedDay = world.AbsoluteDay,
+                LoyaltyBasisPoints = 6_000
+            });
+            world.Validate();
+            return new MilitaryRearMedicalSystem().RegisterExistingClinic(
+                world,
+                new StableId(targetLocation.Id),
+                new StableId(ownerOrganizationId),
+                new StableId(receiver.Id),
+                bedCapacity,
+                openingMedicineUnits);
+        }
+
+        private static void AddOrganizationProductBatch(
+            WorldState world,
+            string batchId,
+            string ownerOrganizationId,
+            string containerId,
+            string locationId,
+            string productDefinitionId,
+            long quantity,
+            string actorPersonId)
+        {
+            var transactionId =
+                "inventory_transaction." + batchId + ".opening";
+            var product = ProductionContentRegistry.CreateCore().GetProduct(
+                productDefinitionId);
+            var batch = new ProductBatchState
+            {
+                Id = batchId,
+                ProductDefinitionId = product.Id,
+                OwnerOrganizationId = ownerOrganizationId,
+                InventoryContainerId = containerId,
+                OriginLocationId = locationId,
+                SourceTransactionId = transactionId,
+                UnitId = product.UnitId,
+                UnitWeight = product.BaseWeight,
+                ProducedDay = world.AbsoluteDay,
+                Quantity = quantity,
+                QualityBasisPoints = 8_500,
+                FreshnessBasisPoints = 9_500,
+                QualityDimensions = ProductQualityRules.CreateUniform(
+                    product, 8_500)
+            };
+            world.ProductBatches.Add(batch);
+            world.InventoryTransactions.Add(new InventoryTransactionState
+            {
+                Id = transactionId,
+                Day = world.AbsoluteDay,
+                Type = InventoryTransactionType.OpeningBalance,
+                ActorPersonId = actorPersonId,
+                Summary = "Field-hospital test opening balance.",
+                Lines =
+                {
+                    new InventoryTransactionLineState
+                    {
+                        BatchId = batch.Id,
+                        ProductDefinitionId = batch.ProductDefinitionId,
+                        OwnerOrganizationId = batch.OwnerOrganizationId,
+                        InventoryContainerId = batch.InventoryContainerId,
+                        UnitId = batch.UnitId,
+                        QuantityDelta = quantity
+                    }
+                }
+            });
+        }
+
+        private static void RelocateArmyForFieldHospitalTest(
+            WorldState world,
+            ArmyState army,
+            string destinationLocationId)
+        {
+            var personnel = new List<PersonState>();
+            for (var i = 0; i < world.MilitaryServices.Count; i++)
+            {
+                var service = world.MilitaryServices[i];
+                if (service.ArmyId == army.Id &&
+                    (service.Status == MilitaryServiceStatus.Active ||
+                     service.Status == MilitaryServiceStatus.Mustering ||
+                     service.Status == MilitaryServiceStatus.Wounded))
+                {
+                    personnel.Add(world.People.Find(item =>
+                        item.Id == service.PersonId));
+                }
+            }
+            army.LocationId = destinationLocationId;
+            world.InventoryContainers.Find(item =>
+                item.Id == army.MedicalInventoryContainerId).LocationId =
+                    destinationLocationId;
+            new PopulationLedgerSystem().MovePeople(
+                world, personnel, destinationLocationId, false);
+        }
+
+        private static void RelocateSourceArmyWithoutEvacuationParty(
+            WorldState world,
+            ArmyState army,
+            string destinationLocationId)
+        {
+            var personnel = new List<PersonState>();
+            for (var i = 0; i < world.MilitaryServices.Count; i++)
+            {
+                var service = world.MilitaryServices[i];
+                if (service.ArmyId == army.Id &&
+                    (service.Status == MilitaryServiceStatus.Active ||
+                     service.Status == MilitaryServiceStatus.Mustering))
+                {
+                    personnel.Add(world.People.Find(item =>
+                        item.Id == service.PersonId));
+                }
+            }
+            army.LocationId = destinationLocationId;
+            world.InventoryContainers.Find(item =>
+                item.Id == army.MedicalInventoryContainerId).LocationId =
+                    destinationLocationId;
+            new PopulationLedgerSystem().MovePeople(
+                world, personnel, destinationLocationId, false);
+            world.Validate();
+        }
+
+        private static MilitaryMedicalEvacuationState
+            DispatchAndReceiveEvacuation(
+                WorldState world,
+                ArmyState army,
+                MilitaryServiceState patientService,
+                List<MilitaryServiceState> teamServices,
+                PersonState receiver)
+        {
+            var evacuationSystem = new MilitaryMedicalEvacuationSystem();
+            var evacuation = evacuationSystem.Dispatch(
+                world,
+                new StableId(army.CommanderPersonId),
+                new StableId(patientService.Id),
+                teamServices.ConvertAll(item => new StableId(item.Id)),
+                new StableId("route.zhongshan_anping"),
+                new StableId("location.anping"),
+                new StableId(receiver.Id));
+            new WorldSimulator(world.MasterSeed).AdvanceSegments(world, 13);
+            evacuationSystem.Receive(
+                world,
+                new StableId(evacuation.Id),
+                new StableId(receiver.Id));
+            return evacuation;
         }
 
         private static NewGameCharacterRequest NewGameRequest(
@@ -14306,6 +22116,12 @@ namespace Mandate.Tests
             }
         }
 
+        private sealed class FoodStorageFixture
+        {
+            public WorldState World;
+            public ProductionContentRegistry Content;
+        }
+
         private static PersonState BuildIncrementalNewPerson()
         {
             return new PersonState
@@ -14322,6 +22138,201 @@ namespace Mandate.Tests
                 NextIndependentEventReason =
                     "monthly_household_settlement"
             };
+        }
+
+        private static WorldState PrepareAutomaticHerbalSupplyWorld(
+            ProductionContentRegistry content,
+            ulong seed)
+        {
+            var world = VillagePrototypeFactory.Create(200, seed);
+            var openingMedicine = world.ProductBatches.Find(item =>
+                item.ProductDefinitionId == CoreProductionContent
+                    .HerbalMedicineMaterialProductId);
+            world.InventoryTransactions.RemoveAll(item =>
+                item.Id == openingMedicine.SourceTransactionId);
+            world.ProductBatches.Remove(openingMedicine);
+            world.ProductionContentManifest = content.CreateManifest();
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(world);
+            var physician = world.People.Find(item =>
+                item.VillageOccupation == VillageOccupation.Physician);
+            var family = world.Families.Find(item =>
+                item.Id == physician.FamilyId);
+            var storage = world.VillageFacilities.Find(item =>
+                item.Kind == VillageFacilityKind.HouseholdGranary &&
+                item.OwnerFamilyId == family.Id);
+            family.Wealth = 10_000;
+            storage.Capacity += 1_000;
+            world.Validate();
+            return world;
+        }
+
+        private static void ResolveTwoNutritionDeficitMonths(
+            WorldState world,
+            string personId)
+        {
+            var system = new LongTermNutritionSystem();
+            for (var day = 30L; day <= 60L; day += 30L)
+            {
+                world.AbsoluteDay = day;
+                system.RecordMonthlySettlement(
+                    world,
+                    day,
+                    new List<FormalHouseholdFoodPersonSettlementResult>
+                    {
+                        new FormalHouseholdFoodPersonSettlementResult
+                        {
+                            PersonId = personId,
+                            RequiredNutritionBasisUnits = 30_000,
+                            MissingNutritionBasisUnits = 30_000
+                        }
+                    });
+            }
+        }
+
+        private static long ArmyMedicineQuantity(
+            WorldState world,
+            ArmyState army)
+        {
+            long quantity = 0;
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch.InventoryContainerId ==
+                        army.MedicalInventoryContainerId &&
+                    batch.ProductDefinitionId == CoreProductionContent
+                        .HerbalMedicineMaterialProductId)
+                {
+                    quantity = checked(quantity + batch.Quantity);
+                }
+            }
+            return quantity;
+        }
+
+        private static void RemoveArmyMedicine(
+            WorldState world,
+            ArmyState army)
+        {
+            var transactionIds = new List<string>();
+            for (var i = world.ProductBatches.Count - 1; i >= 0; i--)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch.InventoryContainerId !=
+                        army.MedicalInventoryContainerId ||
+                    batch.ProductDefinitionId != CoreProductionContent
+                        .HerbalMedicineMaterialProductId)
+                {
+                    continue;
+                }
+                transactionIds.Add(batch.SourceTransactionId);
+                world.ProductBatches.RemoveAt(i);
+            }
+            world.InventoryTransactions.RemoveAll(item =>
+                transactionIds.Contains(item.Id));
+            world.Validate();
+        }
+
+        private static FamilyState MoveMedicalPatientToSeparateHousehold(
+            WorldState world,
+            long wealth)
+        {
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var oldFamily = world.Families.Find(item =>
+                item.Id == patient.FamilyId);
+            oldFamily.MemberIds.Remove(patient.Id);
+            oldFamily.HeadPersonId = oldFamily.MemberIds[0];
+            var family = new FamilyState
+            {
+                Id = "family.test.medical_patient",
+                DisplayName = "病患家",
+                HeadPersonId = patient.Id,
+                Wealth = wealth,
+                LocationId = patient.LocationId,
+                MemberIds = { patient.Id }
+            };
+            patient.FamilyId = family.Id;
+            world.Families.Add(family);
+            world.Validate();
+            return family;
+        }
+
+        private static string AddCivilianMedicalPatient(
+            WorldState world,
+            int index)
+        {
+            var personId = $"person.test.medical_patient_{index}";
+            var familyId = $"family.test.medical_patient_{index}";
+            world.People.Add(new PersonState
+            {
+                Id = personId,
+                DisplayName = $"病患{index}",
+                LocationId = "location.zhuo",
+                BirthLocationId = "location.zhuo",
+                FamilyId = familyId,
+                BirthDay = -7_200,
+                HealthBasisPoints = 10_000
+            });
+            world.Families.Add(new FamilyState
+            {
+                Id = familyId,
+                DisplayName = $"病患{index}家",
+                HeadPersonId = personId,
+                Wealth = 1_000,
+                LocationId = "location.zhuo",
+                MemberIds = { personId }
+            });
+            ResolveTwoNutritionDeficitMonths(world, personId);
+            return personId;
+        }
+
+        private static WorldState BuildCivilianMedicalWorld(
+            bool includeMedicine,
+            bool patientIsMinor)
+        {
+            var world = BuildMinimalWorld();
+            var family = world.Families[0];
+            var patient = world.People.Find(item => item.Id == "person.liu_bei");
+            var physician = world.People.Find(item => item.Id == "person.guan_yu");
+            patient.FamilyId = family.Id;
+            physician.FamilyId = family.Id;
+            physician.VillageOccupation = VillageOccupation.Physician;
+            physician.MedicalSkillBasisPoints = 7_500;
+            physician.ProfessionalSkills.Medicine = 7_500;
+            physician.BirthDay = -10_800;
+            family.MemberIds.Add(physician.Id);
+            if (patientIsMinor)
+            {
+                patient.BirthDay = -3_540;
+            }
+            else
+            {
+                patient.BirthDay = -7_200;
+            }
+            ResolveTwoNutritionDeficitMonths(world, patient.Id);
+            if (includeMedicine)
+            {
+                var container = new InventoryContainerState
+                {
+                    Id = "inventory.test.medical_chest",
+                    KindId = "inventory.village_clinic",
+                    OwnerFamilyId = family.Id,
+                    LocationId = patient.LocationId,
+                    CapacityWeight = 10
+                };
+                world.InventoryContainers.Add(container);
+                new ProductInventorySystem()
+                    .CreateFamilyContainerOpeningBatch(
+                        world,
+                        family.Id,
+                        container.Id,
+                        physician.Id,
+                        CoreProductionContent
+                            .HerbalMedicineMaterialProductId,
+                        5,
+                        8_000);
+            }
+            world.Validate();
+            return world;
         }
     }
 }

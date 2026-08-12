@@ -181,6 +181,8 @@ namespace Mandate.Domain
         public const string Armoring = "skill.production.armoring";
         public const string Husbandry = "skill.production.husbandry";
         public const string Tanning = "skill.production.tanning";
+        public const string HerbalProcessing =
+            "skill.production.herbal_processing";
     }
 
     public static class CoreKnowledgeIds

@@ -1,0 +1,36 @@
+{
+  "schema": "mandate.luoyang-184-metropolitan-event-impacts.v1",
+  "impacts": [
+    {
+      "event_id": "event.184.yellow_turban.secret_network",
+      "effects": {
+        "security_pressure": 120,
+        "road_inspection_pressure": 80
+      }
+    },
+    {
+      "event_id": "event.184.hejin.capital_defense",
+      "effects": {
+        "recruitment_persons": 1200,
+        "transport_capacity_delta": -300,
+        "grain_price_basis_points": 10400
+      }
+    },
+    {
+      "event_id": "event.184.luzhi.departure",
+      "effects": {
+        "military_supply_units": 1200,
+        "road_capacity_delta": -180,
+        "refugee_pressure": 40
+      }
+    },
+    {
+      "event_id": "event.184.huangfu.departure",
+      "effects": {
+        "military_supply_units": 900,
+        "agricultural_labor_delta": -240,
+        "refugee_pressure": 80
+      }
+    }
+  ]
+}

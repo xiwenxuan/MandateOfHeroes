@@ -112,7 +112,13 @@ namespace Mandate.Simulation
                 LocationFeature.Fortification);
 
             AddCommodity(world, "commodity.grain", "粮食", 100, 1);
-            AddCommodity(world, "commodity.cloth", "布帛", 180, 2);
+            AddCommodity(
+                world,
+                "commodity.cloth",
+                "布帛",
+                180,
+                2,
+                CoreProductionContent.PlainClothProductId);
             AddCommodity(world, "commodity.salt", "盐", 140, 2);
             AddCommodity(world, "commodity.horses", "战马", 600, 10);
             AddCommodity(world, "commodity.herbs", "药材", 120, 1);
@@ -608,6 +614,9 @@ namespace Mandate.Simulation
             MilitaryEquipmentRepairSystem.InitializePrototypeWorkshop(world);
             UpstreamResourceProductionSystem.InitializePrototype(world);
             LivestockProductionSystem.InitializePrototype(world);
+            MerchantTownOperationSystem.InitializePrototype(world);
+            new MedicalSystem(world.MasterSeed, people)
+                .InitializePrototypeSupply(world);
             world.Validate();
             return world;
         }
@@ -694,12 +703,14 @@ namespace Mandate.Simulation
             string id,
             string displayName,
             int basePrice,
-            int unitWeight)
+            int unitWeight,
+            string productDefinitionId = "")
         {
             world.Commodities.Add(new CommodityState
             {
                 Id = id,
                 DisplayName = displayName,
+                ProductDefinitionId = productDefinitionId,
                 BasePrice = basePrice,
                 UnitWeight = unitWeight
             });

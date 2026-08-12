@@ -9,6 +9,7 @@ namespace Mandate.Simulation
         public int Mustering;
         public int Active;
         public int Wounded;
+        public int MedicalEvacuationDuty;
         public int Stragglers;
         public int Deserters;
         public int Captured;
@@ -18,7 +19,7 @@ namespace Mandate.Simulation
         public int Available => Mustering + Active;
         public int Total =>
             Mustering + Active + Wounded + Stragglers +
-            Deserters + Captured + Retired + Dead;
+            Deserters + Captured + Retired + Dead + MedicalEvacuationDuty;
     }
 
     public sealed class MilitaryServiceSystem
@@ -146,6 +147,9 @@ namespace Mandate.Simulation
                         break;
                     case MilitaryServiceStatus.Dead:
                         audit.Dead++;
+                        break;
+                    case MilitaryServiceStatus.MedicalEvacuationDuty:
+                        audit.MedicalEvacuationDuty++;
                         break;
                 }
             }
@@ -341,6 +345,38 @@ namespace Mandate.Simulation
             SynchronizeArmyCaches(world, armyId.Value);
             world.Validate();
             return selected.Count;
+        }
+
+        internal void RecoverWoundedServiceWithoutValidation(
+            WorldState world,
+            MilitaryServiceState service,
+            IPersonRepository people = null)
+        {
+            if (world == null)
+            {
+                throw new ArgumentNullException(nameof(world));
+            }
+            if (service == null ||
+                !world.MilitaryServiceInitialized ||
+                service.Status != MilitaryServiceStatus.Wounded)
+            {
+                throw new InvalidOperationException(
+                    "A concrete wounded military service is required.");
+            }
+
+            people = people ?? PeopleFor(world);
+            service.Status = MilitaryServiceStatus.Active;
+            service.LastStatusChangeDay = world.AbsoluteDay;
+            var person = people.GetRequired(service.PersonId);
+            var recoveredHealth = Math.Max(
+                person.HealthBasisPoints,
+                MilitaryMedicalRules.ReturnToDutyHealthBasisPoints);
+            if (recoveredHealth != person.HealthBasisPoints)
+            {
+                people.GetRequiredForUpdate(service.PersonId)
+                    .HealthBasisPoints = recoveredHealth;
+            }
+            SynchronizeArmyCaches(world, service.ArmyId);
         }
 
         private static void AddArmyStructure(

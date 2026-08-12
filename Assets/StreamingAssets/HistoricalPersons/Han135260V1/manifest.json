@@ -1,0 +1,166 @@
+{
+  "schema": "mandate.historical-person-clan-package.v1",
+  "format_version": 1,
+  "dataset_id": "han135260-person-clan-v1",
+  "year_start": 135,
+  "year_end": 260,
+  "source_baseline": "01_140-264历史人物与时间轴母库_V5.xlsx",
+  "person_count": 1202,
+  "clan_count": 39,
+  "branch_count": 15,
+  "scenario_count": 13,
+  "family_organization_count": 0,
+  "household_count": 0,
+  "files": [
+    {
+      "path": "allegiances.json",
+      "bytes": 17587,
+      "sha256": "5f786dc04a66d1be6a6aeca380c9a94a323ed151663cd8bed87e494379afb23f"
+    },
+    {
+      "path": "audits.json",
+      "bytes": 395882,
+      "sha256": "2a01bfc742199f7fadcfdaa584c73f36507e9ccf9ff838a5c8c835dbbad9ab4b"
+    },
+    {
+      "path": "branches.json",
+      "bytes": 9405,
+      "sha256": "bdd7fe074c0cb41203136bbe04227b15b08686570b6030f7cac7257da5966b9d"
+    },
+    {
+      "path": "citations.json",
+      "bytes": 519585,
+      "sha256": "fe39da16b47974a4406363284bbb698796c1207eb8cb6a609fd8872bccadf3eb"
+    },
+    {
+      "path": "civil_offices.json",
+      "bytes": 10888,
+      "sha256": "2675ecda180bd9e1c8003ec25a845331c3c4dce786a5d4bede123944dfce0a0d"
+    },
+    {
+      "path": "clan_presence.json",
+      "bytes": 26510,
+      "sha256": "c7ac79e9fe81305d399912c80cc80c18a4faa43d14f91117e0022729b110b8ee"
+    },
+    {
+      "path": "clans.json",
+      "bytes": 34729,
+      "sha256": "1fb97c9a1f42389f56102a9861f9fed5c708c507bc6c6c0b5bea9558d2c9a069"
+    },
+    {
+      "path": "kinship.json",
+      "bytes": 156021,
+      "sha256": "7e274e1172d26106352acb8815ee52199f256116639351c60239dee856fa7722"
+    },
+    {
+      "path": "marriages.json",
+      "bytes": 16631,
+      "sha256": "58c4799301c95834b892c879f5fcc6a88ec0ee9cdd9957805f8d23afc97d2f04"
+    },
+    {
+      "path": "military_offices.json",
+      "bytes": 7856,
+      "sha256": "8d5b70c038038c8d0e880cd45ebaa2aa95680a8e737c582620fe3aefc3d15bf7"
+    },
+    {
+      "path": "person_aliases.json",
+      "bytes": 423253,
+      "sha256": "fc18ff71e18c0588bfd4d1f4b3226dcc50b82606a9a791c8d528a457ff2143c8"
+    },
+    {
+      "path": "person_locations.json",
+      "bytes": 50060,
+      "sha256": "203491a3a490f062dfd9c5487bbd4a62821551041c75d56b6d7c1da901a9be79"
+    },
+    {
+      "path": "persons.json",
+      "bytes": 1423937,
+      "sha256": "482602d3008ca63e3c95d20db1006610b0ceaa4eb80458df7f8ef37a986199ef"
+    },
+    {
+      "path": "scenario_index.json",
+      "bytes": 4074,
+      "sha256": "634698bba0c25850c8d42110513a3ae9a8f85e1ff629434bf2d6c52f0c953ac3"
+    },
+    {
+      "path": "scenarios/140.json",
+      "bytes": 450477,
+      "sha256": "95a8ed3833bed6656e4af4879b7b658f7012fd19cee1126bfe4e13f50323c317"
+    },
+    {
+      "path": "scenarios/184.json",
+      "bytes": 470424,
+      "sha256": "bae087251b9c23499762192230b76f973f1872fe58994a440434da031d9fa5a8"
+    },
+    {
+      "path": "scenarios/189.json",
+      "bytes": 465706,
+      "sha256": "ec482e80f96dff9640e1a356eccf15529e9c48256cb86d43278740865f6410b2"
+    },
+    {
+      "path": "scenarios/194.json",
+      "bytes": 456510,
+      "sha256": "8149d3706de42fff8233262ff3199ceea6a944da77e7d25fd5039bab83f47cdf"
+    },
+    {
+      "path": "scenarios/200.json",
+      "bytes": 446714,
+      "sha256": "78dc198e0db67c19c91d6ea5563c643cdba7c931341ef2a27dc8cc9b446f518a"
+    },
+    {
+      "path": "scenarios/207.json",
+      "bytes": 444993,
+      "sha256": "7c8a9e9cd343adfc0e6888154ba35daa06d49a142eaab67945adea4b9187bbd3"
+    },
+    {
+      "path": "scenarios/214.json",
+      "bytes": 436364,
+      "sha256": "0525c60792ebd357975e20b6656cdd9fb2bd5cd6d7241ea16367d4bf34bcaf05"
+    },
+    {
+      "path": "scenarios/219.json",
+      "bytes": 428552,
+      "sha256": "7eda900da0347840655122511985daf64d0a776fd685f81cad35a8e753c295f5"
+    },
+    {
+      "path": "scenarios/223.json",
+      "bytes": 414778,
+      "sha256": "0cfff733448ea4c3106fa92d8d923f0247a1ff8bd23245553948c5053c7b4031"
+    },
+    {
+      "path": "scenarios/227.json",
+      "bytes": 411013,
+      "sha256": "22f11d253fe73f044df0ad38f2d94ade7040c4dc7158a65059037a9fde6a2d69"
+    },
+    {
+      "path": "scenarios/234.json",
+      "bytes": 405144,
+      "sha256": "154b103e1e502536094be8a4c3c275f128c1a7d3f2f2a454cd468d2e600b0167"
+    },
+    {
+      "path": "scenarios/249.json",
+      "bytes": 393465,
+      "sha256": "05bc21386e9f155800c1d1b2aa635179169671d82dce493bef38d9d871bc2950"
+    },
+    {
+      "path": "scenarios/260.json",
+      "bytes": 380410,
+      "sha256": "873346ca2a09930bc4216deb0a613509b482f7423cd67bdc09b33aea46ded5f7"
+    },
+    {
+      "path": "sources.json",
+      "bytes": 17135,
+      "sha256": "757fdf61027a8169a03a95d21abbf01bd87df058d71a281777ba14c61ddfe99e"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 1757,
+      "sha256": "4c806b1741e6fd13f370b055f8c1b76682a899a0706eb283df2b9fe3519528d3"
+    },
+    {
+      "path": "titles.json",
+      "bytes": 5213,
+      "sha256": "bab06034288163350854344e585d6f5b04e300eca5bee4e6005483029f4e5aec"
+    }
+  ]
+}

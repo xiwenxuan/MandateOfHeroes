@@ -505,7 +505,12 @@ namespace Mandate.Simulation
                 CarrierPersonId = string.Empty,
                 LocationId = locationId,
                 CapacityWeight = Math.Max(
-                    1L, Math.Max(openingQuantity, minimumCapacity))
+                    1L, Math.Max(openingQuantity, minimumCapacity)),
+                FoodStorageEnvironmentId = kindId == VillageContainerKindId
+                    ? "storage.environment.village_public_granary"
+                    : "storage.environment.county_granary",
+                FoodStorageProtectionBasisPoints =
+                    kindId == VillageContainerKindId ? 3_500 : 4_500
             };
         }
 

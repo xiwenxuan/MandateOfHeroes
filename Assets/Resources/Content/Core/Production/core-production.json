@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "8.0.0",
+  "Version": "11.0.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -165,6 +165,54 @@
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 250
+    },
+    {
+      "Id": "product.textile.plain_cloth",
+      "DisplayName": "素布",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.textile",
+        "product.market",
+        "product.household_good"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
+      "BaseWeight": 2,
+      "PerishabilityBasisPoints": 0
+    },
+    {
+      "Id": "product.raw.medicinal_plants",
+      "DisplayName": "野生药草",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.raw",
+        "product.medicine_input",
+        "product.market"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 2000
+    },
+    {
+      "Id": "product.medicine.herbal_material",
+      "DisplayName": "草药材",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.medicine",
+        "product.medical_input",
+        "product.market"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 1200
     },
     {
       "Id": "product.material.iron",
@@ -625,6 +673,27 @@
       ]
     },
     {
+      "Id": "recipe.primary_processing.dry_sort_medicinal_plants",
+      "DisplayName": "晾晒拣选药草",
+      "CropDefinitionId": null,
+      "DurationDays": 2,
+      "FacilityTags": [
+        "facility.primary_processing.herb_drying"
+      ],
+      "Inputs": [
+        {
+          "ProductDefinitionId": "product.raw.medicinal_plants",
+          "QuantityPerLandUnit": 1
+        }
+      ],
+      "Outputs": [
+        {
+          "ProductDefinitionId": "product.medicine.herbal_material",
+          "QuantityPerLandUnit": 1
+        }
+      ]
+    },
+    {
       "Id": "recipe.manufacturing.forge_ring_sword",
       "DisplayName": "锻造环首刀",
       "CropDefinitionId": null,
@@ -1004,6 +1073,28 @@
       "HistoricalStatus": "historical_inference"
     },
     {
+      "Id": "method.primary_processing.herbal_drying_sorting",
+      "DisplayName": "药草晾晒与拣选",
+      "RecipeDefinitionIds": [
+        "recipe.primary_processing.dry_sort_medicinal_plants"
+      ],
+      "PracticeSkillDefinitionId": "skill.production.herbal_processing",
+      "PracticeDifficultyBasisPoints": 8000,
+      "QualityDimensionModifiers": [
+        {
+          "QualityDimensionId": "quality.purity",
+          "ModifierBasisPoints": 200
+        },
+        {
+          "QualityDimensionId": "quality.integrity",
+          "ModifierBasisPoints": 100
+        }
+      ],
+      "YieldBasisPoints": 10000,
+      "LaborBasisPoints": 10000,
+      "HistoricalStatus": "historical_inference"
+    },
+    {
       "Id": "method.manufacturing.blacksmithing",
       "DisplayName": "锻打",
       "RecipeDefinitionIds": [
@@ -1280,6 +1371,13 @@
       "Id": "skill.production.tanning",
       "DisplayName": "鞣革工艺",
       "FieldId": "field.production.tanning",
+      "HistoricalStatus": "system_bridge",
+      "SourceNote": "由真实生产工单积累的开放式专门技艺。"
+    },
+    {
+      "Id": "skill.production.herbal_processing",
+      "DisplayName": "药草加工",
+      "FieldId": "field.production.herbal_processing",
       "HistoricalStatus": "system_bridge",
       "SourceNote": "由真实生产工单积累的开放式专门技艺。"
     }
