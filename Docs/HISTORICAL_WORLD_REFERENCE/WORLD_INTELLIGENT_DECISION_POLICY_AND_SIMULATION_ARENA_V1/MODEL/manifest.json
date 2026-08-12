@@ -1,0 +1,19 @@
+{
+  "model_id": "model.world_decision_utility_teacher_mlp_v1",
+  "model_version": "world-decision-mlp-v1.0.0",
+  "runtime_mode": "inference_only",
+  "online_learning": false,
+  "safe_fallback": [
+    "utility",
+    "rule",
+    "safe_no_action"
+  ],
+  "files": {
+    "model.json": "be7e549abc09e22353285a6a2a61962f1b2e40a4fc116aee7d46465d2c0b56b5",
+    "training_config.json": "af846b16bddcfb09390782e6dda352d1a883006a19184098b9fe7bec0b1a01af",
+    "feature_schema.json": "0498d43e33ef275b250eb6b4dc4efd088f0739892953de458a9580f8553e959c",
+    "evaluation.json": "66ad31208d6875a1e43610662e21d3cedfde2477065a236d88e04f9af4c02218",
+    "training_dataset.jsonl": "c81b414cc8d6426c67a53669f76a964da94f49b20f3976665cc8ed2f62b66b9f"
+  },
+  "reproduce": "python Tools/AI/Training/train_world_decision_mlp.py --output <MODEL>"
+}

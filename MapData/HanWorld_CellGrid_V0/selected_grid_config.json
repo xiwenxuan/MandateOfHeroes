@@ -1,0 +1,19 @@
+{
+  "schema": "hanworld.selected-grid.v1",
+  "grid_version": "HanWorldV1",
+  "grid_schema_version": "hanworld.square-grid.v1",
+  "cell_size_m": 2000,
+  "columns": 3314,
+  "rows": 2176,
+  "origin_x": -3417344.395965772,
+  "origin_y": 6199580.451937504,
+  "grid_x_direction": "west_to_east",
+  "grid_y_direction": "north_to_south",
+  "row_direction": "north_to_south",
+  "column_direction": "west_to_east",
+  "neighbor_mode": "square_8",
+  "alignment_base_m": 500,
+  "cell_id_algorithm": "unsigned row-major 64-bit integer: cell_id = row * columns + column",
+  "selection_status": "V0 working default; not an immutable product scale",
+  "reason": "Coarsest candidate that retains facility, route, river, pass and one-force-per-Cell strategic space while keeping the national package practical."
+}

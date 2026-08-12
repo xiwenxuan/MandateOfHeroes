@@ -29,3 +29,46 @@
 | KnownImplementationGaps | FamilyOrganization/FamilyCenter正式运行时、资产权限、通信、存档迁移和UI。 |
 | DoNotUseDocs | 旧Task/Report、参考游戏分析和Benchmark不得单独作为当前Canonical Spec。 |
 | RecommendedReadingOrder | AGENTS → Game Vision → Domain L1 → Master Status → 本Manifest → P0 Master → Family Spatial → 相关Task/Report。 |
+
+## Development Place Roster V1
+
+| Field | Frozen value |
+|---|---|
+| CanonicalPlaceId | `place.han140.sili.jingzhao.changan` |
+| DevelopmentDepth | D4 |
+| DevelopmentPriority | P1 |
+| RecommendedWave | WAVE_1 |
+| HistoricalStatePlan | 184:S2/H2, 190:S3/H3, 194:S4/H4, 200:S2/H2, 214:S2/H2 |
+| SupportedScenarios / TimePoints | 184, 190, 194, 200, 214 |
+| ReferenceReadiness | MOSTLY_READY |
+| Blockers | DPB-008 |
+| RecommendedDevelopmentScope | Urban|Administrative|Trade|Military|Logistics|HistoricalEvent|Political |
+| RuntimeBoundary | 这是开发目标与资料入口，不表示运行时已经实现。 |
+
+## City Development Pack V1
+
+| Field | Reference |
+|---|---|
+| CityDevelopmentPack | `Docs/HISTORICAL_WORLD_REFERENCE/CITY_DEVELOPMENT_PACKS/CHANGAN/` |
+| PackStatus | READY_WITH_MODELED_GAPS |
+| ReferenceReadiness | MOSTLY_READY |
+| HistoricalStatePlan | `07_CORE_CITY_HISTORICAL_STATE_AND_CHANGEPOINT_PLAN.xlsx` |
+| HinterlandReference | `05_CORE_CITY_HINTERLAND_AND_SETTLEMENT_NETWORK.xlsx` |
+| PopulationLayerReference | `06_CORE_CITY_POPULATION_LAYER_REFERENCE.xlsx` |
+| FacilityReference | `CHANGAN/CITY_DEVELOPMENT_DATA.xlsx#05_FACILITIES` |
+| PersonCoverage | 10 stable PersonId city-slice records |
+| FamilyCoverage | 1 Clan/Branch slice records; no automatic FamilyCenter |
+| DepthUpgradeRecommendation | NONE_THIS_TASK |
+| RuntimeBoundary | Pack complete does not mean runtime implemented and does not change DevelopmentDepth. |
+
+<!-- FDRP-V1:BEGIN -->
+## 当前完整参考包合同（FDRP V1）
+
+- DevelopmentTier：`T3`（旧 `D4` 仅作历史映射）
+- ReferencePackCompleteness：`FULL_READY_WITH_MODELED_GAPS`
+- RuntimeImplementationStatus：`NOT_STARTED`
+- Wave：`WAVE_1`（未改变）
+- Pack：`Docs/HISTORICAL_WORLD_REFERENCE/PLACE_FULL_DEVELOPMENT_REFERENCE_PACKS/PACKS/PLACE_HAN140_SILI_JINGZHAO_CHANGAN`
+
+以上三个状态相互独立；完整包不会自动升档或物化运行时实体。
+<!-- FDRP-V1:END -->

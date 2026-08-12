@@ -1,0 +1,104 @@
+{
+  "schema": "mandate.county-economy-delivery-validation.v1",
+  "task_id": "HAN_135_260_COUNTY_PRODUCTION_RESOURCE_INDUSTRY_AND_SUPPLY_NETWORK_V1",
+  "generated_at_utc": "2026-08-11T11:52:36.762Z",
+  "status": "PASSED",
+  "counts": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "id": "WORKBOOK_COUNT",
+      "status": "PASS",
+      "actual": 40,
+      "expected": 40,
+      "detail": ""
+    },
+    {
+      "id": "WORKBOOK_EXACT_NAMES",
+      "status": "PASS",
+      "actual": "",
+      "expected": "exact 01-40 list",
+      "detail": ""
+    },
+    {
+      "id": "WORKBOOK_NONEMPTY",
+      "status": "PASS",
+      "actual": 8580,
+      "expected": ">5000 bytes",
+      "detail": ""
+    },
+    {
+      "id": "PREVIEW_COUNT",
+      "status": "PASS",
+      "actual": 120,
+      "expected": 120,
+      "detail": "README, Data and Validation for every workbook"
+    },
+    {
+      "id": "INSPECTION_COUNT",
+      "status": "PASS",
+      "actual": 40,
+      "expected": 40,
+      "detail": ""
+    },
+    {
+      "id": "FORMULA_ERROR_SCAN",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "WORKBOOK_VALIDATION_SHEETS",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "RENDER_MANIFEST",
+      "status": "PASS",
+      "actual": 120,
+      "expected": 120,
+      "detail": ""
+    },
+    {
+      "id": "REQUIRED_DELIVERABLES",
+      "status": "PASS",
+      "actual": "",
+      "expected": "none missing",
+      "detail": ""
+    },
+    {
+      "id": "DATA_VALIDATION",
+      "status": "PASS",
+      "actual": "PASSED/0",
+      "expected": "PASSED/0",
+      "detail": ""
+    },
+    {
+      "id": "CHGIS_NOT_IMPORTED",
+      "status": "PASS",
+      "actual": false,
+      "expected": false,
+      "detail": ""
+    },
+    {
+      "id": "REFERENCE_SCOPE_GUARD",
+      "status": "PASS",
+      "actual": "0|0|false",
+      "expected": "0|0|false",
+      "detail": ""
+    },
+    {
+      "id": "KNOWLEDGE_REGISTRIES",
+      "status": "PASS",
+      "actual": "PASS/7",
+      "expected": "PASS/7",
+      "detail": ""
+    }
+  ]
+}

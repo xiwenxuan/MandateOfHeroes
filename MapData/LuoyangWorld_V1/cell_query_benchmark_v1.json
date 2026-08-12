@@ -1,0 +1,6 @@
+{
+  "warm_random_5000_ms": 5.292,
+  "sequential_10000_ms": 2.325,
+  "cached_chunk_100000_ms": 22.998,
+  "checksum": 1
+}

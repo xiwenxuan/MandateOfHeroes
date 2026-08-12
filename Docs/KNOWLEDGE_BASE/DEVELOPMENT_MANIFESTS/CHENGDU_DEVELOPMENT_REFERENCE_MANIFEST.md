@@ -29,3 +29,46 @@
 | KnownImplementationGaps | FamilyOrganization/FamilyCenter正式运行时、资产权限、通信、存档迁移和UI。 |
 | DoNotUseDocs | 旧Task/Report、参考游戏分析和Benchmark不得单独作为当前Canonical Spec。 |
 | RecommendedReadingOrder | AGENTS → Game Vision → Domain L1 → Master Status → 本Manifest → P0 Master → Family Spatial → 相关Task/Report。 |
+
+## Development Place Roster V1
+
+| Field | Frozen value |
+|---|---|
+| CanonicalPlaceId | `place.han140.yizhou.shu.chengdu` |
+| DevelopmentDepth | D4 |
+| DevelopmentPriority | P1 |
+| RecommendedWave | WAVE_2 |
+| HistoricalStatePlan | 184:S2/H2, 194:S2/H2, 214:S4/H4, 223:S4/H3 |
+| SupportedScenarios / TimePoints | 184, 194, 214, 223 |
+| ReferenceReadiness | MOSTLY_READY |
+| Blockers | DPB-004 |
+| RecommendedDevelopmentScope | Urban|Administrative|Agriculture|Family|Trade|Military|Political |
+| RuntimeBoundary | 这是开发目标与资料入口，不表示运行时已经实现。 |
+
+## City Development Pack V1
+
+| Field | Reference |
+|---|---|
+| CityDevelopmentPack | `Docs/HISTORICAL_WORLD_REFERENCE/CITY_DEVELOPMENT_PACKS/CHENGDU/` |
+| PackStatus | READY_WITH_MODELED_GAPS |
+| ReferenceReadiness | MOSTLY_READY |
+| HistoricalStatePlan | `07_CORE_CITY_HISTORICAL_STATE_AND_CHANGEPOINT_PLAN.xlsx` |
+| HinterlandReference | `05_CORE_CITY_HINTERLAND_AND_SETTLEMENT_NETWORK.xlsx` |
+| PopulationLayerReference | `06_CORE_CITY_POPULATION_LAYER_REFERENCE.xlsx` |
+| FacilityReference | `CHENGDU/CITY_DEVELOPMENT_DATA.xlsx#05_FACILITIES` |
+| PersonCoverage | 10 stable PersonId city-slice records |
+| FamilyCoverage | 3 Clan/Branch slice records; no automatic FamilyCenter |
+| DepthUpgradeRecommendation | NONE_THIS_TASK |
+| RuntimeBoundary | Pack complete does not mean runtime implemented and does not change DevelopmentDepth. |
+
+<!-- FDRP-V1:BEGIN -->
+## 当前完整参考包合同（FDRP V1）
+
+- DevelopmentTier：`T3`（旧 `D4` 仅作历史映射）
+- ReferencePackCompleteness：`FULL_READY_WITH_MODELED_GAPS`
+- RuntimeImplementationStatus：`NOT_STARTED`
+- Wave：`WAVE_2`（未改变）
+- Pack：`Docs/HISTORICAL_WORLD_REFERENCE/PLACE_FULL_DEVELOPMENT_REFERENCE_PACKS/PACKS/PLACE_HAN140_YIZHOU_SHU_CHENGDU`
+
+以上三个状态相互独立；完整包不会自动升档或物化运行时实体。
+<!-- FDRP-V1:END -->

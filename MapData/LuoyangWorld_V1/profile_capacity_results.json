@@ -1,0 +1,181 @@
+{
+  "profiles": [
+    {
+      "profile_id": "low",
+      "display_name": "Low Population Profile",
+      "national_population_basis": 500000,
+      "historical_reference_population": 49207358,
+      "henan_historical_weight": 0.020542192084362667,
+      "total_persons": 10271,
+      "total_households": 2231,
+      "working_age_persons": 6174,
+      "effective_workers": 6157,
+      "employed_workers": 5860,
+      "unemployed_workers": 297,
+      "residential_capacity": 13568,
+      "total_cells": 5980,
+      "land_cells": 5785,
+      "developable_cells": 5740,
+      "developed_cells": 602,
+      "unused_developable_cells": 5138,
+      "natural_cells": 5378,
+      "natural_cell_ratio": 0.8993,
+      "developed_cell_ratio": 0.1007,
+      "unused_developable_ratio": 0.8951,
+      "persons_per_land_cell": 1.775,
+      "persons_per_developed_cell": 17.061,
+      "facility_cells": {
+        "agriculture": 186,
+        "commercial": 28,
+        "industry": 39,
+        "military": 39,
+        "public": 26,
+        "residential": 119,
+        "resource": 11,
+        "road": 92,
+        "service": 62
+      },
+      "expansion": {
+        "opening": {
+          "required_cells": 602,
+          "utilization": 0.1049,
+          "remaining_developable_cells": 5138
+        },
+        "plus_25": {
+          "required_cells": 753,
+          "utilization": 0.1312,
+          "remaining_developable_cells": 4987
+        },
+        "plus_50": {
+          "required_cells": 903,
+          "utilization": 0.1573,
+          "remaining_developable_cells": 4837
+        },
+        "plus_100": {
+          "required_cells": 1204,
+          "utilization": 0.2098,
+          "remaining_developable_cells": 4536
+        }
+      },
+      "warnings": []
+    },
+    {
+      "profile_id": "recommended",
+      "display_name": "Recommended Population Profile",
+      "national_population_basis": 1000000,
+      "historical_reference_population": 49207358,
+      "henan_historical_weight": 0.020542192084362667,
+      "total_persons": 20542,
+      "total_households": 4498,
+      "working_age_persons": 12202,
+      "effective_workers": 12175,
+      "employed_workers": 11582,
+      "unemployed_workers": 593,
+      "residential_capacity": 25800,
+      "total_cells": 5980,
+      "land_cells": 5785,
+      "developable_cells": 5740,
+      "developed_cells": 1057,
+      "unused_developable_cells": 4683,
+      "natural_cells": 4923,
+      "natural_cell_ratio": 0.8232,
+      "developed_cell_ratio": 0.1768,
+      "unused_developable_ratio": 0.8159,
+      "persons_per_land_cell": 3.551,
+      "persons_per_developed_cell": 19.434,
+      "facility_cells": {
+        "agriculture": 371,
+        "commercial": 52,
+        "industry": 74,
+        "military": 50,
+        "public": 49,
+        "residential": 232,
+        "resource": 20,
+        "road": 92,
+        "service": 117
+      },
+      "expansion": {
+        "opening": {
+          "required_cells": 1057,
+          "utilization": 0.1841,
+          "remaining_developable_cells": 4683
+        },
+        "plus_25": {
+          "required_cells": 1322,
+          "utilization": 0.2303,
+          "remaining_developable_cells": 4418
+        },
+        "plus_50": {
+          "required_cells": 1586,
+          "utilization": 0.2763,
+          "remaining_developable_cells": 4154
+        },
+        "plus_100": {
+          "required_cells": 2114,
+          "utilization": 0.3683,
+          "remaining_developable_cells": 3626
+        }
+      },
+      "warnings": []
+    },
+    {
+      "profile_id": "high",
+      "display_name": "High Population Profile",
+      "national_population_basis": 2000000,
+      "historical_reference_population": 49207358,
+      "henan_historical_weight": 0.020542192084362667,
+      "total_persons": 41084,
+      "total_households": 8997,
+      "working_age_persons": 24444,
+      "effective_workers": 24389,
+      "employed_workers": 23207,
+      "unemployed_workers": 1182,
+      "residential_capacity": 50988,
+      "total_cells": 5980,
+      "land_cells": 5785,
+      "developable_cells": 5740,
+      "developed_cells": 1970,
+      "unused_developable_cells": 3770,
+      "natural_cells": 4010,
+      "natural_cell_ratio": 0.6706,
+      "developed_cell_ratio": 0.3294,
+      "unused_developable_ratio": 0.6568,
+      "persons_per_land_cell": 7.102,
+      "persons_per_developed_cell": 20.855,
+      "facility_cells": {
+        "agriculture": 739,
+        "commercial": 106,
+        "industry": 146,
+        "military": 77,
+        "public": 94,
+        "residential": 459,
+        "resource": 39,
+        "road": 92,
+        "service": 218
+      },
+      "expansion": {
+        "opening": {
+          "required_cells": 1970,
+          "utilization": 0.3432,
+          "remaining_developable_cells": 3770
+        },
+        "plus_25": {
+          "required_cells": 2463,
+          "utilization": 0.4291,
+          "remaining_developable_cells": 3277
+        },
+        "plus_50": {
+          "required_cells": 2955,
+          "utilization": 0.5148,
+          "remaining_developable_cells": 2785
+        },
+        "plus_100": {
+          "required_cells": 3940,
+          "utilization": 0.6864,
+          "remaining_developable_cells": 1800
+        }
+      },
+      "warnings": []
+    }
+  ]
+}

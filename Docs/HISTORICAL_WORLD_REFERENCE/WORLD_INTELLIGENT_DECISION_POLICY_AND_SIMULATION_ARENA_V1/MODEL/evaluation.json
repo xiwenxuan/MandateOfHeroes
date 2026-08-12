@@ -1,0 +1,54 @@
+{
+  "metrics": {
+    "train": {
+      "rows": 1920,
+      "rmse_basis_points": 669.3805331688393,
+      "mae_basis_points": 536.3777059344914
+    },
+    "test": {
+      "rows": 480,
+      "rmse_basis_points": 696.6438526368394,
+      "mae_basis_points": 557.0689776013677
+    },
+    "test_top_action_agreement": 0.9125,
+    "test_seed_groups": 80
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_mse_normalized": 0.27032187111943
+    },
+    {
+      "epoch": 10,
+      "train_mse_normalized": 0.005250401689267458
+    },
+    {
+      "epoch": 20,
+      "train_mse_normalized": 0.004781056138043688
+    },
+    {
+      "epoch": 30,
+      "train_mse_normalized": 0.004736264798890613
+    },
+    {
+      "epoch": 40,
+      "train_mse_normalized": 0.004684369474910148
+    },
+    {
+      "epoch": 50,
+      "train_mse_normalized": 0.004669782476878702
+    },
+    {
+      "epoch": 60,
+      "train_mse_normalized": 0.004630192921795882
+    },
+    {
+      "epoch": 70,
+      "train_mse_normalized": 0.004597224299308366
+    },
+    {
+      "epoch": 80,
+      "train_mse_normalized": 0.00457638754653825
+    }
+  ]
+}

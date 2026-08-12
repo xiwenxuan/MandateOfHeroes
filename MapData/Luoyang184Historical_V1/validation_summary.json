@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "persons": 20542,
+  "households": 4498,
+  "facilities": 1230,
+  "historical_facilities": 173,
+  "facility_categories": {
+    "road": 92,
+    "residential": 240,
+    "commercial": 55,
+    "public": 50,
+    "service": 117,
+    "industry": 74,
+    "resource": 20,
+    "agriculture": 371,
+    "military": 57,
+    "fortification": 144,
+    "government": 5,
+    "storage": 1,
+    "ritual": 2,
+    "education": 2
+  },
+  "main_city_gates": 12,
+  "walls": 130,
+  "moats": 80,
+  "housed": 20414,
+  "unhoused": 128,
+  "reports": 7,
+  "map_bytes": 1266193
+}

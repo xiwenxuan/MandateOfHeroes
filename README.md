@@ -8,7 +8,7 @@
 
 ## 项目位置
 
-`E:\project\gamedevelop\MandateOfHeroes`
+`<repo-root>`
 
 后续 Unity 工程请创建或打开此目录，不再使用上一级已有的 Godot 工程。
 
@@ -20,7 +20,7 @@
 
 ### 核心设计文档
 
-新 AI 会话先阅读
+新 AI 会话先阅读 [AI 项目导览](Docs/AI_PROJECT_BRIEF.md)和
 [项目知识库入口](Docs/KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md)，再按其中的
 Canonical Domain Map、规则入口与任务路由加载本次任务所需资料。任务书和验收报告只证明其
 明确覆盖的历史范围，不能覆盖领域 L1 正式规范。
@@ -54,6 +54,9 @@ Canonical Domain Map、规则入口与任务路由加载本次任务所需资料
 - [地图美术资源方案](Docs/MAP_ART_RESOURCE_PLAN.md)
 - [历史事件与人物资料](Docs/HISTORICAL_EVENTS_182_190.md)
 - [首批历史人物](Docs/HISTORICAL_CHARACTERS_FIRST_50.md)
+- [135—260历史人物与宗族母库 V1 任务书](Docs/TASK_HAN_135_260_HISTORICAL_PERSON_CLAN_MASTER_V1.md)
+- [历史剧本、时间点、开局点与命运决策规范](Docs/HISTORICAL_SCENARIOS_TIMELINE_AND_FATE_DECISIONS.md)
+- [历史输入整合审计 V1](Docs/HISTORICAL_INPUT_INTEGRATION_AUDIT_V1.md)
 - [全国家族空间合并资料 V1](Docs/HISTORICAL_WORLD_REFERENCE/FAMILY_SPATIAL_CONSOLIDATION_V1/README.md)
 - [项目知识库、文档治理与城市开发清单](Docs/KNOWLEDGE_BASE/README_PROJECT_KNOWLEDGE_BASE.md)
 - [许可证与素材规则](Docs/LEGAL_AND_ASSETS.md)
@@ -89,6 +92,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 在 Unity 中打开 `Assets/Scenes/PlayableDemo.unity`，点击播放按钮。该场景已经加入主相机，
 不会再出现 `No cameras rendering`；它也是 Build Settings 中的第一个场景。游戏首先进入主菜单，可以：
 
+- 点击“商旅—家族体验（推荐）”直接以中山商人沈衡进入 M26-P1 候选路线；
+- 在行动页查看家中债务、行情来源/日期/可靠度、预计路程与口粮，再选择自有本钱或商行垫款；
+- 采购布帛、随苏双前往涿县、处理途中折轴车事件、按到达时的实际价格交付，并在还债与购置货车之间作长期选择；
+- 行动表现可以跳过，但权威结果只结算一次；重要选择会写入人物事件、家庭、关系、市场和任务账；
+
 - 创建姓名、年龄、性别、出生背景、开局地点和身份均可选择的永久人物；
 - 搜索并接管世界中任意合法在世人物，不复制或重新随机人物；
 - 以军人、县吏、商人、医者、农户或士人身份开始；
@@ -104,6 +112,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 - 所有行动使用同一人物、家庭、市场、产品批次、军队、健康和世界时间账，并返回耗时与钱物变化摘要；
 - 推进世界时间并使用内存保存和读取；
 - 保存、返回主菜单、读取并继续同一人物。
+
+M26-P1 当前是独立试玩候选版：自动编译、核心流程和 Unity 启动测试已有证据；最终“成熟玩法完成”仍需由未阅读任务书与代码的试玩者完成一次 20—30 分钟盲玩。详细状态见
+`Docs/REPORT_M26_P1_IMPLEMENTATION_AND_ACCEPTANCE.md`。
 
 开发诊断请另行打开 `Assets/Scenes/SimulationDashboard.unity`。普通 `PlayableDemo` 默认隐藏
 开发观察台和内部医疗责任流水。

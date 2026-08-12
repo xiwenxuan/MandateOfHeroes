@@ -1,0 +1,53 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
+const repo = "E:/project/gamedevelop/MandateOfHeroes";
+const taskId = "HAN_135_260_COUNTY_PRODUCTION_RESOURCE_INDUSTRY_AND_SUPPLY_NETWORK_V1";
+const root = path.join(repo, "Docs/HISTORICAL_WORLD_REFERENCE/HAN_135_260_COUNTY_PRODUCTION_RESOURCE_INDUSTRY_AND_SUPPLY_REFERENCE");
+const workbookDir = path.join(root, "MASTER_WORKBOOKS");
+const previewDir = path.join(root, "VALIDATION/workbook_previews");
+const inspectDir = path.join(root, "VALIDATION/workbook_inspection");
+const reportPath = path.join(root, "VALIDATION/delivery_validation_report.json");
+const exists = p => fs.access(p).then(() => true, () => false);
+const checks = [];
+const check = (id, condition, actual, expected, detail = "") => checks.push({ id, status: condition ? "PASS" : "FAIL", actual, expected, detail });
+const files = (await fs.readdir(workbookDir)).filter(x => x.endsWith(".xlsx")).sort();
+const previews = (await fs.readdir(previewDir)).filter(x => x.endsWith(".png")).sort();
+const inspections = (await fs.readdir(inspectDir)).filter(x => x.endsWith(".ndjson")).sort();
+const expectedNames = ["COUNTY_IDENTITY_GEOGRAPHY_MASTER","COUNTY_POPULATION_WORKFORCE_MASTER","COUNTY_LAND_AGRICULTURAL_POTENTIAL","COUNTY_WATER_IRRIGATION_REFERENCE","COUNTY_CROP_MIX_AND_YIELD","COUNTY_AGRICULTURAL_OUTPUT","COUNTY_LIVESTOCK_REFERENCE","COUNTY_FORESTRY_FUEL_REFERENCE","COUNTY_FISHERY_GATHERING_REFERENCE","COUNTY_MINERAL_REFERENCE","COUNTY_SALT_REFERENCE","COUNTY_RAW_MATERIAL_OUTPUT","COUNTY_FOOD_PROCESSING_CAPACITY","COUNTY_BREWING_CAPACITY","COUNTY_METALLURGY_CAPACITY","COUNTY_METALWORKING_CAPACITY","COUNTY_TEXTILE_SILK_CAPACITY","COUNTY_LEATHER_WOODWORK_CAPACITY","COUNTY_POTTERY_BUILDING_MATERIAL_CAPACITY","COUNTY_MEDICINE_SPECIAL_CRAFT","COUNTY_CART_AND_SHIPBUILDING","COUNTY_MILITARY_PRODUCTION_CAPACITY","COUNTY_FACILITY_REFERENCE","COUNTY_STORAGE_CAPACITY","COUNTY_MARKET_AND_SERVICE_CAPACITY","COUNTY_TRANSPORT_CAPACITY","COUNTY_LOCAL_DEMAND","COUNTY_PRODUCT_PRODUCTION_BALANCE","COUNTY_PRODUCT_SURPLUS_DEFICIT","COUNTY_IMPORT_DEPENDENCY","COUNTY_EXPORT_CAPACITY","COUNTY_SUPPLY_RELATION_MASTER","COUNTY_PROCESSING_CHAIN_DEPENDENCY","REGIONAL_PRODUCTION_ZONE_MASTER","SCENARIO_PRODUCTION_STATE_MASTER","HISTORICAL_PRODUCTION_CHANGEPOINTS","COUNTY_RUNTIME_MAPPING_REFERENCE","EVIDENCE_AND_SOURCE_REGISTRY","COUNTY_UNKNOWNS_AND_RESEARCH_GAPS","NATIONAL_184_PRODUCTION_BALANCE"].map((x, i) => `${String(i + 1).padStart(2, "0")}_${x}.xlsx`);
+check("WORKBOOK_COUNT", files.length === 40, files.length, 40);
+check("WORKBOOK_EXACT_NAMES", JSON.stringify(files) === JSON.stringify(expectedNames), files.filter((x, i) => x !== expectedNames[i]).join("|"), "exact 01-40 list");
+const sizes = await Promise.all(files.map(async x => (await fs.stat(path.join(workbookDir, x))).size));
+check("WORKBOOK_NONEMPTY", sizes.every(x => x > 5000), Math.min(...sizes), ">5000 bytes");
+check("PREVIEW_COUNT", previews.length === 120, previews.length, 120, "README, Data and Validation for every workbook");
+check("INSPECTION_COUNT", inspections.length === 40, inspections.length, 40);
+let formulaErrorFiles = 0, validationFailFiles = 0;
+for (const file of inspections) {
+  const text = await fs.readFile(path.join(inspectDir, file), "utf8");
+  const rows = text.trim().split(/\r?\n/).filter(Boolean).map(x => JSON.parse(x));
+  if (!rows.some(x => x.kind === "notice" && x.message === "Cell search matched 0 entries.")) formulaErrorFiles++;
+  const table = rows.find(x => x.kind === "table" && x.sheet === "Validation");
+  if (!table || table.values.slice(1).some(row => row[3] !== "PASS")) validationFailFiles++;
+}
+check("FORMULA_ERROR_SCAN", formulaErrorFiles === 0, formulaErrorFiles, 0);
+check("WORKBOOK_VALIDATION_SHEETS", validationFailFiles === 0, validationFailFiles, 0);
+const manifest = JSON.parse(await fs.readFile(path.join(previewDir, "render_manifest.json"), "utf8"));
+check("RENDER_MANIFEST", manifest.length === 120 && new Set(manifest.map(x => `${x.workbook}|${x.sheet}`)).size === 120, manifest.length, 120);
+const requiredDocs = ["README.md", "COUNTY_PRODUCTION_ECONOMY_STANDARD.md", "PRODUCT_TAXONOMY.md", "HISTORICAL_UNIT_CONVERSION.md", "REGIONAL_STUDIES/REGIONAL_PRODUCTION_STUDIES.md", "REGIONAL_STUDIES/INDUSTRY_TOPIC_STUDIES.md", "SOURCES/README.md", "HAN_135_260_COUNTY_PRODUCTION_RESOURCE_INDUSTRY_AND_SUPPLY_NETWORK_V1_REPORT.md", "COUNTY_PACKS/county_economy_master_v1.json", "COUNTY_PACKS/county_packs.ndjson", "COUNTY_PACKS/county_pack_index.json", "MAP_OUTPUTS/county_economy_184.geojson", "MAP_OUTPUTS/supply_corridors_184.geojson", "MAP_OUTPUTS/map_layer_manifest.json", "VALIDATION/data_validation_report.json"];
+const missingDocs = [];
+for (const file of requiredDocs) if (!await exists(path.join(root, file))) missingDocs.push(file);
+check("REQUIRED_DELIVERABLES", missingDocs.length === 0, missingDocs.join("|"), "none missing");
+const dataValidation = JSON.parse(await fs.readFile(path.join(root, "VALIDATION/data_validation_report.json"), "utf8"));
+check("DATA_VALIDATION", dataValidation.status === "PASSED" && dataValidation.counts.failed === 0, `${dataValidation.status}/${dataValidation.counts.failed}`, "PASSED/0");
+const master = JSON.parse(await fs.readFile(path.join(root, "COUNTY_PACKS/county_economy_master_v1.json"), "utf8"));
+const chgis = master.evidence_registry.find(x => x.source_id === "source.chgis.locator_only");
+check("CHGIS_NOT_IMPORTED", chgis && chgis.imported === false, chgis?.imported, false);
+check("REFERENCE_SCOPE_GUARD", master.summary.permanent_people_created === 0 && master.summary.facilities_created === 0 && master.summary.luoyang_initialization_modified === false, `${master.summary.permanent_people_created}|${master.summary.facilities_created}|${master.summary.luoyang_initialization_modified}`, "0|0|false");
+const registrySummary = JSON.parse(await fs.readFile(path.join(root, "VALIDATION/registry_updates/registry_update_summary.json"), "utf8"));
+check("KNOWLEDGE_REGISTRIES", registrySummary.status === "PASS" && registrySummary.results.length === 7, `${registrySummary.status}/${registrySummary.results.length}`, "PASS/7");
+const failed = checks.filter(x => x.status === "FAIL");
+const report = { schema: "mandate.county-economy-delivery-validation.v1", task_id: taskId, generated_at_utc: new Date().toISOString(), status: failed.length ? "FAILED" : "PASSED", counts: { total: checks.length, passed: checks.length - failed.length, failed: failed.length }, checks };
+await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+await fs.writeFile(path.join(repo, "outputs", taskId, "delivery_validation_report.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+console.log(`RESULT county-economy-delivery-validation status=${report.status.toLowerCase()} passed=${report.counts.passed} failed=${report.counts.failed}`);
+if (failed.length) { failed.forEach(x => console.error(`FAIL ${x.id} actual=${x.actual} expected=${x.expected}`)); process.exitCode = 1; }

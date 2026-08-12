@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "task_id": "HAN-135-260-COUNTY-PRODUCTION-RESOURCE-INDUSTRY-TRADE-AND-SUPPLY-NETWORK-V1",
+  "results": [
+    {
+      "file": "PROJECT_DOCUMENT_REGISTRY.xlsx",
+      "key": "DocumentId",
+      "before_count": 1076,
+      "requested_rows": 48,
+      "added": 1,
+      "updated": 47,
+      "after_count": 1077
+    },
+    {
+      "file": "PROJECT_CANONICAL_DOMAIN_MAP.xlsx",
+      "key": "Domain",
+      "before_count": 39,
+      "requested_rows": 1,
+      "added": 0,
+      "updated": 1,
+      "after_count": 39
+    },
+    {
+      "file": "DESIGN_DECISION_REGISTRY.xlsx",
+      "key": "DecisionId",
+      "before_count": 73,
+      "requested_rows": 10,
+      "added": 0,
+      "updated": 10,
+      "after_count": 73
+    },
+    {
+      "file": "OPEN_DECISION_REGISTRY.xlsx",
+      "key": "OpenDecisionId",
+      "before_count": 23,
+      "requested_rows": 5,
+      "added": 0,
+      "updated": 5,
+      "after_count": 23
+    },
+    {
+      "file": "RESEARCH_GAP_REGISTER.xlsx",
+      "key": "GapId",
+      "before_count": 36,
+      "requested_rows": 5,
+      "added": 0,
+      "updated": 5,
+      "after_count": 36
+    },
+    {
+      "file": "IMPLEMENTATION_GAP_REGISTER.xlsx",
+      "key": "GapId",
+      "before_count": 37,
+      "requested_rows": 5,
+      "added": 0,
+      "updated": 5,
+      "after_count": 37
+    },
+    {
+      "file": "DOCUMENT_CONFLICT_REGISTER.xlsx",
+      "key": "ConflictId",
+      "before_count": 19,
+      "requested_rows": 1,
+      "added": 0,
+      "updated": 1,
+      "after_count": 19
+    }
+  ]
+}

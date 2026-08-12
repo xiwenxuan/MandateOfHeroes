@@ -1,0 +1,51 @@
+{
+  "schema": "hanworld.environment-audit.v0",
+  "qgis_root": "C:\\Program Files\\QGIS 3.44.12",
+  "python": {
+    "version": "3.12.13",
+    "executable": "C:\\Program Files\\QGIS 3.44.12\\bin\\python.exe"
+  },
+  "gdal": "3.13.1",
+  "proj": 9,
+  "modules": {
+    "geopandas": {
+      "available": true,
+      "version": "1.1.3"
+    },
+    "shapely": {
+      "available": true,
+      "version": "2.1.2"
+    },
+    "pyproj": {
+      "available": true,
+      "version": "3.7.2"
+    },
+    "numpy": {
+      "available": true,
+      "version": "2.4.6"
+    },
+    "matplotlib": {
+      "available": true,
+      "version": "3.10.9"
+    },
+    "PIL": {
+      "available": true,
+      "version": "12.2.0"
+    },
+    "scipy": {
+      "available": true,
+      "version": "1.17.1"
+    }
+  },
+  "executables": {
+    "qgis_process": "C:\\Program Files\\QGIS 3.44.12\\apps\\qgis-ltr\\bin\\qgis_process.exe",
+    "gdalinfo": "C:\\Program Files\\QGIS 3.44.12\\bin\\gdalinfo.exe",
+    "gdalwarp": "C:\\Program Files\\QGIS 3.44.12\\bin\\gdalwarp.exe",
+    "ogr2ogr": "C:\\Program Files\\QGIS 3.44.12\\bin\\ogr2ogr.exe"
+  },
+  "manual_dependency_required": false,
+  "notes": [
+    "The project uses the Python and GDAL runtime bundled with QGIS.",
+    "Rasterio is intentionally not required; all raster work uses osgeo.gdal."
+  ]
+}

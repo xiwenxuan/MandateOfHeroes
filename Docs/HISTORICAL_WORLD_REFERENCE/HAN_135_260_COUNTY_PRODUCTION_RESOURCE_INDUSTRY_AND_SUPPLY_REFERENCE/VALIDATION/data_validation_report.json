@@ -1,0 +1,248 @@
+{
+  "schema": "mandate.county-economy-validation.v1",
+  "task_id": "HAN_135_260_COUNTY_PRODUCTION_RESOURCE_INDUSTRY_AND_SUPPLY_NETWORK_V1",
+  "generated_at_utc": "2026-08-11T11:52:36.516Z",
+  "status": "PASSED",
+  "checks": [
+    {
+      "id": "COUNTY_COUNT",
+      "status": "PASS",
+      "actual": 1182,
+      "expected": 1182,
+      "detail": ""
+    },
+    {
+      "id": "COUNTY_ID_UNIQUE",
+      "status": "PASS",
+      "actual": 1182,
+      "expected": 1182,
+      "detail": ""
+    },
+    {
+      "id": "PROVINCE_COUNT",
+      "status": "PASS",
+      "actual": 13,
+      "expected": 13,
+      "detail": ""
+    },
+    {
+      "id": "COMMANDERY_COUNT",
+      "status": "PASS",
+      "actual": 105,
+      "expected": 105,
+      "detail": ""
+    },
+    {
+      "id": "POPULATION_184",
+      "status": "PASS",
+      "actual": 53500000,
+      "expected": 53500000,
+      "detail": ""
+    },
+    {
+      "id": "SCENARIO_COUNT",
+      "status": "PASS",
+      "actual": 13,
+      "expected": 13,
+      "detail": ""
+    },
+    {
+      "id": "SCENARIO_STATE_COUNT",
+      "status": "PASS",
+      "actual": 15366,
+      "expected": 15366,
+      "detail": ""
+    },
+    {
+      "id": "SCENARIO_COVERAGE",
+      "status": "PASS",
+      "actual": "140:1182|184:1182|189:1182|194:1182|200:1182|207:1182|214:1182|219:1182|223:1182|227:1182|234:1182|249:1182|260:1182",
+      "expected": "1182 per scenario",
+      "detail": ""
+    },
+    {
+      "id": "PRODUCT_TAXONOMY_UNIQUE",
+      "status": "PASS",
+      "actual": 19,
+      "expected": 19,
+      "detail": ""
+    },
+    {
+      "id": "PRODUCT_BALANCE_COVERAGE",
+      "status": "PASS",
+      "actual": 22458,
+      "expected": 22458,
+      "detail": ""
+    },
+    {
+      "id": "PRODUCT_BALANCE_KEYS",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "NONNEGATIVE_CLOSING_STOCK",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "UNMET_DEMAND_EXPLICIT",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "BALANCE_EQUATION",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": "Tolerance covers integer rounding only."
+    },
+    {
+      "id": "TRADE_CONSERVATION",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "ROUTE_ENDPOINTS",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "SUPPLY_RELATION_ROUTES",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "SUPPLY_RELATION_ORIGIN_PRODUCTION",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "TRANSPORT_LOSS_EXPLICIT",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "LOCATION_STATUS_EXPLICIT",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "MODELED_LOCATION_DISCLOSURE",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "LAND_COVERAGE",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "TERRAIN_BASIS_POINT_CONSERVATION",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "RESOURCE_COVERAGE",
+      "status": "PASS",
+      "actual": "1182|1182|1182|1182|1182|1182|1182|1182",
+      "expected": "1182 each",
+      "detail": ""
+    },
+    {
+      "id": "CROP_COVERAGE",
+      "status": "PASS",
+      "actual": 9456,
+      "expected": 9456,
+      "detail": ""
+    },
+    {
+      "id": "PROCESSING_CHAIN_COVERAGE",
+      "status": "PASS",
+      "actual": 7092,
+      "expected": 7092,
+      "detail": ""
+    },
+    {
+      "id": "UNKNOWN_BOUNDARY_COVERAGE",
+      "status": "PASS",
+      "actual": 1182,
+      "expected": 1182,
+      "detail": ""
+    },
+    {
+      "id": "REFERENCE_ONLY_NO_PEOPLE",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "REFERENCE_ONLY_NO_FACILITIES",
+      "status": "PASS",
+      "actual": 0,
+      "expected": 0,
+      "detail": ""
+    },
+    {
+      "id": "LUOYANG_UNCHANGED",
+      "status": "PASS",
+      "actual": false,
+      "expected": false,
+      "detail": ""
+    },
+    {
+      "id": "MAP_COUNTY_GEOJSON",
+      "status": "PASS",
+      "actual": true,
+      "expected": true,
+      "detail": ""
+    },
+    {
+      "id": "MAP_SUPPLY_GEOJSON",
+      "status": "PASS",
+      "actual": true,
+      "expected": true,
+      "detail": ""
+    }
+  ],
+  "counts": {
+    "passed": 32,
+    "failed": 0,
+    "total": 32
+  },
+  "evidence_summary": {
+    "reconstructed_counties": 59,
+    "modeled_counties": 1123,
+    "resolved_county_points": 68,
+    "modeled_analytical_points": 1114
+  },
+  "scope_guards": {
+    "runtime_materialization": false,
+    "save_schema_changed": false,
+    "unity_code_changed": false
+  }
+}

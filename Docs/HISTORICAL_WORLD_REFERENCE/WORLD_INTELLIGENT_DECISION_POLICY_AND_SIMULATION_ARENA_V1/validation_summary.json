@@ -1,0 +1,53 @@
+{
+  "task_id": "WORLD-INTELLIGENT-DECISION-POLICY-AND-SIMULATION-ARENA-V1",
+  "validated_at": "2026-08-12",
+  "world_schema_version": 72,
+  "compile": {
+    "status": "passed",
+    "log": "tmp/skill-verification/compile-20260812-003945-811.out.log"
+  },
+  "task_core_tests": {
+    "status": "passed",
+    "passed": 51,
+    "failed": 0,
+    "log": "tmp/skill-verification/core-tests-20260812-004011-971.out.log"
+  },
+  "full_core_regression": {
+    "status": "incomplete_timeout",
+    "timeout_seconds": 300,
+    "observed_failure": "LuoyangLiving_V69MigratesToEmptyV70Contract expected literal 70 but V72 is current",
+    "resolution": "assert current schema version; included in passing 51-test task set",
+    "log": "tmp/skill-verification/core-tests-20260812-003329-131.out.log"
+  },
+  "unity_edit_mode": {
+    "status": "blocked_startup",
+    "result_code": 125,
+    "startup_timeout_seconds": 120,
+    "reason": "Unity did not create a non-empty startup log.",
+    "pid": 18008,
+    "pid_still_running": false,
+    "summary": "tmp/unity-validation/unity-EditMode-20260812-004136-049.summary.json"
+  },
+  "unity_play_mode": {
+    "status": "not_run_same_startup_blocker"
+  },
+  "arena": {
+    "benchmarks": 10,
+    "seeds": 100,
+    "policies": 4,
+    "runs": 4000,
+    "decisions": 176000,
+    "changed_world": 23116,
+    "decision_trace_file": "ARENA/decision_traces.jsonl",
+    "metric_file": "ARENA/arena_metrics.csv",
+    "event_trace_file": "ARENA/event_traces.jsonl"
+  },
+  "neural_model": {
+    "runtime_online_learning": false,
+    "test_rows": 480,
+    "test_seed_groups": 80,
+    "test_rmse_basis_points": 696.6438526368394,
+    "test_mae_basis_points": 557.0689776013677,
+    "test_top_action_agreement": 0.9125
+  }
+}

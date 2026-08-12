@@ -1,0 +1,13 @@
+location_id,name,longitude,latitude,coordinate_status,confidence,provisional,historical_claim,notes
+L001,涿县,115.97,39.48,provisional,low,true,false,原型范围技术代理点
+L002,蓟县,116.40,39.90,provisional,medium,true,false,原型范围技术代理点
+L003,广阳战区,116.65,39.65,provisional,low,true,false,战区中心技术代理点
+L004,中山国节点,114.99,38.52,provisional,low,true,false,郡国中心技术代理点
+L005,博陵节点,115.05,38.77,provisional,low,true,false,驿路技术代理点
+L006,安平国节点,115.55,38.23,provisional,low,true,false,郡国中心技术代理点
+L007,下曲阳,114.75,38.15,provisional,low,true,false,候选范围技术代理点
+L008,广宗,115.16,37.07,provisional,low,true,false,候选范围技术代理点
+L009,钜鹿郡治节点,115.03,37.22,provisional,low,true,false,郡域中心技术代理点
+L010,瘿陶,114.50,37.30,provisional,low,true,false,候选范围技术代理点
+L011,邺县,114.46,36.33,provisional,medium,true,false,县域中心技术代理点
+L012,黄河—洛阳出口,112.60,34.70,provisional,low,true,false,世界出口技术代理点

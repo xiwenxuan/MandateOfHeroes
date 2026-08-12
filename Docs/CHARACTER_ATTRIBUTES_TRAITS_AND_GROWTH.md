@@ -14,6 +14,9 @@
 ## 1. 文档定位
 
 本文统一记录人物能力、专业成长、词条、社会评价和家族培养的长期设计。
+人物如何通过官职、军职、爵位、皇室/王国关系、政权与政治AI把这些能力作用于世界，见
+[`UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md`](UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md)；
+本文不把野心、忠诚或身份直接等同于行政权、兵权或产权。
 
 主要参考方向：
 
@@ -599,6 +602,12 @@ M18-P0已建立第一条代码桥接：开放技能、知识和科技通过稳�
 没有木材时名匠不能造船；没有船工时主匠只能缓慢亲自制作；没有主匠时普通船工只能稳定制造低级船只。
 
 ## 19. 家族长期属性
+
+本节“家族”数值指FamilyOrganization层的长期组织状态，不等于Clan、Branch或Household。
+Clan记录历史宗族与谱系认同，Branch记录谱系分支，Household记录共同生活；只有明确物化的
+FamilyOrganization才能持有族产、组织职位和组织预算。人物在外地生活、任官、经商和成长不要求
+当地存在FamilyCenter。中心只限制组织性管理，具体关系与动作权限见
+[`FAMILY_ORGANIZATION_REFERENCE_V1/README.md`](FAMILY_ORGANIZATION_REFERENCE_V1/README.md)。
 
 家族具有：
 

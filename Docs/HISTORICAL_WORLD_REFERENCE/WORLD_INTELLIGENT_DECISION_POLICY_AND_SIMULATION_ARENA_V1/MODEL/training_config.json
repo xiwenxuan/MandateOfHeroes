@@ -1,0 +1,16 @@
+{
+  "trainer": "deterministic_sgd_relu_mlp_v1",
+  "seed": 72,
+  "epochs": 80,
+  "hidden_size": 8,
+  "learning_rate": 0.003,
+  "feature_schema_version": "ai.features.v1",
+  "action_schema_version": "ai.actions.v1",
+  "dataset_version": "world-decision-teacher-v1",
+  "split_rule": "scenario_seed modulo 5; remainder 0 is test",
+  "forbidden_features": [
+    "year",
+    "scenario_year",
+    "historical_outcome"
+  ]
+}

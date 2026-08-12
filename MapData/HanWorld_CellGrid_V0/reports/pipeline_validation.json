@@ -1,0 +1,353 @@
+{
+  "schema": "hanworld.pipeline-validation.v0",
+  "passed": true,
+  "checks": [
+    {
+      "name": "external source count",
+      "passed": true,
+      "detail": "6"
+    },
+    {
+      "name": "external source contracts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "external source hashes resolved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "external sources allow commercial redistribution",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "GeoPackage required layers",
+      "passed": true,
+      "detail": "['coastline', 'commanderies_v0', 'counties_v0', 'county_anchors', 'land_reference', 'major_lakes', 'major_rivers', 'major_routes_v0', 'provinces_v0', 'strategic_cities', 'strategic_sites', 'test_regions']"
+    },
+    {
+      "name": "loaded geography uses one working CRS",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "loaded geometry is valid or explicitly null",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "77 strategic cities",
+      "passed": true,
+      "detail": "77"
+    },
+    {
+      "name": "unresolved cities remain null",
+      "passed": true,
+      "detail": "5"
+    },
+    {
+      "name": "1182 unique county identities",
+      "passed": true,
+      "detail": "1182"
+    },
+    {
+      "name": "strategic sites include national passes",
+      "passed": true,
+      "detail": "31"
+    },
+    {
+      "name": "R001-R012 preserved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "administrative proxies labelled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "administrative proxies are not historical claims",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "DEM exists and is readable",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "DEM resolution",
+      "passed": true,
+      "detail": "2000.0"
+    },
+    {
+      "name": "DEM NoData",
+      "passed": true,
+      "detail": "-32768.0"
+    },
+    {
+      "name": "DEM working projection",
+      "passed": true,
+      "detail": "PROJCS[\"unknown\",GEOGCS[\"unknown\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUT"
+    },
+    {
+      "name": "four Cell candidates",
+      "passed": true,
+      "detail": "[500, 1000, 2000, 4000]"
+    },
+    {
+      "name": "candidate strategic metrics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "candidate city metrics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "candidate pass and river metrics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "sixteen previews plus contact sheet",
+      "passed": true,
+      "detail": "17"
+    },
+    {
+      "name": "selected 2000m V0 grid",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "national Cell count",
+      "passed": true,
+      "detail": "7211264"
+    },
+    {
+      "name": "implicit stable CellId contract",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "row-column corners have unique CellIds",
+      "passed": true,
+      "detail": "[0, 3313, 7207950, 7211263]"
+    },
+    {
+      "name": "sampled eight-neighbor relation is symmetric",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "72 positioned cities map to Cells",
+      "passed": true,
+      "detail": "72"
+    },
+    {
+      "name": "five unresolved cities remain unmapped",
+      "passed": true,
+      "detail": "5"
+    },
+    {
+      "name": "positioned cities map to unique Cells",
+      "passed": true,
+      "detail": "72"
+    },
+    {
+      "name": "city Cell mappings use stable row-major IDs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all strategic sites map to Cells",
+      "passed": true,
+      "detail": "31"
+    },
+    {
+      "name": "terrain.bin header",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "terrain.bin dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "terrain.bin compressed sample",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "elevation.bin header",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "elevation.bin dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "elevation.bin compressed sample",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "water.bin header",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "water.bin dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "water.bin compressed sample",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "admin.bin header",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "admin.bin dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "admin.bin compressed sample",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "roads.bin header",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "roads.bin dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "roads.bin compressed sample",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all road paths eight-neighbor continuous",
+      "passed": true,
+      "detail": "18"
+    },
+    {
+      "name": "Unity reader exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "MapValidation scene exists",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "chunk_details": {
+    "terrain.bin": {
+      "magic": "HWC0",
+      "version": 1,
+      "columns": 3314,
+      "rows": 2176,
+      "chunk_size": 64,
+      "value_size": 1,
+      "channels": 2,
+      "chunk_columns": 52,
+      "chunk_rows": 34,
+      "chunk_count": 1768,
+      "sample_raw_length": 8192,
+      "sample_declared_length": 8192,
+      "sample_shape": [
+        64,
+        64
+      ]
+    },
+    "elevation.bin": {
+      "magic": "HWC0",
+      "version": 1,
+      "columns": 3314,
+      "rows": 2176,
+      "chunk_size": 64,
+      "value_size": 2,
+      "channels": 1,
+      "chunk_columns": 52,
+      "chunk_rows": 34,
+      "chunk_count": 1768,
+      "sample_raw_length": 8192,
+      "sample_declared_length": 8192,
+      "sample_shape": [
+        64,
+        64
+      ]
+    },
+    "water.bin": {
+      "magic": "HWC0",
+      "version": 1,
+      "columns": 3314,
+      "rows": 2176,
+      "chunk_size": 64,
+      "value_size": 1,
+      "channels": 1,
+      "chunk_columns": 52,
+      "chunk_rows": 34,
+      "chunk_count": 1768,
+      "sample_raw_length": 4096,
+      "sample_declared_length": 4096,
+      "sample_shape": [
+        64,
+        64
+      ]
+    },
+    "admin.bin": {
+      "magic": "HWC0",
+      "version": 1,
+      "columns": 3314,
+      "rows": 2176,
+      "chunk_size": 64,
+      "value_size": 2,
+      "channels": 3,
+      "chunk_columns": 52,
+      "chunk_rows": 34,
+      "chunk_count": 1768,
+      "sample_raw_length": 24576,
+      "sample_declared_length": 24576,
+      "sample_shape": [
+        64,
+        64
+      ]
+    },
+    "roads.bin": {
+      "magic": "HWC0",
+      "version": 1,
+      "columns": 3314,
+      "rows": 2176,
+      "chunk_size": 64,
+      "value_size": 1,
+      "channels": 1,
+      "chunk_columns": 52,
+      "chunk_rows": 34,
+      "chunk_count": 1768,
+      "sample_raw_length": 4096,
+      "sample_declared_length": 4096,
+      "sample_shape": [
+        64,
+        64
+      ]
+    }
+  }
+}

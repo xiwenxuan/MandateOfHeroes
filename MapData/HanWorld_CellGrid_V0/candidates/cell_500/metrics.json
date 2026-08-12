@@ -1,0 +1,1881 @@
+{
+  "cell_size_m": 500,
+  "columns": 13256,
+  "rows": 8704,
+  "total_cells": 115380224,
+  "land_cells_estimate": 74352816,
+  "water_cells_estimate": 41027408,
+  "passable_cells_estimate": 74292304,
+  "county_cell_distribution_synthetic_proxy": {
+    "min": 1,
+    "p10": 2048,
+    "median": 8136,
+    "p90": 48276,
+    "max": 11472064
+  },
+  "radius_cell_counts": {
+    "5": 314,
+    "10": 1256,
+    "20": 5026
+  },
+  "chunk_count_64": 28288,
+  "estimated_compressed_binary_mb": 156.2,
+  "estimated_uncompressed_runtime_mb": 2310.7,
+  "city_surroundings": [
+    {
+      "city_id": "C001",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C002",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C003",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C004",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 160
+        }
+      }
+    },
+    {
+      "city_id": "C005",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 256,
+          "water": 96
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 896,
+          "water": 176
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 4016,
+          "water": 432
+        }
+      }
+    },
+    {
+      "city_id": "C006",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C007",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C008",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C009",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 80
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 384
+        }
+      }
+    },
+    {
+      "city_id": "C010",
+      "coordinate_status": "unresolved",
+      "radii_km": null
+    },
+    {
+      "city_id": "C011",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 48
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 96
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 208
+        }
+      }
+    },
+    {
+      "city_id": "C012",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C013",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 112
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 192
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 400
+        }
+      }
+    },
+    {
+      "city_id": "C014",
+      "coordinate_status": "unresolved",
+      "radii_km": null
+    },
+    {
+      "city_id": "C015",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C016",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 80
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 208
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 464
+        }
+      }
+    },
+    {
+      "city_id": "C017",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 144
+        }
+      }
+    },
+    {
+      "city_id": "C018",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C019",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C020",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 192
+        }
+      }
+    },
+    {
+      "city_id": "C021",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C022",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 128
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 528
+        }
+      }
+    },
+    {
+      "city_id": "C023",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C024",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C025",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C026",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C027",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C028",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1264,
+          "mountain": 80,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 4960,
+          "mountain": 1376,
+          "water": 256
+        }
+      }
+    },
+    {
+      "city_id": "C029",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 80
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 144
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 576
+        }
+      }
+    },
+    {
+      "city_id": "C030",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 48,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 1312,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C031",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 288
+        }
+      }
+    },
+    {
+      "city_id": "C032",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C033",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 112
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 1296,
+          "water": 176
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 4784,
+          "mountain": 5072,
+          "water": 400
+        }
+      }
+    },
+    {
+      "city_id": "C034",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 256,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 480,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 1488,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C035",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 0,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 0,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 0,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C036",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 4576,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C037",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C038",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C039",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 432,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C040",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C041",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 112
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 240
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 480
+        }
+      }
+    },
+    {
+      "city_id": "C042",
+      "coordinate_status": "unresolved",
+      "radii_km": null
+    },
+    {
+      "city_id": "C043",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 128
+        }
+      }
+    },
+    {
+      "city_id": "C044",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 96
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 160
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 432
+        }
+      }
+    },
+    {
+      "city_id": "C045",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 96
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 256
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 1872
+        }
+      }
+    },
+    {
+      "city_id": "C046",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 112
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 272
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 688
+        }
+      }
+    },
+    {
+      "city_id": "C047",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 96
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 176
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 416
+        }
+      }
+    },
+    {
+      "city_id": "C048",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 4832,
+          "mountain": 480,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C049",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 144
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 208
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 688
+        }
+      }
+    },
+    {
+      "city_id": "C050",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 112
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 288
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 4864,
+          "mountain": 128,
+          "water": 1216
+        }
+      }
+    },
+    {
+      "city_id": "C051",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 128
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 192
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 416
+        }
+      }
+    },
+    {
+      "city_id": "C052",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 288
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 1184
+        }
+      }
+    },
+    {
+      "city_id": "C053",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 272
+        }
+      }
+    },
+    {
+      "city_id": "C054",
+      "coordinate_status": "unresolved",
+      "radii_km": null
+    },
+    {
+      "city_id": "C055",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5040,
+          "mountain": 48,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C056",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 64
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 464
+        }
+      }
+    },
+    {
+      "city_id": "C057",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 48
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 976
+        }
+      }
+    },
+    {
+      "city_id": "C058",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C059",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 112
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 1088
+        }
+      }
+    },
+    {
+      "city_id": "C060",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 144
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 256
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 512
+        }
+      }
+    },
+    {
+      "city_id": "C061",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C062",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 96
+        },
+        "20": {
+          "land": 5056,
+          "buildable": 5056,
+          "mountain": 0,
+          "water": 368
+        }
+      }
+    },
+    {
+      "city_id": "C063",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 4704,
+          "buildable": 4704,
+          "mountain": 0,
+          "water": 368
+        }
+      }
+    },
+    {
+      "city_id": "C064",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 128
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 256
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 512
+        }
+      }
+    },
+    {
+      "city_id": "C065",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 448,
+          "mountain": 64,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1280,
+          "mountain": 144,
+          "water": 112
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5056,
+          "mountain": 1104,
+          "water": 432
+        }
+      }
+    },
+    {
+      "city_id": "C066",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C067",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C068",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 208
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 368
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 848
+        }
+      }
+    },
+    {
+      "city_id": "C069",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 416,
+          "mountain": 48,
+          "water": 128
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1056,
+          "mountain": 224,
+          "water": 208
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 3776,
+          "mountain": 1472,
+          "water": 416
+        }
+      }
+    },
+    {
+      "city_id": "C070",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 352,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 816,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 2672,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C071",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 16
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1120,
+          "mountain": 1296,
+          "water": 144
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 2512,
+          "mountain": 5072,
+          "water": 352
+        }
+      }
+    },
+    {
+      "city_id": "C072",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 176,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 384,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 2000,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C073",
+      "coordinate_status": "unresolved",
+      "radii_km": null
+    },
+    {
+      "city_id": "C074",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 432,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1024,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 2576,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C075",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 464,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 960,
+          "mountain": 1296,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 2352,
+          "mountain": 5072,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C076",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 0
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 0
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 0,
+          "water": 0
+        }
+      }
+    },
+    {
+      "city_id": "C077",
+      "coordinate_status": "positioned",
+      "radii_km": {
+        "5": {
+          "land": 464,
+          "buildable": 464,
+          "mountain": 0,
+          "water": 144
+        },
+        "10": {
+          "land": 1296,
+          "buildable": 1296,
+          "mountain": 0,
+          "water": 240
+        },
+        "20": {
+          "land": 5072,
+          "buildable": 5072,
+          "mountain": 160,
+          "water": 480
+        }
+      }
+    }
+  ],
+  "strategic_distances": [
+    {
+      "route": "ye_to_guangzong",
+      "distance_m": 102862,
+      "cell_steps": 206
+    },
+    {
+      "route": "luoyang_to_hulao",
+      "distance_m": 66912,
+      "cell_steps": 134
+    },
+    {
+      "route": "hulao_to_chenliu",
+      "distance_m": 107601,
+      "cell_steps": 216
+    },
+    {
+      "route": "hanzhong_to_jiange",
+      "distance_m": 163771,
+      "cell_steps": 328
+    },
+    {
+      "route": "jiange_to_chengdu",
+      "distance_m": 215264,
+      "cell_steps": 431
+    },
+    {
+      "route": "xiangyang_to_jiangling",
+      "distance_m": 191831,
+      "cell_steps": 384
+    }
+  ],
+  "pass_analysis": [
+    {
+      "site_id": "geo.site.hulao",
+      "passable_width_m": 42000,
+      "passable_width_cells": 84,
+      "supports_blocking": false,
+      "historical_claim": false
+    },
+    {
+      "site_id": "geo.site.jiange",
+      "passable_width_m": 42000,
+      "passable_width_cells": 84,
+      "supports_blocking": false,
+      "historical_claim": false
+    },
+    {
+      "site_id": "geo.site.hangu",
+      "passable_width_m": 42000,
+      "passable_width_cells": 84,
+      "supports_blocking": false,
+      "historical_claim": false
+    },
+    {
+      "site_id": "geo.site.yangping",
+      "passable_width_m": 42000,
+      "passable_width_cells": 84,
+      "supports_blocking": false,
+      "historical_claim": false
+    }
+  ],
+  "river_analysis": [
+    {
+      "river_id": "yellow_river",
+      "vector_segments": 3,
+      "vector_length_m": 4822560,
+      "source_continuity": true,
+      "length_cells": 9646,
+      "representation": "water-cell coverage plus preserved vector centerline",
+      "cuts_land_route": true,
+      "ferry_or_bridge_has_value": true
+    },
+    {
+      "river_id": "yangtze",
+      "vector_segments": 3,
+      "vector_length_m": 4230367,
+      "source_continuity": true,
+      "length_cells": 8461,
+      "representation": "water-cell coverage plus preserved vector centerline",
+      "cuts_land_route": true,
+      "ferry_or_bridge_has_value": true
+    },
+    {
+      "river_id": "han_river",
+      "vector_segments": 2,
+      "vector_length_m": 1228618,
+      "source_continuity": true,
+      "length_cells": 2458,
+      "representation": "water-cell coverage plus preserved vector centerline",
+      "cuts_land_route": true,
+      "ferry_or_bridge_has_value": true
+    }
+  ],
+  "scores": {
+    "strategic_space": 100,
+    "facility_town": 100,
+    "physical_geography": 97,
+    "performance": 20,
+    "travel_roads": 100
+  },
+  "weighted_score": 87.4
+}

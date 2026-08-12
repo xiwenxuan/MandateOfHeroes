@@ -1,0 +1,9 @@
+{
+  "schema": "hanworld.cell-performance.v0",
+  "total_cells": 7211264,
+  "generation_seconds": 8.314,
+  "random_queries": 100000,
+  "random_query_seconds": 0.108163,
+  "checksum": 3438,
+  "unity_package_bytes": 11197138
+}

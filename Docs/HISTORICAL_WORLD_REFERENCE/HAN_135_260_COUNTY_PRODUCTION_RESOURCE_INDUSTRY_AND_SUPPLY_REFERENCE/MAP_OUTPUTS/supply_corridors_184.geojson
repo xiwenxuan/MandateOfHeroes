@@ -1,0 +1,4578 @@
+{
+  "type": "FeatureCollection",
+  "name": "Han 184 Modeled Supply Corridors",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.grain.6e83892a8e58bab0",
+        "origin_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "GRAIN",
+        "route_ids": "route.county.6e83892a8e58bab0",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 2812754,
+        "peak_capacity": 3515943,
+        "shipped_quantity": 2812754,
+        "delivered_quantity": 2786595,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.16538,
+            25.30995
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.grain.4ef14ebdf6228a93",
+        "origin_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "GRAIN",
+        "route_ids": "route.county.c39d38e29fac2200",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 345806,
+        "peak_capacity": 432258,
+        "shipped_quantity": 345806,
+        "delivered_quantity": 342590,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.17374,
+            24.93003
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.other_food.d96336c53eb228f9",
+        "origin_county_id": "admin.han140.sili.henan.juan",
+        "destination_county_id": "admin.han140.sili.henan.luoyang",
+        "product_category": "OTHER_FOOD",
+        "route_ids": "route.county.d96336c53eb228f9",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 14900,
+        "peak_capacity": 18625,
+        "shipped_quantity": 14900,
+        "delivered_quantity": 14761,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            112.35108,
+            34.79168
+          ],
+          [
+            112.45,
+            34.62
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.salt.46031baea66ce46c",
+        "origin_county_id": "admin.han140.yizhou.hanzhong.shangyong",
+        "destination_county_id": "admin.han140.jingzhou.nanyang.wan",
+        "product_category": "SALT",
+        "route_ids": "route.county.338f324cd4dae8a5|route.county.ac3e6e642f3128de|route.county.c3ef3547541edbb4|route.county.f679ae406596db10|route.county.b1222d8fb35ee1cd",
+        "transport_mode": "MULTI_LEG_MIXED_REFERENCE",
+        "distance_km": 293.1,
+        "travel_time_days": 11,
+        "normal_capacity": 33969,
+        "peak_capacity": 42461,
+        "shipped_quantity": 33969,
+        "delivered_quantity": 32637,
+        "loss_reference_basis_points": 392,
+        "risk_basis_points": 1779,
+        "political_dependency": "CROSS_PROVINCE_CONTROL_REQUIRED",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            110.23,
+            32.23
+          ],
+          [
+            112.53,
+            32.99
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.salt.a306e6097e3fe85e",
+        "origin_county_id": "admin.han140.yizhou.hanzhong.xicheng",
+        "destination_county_id": "admin.han140.jingzhou.nanyang.wan",
+        "product_category": "SALT",
+        "route_ids": "route.county.d041990a57b3a223|route.county.338f324cd4dae8a5|route.county.ac3e6e642f3128de|route.county.c3ef3547541edbb4|route.county.f679ae406596db10|route.county.b1222d8fb35ee1cd",
+        "transport_mode": "MULTI_LEG_MIXED_REFERENCE",
+        "distance_km": 416.8,
+        "travel_time_days": 15,
+        "normal_capacity": 114037,
+        "peak_capacity": 142546,
+        "shipped_quantity": 114037,
+        "delivered_quantity": 108016,
+        "loss_reference_basis_points": 528,
+        "risk_basis_points": 2150,
+        "political_dependency": "CROSS_PROVINCE_CONTROL_REQUIRED",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            109.03,
+            32.69
+          ],
+          [
+            112.53,
+            32.99
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.salt.cd385cb5f01d3fc8",
+        "origin_county_id": "admin.han140.yizhou.ba.yufu",
+        "destination_county_id": "admin.han140.jingzhou.nanyang.wan",
+        "product_category": "SALT",
+        "route_ids": "route.county.391875ef3c238340|route.county.338f324cd4dae8a5|route.county.ac3e6e642f3128de|route.county.c3ef3547541edbb4|route.county.f679ae406596db10|route.county.b1222d8fb35ee1cd",
+        "transport_mode": "MULTI_LEG_MIXED_REFERENCE",
+        "distance_km": 446.1,
+        "travel_time_days": 16,
+        "normal_capacity": 251874,
+        "peak_capacity": 314843,
+        "shipped_quantity": 251874,
+        "delivered_quantity": 237744,
+        "loss_reference_basis_points": 561,
+        "risk_basis_points": 2238,
+        "political_dependency": "CROSS_PROVINCE_CONTROL_REQUIRED",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            109.46,
+            31.02
+          ],
+          [
+            112.53,
+            32.99
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.salt.3b5af7aa3d4be5d3",
+        "origin_county_id": "admin.han140.yizhou.hanzhong.baozhong",
+        "destination_county_id": "admin.han140.jingzhou.nanyang.wan",
+        "product_category": "SALT",
+        "route_ids": "route.county.c5b01153f236b525|route.county.d041990a57b3a223|route.county.338f324cd4dae8a5|route.county.ac3e6e642f3128de|route.county.c3ef3547541edbb4|route.county.f679ae406596db10|route.county.b1222d8fb35ee1cd",
+        "transport_mode": "MULTI_LEG_MIXED_REFERENCE",
+        "distance_km": 608.8,
+        "travel_time_days": 22,
+        "normal_capacity": 149048,
+        "peak_capacity": 186310,
+        "shipped_quantity": 149048,
+        "delivered_quantity": 138018,
+        "loss_reference_basis_points": 740,
+        "risk_basis_points": 2726,
+        "political_dependency": "CROSS_PROVINCE_CONTROL_REQUIRED",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            107.03364,
+            33.1033
+          ],
+          [
+            112.53,
+            32.99
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.timber.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "TIMBER",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 564895,
+        "peak_capacity": 706119,
+        "shipped_quantity": 564895,
+        "delivered_quantity": 559980,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.timber.6e83892a8e58bab0",
+        "origin_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "TIMBER",
+        "route_ids": "route.county.6e83892a8e58bab0",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 1110975,
+        "peak_capacity": 1388719,
+        "shipped_quantity": 1110975,
+        "delivered_quantity": 1100643,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.16538,
+            25.30995
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.timber.4ef14ebdf6228a93",
+        "origin_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "TIMBER",
+        "route_ids": "route.county.c39d38e29fac2200",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 2593453,
+        "peak_capacity": 3241816,
+        "shipped_quantity": 2593453,
+        "delivered_quantity": 2569334,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.17374,
+            24.93003
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.fiber.c32c1f87bf7f8380",
+        "origin_county_id": "admin.han140.yizhou.yongchang.suitang",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "FIBER",
+        "route_ids": "route.county.1c5d0e0b630f05ec",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 125459,
+        "peak_capacity": 156824,
+        "shipped_quantity": 125459,
+        "delivered_quantity": 124455,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.08167,
+            25.11789
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.fiber.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "FIBER",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 39026,
+        "peak_capacity": 48783,
+        "shipped_quantity": 39026,
+        "delivered_quantity": 38686,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.fiber.6e83892a8e58bab0",
+        "origin_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "FIBER",
+        "route_ids": "route.county.6e83892a8e58bab0",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 129223,
+        "peak_capacity": 161529,
+        "shipped_quantity": 129223,
+        "delivered_quantity": 128021,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.16538,
+            25.30995
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.fiber.4ef14ebdf6228a93",
+        "origin_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "FIBER",
+        "route_ids": "route.county.c39d38e29fac2200",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 183777,
+        "peak_capacity": 229721,
+        "shipped_quantity": 183777,
+        "delivered_quantity": 182068,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.17374,
+            24.93003
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 4574,
+        "peak_capacity": 5718,
+        "shipped_quantity": 4574,
+        "delivered_quantity": 4534,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 40,
+        "peak_capacity": 50,
+        "shipped_quantity": 40,
+        "delivered_quantity": 39,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.597e7aba4d3d2e17",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.buwei",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.f6c8639d4ea6d983",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17,
+            25.12
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.344f2ef5f5471165",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.suitang",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.15bdd58112e0800a",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.5,
+        "travel_time_days": 1,
+        "normal_capacity": 2891,
+        "peak_capacity": 3614,
+        "shipped_quantity": 2891,
+        "delivered_quantity": 2867,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.08167,
+            25.11789
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.344f2ef5f5471165",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.suitang",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.15bdd58112e0800a",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.5,
+        "travel_time_days": 1,
+        "normal_capacity": 24,
+        "peak_capacity": 30,
+        "shipped_quantity": 24,
+        "delivered_quantity": 24,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.08167,
+            25.11789
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.344f2ef5f5471165",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.suitang",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.15bdd58112e0800a",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.5,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.08167,
+            25.11789
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.344f2ef5f5471165",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.suitang",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.15bdd58112e0800a",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.5,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.08167,
+            25.11789
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.5d747375421cb8f4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.5d747375421cb8f4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.6,
+        "travel_time_days": 1,
+        "normal_capacity": 2548,
+        "peak_capacity": 3185,
+        "shipped_quantity": 2548,
+        "delivered_quantity": 2526,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 941,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17374,
+            24.93003
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.5d747375421cb8f4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.5d747375421cb8f4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.6,
+        "travel_time_days": 1,
+        "normal_capacity": 22,
+        "peak_capacity": 27,
+        "shipped_quantity": 22,
+        "delivered_quantity": 21,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 941,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17374,
+            24.93003
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.5d747375421cb8f4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.5d747375421cb8f4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.6,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 941,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17374,
+            24.93003
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.5d747375421cb8f4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yeyu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.5d747375421cb8f4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.6,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 941,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.17374,
+            24.93003
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.f098e2de18aaccb4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bisu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.07c5350aa7518130",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 30,
+        "travel_time_days": 2,
+        "normal_capacity": 2412,
+        "peak_capacity": 3015,
+        "shipped_quantity": 2412,
+        "delivered_quantity": 2387,
+        "loss_reference_basis_points": 103,
+        "risk_basis_points": 990,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.27175,
+            25.21868
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.f098e2de18aaccb4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bisu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.07c5350aa7518130",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 30,
+        "travel_time_days": 2,
+        "normal_capacity": 25,
+        "peak_capacity": 31,
+        "shipped_quantity": 25,
+        "delivered_quantity": 25,
+        "loss_reference_basis_points": 103,
+        "risk_basis_points": 990,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.27175,
+            25.21868
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.f098e2de18aaccb4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bisu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.07c5350aa7518130",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 30,
+        "travel_time_days": 2,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 103,
+        "risk_basis_points": 990,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.27175,
+            25.21868
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.f098e2de18aaccb4",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bisu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.07c5350aa7518130",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 30,
+        "travel_time_days": 2,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 103,
+        "risk_basis_points": 990,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.27175,
+            25.21868
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.53e60340324c2065",
+        "origin_county_id": "admin.han140.yizhou.shushuguo.maoniu",
+        "destination_county_id": "admin.han140.yizhou.shushuguo.yijia",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.53e60340324c2065",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27.3,
+        "travel_time_days": 1,
+        "normal_capacity": 2073,
+        "peak_capacity": 2591,
+        "shipped_quantity": 2073,
+        "delivered_quantity": 2052,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 982,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.54784,
+            28.82941
+          ],
+          [
+            105.50711,
+            28.58688
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.53e60340324c2065",
+        "origin_county_id": "admin.han140.yizhou.shushuguo.maoniu",
+        "destination_county_id": "admin.han140.yizhou.shushuguo.yijia",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.53e60340324c2065",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27.3,
+        "travel_time_days": 1,
+        "normal_capacity": 21,
+        "peak_capacity": 26,
+        "shipped_quantity": 21,
+        "delivered_quantity": 21,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 982,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.54784,
+            28.82941
+          ],
+          [
+            105.50711,
+            28.58688
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.53e60340324c2065",
+        "origin_county_id": "admin.han140.yizhou.shushuguo.maoniu",
+        "destination_county_id": "admin.han140.yizhou.shushuguo.yijia",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.53e60340324c2065",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27.3,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 982,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.54784,
+            28.82941
+          ],
+          [
+            105.50711,
+            28.58688
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.53e60340324c2065",
+        "origin_county_id": "admin.han140.yizhou.shushuguo.maoniu",
+        "destination_county_id": "admin.han140.yizhou.shushuguo.yijia",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.53e60340324c2065",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27.3,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 982,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.54784,
+            28.82941
+          ],
+          [
+            105.50711,
+            28.58688
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.e2d87907f87f6dc3",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.275102a4f92609e5",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 34,
+        "travel_time_days": 2,
+        "normal_capacity": 1906,
+        "peak_capacity": 2383,
+        "shipped_quantity": 1906,
+        "delivered_quantity": 1886,
+        "loss_reference_basis_points": 107,
+        "risk_basis_points": 1002,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.16538,
+            25.30995
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.e2d87907f87f6dc3",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.275102a4f92609e5",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 34,
+        "travel_time_days": 2,
+        "normal_capacity": 20,
+        "peak_capacity": 25,
+        "shipped_quantity": 20,
+        "delivered_quantity": 20,
+        "loss_reference_basis_points": 107,
+        "risk_basis_points": 1002,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.16538,
+            25.30995
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.e2d87907f87f6dc3",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.275102a4f92609e5",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 34,
+        "travel_time_days": 2,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 107,
+        "risk_basis_points": 1002,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.16538,
+            25.30995
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.e2d87907f87f6dc3",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.bonan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.275102a4f92609e5",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 34,
+        "travel_time_days": 2,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 107,
+        "risk_basis_points": 1002,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            99.16538,
+            25.30995
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.9ad75c9250d73a28",
+        "origin_county_id": "admin.han140.yizhou.ba.yichang",
+        "destination_county_id": "admin.han140.yizhou.ba.jiangzhou",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.b8c33f04fd5061a4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 1782,
+        "peak_capacity": 2228,
+        "shipped_quantity": 1782,
+        "delivered_quantity": 1768,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.58223,
+            29.48507
+          ],
+          [
+            106.55,
+            29.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.9ad75c9250d73a28",
+        "origin_county_id": "admin.han140.yizhou.ba.yichang",
+        "destination_county_id": "admin.han140.yizhou.ba.jiangzhou",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.b8c33f04fd5061a4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 14,
+        "peak_capacity": 18,
+        "shipped_quantity": 14,
+        "delivered_quantity": 14,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.58223,
+            29.48507
+          ],
+          [
+            106.55,
+            29.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.9ad75c9250d73a28",
+        "origin_county_id": "admin.han140.yizhou.ba.yichang",
+        "destination_county_id": "admin.han140.yizhou.ba.jiangzhou",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.b8c33f04fd5061a4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.58223,
+            29.48507
+          ],
+          [
+            106.55,
+            29.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.9ad75c9250d73a28",
+        "origin_county_id": "admin.han140.yizhou.ba.yichang",
+        "destination_county_id": "admin.han140.yizhou.ba.jiangzhou",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.b8c33f04fd5061a4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.58223,
+            29.48507
+          ],
+          [
+            106.55,
+            29.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.8534df3a4ac33549",
+        "origin_county_id": "admin.han140.yizhou.shu.fan",
+        "destination_county_id": "admin.han140.yizhou.shu.chengdu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.432c2419f961b21c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 1746,
+        "peak_capacity": 2183,
+        "shipped_quantity": 1746,
+        "delivered_quantity": 1730,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.13585,
+            30.85136
+          ],
+          [
+            104.07,
+            30.67
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.8534df3a4ac33549",
+        "origin_county_id": "admin.han140.yizhou.shu.fan",
+        "destination_county_id": "admin.han140.yizhou.shu.chengdu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.432c2419f961b21c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 16,
+        "peak_capacity": 20,
+        "shipped_quantity": 16,
+        "delivered_quantity": 16,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.13585,
+            30.85136
+          ],
+          [
+            104.07,
+            30.67
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.8534df3a4ac33549",
+        "origin_county_id": "admin.han140.yizhou.shu.fan",
+        "destination_county_id": "admin.han140.yizhou.shu.chengdu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.432c2419f961b21c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.13585,
+            30.85136
+          ],
+          [
+            104.07,
+            30.67
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.8534df3a4ac33549",
+        "origin_county_id": "admin.han140.yizhou.shu.fan",
+        "destination_county_id": "admin.han140.yizhou.shu.chengdu",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.432c2419f961b21c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.13585,
+            30.85136
+          ],
+          [
+            104.07,
+            30.67
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.22fdc202a76a6ce2",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yunnan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.ea7ca9b94fa53ee1|route.county.268af0a92f8d2aed",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 159.2,
+        "travel_time_days": 6,
+        "normal_capacity": 1693,
+        "peak_capacity": 2116,
+        "shipped_quantity": 1693,
+        "delivered_quantity": 1652,
+        "loss_reference_basis_points": 245,
+        "risk_basis_points": 1378,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            100.56,
+            25.48
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.22fdc202a76a6ce2",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yunnan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.ea7ca9b94fa53ee1|route.county.268af0a92f8d2aed",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 159.2,
+        "travel_time_days": 6,
+        "normal_capacity": 41,
+        "peak_capacity": 52,
+        "shipped_quantity": 41,
+        "delivered_quantity": 40,
+        "loss_reference_basis_points": 245,
+        "risk_basis_points": 1378,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            100.56,
+            25.48
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.22fdc202a76a6ce2",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yunnan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.ea7ca9b94fa53ee1|route.county.268af0a92f8d2aed",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 159.2,
+        "travel_time_days": 6,
+        "normal_capacity": 1,
+        "peak_capacity": 1,
+        "shipped_quantity": 1,
+        "delivered_quantity": 1,
+        "loss_reference_basis_points": 245,
+        "risk_basis_points": 1378,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            100.56,
+            25.48
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.22fdc202a76a6ce2",
+        "origin_county_id": "admin.han140.yizhou.yongchang.xielong",
+        "destination_county_id": "admin.han140.yizhou.yongchang.yunnan",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.ea7ca9b94fa53ee1|route.county.268af0a92f8d2aed",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 159.2,
+        "travel_time_days": 6,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 245,
+        "risk_basis_points": 1378,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            99.07631,
+            25.01498
+          ],
+          [
+            100.56,
+            25.48
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.c9c92682b0b83101",
+        "origin_county_id": "admin.han140.yizhou.guanghanshuguo.yinpingdao",
+        "destination_county_id": "admin.han140.yizhou.shu.pi",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.c9c92682b0b83101",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27,
+        "travel_time_days": 1,
+        "normal_capacity": 1639,
+        "peak_capacity": 2049,
+        "shipped_quantity": 1639,
+        "delivered_quantity": 1623,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 981,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.17413,
+            30.37649
+          ],
+          [
+            103.91201,
+            30.46614
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.c9c92682b0b83101",
+        "origin_county_id": "admin.han140.yizhou.guanghanshuguo.yinpingdao",
+        "destination_county_id": "admin.han140.yizhou.shu.pi",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.c9c92682b0b83101",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27,
+        "travel_time_days": 1,
+        "normal_capacity": 16,
+        "peak_capacity": 20,
+        "shipped_quantity": 16,
+        "delivered_quantity": 16,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 981,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.17413,
+            30.37649
+          ],
+          [
+            103.91201,
+            30.46614
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.c9c92682b0b83101",
+        "origin_county_id": "admin.han140.yizhou.guanghanshuguo.yinpingdao",
+        "destination_county_id": "admin.han140.yizhou.shu.pi",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.c9c92682b0b83101",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 981,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.17413,
+            30.37649
+          ],
+          [
+            103.91201,
+            30.46614
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.iron_ore.c9c92682b0b83101",
+        "origin_county_id": "admin.han140.yizhou.guanghanshuguo.yinpingdao",
+        "destination_county_id": "admin.han140.yizhou.shu.pi",
+        "product_category": "IRON_ORE",
+        "route_ids": "route.county.c9c92682b0b83101",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 27,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 100,
+        "risk_basis_points": 981,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            104.17413,
+            30.37649
+          ],
+          [
+            103.91201,
+            30.46614
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.7830ab7404aec2b1",
+        "origin_county_id": "admin.han140.jizhou.bohai.dongguang",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhonghe",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.7830ab7404aec2b1",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.3,
+        "travel_time_days": 1,
+        "normal_capacity": 56,
+        "peak_capacity": 70,
+        "shipped_quantity": 56,
+        "delivered_quantity": 55,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 964,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.81018,
+            38.05322
+          ],
+          [
+            116.97596,
+            37.91292
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.7830ab7404aec2b1",
+        "origin_county_id": "admin.han140.jizhou.bohai.dongguang",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhonghe",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.7830ab7404aec2b1",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.3,
+        "travel_time_days": 1,
+        "normal_capacity": 1,
+        "peak_capacity": 1,
+        "shipped_quantity": 1,
+        "delivered_quantity": 1,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 964,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.81018,
+            38.05322
+          ],
+          [
+            116.97596,
+            37.91292
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.7830ab7404aec2b1",
+        "origin_county_id": "admin.han140.jizhou.bohai.dongguang",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhonghe",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.7830ab7404aec2b1",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.3,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 964,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.81018,
+            38.05322
+          ],
+          [
+            116.97596,
+            37.91292
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.7830ab7404aec2b1",
+        "origin_county_id": "admin.han140.jizhou.bohai.dongguang",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhonghe",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.7830ab7404aec2b1",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.3,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 964,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.81018,
+            38.05322
+          ],
+          [
+            116.97596,
+            37.91292
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.35b633575a2343d2",
+        "origin_county_id": "admin.han140.yuzhou.liang.suiyang",
+        "destination_county_id": "admin.han140.yuzhou.liang.xiayi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.35b633575a2343d2",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 10.5,
+        "travel_time_days": 1,
+        "normal_capacity": 16,
+        "peak_capacity": 20,
+        "shipped_quantity": 16,
+        "delivered_quantity": 16,
+        "loss_reference_basis_points": 82,
+        "risk_basis_points": 932,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.67475,
+            34.67014
+          ],
+          [
+            114.63456,
+            34.58178
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.724f148d82eb934d",
+        "origin_county_id": "admin.han140.yuzhou.liang.yan",
+        "destination_county_id": "admin.han140.yuzhou.liang.xiayi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.512e8a38b0820602",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.8,
+        "travel_time_days": 1,
+        "normal_capacity": 5,
+        "peak_capacity": 6,
+        "shipped_quantity": 5,
+        "delivered_quantity": 5,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 941,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.70942,
+            34.47396
+          ],
+          [
+            114.63456,
+            34.58178
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.4b321a57f4d83a5c",
+        "origin_county_id": "admin.han140.yuzhou.liang.gushou",
+        "destination_county_id": "admin.han140.yuzhou.liang.xiayi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.4b321a57f4d83a5c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 31.6,
+        "travel_time_days": 2,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 105,
+        "risk_basis_points": 995,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.75887,
+            34.8469
+          ],
+          [
+            114.63456,
+            34.58178
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.4b321a57f4d83a5c",
+        "origin_county_id": "admin.han140.yuzhou.liang.gushou",
+        "destination_county_id": "admin.han140.yuzhou.liang.xiayi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.4b321a57f4d83a5c",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 31.6,
+        "travel_time_days": 2,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 105,
+        "risk_basis_points": 995,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.75887,
+            34.8469
+          ],
+          [
+            114.63456,
+            34.58178
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.f47d456638475721",
+        "origin_county_id": "admin.han140.jizhou.qinghe.dongwucheng",
+        "destination_county_id": "admin.han140.jizhou.qinghe.beiqiu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.9931d6b1f77bc49a",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 12.5,
+        "travel_time_days": 1,
+        "normal_capacity": 20,
+        "peak_capacity": 25,
+        "shipped_quantity": 20,
+        "delivered_quantity": 20,
+        "loss_reference_basis_points": 84,
+        "risk_basis_points": 938,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.77626,
+            36.97042
+          ],
+          [
+            115.79923,
+            36.85971
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.ae3c5effb5d5542c",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.beiqiu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d84e08a8d804c2f9",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 16.4,
+        "travel_time_days": 1,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 88,
+        "risk_basis_points": 949,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.88214,
+            36.72811
+          ],
+          [
+            115.79923,
+            36.85971
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.ae3c5effb5d5542c",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.beiqiu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d84e08a8d804c2f9",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 16.4,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 88,
+        "risk_basis_points": 949,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.88214,
+            36.72811
+          ],
+          [
+            115.79923,
+            36.85971
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.ae3c5effb5d5542c",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.beiqiu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d84e08a8d804c2f9",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 16.4,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 88,
+        "risk_basis_points": 949,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.88214,
+            36.72811
+          ],
+          [
+            115.79923,
+            36.85971
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c049eced9b04190e",
+        "origin_county_id": "admin.han140.jizhou.bohai.xiu",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhangwu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c049eced9b04190e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 22.7,
+        "travel_time_days": 1,
+        "normal_capacity": 23,
+        "peak_capacity": 29,
+        "shipped_quantity": 23,
+        "delivered_quantity": 23,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 968,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.60864,
+            38.03476
+          ],
+          [
+            116.71805,
+            37.85011
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c049eced9b04190e",
+        "origin_county_id": "admin.han140.jizhou.bohai.xiu",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhangwu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c049eced9b04190e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 22.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 968,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.60864,
+            38.03476
+          ],
+          [
+            116.71805,
+            37.85011
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c049eced9b04190e",
+        "origin_county_id": "admin.han140.jizhou.bohai.xiu",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhangwu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c049eced9b04190e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 22.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 968,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.60864,
+            38.03476
+          ],
+          [
+            116.71805,
+            37.85011
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c049eced9b04190e",
+        "origin_county_id": "admin.han140.jizhou.bohai.xiu",
+        "destination_county_id": "admin.han140.jizhou.bohai.zhangwu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c049eced9b04190e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 22.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 968,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.60864,
+            38.03476
+          ],
+          [
+            116.71805,
+            37.85011
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.125bd0edb281a889",
+        "origin_county_id": "admin.han140.yuzhou.runan.tongyang",
+        "destination_county_id": "admin.han140.yuzhou.runan.wufang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.125bd0edb281a889",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.6,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.45344,
+            32.85231
+          ],
+          [
+            114.48675,
+            32.75145
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.0d54d57866f52fdb",
+        "origin_county_id": "admin.han140.yuzhou.runan.xincai",
+        "destination_county_id": "admin.han140.yuzhou.runan.wufang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.b012f8cf3436f5a0",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13.2,
+        "travel_time_days": 1,
+        "normal_capacity": 11,
+        "peak_capacity": 14,
+        "shipped_quantity": 11,
+        "delivered_quantity": 11,
+        "loss_reference_basis_points": 85,
+        "risk_basis_points": 940,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.62658,
+            32.77033
+          ],
+          [
+            114.48675,
+            32.75145
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e04fad305aa40f86",
+        "origin_county_id": "admin.han140.yuzhou.runan.song",
+        "destination_county_id": "admin.han140.yuzhou.runan.wufang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.e04fad305aa40f86",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 16.6,
+        "travel_time_days": 1,
+        "normal_capacity": 9,
+        "peak_capacity": 11,
+        "shipped_quantity": 9,
+        "delivered_quantity": 9,
+        "loss_reference_basis_points": 88,
+        "risk_basis_points": 950,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.49568,
+            32.90032
+          ],
+          [
+            114.48675,
+            32.75145
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e04fad305aa40f86",
+        "origin_county_id": "admin.han140.yuzhou.runan.song",
+        "destination_county_id": "admin.han140.yuzhou.runan.wufang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.e04fad305aa40f86",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 16.6,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 88,
+        "risk_basis_points": 950,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.49568,
+            32.90032
+          ],
+          [
+            114.48675,
+            32.75145
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.73fa244e53c67922",
+        "origin_county_id": "admin.han140.jizhou.changshan.shangai",
+        "destination_county_id": "admin.han140.jizhou.changshan.yuanshi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.73fa244e53c67922",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 12.9,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 84,
+        "risk_basis_points": 939,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.31984,
+            38.37157
+          ],
+          [
+            115.46658,
+            38.38653
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.47f6ea8b4f3b1cbc",
+        "origin_county_id": "admin.han140.jizhou.changshan.zhending",
+        "destination_county_id": "admin.han140.jizhou.changshan.yuanshi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.09468e0d4c24f4bc",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 19.6,
+        "travel_time_days": 1,
+        "normal_capacity": 13,
+        "peak_capacity": 16,
+        "shipped_quantity": 13,
+        "delivered_quantity": 13,
+        "loss_reference_basis_points": 92,
+        "risk_basis_points": 959,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.3298,
+            38.52605
+          ],
+          [
+            115.46658,
+            38.38653
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.87b17010bd0f0587",
+        "origin_county_id": "admin.han140.jizhou.changshan.duxiang",
+        "destination_county_id": "admin.han140.jizhou.changshan.yuanshi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.87b17010bd0f0587",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 23.1,
+        "travel_time_days": 1,
+        "normal_capacity": 5,
+        "peak_capacity": 6,
+        "shipped_quantity": 5,
+        "delivered_quantity": 5,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 969,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.33175,
+            38.56512
+          ],
+          [
+            115.46658,
+            38.38653
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.87b17010bd0f0587",
+        "origin_county_id": "admin.han140.jizhou.changshan.duxiang",
+        "destination_county_id": "admin.han140.jizhou.changshan.yuanshi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.87b17010bd0f0587",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 23.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 95,
+        "risk_basis_points": 969,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.33175,
+            38.56512
+          ],
+          [
+            115.46658,
+            38.38653
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.4bc71bfbb6def505",
+        "origin_county_id": "admin.han140.xuzhou.donghai.zhuqi",
+        "destination_county_id": "admin.han140.xuzhou.donghai.cheng",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.3fdc4f179fc8dd04",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11,
+        "travel_time_days": 1,
+        "normal_capacity": 16,
+        "peak_capacity": 20,
+        "shipped_quantity": 16,
+        "delivered_quantity": 16,
+        "loss_reference_basis_points": 82,
+        "risk_basis_points": 933,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.37492,
+            34.30971
+          ],
+          [
+            119.42766,
+            34.39897
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6927837b2c5f17f1",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.cheng",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.b22934c6b7a3cb0b",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.7,
+        "travel_time_days": 1,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.42766,
+            34.39897
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6927837b2c5f17f1",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.cheng",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.b22934c6b7a3cb0b",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.42766,
+            34.39897
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6927837b2c5f17f1",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.cheng",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.b22934c6b7a3cb0b",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 11.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 83,
+        "risk_basis_points": 935,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.42766,
+            34.39897
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.fcec9a5102540be5",
+        "origin_county_id": "admin.han140.xuzhou.xiapi.dongcheng",
+        "destination_county_id": "admin.han140.xuzhou.xiapi.xiapei",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.fcec9a5102540be5",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 8,
+        "peak_capacity": 10,
+        "shipped_quantity": 8,
+        "delivered_quantity": 8,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            118.11595,
+            34.32089
+          ],
+          [
+            118.02,
+            34.31
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.31b57b22b0d7d5e3",
+        "origin_county_id": "admin.han140.xuzhou.xiapi.quyang",
+        "destination_county_id": "admin.han140.xuzhou.xiapi.xiapei",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.31b57b22b0d7d5e3",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 12,
+        "peak_capacity": 15,
+        "shipped_quantity": 12,
+        "delivered_quantity": 12,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            117.92321,
+            34.31296
+          ],
+          [
+            118.02,
+            34.31
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.d6269b6ff54f0679",
+        "origin_county_id": "admin.han140.xuzhou.xiapi.liangcheng",
+        "destination_county_id": "admin.han140.xuzhou.xiapi.xiapei",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d6269b6ff54f0679",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            117.95206,
+            34.43278
+          ],
+          [
+            118.02,
+            34.31
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.d6269b6ff54f0679",
+        "origin_county_id": "admin.han140.xuzhou.xiapi.liangcheng",
+        "destination_county_id": "admin.han140.xuzhou.xiapi.xiapei",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d6269b6ff54f0679",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            117.95206,
+            34.43278
+          ],
+          [
+            118.02,
+            34.31
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.70fa7e1688b0117e",
+        "origin_county_id": "admin.han140.yanzhou.dong.dunqiu",
+        "destination_county_id": "admin.han140.yanzhou.dong.puyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.70fa7e1688b0117e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 6,
+        "peak_capacity": 8,
+        "shipped_quantity": 6,
+        "delivered_quantity": 6,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.00695,
+            35.83778
+          ],
+          [
+            115.03,
+            35.76
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.f7ae12588ae7a8dd",
+        "origin_county_id": "admin.han140.yanzhou.dong.wei",
+        "destination_county_id": "admin.han140.yanzhou.dong.puyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.f872bd49bde62f95",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 7,
+        "peak_capacity": 9,
+        "shipped_quantity": 7,
+        "delivered_quantity": 7,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.08304,
+            35.69256
+          ],
+          [
+            115.03,
+            35.76
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.cb81fa4d418f127e",
+        "origin_county_id": "admin.han140.yanzhou.dong.fagan",
+        "destination_county_id": "admin.han140.yanzhou.dong.puyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.cb81fa4d418f127e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 6,
+        "peak_capacity": 8,
+        "shipped_quantity": 6,
+        "delivered_quantity": 6,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.94425,
+            35.87569
+          ],
+          [
+            115.03,
+            35.76
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.cc1e7d107665c446",
+        "origin_county_id": "admin.han140.yanzhou.dong.yan",
+        "destination_county_id": "admin.han140.yanzhou.dong.puyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.77ac143b0bb03276",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 1,
+        "peak_capacity": 1,
+        "shipped_quantity": 1,
+        "delivered_quantity": 1,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.16981,
+            35.68683
+          ],
+          [
+            115.03,
+            35.76
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.5fe4f211d8156a6f",
+        "origin_county_id": "admin.han140.xuzhou.donghai.houqiu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.lanling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.5fe4f211d8156a6f",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 9.4,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 928,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.23767,
+            34.40623
+          ],
+          [
+            119.13633,
+            34.39483
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e33dd932287b7fdc",
+        "origin_county_id": "admin.han140.xuzhou.donghai.licheng",
+        "destination_county_id": "admin.han140.xuzhou.donghai.lanling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.26b9c03d9d2b6fff",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 10,
+        "travel_time_days": 1,
+        "normal_capacity": 11,
+        "peak_capacity": 14,
+        "shipped_quantity": 11,
+        "delivered_quantity": 11,
+        "loss_reference_basis_points": 81,
+        "risk_basis_points": 930,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.05318,
+            34.33669
+          ],
+          [
+            119.13633,
+            34.39483
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.50c626ef02fdf8e4",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.lanling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.50c626ef02fdf8e4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 26.7,
+        "travel_time_days": 1,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 99,
+        "risk_basis_points": 980,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.13633,
+            34.39483
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.50c626ef02fdf8e4",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.lanling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.50c626ef02fdf8e4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 26.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 99,
+        "risk_basis_points": 980,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.13633,
+            34.39483
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.9be2798d77ad9dd8",
+        "origin_county_id": "admin.han140.yuzhou.runan.yuanlu",
+        "destination_county_id": "admin.han140.yuzhou.runan.zhaoling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.9be2798d77ad9dd8",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 7.5,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 923,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.85891,
+            32.91138
+          ],
+          [
+            114.93105,
+            32.94029
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6b7b830935e5d233",
+        "origin_county_id": "admin.han140.yuzhou.runan.baoxin",
+        "destination_county_id": "admin.han140.yuzhou.runan.zhaoling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.6b7b830935e5d233",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 14.3,
+        "travel_time_days": 1,
+        "normal_capacity": 2,
+        "peak_capacity": 3,
+        "shipped_quantity": 2,
+        "delivered_quantity": 2,
+        "loss_reference_basis_points": 86,
+        "risk_basis_points": 943,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.84227,
+            33.04542
+          ],
+          [
+            114.93105,
+            32.94029
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.2edddc1ee8351389",
+        "origin_county_id": "admin.han140.yuzhou.runan.zhengqiang",
+        "destination_county_id": "admin.han140.yuzhou.runan.zhaoling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.40522f25bdcf6321",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 18.4,
+        "travel_time_days": 1,
+        "normal_capacity": 12,
+        "peak_capacity": 15,
+        "shipped_quantity": 12,
+        "delivered_quantity": 12,
+        "loss_reference_basis_points": 90,
+        "risk_basis_points": 955,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.7351,
+            32.95424
+          ],
+          [
+            114.93105,
+            32.94029
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.2edddc1ee8351389",
+        "origin_county_id": "admin.han140.yuzhou.runan.zhengqiang",
+        "destination_county_id": "admin.han140.yuzhou.runan.zhaoling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.40522f25bdcf6321",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 18.4,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 90,
+        "risk_basis_points": 955,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.7351,
+            32.95424
+          ],
+          [
+            114.93105,
+            32.94029
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.b7b89b521dd9b192",
+        "origin_county_id": "admin.han140.jizhou.julu.yannian",
+        "destination_county_id": "admin.han140.jizhou.julu.yingtao",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.b7b89b521dd9b192",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 17,
+        "travel_time_days": 1,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 89,
+        "risk_basis_points": 951,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.18554,
+            37.36191
+          ],
+          [
+            114.37725,
+            37.37026
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.3d6cb84f618410e4",
+        "origin_county_id": "admin.han140.jizhou.julu.guangzong",
+        "destination_county_id": "admin.han140.jizhou.julu.yingtao",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.3d6cb84f618410e4",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 17.4,
+        "travel_time_days": 1,
+        "normal_capacity": 6,
+        "peak_capacity": 8,
+        "shipped_quantity": 6,
+        "delivered_quantity": 6,
+        "loss_reference_basis_points": 89,
+        "risk_basis_points": 952,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.29545,
+            37.51218
+          ],
+          [
+            114.37725,
+            37.37026
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.806e653852811656",
+        "origin_county_id": "admin.han140.jizhou.julu.nan",
+        "destination_county_id": "admin.han140.jizhou.julu.yingtao",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.806e653852811656",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 26.7,
+        "travel_time_days": 1,
+        "normal_capacity": 6,
+        "peak_capacity": 8,
+        "shipped_quantity": 6,
+        "delivered_quantity": 6,
+        "loss_reference_basis_points": 99,
+        "risk_basis_points": 980,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.13801,
+            37.51682
+          ],
+          [
+            114.37725,
+            37.37026
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.806e653852811656",
+        "origin_county_id": "admin.han140.jizhou.julu.nan",
+        "destination_county_id": "admin.han140.jizhou.julu.yingtao",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.806e653852811656",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 26.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 99,
+        "risk_basis_points": 980,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.13801,
+            37.51682
+          ],
+          [
+            114.37725,
+            37.37026
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6b504053399bbf32",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yanchuan",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.802f0e7d0172af90",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.9,
+        "travel_time_days": 1,
+        "normal_capacity": 16,
+        "peak_capacity": 20,
+        "shipped_quantity": 16,
+        "delivered_quantity": 16,
+        "loss_reference_basis_points": 94,
+        "risk_basis_points": 966,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.61396,
+            36.80925
+          ],
+          [
+            115.40407,
+            36.91285
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6b504053399bbf32",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yanchuan",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.802f0e7d0172af90",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.9,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 94,
+        "risk_basis_points": 966,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.61396,
+            36.80925
+          ],
+          [
+            115.40407,
+            36.91285
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6b504053399bbf32",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yanchuan",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.802f0e7d0172af90",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.9,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 94,
+        "risk_basis_points": 966,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.61396,
+            36.80925
+          ],
+          [
+            115.40407,
+            36.91285
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.6b504053399bbf32",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yanchuan",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.802f0e7d0172af90",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.9,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 94,
+        "risk_basis_points": 966,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.61396,
+            36.80925
+          ],
+          [
+            115.40407,
+            36.91285
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.dbbb259247f80b13",
+        "origin_county_id": "admin.han140.yuzhou.runan.xinyang",
+        "destination_county_id": "admin.han140.yuzhou.runan.xiping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.dbbb259247f80b13",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 6.3,
+        "travel_time_days": 1,
+        "normal_capacity": 2,
+        "peak_capacity": 3,
+        "shipped_quantity": 2,
+        "delivered_quantity": 2,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 919,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.66173,
+            32.88211
+          ],
+          [
+            114.69727,
+            32.83384
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.eddaa354ed9f329c",
+        "origin_county_id": "admin.han140.yuzhou.runan.yilu",
+        "destination_county_id": "admin.han140.yuzhou.runan.xiping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.868a1fdb7bc2da62",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 7.6,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 923,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.70569,
+            32.90202
+          ],
+          [
+            114.69727,
+            32.83384
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.87b82aba28768c47",
+        "origin_county_id": "admin.han140.yuzhou.runan.xinxi",
+        "destination_county_id": "admin.han140.yuzhou.runan.xiping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.87b82aba28768c47",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13,
+        "travel_time_days": 1,
+        "normal_capacity": 11,
+        "peak_capacity": 14,
+        "shipped_quantity": 11,
+        "delivered_quantity": 11,
+        "loss_reference_basis_points": 84,
+        "risk_basis_points": 939,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.6833,
+            32.71771
+          ],
+          [
+            114.69727,
+            32.83384
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.87b82aba28768c47",
+        "origin_county_id": "admin.han140.yuzhou.runan.xinxi",
+        "destination_county_id": "admin.han140.yuzhou.runan.xiping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.87b82aba28768c47",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 13,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 84,
+        "risk_basis_points": 939,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.6833,
+            32.71771
+          ],
+          [
+            114.69727,
+            32.83384
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.9a618974b7c8e40a",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yanchuan",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ganling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.1ac2b755967e79ca",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 9,
+        "peak_capacity": 11,
+        "shipped_quantity": 9,
+        "delivered_quantity": 9,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.61396,
+            36.80925
+          ],
+          [
+            115.7,
+            36.85
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.46ce4ed70af5d919",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yimu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ganling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.616e7cfd8d623cc0",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 2,
+        "peak_capacity": 3,
+        "shipped_quantity": 2,
+        "delivered_quantity": 2,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.67646,
+            36.71632
+          ],
+          [
+            115.7,
+            36.85
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c4c6e3aaeac69b1f",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ganling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.92a144ea93a3fd35",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 4,
+        "peak_capacity": 5,
+        "shipped_quantity": 4,
+        "delivered_quantity": 4,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.88214,
+            36.72811
+          ],
+          [
+            115.7,
+            36.85
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c4c6e3aaeac69b1f",
+        "origin_county_id": "admin.han140.jizhou.qinghe.yu",
+        "destination_county_id": "admin.han140.jizhou.qinghe.ganling",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.92a144ea93a3fd35",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            115.88214,
+            36.72811
+          ],
+          [
+            115.7,
+            36.85
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.cd92da12052491c3",
+        "origin_county_id": "admin.han140.yanzhou.jibei.sheqiu",
+        "destination_county_id": "admin.han140.yanzhou.jibei.lu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.56ddff6446b55ba1",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.9,
+        "travel_time_days": 1,
+        "normal_capacity": 3,
+        "peak_capacity": 4,
+        "shipped_quantity": 3,
+        "delivered_quantity": 3,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 927,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.7731,
+            36.48788
+          ],
+          [
+            116.73,
+            36.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.7247f2097550061e",
+        "origin_county_id": "admin.han140.yanzhou.jibei.chiping",
+        "destination_county_id": "admin.han140.yanzhou.jibei.lu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.7247f2097550061e",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 15,
+        "travel_time_days": 1,
+        "normal_capacity": 12,
+        "peak_capacity": 15,
+        "shipped_quantity": 12,
+        "delivered_quantity": 12,
+        "loss_reference_basis_points": 87,
+        "risk_basis_points": 945,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.77632,
+            36.68977
+          ],
+          [
+            116.73,
+            36.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.185e7cda158a56a6",
+        "origin_county_id": "admin.han140.yanzhou.jibei.gang",
+        "destination_county_id": "admin.han140.yanzhou.jibei.lu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.185e7cda158a56a6",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.50775,
+            36.62504
+          ],
+          [
+            116.73,
+            36.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.185e7cda158a56a6",
+        "origin_county_id": "admin.han140.yanzhou.jibei.gang",
+        "destination_county_id": "admin.han140.yanzhou.jibei.lu",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.185e7cda158a56a6",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 21.1,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 93,
+        "risk_basis_points": 963,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.50775,
+            36.62504
+          ],
+          [
+            116.73,
+            36.56
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.c9b1a359c35f8e30",
+        "origin_county_id": "admin.han140.yanzhou.dong.fan",
+        "destination_county_id": "admin.han140.yanzhou.dong.leping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c9b1a359c35f8e30",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 17.2,
+        "travel_time_days": 1,
+        "normal_capacity": 14,
+        "peak_capacity": 18,
+        "shipped_quantity": 14,
+        "delivered_quantity": 14,
+        "loss_reference_basis_points": 89,
+        "risk_basis_points": 952,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.83417,
+            35.86416
+          ],
+          [
+            114.93684,
+            35.73382
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.d26208aab202b667",
+        "origin_county_id": "admin.han140.yanzhou.dong.gucheng",
+        "destination_county_id": "admin.han140.yanzhou.dong.leping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d26208aab202b667",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 19.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 92,
+        "risk_basis_points": 959,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.73054,
+            35.79122
+          ],
+          [
+            114.93684,
+            35.73382
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.d26208aab202b667",
+        "origin_county_id": "admin.han140.yanzhou.dong.gucheng",
+        "destination_county_id": "admin.han140.yanzhou.dong.leping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d26208aab202b667",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 19.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 92,
+        "risk_basis_points": 959,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.73054,
+            35.79122
+          ],
+          [
+            114.93684,
+            35.73382
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.d26208aab202b667",
+        "origin_county_id": "admin.han140.yanzhou.dong.gucheng",
+        "destination_county_id": "admin.han140.yanzhou.dong.leping",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.d26208aab202b667",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 19.7,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 92,
+        "risk_basis_points": 959,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.73054,
+            35.79122
+          ],
+          [
+            114.93684,
+            35.73382
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.10fc757297d22882",
+        "origin_county_id": "admin.han140.yuzhou.runan.chengfu",
+        "destination_county_id": "admin.han140.yuzhou.runan.anyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.8b4ec154ce683fe3",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.2,
+        "travel_time_days": 1,
+        "normal_capacity": 14,
+        "peak_capacity": 18,
+        "shipped_quantity": 14,
+        "delivered_quantity": 14,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 925,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.6979,
+            33.02356
+          ],
+          [
+            114.78521,
+            33.01813
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e258788e43a0fb2a",
+        "origin_county_id": "admin.han140.yuzhou.runan.zhengqiang",
+        "destination_county_id": "admin.han140.yuzhou.runan.anyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.e372de48ca475b16",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.5,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 926,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.7351,
+            32.95424
+          ],
+          [
+            114.78521,
+            33.01813
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e258788e43a0fb2a",
+        "origin_county_id": "admin.han140.yuzhou.runan.zhengqiang",
+        "destination_county_id": "admin.han140.yuzhou.runan.anyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.e372de48ca475b16",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.5,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 926,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.7351,
+            32.95424
+          ],
+          [
+            114.78521,
+            33.01813
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.e258788e43a0fb2a",
+        "origin_county_id": "admin.han140.yuzhou.runan.zhengqiang",
+        "destination_county_id": "admin.han140.yuzhou.runan.anyang",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.e372de48ca475b16",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 8.5,
+        "travel_time_days": 1,
+        "normal_capacity": 0,
+        "peak_capacity": 0,
+        "shipped_quantity": 0,
+        "delivered_quantity": 0,
+        "loss_reference_basis_points": 80,
+        "risk_basis_points": 926,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            114.7351,
+            32.95424
+          ],
+          [
+            114.78521,
+            33.01813
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "relation_id": "supply.weapons.f1b4f785979c813a",
+        "origin_county_id": "admin.han140.xuzhou.donghai.ganyu",
+        "destination_county_id": "admin.han140.xuzhou.donghai.xiangbi",
+        "product_category": "WEAPONS",
+        "route_ids": "route.county.c16985178ce9031b|route.county.84c141a4de9c1899|route.county.d860134b241f9870",
+        "transport_mode": "ROAD_PACK_CART_REFERENCE",
+        "distance_km": 40.2,
+        "travel_time_days": 2,
+        "normal_capacity": 7,
+        "peak_capacity": 8,
+        "shipped_quantity": 7,
+        "delivered_quantity": 7,
+        "loss_reference_basis_points": 114,
+        "risk_basis_points": 1021,
+        "political_dependency": "INTRA_PROVINCE",
+        "logistics_type": "COMMERCIAL_OR_MILITARY",
+        "evidence_grade": "MODELED",
+        "historical_evidence": "NO_DIRECT_ROUTE_CLAIM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            119.39721,
+            34.50072
+          ],
+          [
+            119.31501,
+            34.14747
+          ]
+        ]
+      }
+    }
+  ]
+}

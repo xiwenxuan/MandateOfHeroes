@@ -1,0 +1,33 @@
+{
+  "schema": "mandate.validation-summary.v1",
+  "task": "LUOYANG-184-PERSON-WORK-PRODUCTION-CONSUMPTION-CLOSURE-V1",
+  "status": "PASS",
+  "generated_at": "2026-08-11T16:38:30+08:00",
+  "protected_counts": {
+    "persons": 400000,
+    "households": 80899,
+    "facilities": 2084,
+    "added_persons": 0,
+    "added_households": 0,
+    "added_facilities": 0
+  },
+  "simulation": {
+    "days": 365,
+    "supply_status": "SUPPLY_REGION_DEPENDENCY",
+    "food_conservation_balanced": true,
+    "negative_inventory_count": 0,
+    "checkpoint_round_trip": true,
+    "checkpoint_sha256": "beb08df6df22acdf9dd5e0ac35865d507a0eb750fd40eb0429bf77d1279fde41"
+  },
+  "verification": {
+    "compile": "PASS",
+    "core_tests": "PASS 563/563 (12 bounded groups)",
+    "core_tests_fingerprint": "7FF862A31BDA965CB27957A3B4A4053F13E06989AB32FEC7FAB5240BF836DE90",
+    "core_tests_aggregate": "tmp/core-test-groups/luoyang_living_final_current_20260811/aggregate.json",
+    "unity_editmode": "PASS 15/15",
+    "unity_editmode_summary": "tmp/unity-validation/luoyang-living-final-editmode-escalated-rerun/unity-EditMode-20260811-162940-416.summary.json",
+    "unity_playmode": "PASS 1/1",
+    "unity_playmode_summary": "tmp/unity-validation/luoyang-living-final-playmode-escalated/unity-PlayMode-20260811-163031-738.summary.json",
+    "git_diff_check": "PASS"
+  }
+}

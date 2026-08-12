@@ -1,0 +1,19 @@
+{
+  "version": "ai.features.v1",
+  "features": [
+    "feature.food_pressure",
+    "feature.housing_pressure",
+    "feature.population_pressure",
+    "feature.profit_opportunity",
+    "feature.route_risk",
+    "feature.security_risk",
+    "feature.expected_benefit",
+    "feature.cost",
+    "feature.action_risk",
+    "feature.agent_risk_tolerance",
+    "feature.goal_affinity",
+    "feature.validation_feasibility"
+  ],
+  "normalization": "clamp((x-min)/(max-min),0,1)",
+  "year_feature_present": false
+}

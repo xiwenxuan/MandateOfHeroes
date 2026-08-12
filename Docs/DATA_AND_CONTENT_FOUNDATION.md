@@ -454,3 +454,32 @@ ChronicleEntry
 5. 转化为原创的游戏条件、参与席位和结果。
 6. 由数据校验器检查缺失引用和时间冲突。
 7. 通过快速模拟检查事件是否能在合理条件下发生。
+
+## 18. 行政地理与历史世界状态内容合同（ADMINISTRATIVE-SEAT-CANONICAL-PLACE-V1）
+
+早期由一个`Location`同时表示行政区、城市、战略节点和治所的粗模型标记为`PARTIALLY_SUPERSEDED`。新内容必须明确区分：
+
+- `AdministrativeRegion`：州、郡、国、尹、属国、县等管辖空间；
+- `CanonicalPlace`：真实物理地点，引用稳定Cell、道路/水系、Facility、Person、Owner与Controller；
+- `PlaceNameTimeline`：同一Place在不同时段的名称，不改变PlacePermanentId；
+- `SeatRole`：县治、郡国治、州治、首都等绑定Place的行政/政治Role；
+- `HistoricalSeatReference`：Scenario或重要时点的历史治所参考；
+- `RuntimeAdministrativeSeat`：当前运行世界中由真实Government Facility、Office/Authority和Controller形成的办公中心；
+- `StrategicDisplayLabel`：面向战略视图的熟悉名称，可指Place或AdministrativeRegion，不据此复制城市；
+- `HistoricalWorldStateSnapshot`：直接Scenario开局所用的同ID状态集合；
+- `HistoricalChangePoint`：重大事件的Pre-State、Canonical ChangePackage和Post-State Reference。
+
+所有历史地理内容使用`HISTORICAL / RECONSTRUCTED / MODELED / UNKNOWN`证据层。普通内容新增不得改变稳定ID或要求复制存档结构；证据不足时保留UNKNOWN和研究问题。
+
+当前正式Reference入口为
+[`HISTORICAL_WORLD_REFERENCE/ADMINISTRATIVE_SEAT_AND_WORLD_STATE_V1/README.md`](HISTORICAL_WORLD_REFERENCE/ADMINISTRATIVE_SEAT_AND_WORLD_STATE_V1/README.md)。
+
+## 19. 参考资料、运行时事实与重大事件内容边界（V71）
+
+- 历史人口、县域供需、路线潜力、城市Pack和Scenario Snapshot是Reference或初始化输入；运行后不能作为实时库存、订单、运输、设施或人口真相。
+- `WorldSignal`只保存稳定命名空间ID、0—10000值和证据摘要，可随世界事实重算；新增普通信号、动作、条件和ChangeOperation使用数据ID，不升级存档封闭枚举。
+- 重大事件内容必须提供稳定Event/Rule/Condition/Operation ID、规则包版本、时间窗口和至少一个非时间前提。仅配置年份的重大事件在校验期被拒绝。
+- ChangePackage引用现有Permanent Person、Organization、Location、Facility、Route、Army等ID；引用缺失不得静默改指或临时生成替代对象。
+- Canonical结果只是满足当前世界前提时的一个优先规则。Variant、Delayed、Prevented与Transformed均是一等可保存结果。
+
+详细字段合同见[Living World交付目录](HISTORICAL_WORLD_REFERENCE/WORLD_INTELLIGENT_POPULATION_DRIVEN_SIMULATION_AND_HISTORICAL_EVENT_CONTRACT_V1/)。

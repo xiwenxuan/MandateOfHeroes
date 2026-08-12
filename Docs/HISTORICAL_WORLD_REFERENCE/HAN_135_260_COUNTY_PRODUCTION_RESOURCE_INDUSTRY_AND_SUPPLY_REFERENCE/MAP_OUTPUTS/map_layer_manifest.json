@@ -1,0 +1,32 @@
+{
+  "schema": "mandate.han184.economy-map-layer-manifest.v1",
+  "geometry_warning": "County polygons are unavailable; all county layers use county-seat points. Corridor lines connect origin/destination for analysis and do not claim exact ancient route geometry.",
+  "county_file": "county_economy_184.geojson",
+  "corridor_file": "supply_corridors_184.geojson",
+  "layers": [
+    "Population Density",
+    "Agricultural Potential",
+    "Cultivated Land",
+    "Crop Distribution",
+    "Food Production",
+    "Food Surplus",
+    "Food Import Dependency",
+    "Livestock",
+    "Horse Production",
+    "Forest/Timber",
+    "Fuel",
+    "Salt",
+    "Iron Ore",
+    "Other Mineral",
+    "Metallurgy",
+    "Textile",
+    "Silk",
+    "Pottery/Building Materials",
+    "Shipbuilding",
+    "Military Production",
+    "Storage",
+    "Market",
+    "Transport",
+    "Supply Corridors"
+  ]
+}

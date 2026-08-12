@@ -1,0 +1,985 @@
+{
+  "schema": "mandate.luoyang-population-stress-adaptive-construction.v1",
+  "profile_id": "Profile_020542_HistoricalBaseline",
+  "protected_historical_hashes": {
+    "world_sha256": "654fbb7c769c22d4e4653009f6557321a12463c1db864ff080543aeadbcca4a0",
+    "persons_sha256": "ef8d1ce3eaa6f3e3ae72a824fb7caa672d71e2b80f32cdf2a999c2bf3b51966e",
+    "facility_definitions_sha256": "85727599b85e559e1b538b789cfabfcb180f863d78b37c0d98a579e504ae0d60"
+  },
+  "base_facility_count": 1230,
+  "base_cell_count": 5980,
+  "facilities_added": [
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00001",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081577,
+      "grid_x": 2043,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00001",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3975,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00002",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4114707,
+      "grid_x": 2033,
+      "grid_y": 1241,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00002",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3866,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00003",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4114727,
+      "grid_x": 2053,
+      "grid_y": 1241,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00003",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3756,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00004",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147857,
+      "grid_x": 2043,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00004",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3647,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00005",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081576,
+      "grid_x": 2042,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00005",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3537,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00006",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081578,
+      "grid_x": 2044,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00006",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3428,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00007",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4111393,
+      "grid_x": 2033,
+      "grid_y": 1240,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00007",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3318,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00008",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4111413,
+      "grid_x": 2053,
+      "grid_y": 1240,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00008",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3209,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00009",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4118021,
+      "grid_x": 2033,
+      "grid_y": 1242,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00009",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 3099,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00010",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4118041,
+      "grid_x": 2053,
+      "grid_y": 1242,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00010",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2989,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00011",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147856,
+      "grid_x": 2042,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00011",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2880,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00012",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147858,
+      "grid_x": 2044,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00012",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2770,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00013",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081575,
+      "grid_x": 2041,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00013",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2661,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00014",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081579,
+      "grid_x": 2045,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00014",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2551,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00015",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4108079,
+      "grid_x": 2033,
+      "grid_y": 1239,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00015",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2442,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00016",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4108099,
+      "grid_x": 2053,
+      "grid_y": 1239,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00016",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2332,
+        "created_day": 0,
+        "approved_day": 0,
+        "started_day": 1,
+        "completed_day": 4,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00017",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4121335,
+      "grid_x": 2033,
+      "grid_y": 1243,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00017",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2223,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00018",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4121355,
+      "grid_x": 2053,
+      "grid_y": 1243,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00018",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2113,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00019",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147855,
+      "grid_x": 2041,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00019",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 2004,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00020",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147859,
+      "grid_x": 2045,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00020",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1894,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00021",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081574,
+      "grid_x": 2040,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00021",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1785,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00022",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4081580,
+      "grid_x": 2046,
+      "grid_y": 1231,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00022",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1675,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00023",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4104765,
+      "grid_x": 2033,
+      "grid_y": 1238,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00023",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1566,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00024",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4104785,
+      "grid_x": 2053,
+      "grid_y": 1238,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00024",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1456,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00025",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4124649,
+      "grid_x": 2033,
+      "grid_y": 1244,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00025",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1346,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00026",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4124669,
+      "grid_x": 2053,
+      "grid_y": 1244,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00026",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1237,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    },
+    {
+      "facility_id": "facility.instance.luoyang.stress.020542.00027",
+      "definition_id": "facility.commercial.market",
+      "category_id": "commercial",
+      "cell_id64": 4147854,
+      "grid_x": 2040,
+      "grid_y": 1251,
+      "owner_id": "organization.government.henan.luoyang",
+      "controller_id": "organization.government.henan.luoyang",
+      "historical_confidence": "GameplayStressConstruction",
+      "normal_operation": true,
+      "effects": {
+        "residential_capacity": 0,
+        "job_capacity": 120,
+        "food_output_per_year": 0,
+        "storage_capacity": 0,
+        "market_capacity": 1800
+      },
+      "construction": {
+        "project_id": "construction.luoyang.stress.020542.00027",
+        "candidate_id": "stress.candidate.market",
+        "pressure_source_id": "pressure.market",
+        "pressure_basis_points_at_decision": 1127,
+        "created_day": 1,
+        "approved_day": 1,
+        "started_day": 2,
+        "completed_day": 5,
+        "status_history": [
+          "Planned",
+          "Approved",
+          "UnderConstruction",
+          "Completed"
+        ],
+        "status": "Completed"
+      }
+    }
+  ]
+}

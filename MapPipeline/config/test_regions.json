@@ -1,0 +1,9 @@
+{
+  "schema_version": "hanworld.test-regions.v0",
+  "regions": [
+    {"id":"test_region.ye_guangzong","display_name":"邺—广宗","west":113.4,"south":35.7,"east":116.2,"north":38.0},
+    {"id":"test_region.luoyang_hulao_chenliu","display_name":"洛阳—虎牢—陈留","west":111.6,"south":33.7,"east":115.0,"north":35.5},
+    {"id":"test_region.hanzhong_jiange_chengdu","display_name":"汉中—剑阁—成都","west":103.4,"south":29.7,"east":107.6,"north":33.5},
+    {"id":"test_region.xiangyang_jiangling","display_name":"襄阳—江陵","west":110.7,"south":29.4,"east":113.3,"north":32.6}
+  ]
+}

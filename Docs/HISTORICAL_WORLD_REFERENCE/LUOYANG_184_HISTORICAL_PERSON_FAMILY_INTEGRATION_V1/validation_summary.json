@@ -1,0 +1,81 @@
+{
+  "schema": "mandate.validation-summary.luoyang-184-historical-person-family-integration.v1",
+  "generated_at": "2026-08-11T14:43:00+08:00",
+  "status": "PASS",
+  "source_fingerprint": "14957502B2F950B2B4F9E162C441A10181649E3950EEC30CA203DC6D38C110C5",
+  "scope": "LUOYANG-184-HISTORICAL-PERSON-FAMILY-INTEGRATION-V1",
+  "data_contract": {
+    "status": "PASS",
+    "persons": 400000,
+    "households": 80899,
+    "facilities": 2084,
+    "historical_persons": 25,
+    "duplicate_historical_persons": 0,
+    "family_organizations": 15,
+    "family_centers_active": 0,
+    "family_centers_deferred": 15,
+    "added_persons": 0,
+    "added_facilities": 0,
+    "removed_misassigned_memberships": 10,
+    "unresolved_facility_claims": 32,
+    "protected_package_digest": "236f3b40bdcee6d6c265b4b93e3bf73c54721563eaa46a2559fc5afc4d07fbcc"
+  },
+  "compile": {
+    "status": "PASS",
+    "command": "Tools/Run-CoreTestGroupsSafe.ps1 -PrepareOnly",
+    "evidence": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/compile.out.log"
+  },
+  "core_tests": {
+    "status": "PASS",
+    "total": 558,
+    "passed": 558,
+    "failed": 0,
+    "groups": 32,
+    "hard_timeout_seconds_per_group": 300,
+    "aggregate": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/core_aggregate.json",
+    "manifest": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/core_manifest.json"
+  },
+  "unity_editmode": {
+    "status": "PASS",
+    "filter": "Mandate.Tests.Luoyang184HistoricalPersonFamilyIntegrationV1Tests",
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "duration_seconds": 16.169,
+    "integration_ms": 911,
+    "save_ms": 18,
+    "load_ms": 39,
+    "historical_query_10000_ticks": 3873,
+    "family_query_10000_ticks": 12249,
+    "summary": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/unity_editmode_summary.json",
+    "results": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/unity_editmode_results.xml"
+  },
+  "unity_playmode": {
+    "status": "PASS",
+    "filter": "Mandate.Tests.Luoyang184HistoricalPersonFamilyIntegrationPlayModeTests",
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "duration_seconds": 12.254,
+    "summary": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/unity_playmode_summary.json",
+    "results": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/validation/unity_playmode_results.xml"
+  },
+  "workbooks": {
+    "status": "PASS",
+    "readiness_source_workbooks_imported": 9,
+    "output_workbooks": 9,
+    "rendered_sheets": 18,
+    "formula_errors": 0,
+    "render_manifest": "outputs/LUOYANG_184_HISTORICAL_PERSON_FAMILY_INTEGRATION_V1/previews/workbooks/render_manifest.json"
+  },
+  "final_checks": {
+    "documentation_validation": "PASS",
+    "git_diff_check": "PASS",
+    "scope_review": "PASS_WITH_PREEXISTING_UNRELATED_WORKTREE_CHANGES_PRESERVED"
+  },
+  "environment": {
+    "unity": "2022.3.62f3c1",
+    "unity_sandbox_note": "Unity license/startup required the previously approved out-of-sandbox safe runner; no residual Unity process remained.",
+    "maximum_external_tool_timeout_seconds": 300
+  }
+}

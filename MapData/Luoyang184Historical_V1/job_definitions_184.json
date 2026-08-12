@@ -1,0 +1,122 @@
+{
+  "schema": "mandate.facility-job-definition.v1",
+  "definitions": [
+    {
+      "id": "job.agriculture.worker",
+      "profession_id": "profession.agriculture",
+      "primary_skill_id": "skill.agriculture.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.craft.worker",
+      "profession_id": "profession.craft",
+      "primary_skill_id": "skill.craft.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.trade.merchant",
+      "profession_id": "profession.trade",
+      "primary_skill_id": "skill.trade.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.service.worker",
+      "profession_id": "profession.service",
+      "primary_skill_id": "skill.service.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.transport.worker",
+      "profession_id": "profession.transport",
+      "primary_skill_id": "skill.transport.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.government.official",
+      "profession_id": "profession.government",
+      "primary_skill_id": "skill.government.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.education.scholar",
+      "profession_id": "profession.scholar",
+      "primary_skill_id": "skill.scholar.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.military.garrison",
+      "profession_id": "profession.military",
+      "primary_skill_id": "skill.military.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    },
+    {
+      "id": "job.medical.physician",
+      "profession_id": "profession.medical",
+      "primary_skill_id": "skill.medical.basic",
+      "minimum_skill_basis_points": 500,
+      "requires_same_cell": true,
+      "eligibility": [
+        "alive",
+        "present",
+        "profession_match",
+        "skill_minimum"
+      ]
+    }
+  ]
+}

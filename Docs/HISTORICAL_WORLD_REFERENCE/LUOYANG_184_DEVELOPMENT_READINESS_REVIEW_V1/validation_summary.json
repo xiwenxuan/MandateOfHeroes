@@ -1,0 +1,108 @@
+{
+  "schema": "mandate.luoyang-184-development-readiness-review.validation.v1",
+  "status": "PASS",
+  "validated_on": "2026-08-11",
+  "gate_a": "GO_WITH_BLOCKERS",
+  "gate_b": "GO_WITH_DEFERRED_PLACES",
+  "next_task": "LUOYANG-184-HISTORICAL-PERSON-FAMILY-INTEGRATION-V1",
+  "formal_opening_scope": {
+    "persons": 400000,
+    "households": 80899,
+    "facilities": 2084,
+    "historical_person_bindings": 25,
+    "supply_region_700k_materialized": false
+  },
+  "machine_invariants": {
+    "bad_person_ordinals": 0,
+    "duplicate_person_ids": 0,
+    "bad_household_refs": 0,
+    "bad_residence_refs": 0,
+    "bad_work_refs": 0,
+    "bad_family_indices": 0,
+    "bad_kinship_refs": 0,
+    "bad_household_ordinals": 0,
+    "bad_household_heads": 0,
+    "bad_household_ranges": 0,
+    "person_household_mismatch": 0,
+    "duplicate_facility_ids": 0,
+    "duplicate_facility_cells": 0,
+    "capacity_overflows": 0
+  },
+  "protected_package_files": {
+    "checked": 24,
+    "failures": 0
+  },
+  "workbooks": [
+    {
+      "file": "01_LUOYANG_184_DEVELOPMENT_READINESS_MATRIX.xlsx",
+      "bytes": 18189,
+      "sheets": 4,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "02_LUOYANG_RUNTIME_ENTITY_MAPPING_AUDIT.xlsx",
+      "bytes": 7118,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "03_LUOYANG_HISTORICAL_PERSON_RUNTIME_MAPPING.xlsx",
+      "bytes": 9058,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "04_LUOYANG_CLAN_FAMILYORGANIZATION_MIGRATION_PLAN.xlsx",
+      "bytes": 8034,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "05_LUOYANG_FAMILYCENTER_IMPLEMENTATION_READINESS.xlsx",
+      "bytes": 8429,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "06_LUOYANG_FACILITY_HISTORICAL_REFERENCE_RUNTIME_CROSSWALK.xlsx",
+      "bytes": 208334,
+      "sheets": 3,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "07_LUOYANG_POPULATION_HOUSEHOLD_RESIDENCE_AUDIT.xlsx",
+      "bytes": 6539,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "09_LUOYANG_190_FUTURE_COMPATIBILITY_AUDIT.xlsx",
+      "bytes": 7376,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    },
+    {
+      "file": "10_LUOYANG_HULAO_WAVE0_DEPENDENCY_REVIEW.xlsx",
+      "bytes": 6869,
+      "sheets": 2,
+      "formula_error_tokens": 0
+    }
+  ],
+  "visual_qa": {
+    "review_workbook_sheets_rendered": 21,
+    "updated_registry_sheets_rendered": 12
+  },
+  "next_task_blockers": [
+    "main-world/new-game/save projection",
+    "idempotent historical Person binding",
+    "stable-ID FamilyOrganization migration",
+    "persisted FamilyCenter five-prerequisite contract",
+    "Facility inline-person-list authority migration"
+  ],
+  "deferred_places": [
+    "geo.site.hulao",
+    "geo.site.hangu"
+  ],
+  "runtime_code_changed_by_this_task": false,
+  "unity_required_for_this_review": false
+}

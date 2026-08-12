@@ -1,0 +1,5 @@
+{
+  "cases": ["CF_A_LOW_LUOYANG_FOOD","CF_B_ROUTE_BLOCK","CF_C_HENAN_CROP_FAILURE","CF_D_IN_MIGRATION","CF_E_MASS_FLIGHT","CF_F_KEY_PERSON_DEATH","CF_G_GOVERNMENT_FUNDS","CF_H_FAMILY_ASSETS"],
+  "method": "paired same-seed initial-world perturbation",
+  "year_feature_used": false
+}

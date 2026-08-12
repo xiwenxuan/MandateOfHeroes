@@ -1,0 +1,12 @@
+{
+  "schema": "world-decision-arena-evidence-v1",
+  "benchmark_count": 10,
+  "seed_count": 100,
+  "policy_count": 4,
+  "run_count": 4000,
+  "decision_count": 176000,
+  "changed_world_count": 23116,
+  "checkpoint_days": [365,1825,3650],
+  "deterministic_seed_contract": "MasterSeed+agentId+decisionSequence+absoluteDay+actionId",
+  "online_learning": false
+}

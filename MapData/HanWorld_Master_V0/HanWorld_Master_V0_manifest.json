@@ -1,0 +1,124 @@
+{
+  "schema": "hanworld.master-manifest.v0",
+  "crs_id": "hanworld.albers.china.v0",
+  "projected_bounds": {
+    "min_x": -3417344.395965772,
+    "min_y": 1848279.1446449554,
+    "max_x": 3210529.0246473574,
+    "max_y": 6199580.451937504
+  },
+  "counts": {
+    "strategic_cities": 77,
+    "located_cities": 72,
+    "county_catalog": 1182,
+    "located_county_anchors": 68,
+    "strategic_sites": 31,
+    "routes": 18,
+    "test_regions": 4
+  },
+  "dem": {
+    "path": "MapData\\HanWorld_Master_V0\\physical\\elevation_master.tif",
+    "width": 3314,
+    "height": 2176,
+    "resolution_m": 2000,
+    "source_tile_count": 117
+  },
+  "files": [
+    {
+      "path": "MapData/HanWorld_Master_V0/HanWorld_Master_V0.gpkg",
+      "bytes": 4648960,
+      "sha256": "eb5844170bef981ed6d6a2008c7787f7aa18f0ab2952d22835baca5d5f955f2b"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/administrative/commanderies_v0.geojson",
+      "bytes": 329578,
+      "sha256": "2ecd0376625f2517763e36f962973fdbfb5d6a5fc2d5e591fe17d567b4efb0bf"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/administrative/counties_v0.geojson",
+      "bytes": 3461043,
+      "sha256": "2d6353bf6b5b01fdad50953db04de6e6712f7028b80e1eb7d2cd3d773c8ac769"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/administrative/provinces_v0.geojson",
+      "bytes": 43739,
+      "sha256": "e0e87322b042d3d6007220322a381c5723d75696dc6d3aedd5131db013406230"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/historical/county_anchors.geojson",
+      "bytes": 480176,
+      "sha256": "92762896217eaf3743d96ce7ff2bd03cf28feb8d3d22eacae3e6e888c1347666"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/historical/major_routes_v0.geojson",
+      "bytes": 6928,
+      "sha256": "4c4bdde6fb893e5436703d85400d0f771d7fd346e19951d6e83a36570ccb7dcd"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/historical/strategic_cities.geojson",
+      "bytes": 44315,
+      "sha256": "dbe06a947c3a3cc253eae401c70288cd0a0bb42bda874dd1170c40954afafe70"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/historical/strategic_sites.geojson",
+      "bytes": 11687,
+      "sha256": "e14f6428373d66652e5d9d8a944e828c851353a3205d2e8e20aafa10a9154f96"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/historical/test_regions.geojson",
+      "bytes": 1260,
+      "sha256": "b7d6395afe8f994b388992f2650944e3d87007d18a34db8f7383fade0a985f75"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/manifest/elevation_tiles.resolved.json",
+      "bytes": 28014,
+      "sha256": "3558624b1a12c6e79f7459d9f6de9a65cec78fac3edeb86d4e7ae2deb0bb1390"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/manifest/external_sources.resolved.json",
+      "bytes": 5251,
+      "sha256": "56ad4f75e6b627ec7fa4d4f6c3b4aca486eadd7d38742f2d6668f6c496068c8e"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/physical/coastline.geojson",
+      "bytes": 961699,
+      "sha256": "7a1154ddf95e2637910d55229ee94cc95df0c79f7829b7525118a290041c354f"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/physical/elevation_master.tif",
+      "bytes": 7645234,
+      "sha256": "2015827c21d881a2a5df1efd37173394ad8f9f41ee239920246b34d0e399260f"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/physical/major_lakes.geojson",
+      "bytes": 697021,
+      "sha256": "8f422b1992627f2444207a7e4ddce59eb5d79f4143c31ae284d3bd72cc4db357"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/physical/major_rivers.geojson",
+      "bytes": 1826394,
+      "sha256": "a99238000bfe274bebc7fe6800781a128fd1b63fc3b3bf61a13e30284ce504e6"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/physical/terrain_reference.geojson",
+      "bytes": 1107422,
+      "sha256": "0b18f8bb1592e10849bb9521837aef6500fe944d0bc2ed6afc1f733a0700ff28"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/reports/HAN_WORLD_MASTER_V0_REPORT.md",
+      "bytes": 1034,
+      "sha256": "e3370b9d4c353abf6dbfceb6e79b17b85d01c15b9fec478e08789ff90d1ffd0c"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/reports/MAP_PIPELINE_ENVIRONMENT_AUDIT.json",
+      "bytes": 1362,
+      "sha256": "aa8702622e8091fe152c5dcaed2de5237af1a49bfb9cf92cc9554bea2d9a47e9"
+    },
+    {
+      "path": "MapData/HanWorld_Master_V0/reports/MAP_PIPELINE_ENVIRONMENT_AUDIT.md",
+      "bytes": 888,
+      "sha256": "dae701e0a1c9b120088e0c740af236a82571c72e3504f70e5635201691db59c7"
+    }
+  ],
+  "historical_uncertainty": "All synthetic administrative geometries are geometry_status=synthetic_proxy and historical_claim=false."
+}

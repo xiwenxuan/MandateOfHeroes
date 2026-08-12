@@ -1,0 +1,63 @@
+{
+  "schema": "hanworld.unity-world-manifest.v1",
+  "grid_version": "HanWorldV1",
+  "grid_schema_version": "hanworld.square-grid.v1",
+  "columns": 3314,
+  "rows": 2176,
+  "total_cells": 7211264,
+  "cell_size_m": 2000,
+  "chunk_size": 64,
+  "crs_id": "hanworld.albers.china.v0",
+  "origin_x": -3417344.395965772,
+  "origin_y": 6199580.451937504,
+  "cell_id_algorithm": "unsigned row-major 64-bit integer: cell_id = row * columns + column",
+  "binary_files": [
+    {
+      "path": "terrain.bin",
+      "bytes": 955952,
+      "chunk_count": 1768,
+      "channels": 2,
+      "value_size": 1
+    },
+    {
+      "path": "elevation.bin",
+      "bytes": 8783921,
+      "chunk_count": 1768,
+      "channels": 1,
+      "value_size": 2
+    },
+    {
+      "path": "water.bin",
+      "bytes": 147475,
+      "chunk_count": 1768,
+      "channels": 1,
+      "value_size": 1
+    },
+    {
+      "path": "admin.bin",
+      "bytes": 279692,
+      "chunk_count": 1768,
+      "channels": 3,
+      "value_size": 2
+    },
+    {
+      "path": "roads.bin",
+      "bytes": 71843,
+      "chunk_count": 1768,
+      "channels": 1,
+      "value_size": 1
+    }
+  ],
+  "statistics": {
+    "land_cells": 4647051,
+    "water_cells": 2564213,
+    "passable_cells": 4643269,
+    "buildable_cells": 3608897
+  },
+  "empty_runtime_fields": [
+    "owner_id",
+    "facility_id",
+    "resource_ids",
+    "force_id"
+  ]
+}

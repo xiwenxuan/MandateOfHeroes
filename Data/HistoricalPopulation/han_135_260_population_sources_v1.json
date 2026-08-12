@@ -1,0 +1,59 @@
+{
+  "schema": "mandate.historical-population-sources.v1",
+  "sources": [
+    {
+      "source_id": "source.hou_han_shu.jun_guo_zhi",
+      "source_type": "primary_text",
+      "title": "《后汉书》志第二十至二十三·郡国（源出司马彪《续汉书》）",
+      "url": "https://zh.wikisource.org/zh-hant/續漢志",
+      "reliability": "H",
+      "scope": "140年全国户口总量、105项郡国人口和1182县级目录",
+      "license_note": "古籍原文属于公共领域；项目只录历史事实和原创结构化表达。"
+    },
+    {
+      "source_id": "source.jin_shu.geography.014",
+      "source_type": "primary_text",
+      "title": "《晋书》卷十四·地理志上",
+      "url": "https://zh.wikisource.org/zh-hant/晉書/卷014",
+      "reliability": "H",
+      "scope": "桓帝永寿三年（157）10,677,960户、56,486,856口全国锚点",
+      "license_note": "古籍原文属于公共领域。"
+    },
+    {
+      "source_id": "source.san_guo_zhi.48",
+      "source_type": "primary_text_with_early_commentary",
+      "title": "《三国志》卷四十八及裴松之注引《晋阳秋》",
+      "url": "https://zh.wikisource.org/zh-hant/三嗣主傳",
+      "reliability": "H",
+      "scope": "280年孙吴降晋图籍52.3万户、230万口的后向校验",
+      "license_note": "古籍原文属于公共领域。"
+    },
+    {
+      "source_id": "source.wen_xian_tong_kao.010",
+      "source_type": "historical_compilation",
+      "title": "《文献通考》卷十",
+      "url": "https://zh.wikisource.org/zh-hant/文獻通考/卷十",
+      "reliability": "A",
+      "scope": "魏景元四年魏蜀合计与蜀亡户口、三国登记口径后向约束",
+      "license_note": "古籍原文属于公共领域。"
+    },
+    {
+      "source_id": "source.project.historical_population.v0_1",
+      "source_type": "project_model",
+      "title": "135—260年东汉至三国人口分布基线V0.1",
+      "url": "Docs/HISTORICAL_POPULATION_135_260.md",
+      "reliability": "C",
+      "scope": "140、157以外的全国人口曲线方向和空间阶段假设",
+      "license_note": "项目原创模型，不冒充史籍人口。"
+    },
+    {
+      "source_id": "source.project.luoyang184.metropolitan.v1",
+      "source_type": "project_validated_model",
+      "title": "LUOYANG-184-METROPOLITAN-INITIALIZATION-V1",
+      "url": "Docs/TASK_LUOYANG_184_METROPOLITAN_INITIALIZATION_V1.md",
+      "reliability": "B",
+      "scope": "184洛阳城墙内20万、连续城区27万、近郊生活圈40万局部校准",
+      "license_note": "项目原创历史重建与工程原型。"
+    }
+  ]
+}

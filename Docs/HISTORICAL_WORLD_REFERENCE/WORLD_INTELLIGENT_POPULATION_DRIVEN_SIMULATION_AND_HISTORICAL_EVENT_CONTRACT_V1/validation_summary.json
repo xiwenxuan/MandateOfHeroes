@@ -1,0 +1,78 @@
+{
+  "task_id": "WORLD-INTELLIGENT-POPULATION-DRIVEN-SIMULATION-AND-HISTORICAL-EVENT-CONTRACT-V1",
+  "status": "PASS_TASK_SCOPE",
+  "date": "2026-08-11",
+  "world_schema_version": 71,
+  "compile": {
+    "status": "passed",
+    "log": "tmp/skill-verification/compile-20260811-213828-859.out.log"
+  },
+  "core_tests": {
+    "status": "passed",
+    "passed": 44,
+    "failed": 0,
+    "scope": "Living World contract plus reused formal freight and inventory regressions",
+    "log": "tmp/skill-verification/core-tests-20260811-213834-931.out.log"
+  },
+  "unity_editmode_contract": {
+    "status": "passed",
+    "passed": 2,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-EditMode-20260811-212314-307.summary.json"
+  },
+  "unity_editmode_change_and_batches": {
+    "status": "passed",
+    "passed": 5,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-EditMode-20260811-213128-895.summary.json"
+  },
+  "unity_editmode_v70_to_v71_migration": {
+    "status": "passed",
+    "passed": 1,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-EditMode-20260811-213902-311.summary.json"
+  },
+  "unity_playmode_living_world": {
+    "status": "passed",
+    "passed": 2,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-PlayMode-20260811-212423-772.summary.json"
+  },
+  "unity_playmode_luoyang_smoke": {
+    "status": "passed",
+    "passed": 1,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-PlayMode-20260811-213200-654.summary.json"
+  },
+  "luoyang_400k_regression": {
+    "status": "passed",
+    "passed": 15,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-EditMode-20260811-212531-422.summary.json"
+  },
+  "spreadsheet_contracts": {
+    "status": "passed",
+    "workbooks": 11,
+    "formula_error_scan": "passed",
+    "rendered_previews": 10
+  },
+  "knowledge_registries": {
+    "status": "passed",
+    "registries": 7,
+    "design_decisions_added": 18,
+    "audit": "tmp/world_runtime_contract/registry_previews/registry_update_summary.json"
+  },
+  "environment_note": {
+    "initial_sandbox_attempt": "blocked after 120 seconds without a startup log and safely terminated",
+    "resolution": "the same safe Unity script passed outside the workspace sandbox",
+    "residual_unity_process": false
+  },
+  "not_claimed": [
+    "full repository historical core suite",
+    "53.5 million all-HOT population performance",
+    "production neural model",
+    "complete sourced Luoyang 189/190 content package"
+  ],
+  "git_commit": null,
+  "git_push": null
+}

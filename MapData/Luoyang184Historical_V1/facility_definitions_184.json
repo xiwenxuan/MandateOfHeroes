@@ -1,0 +1,1276 @@
+{
+  "schema": "mandate.facility-definition.v1",
+  "definitions": [
+    {
+      "id": "facility.residential.urban_quarter",
+      "recommended_workers": 0,
+      "normal_workers": 0,
+      "peak_workers": 0,
+      "residential_households": 28,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "城市居民片区",
+      "category_id": "residential",
+      "residential_capacity_persons": 120,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 0,
+      "allowed_resident_type_ids": [
+        "population.civilian"
+      ],
+      "purpose_ids": [
+        "purpose.residential"
+      ],
+      "capability_ids": [
+        "capability.residential.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.residential.rural_hamlet",
+      "recommended_workers": 0,
+      "normal_workers": 0,
+      "peak_workers": 0,
+      "residential_households": 17,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "村庄住宅片区",
+      "category_id": "residential",
+      "residential_capacity_persons": 72,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 0,
+      "allowed_resident_type_ids": [
+        "population.civilian"
+      ],
+      "purpose_ids": [
+        "purpose.residential"
+      ],
+      "capability_ids": [
+        "capability.residential.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.residential.family_manor",
+      "recommended_workers": 6,
+      "normal_workers": 4,
+      "peak_workers": 10,
+      "residential_households": 20,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "家族庄园",
+      "category_id": "residential",
+      "residential_capacity_persons": 96,
+      "minimum_workers_for_normal_operation": 2,
+      "worker_capacity": 16,
+      "allowed_resident_type_ids": [
+        "population.civilian"
+      ],
+      "purpose_ids": [
+        "purpose.residential"
+      ],
+      "capability_ids": [
+        "capability.residential.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.wheat_field",
+      "recommended_workers": 18,
+      "normal_workers": 14,
+      "peak_workers": 32,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "麦田",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 40,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.millet_field",
+      "recommended_workers": 18,
+      "normal_workers": 13,
+      "peak_workers": 30,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "粟田",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 40,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.broomcorn_field",
+      "recommended_workers": 16,
+      "normal_workers": 12,
+      "peak_workers": 28,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "黍田",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 36,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.bean_field",
+      "recommended_workers": 16,
+      "normal_workers": 11,
+      "peak_workers": 26,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "菽田",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 36,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.rice_field",
+      "recommended_workers": 22,
+      "normal_workers": 18,
+      "peak_workers": 38,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "稻田",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 5,
+      "worker_capacity": 48,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.mulberry_garden",
+      "recommended_workers": 14,
+      "normal_workers": 11,
+      "peak_workers": 22,
+      "residential_households": 0,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "桑园",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 30,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.orchard",
+      "recommended_workers": 12,
+      "normal_workers": 9,
+      "peak_workers": 20,
+      "residential_households": 0,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "果园",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 28,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.herb_garden",
+      "recommended_workers": 10,
+      "normal_workers": 8,
+      "peak_workers": 16,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "药圃",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 2,
+      "worker_capacity": 22,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.agriculture.pasture",
+      "recommended_workers": 16,
+      "normal_workers": 14,
+      "peak_workers": 24,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "牧场",
+      "category_id": "agriculture",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 36,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.agriculture"
+      ],
+      "capability_ids": [
+        "capability.agriculture.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.resource.forestry",
+      "recommended_workers": 16,
+      "normal_workers": 16,
+      "peak_workers": 24,
+      "residential_households": 0,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "林场",
+      "category_id": "resource",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 36,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.resource"
+      ],
+      "capability_ids": [
+        "capability.resource.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.resource.mine",
+      "recommended_workers": 28,
+      "normal_workers": 28,
+      "peak_workers": 40,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "矿场",
+      "category_id": "resource",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 8,
+      "worker_capacity": 64,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.resource"
+      ],
+      "capability_ids": [
+        "capability.resource.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.resource.quarry",
+      "recommended_workers": 24,
+      "normal_workers": 24,
+      "peak_workers": 36,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "采石场",
+      "category_id": "resource",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 6,
+      "worker_capacity": 54,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.resource"
+      ],
+      "capability_ids": [
+        "capability.resource.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.mill",
+      "recommended_workers": 10,
+      "normal_workers": 10,
+      "peak_workers": 18,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "磨坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 22,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.brewery",
+      "recommended_workers": 14,
+      "normal_workers": 14,
+      "peak_workers": 22,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "酿造坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 30,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.bloomery",
+      "recommended_workers": 24,
+      "normal_workers": 24,
+      "peak_workers": 36,
+      "residential_households": 0,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "冶铁坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 8,
+      "worker_capacity": 52,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.smithy",
+      "recommended_workers": 18,
+      "normal_workers": 18,
+      "peak_workers": 28,
+      "residential_households": 0,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "铁器坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 5,
+      "worker_capacity": 40,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.carpentry",
+      "recommended_workers": 16,
+      "normal_workers": 16,
+      "peak_workers": 24,
+      "residential_households": 0,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "木工坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 34,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.weaving",
+      "recommended_workers": 20,
+      "normal_workers": 20,
+      "peak_workers": 30,
+      "residential_households": 0,
+      "parallel_capacity": 6,
+      "basis": "gameplay_candidate",
+      "display_name": "织坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 5,
+      "worker_capacity": 44,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.dyehouse",
+      "recommended_workers": 14,
+      "normal_workers": 14,
+      "peak_workers": 22,
+      "residential_households": 0,
+      "parallel_capacity": 3,
+      "basis": "gameplay_candidate",
+      "display_name": "染坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 30,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.industry.apothecary",
+      "recommended_workers": 12,
+      "normal_workers": 12,
+      "peak_workers": 18,
+      "residential_households": 0,
+      "parallel_capacity": 4,
+      "basis": "gameplay_candidate",
+      "display_name": "药坊",
+      "category_id": "industry",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 26,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.industry"
+      ],
+      "capability_ids": [
+        "capability.industry.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.commercial.market",
+      "recommended_workers": 48,
+      "normal_workers": 48,
+      "peak_workers": 90,
+      "residential_households": 0,
+      "parallel_capacity": 12,
+      "basis": "gameplay_candidate",
+      "display_name": "市场",
+      "category_id": "commercial",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 12,
+      "worker_capacity": 120,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.commercial"
+      ],
+      "capability_ids": [
+        "capability.commercial.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.commercial.shop_cluster",
+      "recommended_workers": 18,
+      "normal_workers": 18,
+      "peak_workers": 32,
+      "residential_households": 0,
+      "parallel_capacity": 8,
+      "basis": "gameplay_candidate",
+      "display_name": "商铺片区",
+      "category_id": "commercial",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 44,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.commercial"
+      ],
+      "capability_ids": [
+        "capability.commercial.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.commercial.warehouse",
+      "recommended_workers": 12,
+      "normal_workers": 12,
+      "peak_workers": 22,
+      "residential_households": 0,
+      "parallel_capacity": 8,
+      "basis": "gameplay_candidate",
+      "display_name": "仓库",
+      "category_id": "commercial",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 30,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.commercial"
+      ],
+      "capability_ids": [
+        "capability.commercial.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.service.inn",
+      "recommended_workers": 16,
+      "normal_workers": 16,
+      "peak_workers": 28,
+      "residential_households": 0,
+      "parallel_capacity": 12,
+      "basis": "gameplay_candidate",
+      "display_name": "客栈",
+      "category_id": "service",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 36,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.service"
+      ],
+      "capability_ids": [
+        "capability.service.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.service.clinic",
+      "recommended_workers": 12,
+      "normal_workers": 12,
+      "peak_workers": 22,
+      "residential_households": 0,
+      "parallel_capacity": 16,
+      "basis": "gameplay_candidate",
+      "display_name": "医馆",
+      "category_id": "service",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 28,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.service"
+      ],
+      "capability_ids": [
+        "capability.service.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.service.school",
+      "recommended_workers": 8,
+      "normal_workers": 8,
+      "peak_workers": 14,
+      "residential_households": 0,
+      "parallel_capacity": 36,
+      "basis": "gameplay_candidate",
+      "display_name": "学塾",
+      "category_id": "service",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 2,
+      "worker_capacity": 20,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.service"
+      ],
+      "capability_ids": [
+        "capability.service.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.service.post_station",
+      "recommended_workers": 18,
+      "normal_workers": 18,
+      "peak_workers": 32,
+      "residential_households": 0,
+      "parallel_capacity": 20,
+      "basis": "gameplay_candidate",
+      "display_name": "驿站",
+      "category_id": "service",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 5,
+      "worker_capacity": 42,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.service"
+      ],
+      "capability_ids": [
+        "capability.service.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.service.caravan_yard",
+      "recommended_workers": 22,
+      "normal_workers": 22,
+      "peak_workers": 38,
+      "residential_households": 0,
+      "parallel_capacity": 16,
+      "basis": "gameplay_candidate",
+      "display_name": "车马行",
+      "category_id": "service",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 6,
+      "worker_capacity": 50,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.service"
+      ],
+      "capability_ids": [
+        "capability.service.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.public.road",
+      "recommended_workers": 0,
+      "normal_workers": 0,
+      "peak_workers": 12,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "technical_test_value",
+      "display_name": "道路",
+      "category_id": "road",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 12,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.road"
+      ],
+      "capability_ids": [
+        "capability.road.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.public.bridge",
+      "recommended_workers": 4,
+      "normal_workers": 2,
+      "peak_workers": 10,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "桥梁",
+      "category_id": "public",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 1,
+      "worker_capacity": 12,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.public"
+      ],
+      "capability_ids": [
+        "capability.public.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.public.canal",
+      "recommended_workers": 6,
+      "normal_workers": 3,
+      "peak_workers": 16,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "gameplay_candidate",
+      "display_name": "水渠",
+      "category_id": "public",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 1,
+      "worker_capacity": 18,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.public"
+      ],
+      "capability_ids": [
+        "capability.public.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.public.county_office",
+      "recommended_workers": 40,
+      "normal_workers": 40,
+      "peak_workers": 70,
+      "residential_households": 0,
+      "parallel_capacity": 12,
+      "basis": "gameplay_candidate",
+      "display_name": "县府",
+      "category_id": "public",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 10,
+      "worker_capacity": 96,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.public"
+      ],
+      "capability_ids": [
+        "capability.public.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.public.granary",
+      "recommended_workers": 16,
+      "normal_workers": 16,
+      "peak_workers": 30,
+      "residential_households": 0,
+      "parallel_capacity": 12,
+      "basis": "gameplay_candidate",
+      "display_name": "公共仓",
+      "category_id": "public",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 40,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.public"
+      ],
+      "capability_ids": [
+        "capability.public.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.camp",
+      "recommended_workers": 80,
+      "normal_workers": 80,
+      "peak_workers": 180,
+      "residential_households": 0,
+      "parallel_capacity": 8,
+      "basis": "gameplay_candidate",
+      "display_name": "军营",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 20,
+      "worker_capacity": 240,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.armory",
+      "recommended_workers": 20,
+      "normal_workers": 20,
+      "peak_workers": 40,
+      "residential_households": 0,
+      "parallel_capacity": 12,
+      "basis": "gameplay_candidate",
+      "display_name": "武库",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 5,
+      "worker_capacity": 52,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.wall",
+      "recommended_workers": 12,
+      "normal_workers": 8,
+      "peak_workers": 32,
+      "residential_households": 0,
+      "parallel_capacity": 1,
+      "basis": "technical_test_value",
+      "display_name": "城墙",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 2,
+      "worker_capacity": 40,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.gate",
+      "recommended_workers": 18,
+      "normal_workers": 18,
+      "peak_workers": 40,
+      "residential_households": 0,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "城门",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 50,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.fortified_manor",
+      "recommended_workers": 48,
+      "normal_workers": 48,
+      "peak_workers": 100,
+      "residential_households": 30,
+      "parallel_capacity": 6,
+      "basis": "gameplay_candidate",
+      "display_name": "坞堡",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 12,
+      "worker_capacity": 140,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.military.beacon",
+      "recommended_workers": 8,
+      "normal_workers": 8,
+      "peak_workers": 14,
+      "residential_households": 0,
+      "parallel_capacity": 2,
+      "basis": "gameplay_candidate",
+      "display_name": "烽火台",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 3,
+      "worker_capacity": 20,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.military"
+      ],
+      "capability_ids": [
+        "capability.military.basic"
+      ],
+      "future_hook_ids": [],
+      "historical_confidence": "GameplayReconstruction"
+    },
+    {
+      "id": "facility.historical.palace_complex",
+      "display_name": "宫殿政务建筑群",
+      "category_id": "government",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 30,
+      "worker_capacity": 180,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.court",
+        "purpose.government"
+      ],
+      "capability_ids": [
+        "capability.court.session",
+        "capability.government.administration"
+      ],
+      "future_hook_ids": [
+        "hook.court_gameplay",
+        "hook.palace_intrigue"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.imperial_garden",
+      "display_name": "皇家苑囿",
+      "category_id": "public",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 8,
+      "worker_capacity": 60,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.imperial_garden"
+      ],
+      "capability_ids": [
+        "capability.garden.supply"
+      ],
+      "future_hook_ids": [
+        "hook.palace_life"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.central_office",
+      "display_name": "三公及中央官署区",
+      "category_id": "government",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 24,
+      "worker_capacity": 140,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.central_administration"
+      ],
+      "capability_ids": [
+        "capability.government.archive",
+        "capability.government.order"
+      ],
+      "future_hook_ids": [
+        "hook.official_career"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.taicang",
+      "display_name": "太仓",
+      "category_id": "storage",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 12,
+      "worker_capacity": 90,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.public_granary"
+      ],
+      "capability_ids": [
+        "capability.inventory.grain",
+        "capability.relief.supply"
+      ],
+      "future_hook_ids": [
+        "hook.siege_logistics"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.arsenal",
+      "display_name": "武库",
+      "category_id": "military",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 16,
+      "worker_capacity": 100,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.armory"
+      ],
+      "capability_ids": [
+        "capability.inventory.weapon",
+        "capability.military.equipment"
+      ],
+      "future_hook_ids": [
+        "hook.army_equipment"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.market",
+      "display_name": "京师市",
+      "category_id": "commercial",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 24,
+      "worker_capacity": 140,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.market"
+      ],
+      "capability_ids": [
+        "capability.trade.wholesale",
+        "capability.price.discovery"
+      ],
+      "future_hook_ids": [
+        "hook.merchant_competition"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.imperial_academy",
+      "display_name": "太学",
+      "category_id": "education",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 20,
+      "worker_capacity": 120,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.education"
+      ],
+      "capability_ids": [
+        "capability.education.advanced",
+        "capability.knowledge.copy"
+      ],
+      "future_hook_ids": [
+        "hook.scholar_career"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.ritual_hall",
+      "display_name": "礼制建筑",
+      "category_id": "ritual",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 12,
+      "worker_capacity": 72,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.ritual"
+      ],
+      "capability_ids": [
+        "capability.ritual.state"
+      ],
+      "future_hook_ids": [
+        "hook.ritual_gameplay"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.observatory",
+      "display_name": "灵台",
+      "category_id": "education",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 8,
+      "worker_capacity": 54,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.observation"
+      ],
+      "capability_ids": [
+        "capability.calendar.observation"
+      ],
+      "future_hook_ids": [
+        "hook.astronomy"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.urban_ward",
+      "display_name": "洛阳里坊住宅",
+      "category_id": "residential",
+      "residential_capacity_persons": 180,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 0,
+      "allowed_resident_type_ids": [
+        "population.civilian"
+      ],
+      "purpose_ids": [
+        "purpose.residential"
+      ],
+      "capability_ids": [
+        "capability.housing.permanent"
+      ],
+      "future_hook_ids": [
+        "hook.urban_household"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.historical.barracks",
+      "display_name": "京师兵营",
+      "category_id": "military",
+      "residential_capacity_persons": 200,
+      "minimum_workers_for_normal_operation": 8,
+      "worker_capacity": 60,
+      "allowed_resident_type_ids": [
+        "population.active_military"
+      ],
+      "purpose_ids": [
+        "purpose.barracks"
+      ],
+      "capability_ids": [
+        "capability.housing.active_military",
+        "capability.military.muster"
+      ],
+      "future_hook_ids": [
+        "hook.garrison_training"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.fortification.city_wall",
+      "display_name": "洛阳大城城垣",
+      "category_id": "fortification",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 12,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.fortification"
+      ],
+      "capability_ids": [
+        "capability.movement.block"
+      ],
+      "future_hook_ids": [
+        "hook.siege.wall"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.fortification.city_gate",
+      "display_name": "洛阳大城城门",
+      "category_id": "fortification",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 32,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.gate"
+      ],
+      "capability_ids": [
+        "capability.passage.control",
+        "capability.movement.block"
+      ],
+      "future_hook_ids": [
+        "hook.siege.gate"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.fortification.palace_wall",
+      "display_name": "宫城城垣",
+      "category_id": "fortification",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 0,
+      "worker_capacity": 10,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.palace_fortification"
+      ],
+      "capability_ids": [
+        "capability.movement.block"
+      ],
+      "future_hook_ids": [
+        "hook.siege.inner_wall"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    },
+    {
+      "id": "facility.fortification.palace_gate",
+      "display_name": "宫城门",
+      "category_id": "fortification",
+      "residential_capacity_persons": 0,
+      "minimum_workers_for_normal_operation": 4,
+      "worker_capacity": 24,
+      "allowed_resident_type_ids": [],
+      "purpose_ids": [
+        "purpose.palace_gate"
+      ],
+      "capability_ids": [
+        "capability.passage.control"
+      ],
+      "future_hook_ids": [
+        "hook.siege.inner_gate"
+      ],
+      "historical_confidence": "HistoricalReconstruction"
+    }
+  ]
+}
