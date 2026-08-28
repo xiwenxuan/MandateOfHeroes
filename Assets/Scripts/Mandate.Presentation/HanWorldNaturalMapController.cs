@@ -185,6 +185,8 @@ namespace Mandate.Presentation
 
         private void Update()
         {
+            if (IsReady && _luoyangBuildingPerformancePreviewVisible)
+                StepLuoyangPedestrian(Time.deltaTime);
             if (!IsReady || !CellOverlayVisible || View != HanNaturalMapView.Region ||
                 _camera == null) return;
             var uiGuardHeight = _luoyangP0FinalAssetVerticalSlicePreviewVisible ||
@@ -201,6 +203,9 @@ namespace Mandate.Presentation
             if (Input.GetMouseButtonDown(0) &&
                 _luoyangBuildingPerformancePreviewVisible)
                 TrySelectLuoyangFacility(ray);
+            if (Input.GetMouseButtonDown(1) &&
+                _luoyangBuildingPerformancePreviewVisible)
+                TrySetLuoyangPedestrianDestination(ray);
             var select = Input.GetMouseButtonDown(0) && hovered.HasValue;
             if (Nullable.Equals(hovered, _hoveredCellId) && !select) return;
             _hoveredCellId = hovered;

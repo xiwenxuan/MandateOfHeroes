@@ -24,6 +24,371 @@ namespace Mandate.Presentation
         }
     }
 
+    public sealed class LuoyangPassagePedestrianPresentationInstance :
+        MonoBehaviour
+    {
+        private BoxCollider _navigationBlocker;
+        private Transform _leftLeaf;
+        private Transform _rightLeaf;
+        private Transform _rubble;
+        private Transform _scaffold;
+        private MeshRenderer _leftLeafRenderer;
+        private MeshRenderer _rightLeafRenderer;
+        private MeshRenderer _rubbleRenderer;
+        private MeshRenderer _scaffoldRenderer;
+        private Material _openMaterial;
+        private Material _closedMaterial;
+        private Material _damagedMaterial;
+        private Material _destroyedMaterial;
+        private Material _repairingMaterial;
+        private float _width;
+        private float _height;
+        private float _depth;
+
+        public string FacilityId { get; private set; }
+        public string TraversalStatusId { get; private set; }
+        public string VisualStateId { get; private set; }
+        public bool BlocksPedestrianTraversal { get; private set; }
+        public bool IsRepairing { get; private set; }
+        public int ConditionBasisPoints { get; private set; }
+        public long PassageRevision { get; private set; }
+        public long IntegrityRevision { get; private set; }
+        public BoxCollider NavigationBlocker => _navigationBlocker;
+
+        public void Initialize(LuoyangPassagePedestrianState state,
+            Mesh unitCubeMesh, float width, float height, float depth,
+            Material openMaterial, Material closedMaterial,
+            Material damagedMaterial, Material destroyedMaterial,
+            Material repairingMaterial)
+        {
+            if (state == null) throw new ArgumentNullException(nameof(state));
+            if (unitCubeMesh == null)
+                throw new ArgumentNullException(nameof(unitCubeMesh));
+            if (width <= 0f || height <= 0f || depth <= 0f)
+                throw new ArgumentOutOfRangeException(nameof(width));
+            _width = width;
+            _height = height;
+            _depth = depth;
+            _openMaterial = openMaterial ?? throw new ArgumentNullException(
+                nameof(openMaterial));
+            _closedMaterial = closedMaterial ?? throw new ArgumentNullException(
+                nameof(closedMaterial));
+            _damagedMaterial = damagedMaterial ??
+                throw new ArgumentNullException(nameof(damagedMaterial));
+            _destroyedMaterial = destroyedMaterial ??
+                throw new ArgumentNullException(nameof(destroyedMaterial));
+            _repairingMaterial = repairingMaterial ??
+                throw new ArgumentNullException(nameof(repairingMaterial));
+
+            _navigationBlocker = gameObject.AddComponent<BoxCollider>();
+            _navigationBlocker.isTrigger = false;
+            _navigationBlocker.center = new Vector3(0f, height * 0.5f, 0f);
+            _navigationBlocker.size = new Vector3(width, height, depth);
+            _leftLeaf = CreatePart("STATE_LEAF_LEFT", unitCubeMesh,
+                out _leftLeafRenderer);
+            _rightLeaf = CreatePart("STATE_LEAF_RIGHT", unitCubeMesh,
+                out _rightLeafRenderer);
+            _rubble = CreatePart("STATE_RUBBLE", unitCubeMesh,
+                out _rubbleRenderer);
+            _scaffold = CreatePart("STATE_REPAIR_SCAFFOLD", unitCubeMesh,
+                out _scaffoldRenderer);
+            Apply(state);
+        }
+
+        public void Apply(LuoyangPassagePedestrianState state)
+        {
+            if (state == null) throw new ArgumentNullException(nameof(state));
+            if (!string.IsNullOrWhiteSpace(FacilityId) &&
+                !string.Equals(FacilityId, state.FacilityId,
+                    StringComparison.Ordinal))
+                throw new InvalidOperationException(
+                    "A passage presentation instance cannot change Facility ID.");
+            FacilityId = state.FacilityId;
+            TraversalStatusId = state.TraversalStatusId;
+            VisualStateId = state.VisualStateId;
+            BlocksPedestrianTraversal = state.BlocksPedestrianTraversal;
+            IsRepairing = state.IsRepairing;
+            ConditionBasisPoints = state.ConditionBasisPoints;
+            PassageRevision = state.PassageRevision;
+            IntegrityRevision = state.IntegrityRevision;
+            _navigationBlocker.enabled = state.BlocksPedestrianTraversal;
+
+            SetPartActive(_leftLeaf, false);
+            SetPartActive(_rightLeaf, false);
+            SetPartActive(_rubble, false);
+            SetPartActive(_scaffold, false);
+            if (string.Equals(state.TraversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                    StringComparison.Ordinal))
+            {
+                ConfigureLeaf(_leftLeaf, _leftLeafRenderer, -1f, -58f,
+                    _openMaterial);
+                ConfigureLeaf(_rightLeaf, _rightLeafRenderer, 1f, 58f,
+                    _openMaterial);
+            }
+            else if (string.Equals(state.TraversalStatusId,
+                         LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                         StringComparison.Ordinal))
+            {
+                ConfigureLeaf(_leftLeaf, _leftLeafRenderer, -1f, 0f,
+                    _closedMaterial);
+                ConfigureLeaf(_rightLeaf, _rightLeafRenderer, 1f, 0f,
+                    _closedMaterial);
+            }
+            else if (string.Equals(state.TraversalStatusId,
+                         LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                         StringComparison.Ordinal))
+            {
+                ConfigureLeaf(_leftLeaf, _leftLeafRenderer, -0.55f, -24f,
+                    _damagedMaterial);
+                ConfigureRubble(_damagedMaterial, 0.48f, 0.22f, 18f);
+            }
+            else if (string.Equals(state.TraversalStatusId,
+                         LuoyangRoadConnectorPassageTraversalIds
+                             .DestroyedStatusId,
+                         StringComparison.Ordinal))
+            {
+                ConfigureRubble(_destroyedMaterial, 0.92f, 0.38f, -11f);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    "Unknown Luoyang passage presentation status: " +
+                    state.TraversalStatusId);
+            }
+
+            if (state.IsRepairing) ConfigureScaffold();
+        }
+
+        private Transform CreatePart(string name, Mesh mesh,
+            out MeshRenderer meshRenderer)
+        {
+            var part = new GameObject(name);
+            part.transform.SetParent(transform, false);
+            part.AddComponent<MeshFilter>().sharedMesh = mesh;
+            meshRenderer = part.AddComponent<MeshRenderer>();
+            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            meshRenderer.receiveShadows = false;
+            return part.transform;
+        }
+
+        private void ConfigureLeaf(Transform leaf, MeshRenderer renderer,
+            float side, float yawDegrees, Material material)
+        {
+            SetPartActive(leaf, true);
+            leaf.localPosition = new Vector3(side * _width * 0.24f,
+                _height * 0.5f, 0f);
+            leaf.localRotation = Quaternion.Euler(0f, yawDegrees, 0f);
+            leaf.localScale = new Vector3(_width * 0.48f, _height,
+                Math.Max(0.018f, _depth * 0.42f));
+            renderer.sharedMaterial = material;
+        }
+
+        private void ConfigureRubble(Material material, float widthScale,
+            float heightScale, float yawDegrees)
+        {
+            SetPartActive(_rubble, true);
+            _rubble.localPosition = new Vector3(0f,
+                _height * heightScale * 0.5f, 0f);
+            _rubble.localRotation = Quaternion.Euler(0f, yawDegrees, 7f);
+            _rubble.localScale = new Vector3(_width * widthScale,
+                Math.Max(0.035f, _height * heightScale), _depth * 1.75f);
+            _rubbleRenderer.sharedMaterial = material;
+        }
+
+        private void ConfigureScaffold()
+        {
+            SetPartActive(_scaffold, true);
+            _scaffold.localPosition = new Vector3(0f, _height * 0.88f, 0f);
+            _scaffold.localRotation = Quaternion.identity;
+            _scaffold.localScale = new Vector3(_width * 1.12f,
+                Math.Max(0.018f, _height * 0.08f), _depth * 1.35f);
+            _scaffoldRenderer.sharedMaterial = _repairingMaterial;
+        }
+
+        private static void SetPartActive(Transform part, bool active)
+        {
+            if (part != null) part.gameObject.SetActive(active);
+        }
+    }
+
+    public sealed class LuoyangClickWalkPedestrianInstance : MonoBehaviour
+    {
+        private const float BodyHeight = 0.14f;
+        private const float BodyRadius = 0.025f;
+        private IReadOnlyList<Vector3> _routePoints = Array.Empty<Vector3>();
+        private LuoyangPedestrianWalkPlan _routePlan;
+        private int _nextPointIndex;
+
+        public string ActorId { get; private set; }
+        public string CurrentFacilityId { get; private set; }
+        public string TargetFacilityId { get; private set; }
+        public string MovementStateId { get; private set; }
+        public string LastStopReasonId { get; private set; }
+        public bool IsWalking => string.Equals(MovementStateId,
+            LuoyangClickToWalkPedestrianIds.WalkingStateId,
+            StringComparison.Ordinal);
+        public int RoutePointCount => _routePoints.Count;
+        public CapsuleCollider CollisionProxy { get; private set; }
+        public IReadOnlyList<string> RouteFacilityIds =>
+            _routePlan?.FacilityIds ?? Array.Empty<string>();
+
+        public void Initialize(string actorId, string facilityId,
+            Vector3 position, Mesh unitCubeMesh, Material bodyMaterial,
+            Material skinMaterial)
+        {
+            if (unitCubeMesh == null)
+                throw new ArgumentNullException(nameof(unitCubeMesh));
+            ActorId = new StableId(actorId).Value;
+            CurrentFacilityId = new StableId(facilityId).Value;
+            TargetFacilityId = string.Empty;
+            LastStopReasonId = string.Empty;
+            MovementStateId = LuoyangClickToWalkPedestrianIds.ReadyStateId;
+            transform.position = position;
+            CollisionProxy = gameObject.AddComponent<CapsuleCollider>();
+            CollisionProxy.isTrigger = false;
+            CollisionProxy.radius = BodyRadius;
+            CollisionProxy.height = BodyHeight;
+            CollisionProxy.center = new Vector3(0f, BodyHeight * 0.5f, 0f);
+            var rigidbody = gameObject.AddComponent<Rigidbody>();
+            rigidbody.isKinematic = true;
+            rigidbody.useGravity = false;
+            rigidbody.interpolation = RigidbodyInterpolation.None;
+
+            CreateBodyPart("BODY", unitCubeMesh, bodyMaterial,
+                new Vector3(0f, 0.087f, 0f),
+                new Vector3(0.052f, 0.078f, 0.032f));
+            CreateBodyPart("HEAD", unitCubeMesh, skinMaterial,
+                new Vector3(0f, 0.145f, 0f),
+                new Vector3(0.040f, 0.040f, 0.040f));
+            CreateBodyPart("ARM_LEFT", unitCubeMesh, bodyMaterial,
+                new Vector3(-0.037f, 0.086f, 0f),
+                new Vector3(0.018f, 0.070f, 0.018f));
+            CreateBodyPart("ARM_RIGHT", unitCubeMesh, bodyMaterial,
+                new Vector3(0.037f, 0.086f, 0f),
+                new Vector3(0.018f, 0.070f, 0.018f));
+            CreateBodyPart("LEG_LEFT", unitCubeMesh, bodyMaterial,
+                new Vector3(-0.014f, 0.027f, 0f),
+                new Vector3(0.020f, 0.054f, 0.022f));
+            CreateBodyPart("LEG_RIGHT", unitCubeMesh, bodyMaterial,
+                new Vector3(0.014f, 0.027f, 0f),
+                new Vector3(0.020f, 0.054f, 0.022f));
+        }
+
+        public void PlaceAt(string facilityId, Vector3 position)
+        {
+            CurrentFacilityId = new StableId(facilityId).Value;
+            TargetFacilityId = string.Empty;
+            LastStopReasonId = string.Empty;
+            MovementStateId = LuoyangClickToWalkPedestrianIds.ReadyStateId;
+            _routePlan = null;
+            _routePoints = Array.Empty<Vector3>();
+            _nextPointIndex = 0;
+            transform.position = position;
+        }
+
+        public void BindActor(string actorId)
+        {
+            if (IsWalking)
+                throw new InvalidOperationException(
+                    "A walking presentation actor cannot be rebound.");
+            ActorId = new StableId(actorId).Value;
+        }
+
+        public void BeginRoute(LuoyangPedestrianWalkPlan plan,
+            IReadOnlyList<Vector3> routePoints)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            if (!plan.CanWalk || routePoints == null ||
+                routePoints.Count != plan.FacilityIds.Count)
+                throw new InvalidOperationException(
+                    "A runtime pedestrian route requires a valid Domain plan.");
+            _routePlan = plan;
+            _routePoints = routePoints;
+            CurrentFacilityId = plan.StartFacilityId;
+            TargetFacilityId = plan.TargetFacilityId;
+            LastStopReasonId = string.Empty;
+            transform.position = routePoints[0];
+            _nextPointIndex = routePoints.Count > 1 ? 1 : 0;
+            MovementStateId = routePoints.Count > 1
+                ? LuoyangClickToWalkPedestrianIds.WalkingStateId
+                : LuoyangClickToWalkPedestrianIds.ArrivedStateId;
+        }
+
+        public void Stop(string reasonId, bool blocked)
+        {
+            LastStopReasonId = new StableId(reasonId).Value;
+            MovementStateId = blocked
+                ? LuoyangClickToWalkPedestrianIds.BlockedStateId
+                : LuoyangClickToWalkPedestrianIds.CancelledStateId;
+        }
+
+        public bool Step(float deltaSeconds, float speedUnitsPerSecond)
+        {
+            if (!IsWalking || deltaSeconds <= 0f ||
+                speedUnitsPerSecond <= 0f) return false;
+            var target = _routePoints[_nextPointIndex];
+            var difference = target - transform.position;
+            var distance = difference.magnitude;
+            var stepDistance = speedUnitsPerSecond * deltaSeconds;
+            if (distance > 0.00001f)
+            {
+                var direction = difference / distance;
+                var probeDistance = Math.Min(distance, stepDistance);
+                var hits = Physics.SphereCastAll(
+                    transform.position + Vector3.up * (BodyHeight * 0.5f),
+                    BodyRadius, direction, probeDistance,
+                    Physics.DefaultRaycastLayers,
+                    QueryTriggerInteraction.Ignore);
+                if (hits.Any(hit => hit.collider != CollisionProxy &&
+                    hit.collider.enabled &&
+                    hit.collider.GetComponent<
+                        LuoyangPassagePedestrianPresentationInstance>() != null))
+                {
+                    Stop(LuoyangClickToWalkPedestrianIds.DynamicBlockerReasonId,
+                        true);
+                    return false;
+                }
+                transform.position = Vector3.MoveTowards(transform.position,
+                    target, stepDistance);
+                var horizontal = new Vector3(direction.x, 0f, direction.z);
+                if (horizontal.sqrMagnitude > 0.00001f)
+                    transform.rotation = Quaternion.LookRotation(horizontal,
+                        Vector3.up);
+            }
+            if ((transform.position - target).sqrMagnitude > 0.000001f)
+                return true;
+            CurrentFacilityId = _routePlan.FacilityIds[_nextPointIndex];
+            _nextPointIndex++;
+            if (_nextPointIndex < _routePoints.Count) return true;
+            transform.position = _routePoints[_routePoints.Count - 1];
+            CurrentFacilityId = _routePlan.TargetFacilityId;
+            MovementStateId = LuoyangClickToWalkPedestrianIds.ArrivedStateId;
+            return true;
+        }
+
+        public IReadOnlyList<string> RemainingFacilityIds()
+        {
+            if (_routePlan == null || !IsWalking) return Array.Empty<string>();
+            return _routePlan.FacilityIds.Skip(Math.Max(0,
+                _nextPointIndex - 1)).ToArray();
+        }
+
+        private void CreateBodyPart(string name, Mesh mesh, Material material,
+            Vector3 localPosition, Vector3 localScale)
+        {
+            var part = new GameObject(name);
+            part.transform.SetParent(transform, false);
+            part.transform.localPosition = localPosition;
+            part.transform.localScale = localScale;
+            part.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var renderer = part.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+        }
+    }
+
     public sealed class LuoyangFacilityInteractionNavigationRuntime : IDisposable
     {
         public const string RootName =
@@ -38,9 +403,21 @@ namespace Mandate.Presentation
             "Luoyang Damaged Passage Overlay V1";
         public const string SelectionHighlightName =
             "Luoyang Selected Facility Highlight V1";
+        public const string PassagePedestrianPresentationRootName =
+            "Luoyang Passage Stateful Presentation Pedestrian Blocking V1";
+        public const string ClickWalkPedestrianRootName =
+            "Luoyang Click To Walk Pedestrian Vertical Slice V1";
+        public const string ClickWalkRouteName =
+            "Luoyang Click To Walk Route V1";
+        public const string ClickWalkTargetName =
+            "Luoyang Click To Walk Target V1";
 
         private readonly Dictionary<string,
             LuoyangFacilitySelectionProxyInstance> _instancesByFacilityId;
+        private readonly Dictionary<string,
+            LuoyangPassagePedestrianPresentationInstance>
+            _passagePresentationInstancesByFacilityId;
+        private readonly LuoyangRoadTraversalRefinementPlan _refinementPlan;
         private readonly Material _navigationMaterial;
         private readonly Material _modeledConnectorMaterial;
         private readonly Material _blockedPassageMaterial;
@@ -54,13 +431,39 @@ namespace Mandate.Presentation
         private readonly MeshRenderer _blockedPassageRenderer;
         private readonly MeshRenderer _damagedPassageRenderer;
         private readonly MeshRenderer _selectionRenderer;
+        private readonly Material _passageOpenMaterial;
+        private readonly Material _passageClosedMaterial;
+        private readonly Material _passageDamagedMaterial;
+        private readonly Material _passageDestroyedMaterial;
+        private readonly Material _passageRepairingMaterial;
+        private readonly Mesh _passageStateCubeMesh;
+        private LuoyangPassageTraversalSession _passageSession;
+        private Dictionary<string, Vector3> _pedestrianNodePositions;
+        private LuoyangClickWalkPedestrianInstance _pedestrianInstance;
+        private Mesh _pedestrianRouteMesh;
+        private MeshRenderer _pedestrianRouteRenderer;
+        private GameObject _pedestrianTarget;
+        private Material _pedestrianBodyMaterial;
+        private Material _pedestrianSkinMaterial;
+        private Material _pedestrianRouteMaterial;
+        private Material _pedestrianTargetMaterial;
+        private float _horizontalMetresPerUnit;
+        private LuoyangPedestrianWalkPlan _lastPedestrianWalkPlan;
 
         private LuoyangFacilityInteractionNavigationRuntime(GameObject root,
+            LuoyangRoadTraversalRefinementPlan refinementPlan,
             Dictionary<string, LuoyangFacilitySelectionProxyInstance>
                 instancesByFacilityId,
+            Dictionary<string,
+                LuoyangPassagePedestrianPresentationInstance>
+                passagePresentationInstancesByFacilityId,
             Material navigationMaterial, Material modeledConnectorMaterial,
             Material blockedPassageMaterial, Material damagedPassageMaterial,
-            Material selectionMaterial, Mesh navigationMesh,
+            Material selectionMaterial, Material passageOpenMaterial,
+            Material passageClosedMaterial, Material passageDamagedMaterial,
+            Material passageDestroyedMaterial,
+            Material passageRepairingMaterial, Mesh passageStateCubeMesh,
+            Mesh navigationMesh,
             Mesh modeledConnectorMesh, Mesh blockedPassageMesh,
             Mesh damagedPassageMesh, Mesh selectionMesh,
             MeshRenderer blockedPassageRenderer,
@@ -69,7 +472,11 @@ namespace Mandate.Presentation
             int residentModeledConnectorEdgeCount)
         {
             Root = root;
+            _refinementPlan = refinementPlan ?? throw new ArgumentNullException(
+                nameof(refinementPlan));
             _instancesByFacilityId = instancesByFacilityId;
+            _passagePresentationInstancesByFacilityId =
+                passagePresentationInstancesByFacilityId;
             _navigationMaterial = navigationMaterial;
             _modeledConnectorMaterial = modeledConnectorMaterial;
             _blockedPassageMaterial = blockedPassageMaterial;
@@ -83,6 +490,12 @@ namespace Mandate.Presentation
             _blockedPassageRenderer = blockedPassageRenderer;
             _damagedPassageRenderer = damagedPassageRenderer;
             _selectionRenderer = selectionRenderer;
+            _passageOpenMaterial = passageOpenMaterial;
+            _passageClosedMaterial = passageClosedMaterial;
+            _passageDamagedMaterial = passageDamagedMaterial;
+            _passageDestroyedMaterial = passageDestroyedMaterial;
+            _passageRepairingMaterial = passageRepairingMaterial;
+            _passageStateCubeMesh = passageStateCubeMesh;
             ResidentNavigationEdgeCount = residentNavigationEdgeCount;
             ResidentModeledConnectorEdgeCount = residentModeledConnectorEdgeCount;
         }
@@ -92,11 +505,39 @@ namespace Mandate.Presentation
         public int ResidentNavigationEdgeCount { get; }
         public int ResidentModeledConnectorEdgeCount { get; }
         public int ResidentPassageMarkerCount { get; private set; }
+        public int ResidentPassagePresentationCount =>
+            _passagePresentationInstancesByFacilityId.Count;
+        public int ActivePedestrianBlockerCount { get; private set; }
+        public int DamagedPassagePresentationCount { get; private set; }
+        public int DestroyedPassagePresentationCount { get; private set; }
+        public int ActiveRepairScaffoldCount { get; private set; }
+        public string PedestrianActorId => _pedestrianInstance?.ActorId;
+        public string PedestrianCurrentFacilityId =>
+            _pedestrianInstance?.CurrentFacilityId;
+        public string PedestrianTargetFacilityId =>
+            _pedestrianInstance?.TargetFacilityId;
+        public string PedestrianMovementStateId =>
+            _pedestrianInstance?.MovementStateId;
+        public string PedestrianLastStopReasonId =>
+            _pedestrianInstance?.LastStopReasonId;
+        public bool PedestrianIsWalking =>
+            _pedestrianInstance != null && _pedestrianInstance.IsWalking;
+        public int PedestrianRouteNodeCount =>
+            _pedestrianInstance?.RouteFacilityIds.Count ?? 0;
+        public float PedestrianRouteDistanceMetres =>
+            _lastPedestrianWalkPlan?.TotalDistanceMetres ?? 0f;
+        public float PedestrianEstimatedDurationSeconds =>
+            _lastPedestrianWalkPlan?.EstimatedDurationSeconds ?? 0f;
+        public LuoyangClickWalkPedestrianInstance PedestrianInstance =>
+            _pedestrianInstance;
+        public IReadOnlyList<string> PedestrianRouteFacilityIds =>
+            _pedestrianInstance?.RouteFacilityIds ?? Array.Empty<string>();
 
         public static LuoyangFacilityInteractionNavigationRuntime Build(
             LuoyangFacilityInteractionNavigationPlan plan,
             LuoyangRoadTraversalRefinementPlan refinementPlan,
             LuoyangPassageTraversalSession passageSession,
+            WorldState passageWorld,
             IReadOnlyList<LuoyangBuildingPerformanceFacility> residents,
             Func<LuoyangBuildingPerformanceFacility, Vector3> positionResolver,
             Func<LuoyangBuildingPerformanceFacility, float> rotationResolver,
@@ -158,8 +599,60 @@ namespace Mandate.Presentation
                 0.08f, 0.96f));
             var selectionMaterial = CreateMaterial(new Color(1f, 0.74f,
                 0.08f, 0.96f));
+            var passageOpenMaterial = CreateMaterial(new Color(0.20f, 0.48f,
+                0.28f, 0.96f));
+            var passageClosedMaterial = CreateMaterial(new Color(0.42f, 0.22f,
+                0.10f, 0.98f));
+            var passageDamagedMaterial = CreateMaterial(new Color(0.95f,
+                0.56f, 0.08f, 0.98f));
+            var passageDestroyedMaterial = CreateMaterial(new Color(0.42f,
+                0.08f, 0.06f, 0.98f));
+            var passageRepairingMaterial = CreateMaterial(new Color(0.10f,
+                0.82f, 0.92f, 0.98f));
+            var passageStateCubeMesh = CreateUnitCubeMesh();
             var nodeById = refinementPlan.NavigationNodes.ToDictionary(
                 item => item.NodeId, StringComparer.Ordinal);
+            var passagePresentationRoot = new GameObject(
+                PassagePedestrianPresentationRootName);
+            passagePresentationRoot.transform.SetParent(root.transform, false);
+            var passagePresentationInstances = new Dictionary<string,
+                LuoyangPassagePedestrianPresentationInstance>(
+                StringComparer.Ordinal);
+            var pedestrianPlan = LuoyangPassagePedestrianPresentationRules
+                .CreatePlan(refinementPlan, passageSession, passageWorld);
+            foreach (var state in pedestrianPlan.States)
+            {
+                if (!instances.TryGetValue(state.FacilityId,
+                        out var selectionProxy)) continue;
+                var selectionCollider = selectionProxy.GetComponent<
+                    BoxCollider>();
+                var bounds = selectionCollider.bounds;
+                var width = Mathf.Clamp(
+                    Mathf.Max(bounds.size.x, bounds.size.z) * 0.62f,
+                    0.16f, 0.52f);
+                var height = Mathf.Clamp(bounds.size.y * 0.72f,
+                    0.12f, 0.42f);
+                var depth = Mathf.Clamp(
+                    Mathf.Min(bounds.size.x, bounds.size.z) * 0.24f,
+                    0.04f, 0.12f);
+                var presentationObject = new GameObject(
+                    "LUOYANG_PASSAGE_PEDESTRIAN_" + state.FacilityId);
+                presentationObject.transform.SetParent(
+                    passagePresentationRoot.transform, false);
+                presentationObject.transform.position = new Vector3(
+                    bounds.center.x, bounds.min.y + 0.012f, bounds.center.z);
+                presentationObject.transform.rotation = Quaternion.Euler(0f,
+                    ResolvePassageYawDegrees(refinementPlan,
+                        state.FacilityId), 0f);
+                var presentationInstance = presentationObject.AddComponent<
+                    LuoyangPassagePedestrianPresentationInstance>();
+                presentationInstance.Initialize(state, passageStateCubeMesh,
+                    width, height, depth, passageOpenMaterial,
+                    passageClosedMaterial, passageDamagedMaterial,
+                    passageDestroyedMaterial, passageRepairingMaterial);
+                passagePresentationInstances.Add(state.FacilityId,
+                    presentationInstance);
+            }
             var visibleEdges = refinementPlan.NavigationEdges.Where(edge =>
                     instances.ContainsKey(nodeById[edge.FromNodeId].FacilityId) &&
                     instances.ContainsKey(nodeById[edge.ToNodeId].FacilityId))
@@ -230,22 +723,270 @@ namespace Mandate.Presentation
             selectionRenderer.enabled = false;
 
             var runtime = new LuoyangFacilityInteractionNavigationRuntime(root,
-                instances, navigationMaterial, modeledConnectorMaterial,
+                refinementPlan, instances, passagePresentationInstances,
+                navigationMaterial, modeledConnectorMaterial,
                 blockedPassageMaterial, damagedPassageMaterial,
-                selectionMaterial, navigationMesh, modeledConnectorMesh,
+                selectionMaterial, passageOpenMaterial,
+                passageClosedMaterial, passageDamagedMaterial,
+                passageDestroyedMaterial, passageRepairingMaterial,
+                passageStateCubeMesh, navigationMesh, modeledConnectorMesh,
                 blockedPassageMesh, damagedPassageMesh, selectionMesh,
                 blockedPassageRenderer, damagedPassageRenderer,
                 selectionRenderer, visibleEdges.Length,
                 visibleModeledEdges.Length);
-            runtime.RefreshTraversalState(passageSession);
+            runtime.InitializeClickWalkPedestrian(passageSession, instances,
+                horizontalMetresPerUnit);
+            runtime.RefreshTraversalState(passageSession, passageWorld);
             return runtime;
         }
 
+        private void InitializeClickWalkPedestrian(
+            LuoyangPassageTraversalSession passageSession,
+            IReadOnlyDictionary<string,
+                LuoyangFacilitySelectionProxyInstance> instances,
+            float horizontalMetresPerUnit)
+        {
+            _passageSession = passageSession ?? throw new ArgumentNullException(
+                nameof(passageSession));
+            _horizontalMetresPerUnit = horizontalMetresPerUnit;
+            _pedestrianNodePositions = _refinementPlan.NavigationNodes
+                .Where(item => instances.ContainsKey(item.FacilityId))
+                .ToDictionary(item => item.FacilityId,
+                    item => instances[item.FacilityId].transform.position +
+                            Vector3.up * 0.025f, StringComparer.Ordinal);
+            var initial = _refinementPlan.NavigationNodes.Where(item =>
+                    string.Equals(item.FacilityDefinitionId,
+                        "facility.public.road", StringComparison.Ordinal) &&
+                    _pedestrianNodePositions.ContainsKey(item.FacilityId))
+                .OrderBy(item => item.CellId64)
+                .ThenBy(item => item.FacilityId, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (initial == null) return;
+
+            var root = new GameObject(ClickWalkPedestrianRootName);
+            root.transform.SetParent(Root.transform, false);
+            _pedestrianBodyMaterial = CreateMaterial(new Color(0.12f, 0.26f,
+                0.62f, 1f));
+            _pedestrianSkinMaterial = CreateMaterial(new Color(0.94f, 0.72f,
+                0.50f, 1f));
+            _pedestrianRouteMaterial = CreateMaterial(new Color(1f, 0.92f,
+                0.10f, 0.98f));
+            _pedestrianTargetMaterial = CreateMaterial(new Color(1f, 0.20f,
+                0.76f, 0.98f));
+            var actor = new GameObject("PEDESTRIAN_ACTOR_" +
+                                       LuoyangClickToWalkPedestrianIds
+                                           .PreviewActorId);
+            actor.transform.SetParent(root.transform, false);
+            _pedestrianInstance = actor.AddComponent<
+                LuoyangClickWalkPedestrianInstance>();
+            _pedestrianInstance.Initialize(
+                LuoyangClickToWalkPedestrianIds.PreviewActorId,
+                initial.FacilityId,
+                _pedestrianNodePositions[initial.FacilityId],
+                _passageStateCubeMesh, _pedestrianBodyMaterial,
+                _pedestrianSkinMaterial);
+
+            _pedestrianRouteMesh = new Mesh { name = ClickWalkRouteName };
+            var route = new GameObject(ClickWalkRouteName);
+            route.transform.SetParent(root.transform, false);
+            route.AddComponent<MeshFilter>().sharedMesh =
+                _pedestrianRouteMesh;
+            _pedestrianRouteRenderer = route.AddComponent<MeshRenderer>();
+            _pedestrianRouteRenderer.sharedMaterial =
+                _pedestrianRouteMaterial;
+            _pedestrianRouteRenderer.shadowCastingMode =
+                ShadowCastingMode.Off;
+            _pedestrianRouteRenderer.receiveShadows = false;
+            _pedestrianRouteRenderer.enabled = false;
+
+            _pedestrianTarget = new GameObject(ClickWalkTargetName);
+            _pedestrianTarget.transform.SetParent(root.transform, false);
+            _pedestrianTarget.AddComponent<MeshFilter>().sharedMesh =
+                _passageStateCubeMesh;
+            var targetRenderer = _pedestrianTarget.AddComponent<MeshRenderer>();
+            targetRenderer.sharedMaterial = _pedestrianTargetMaterial;
+            targetRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            targetRenderer.receiveShadows = false;
+            _pedestrianTarget.transform.localScale = new Vector3(0.08f,
+                0.012f, 0.08f);
+            _pedestrianTarget.SetActive(false);
+        }
+
+        public bool TryPlacePedestrianAtFacility(string facilityId,
+            string actorId = null)
+        {
+            if (_pedestrianInstance == null ||
+                string.IsNullOrWhiteSpace(facilityId) ||
+                !_pedestrianNodePositions.TryGetValue(facilityId,
+                    out var position)) return false;
+            if (!string.IsNullOrWhiteSpace(actorId) && !string.Equals(
+                    actorId, _pedestrianInstance.ActorId,
+                    StringComparison.Ordinal))
+            {
+                if (_lastPedestrianWalkPlan != null ||
+                    _pedestrianInstance.IsWalking) return false;
+                _pedestrianInstance.BindActor(actorId);
+            }
+            _pedestrianInstance.PlaceAt(facilityId, position);
+            _lastPedestrianWalkPlan = null;
+            ClearPedestrianRouteVisual();
+            return true;
+        }
+
+        public bool TrySetPedestrianDestination(string facilityId)
+        {
+            if (_pedestrianInstance == null || _passageSession == null ||
+                string.IsNullOrWhiteSpace(facilityId)) return false;
+            var plan = LuoyangClickToWalkPedestrianRules.CreatePlan(
+                _refinementPlan, _passageSession,
+                _pedestrianInstance.ActorId,
+                _pedestrianInstance.CurrentFacilityId, facilityId);
+            _lastPedestrianWalkPlan = plan;
+            if (!plan.CanWalk)
+            {
+                _pedestrianInstance.Stop(plan.FailureReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            if (plan.FacilityIds.Any(item =>
+                    !_pedestrianNodePositions.ContainsKey(item)))
+            {
+                _pedestrianInstance.Stop(
+                    LuoyangClickToWalkPedestrianIds
+                        .OutsideResidentWindowReasonId, false);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            var routePoints = BuildPedestrianRoutePoints(plan);
+            _pedestrianInstance.BeginRoute(plan, routePoints);
+            SetPedestrianRouteVisual(routePoints);
+            _pedestrianTarget.transform.position = routePoints[
+                routePoints.Count - 1] + Vector3.up * 0.006f;
+            _pedestrianTarget.SetActive(true);
+            return true;
+        }
+
+        public bool TrySetPedestrianDestination(Vector3 worldPosition)
+        {
+            if (_pedestrianInstance == null ||
+                _pedestrianNodePositions.Count == 0) return false;
+            var target = _pedestrianNodePositions
+                .Select(item => new
+                {
+                    item.Key,
+                    Distance = HorizontalDistanceSquared(item.Value,
+                        worldPosition)
+                })
+                .OrderBy(item => item.Distance)
+                .ThenBy(item => item.Key, StringComparer.Ordinal)
+                .First();
+            if (target.Distance > 0.85f * 0.85f) return false;
+            return TrySetPedestrianDestination(target.Key);
+        }
+
+        public bool StepPedestrian(float deltaSeconds)
+        {
+            if (_pedestrianInstance == null) return false;
+            const float reviewSpeedUnitsPerSecond = 0.32f;
+            return _pedestrianInstance.Step(deltaSeconds,
+                reviewSpeedUnitsPerSecond);
+        }
+
+        private IReadOnlyList<Vector3> BuildPedestrianRoutePoints(
+            LuoyangPedestrianWalkPlan plan)
+        {
+            var result = plan.FacilityIds.Select(item =>
+                _pedestrianNodePositions[item]).ToArray();
+            for (var index = 0; index < plan.Segments.Count; index++)
+            {
+                var from = _pedestrianNodePositions[
+                    plan.Segments[index].FromFacilityId];
+                var to = _pedestrianNodePositions[
+                    plan.Segments[index].ToFacilityId];
+                var direction = new Vector3(to.x - from.x, 0f,
+                    to.z - from.z).normalized;
+                var perpendicular = new Vector3(-direction.z, 0f,
+                    direction.x);
+                var actualOffset = plan.Segments[index].LateralOffsetMetres /
+                                   _horizontalMetresPerUnit;
+                var visibleOffset = Mathf.Sign(actualOffset) * Mathf.Max(
+                    Mathf.Abs(actualOffset), 0.012f);
+                if (index == 0) result[0] += perpendicular * visibleOffset;
+                result[index + 1] += perpendicular * visibleOffset;
+            }
+            return result;
+        }
+
+        private void SetPedestrianRouteVisual(
+            IReadOnlyList<Vector3> routePoints)
+        {
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            for (var index = 1; index < routePoints.Count; index++)
+                AddRibbon(vertices, triangles,
+                    routePoints[index - 1] + Vector3.up * 0.055f,
+                    routePoints[index] + Vector3.up * 0.055f, 0.040f);
+            SetMesh(_pedestrianRouteMesh, vertices, triangles);
+            _pedestrianRouteRenderer.enabled = vertices.Count > 0;
+        }
+
+        private void ClearPedestrianRouteVisual()
+        {
+            if (_pedestrianRouteMesh != null) _pedestrianRouteMesh.Clear();
+            if (_pedestrianRouteRenderer != null)
+                _pedestrianRouteRenderer.enabled = false;
+            if (_pedestrianTarget != null) _pedestrianTarget.SetActive(false);
+        }
+
+        private static float HorizontalDistanceSquared(Vector3 first,
+            Vector3 second)
+        {
+            var x = first.x - second.x;
+            var z = first.z - second.z;
+            return x * x + z * z;
+        }
+
         public void RefreshTraversalState(
-            LuoyangPassageTraversalSession passageSession)
+            LuoyangPassageTraversalSession passageSession,
+            WorldState passageWorld = null)
         {
             if (passageSession == null) throw new ArgumentNullException(
                 nameof(passageSession));
+            _passageSession = passageSession;
+            var pedestrianPlan = LuoyangPassagePedestrianPresentationRules
+                .CreatePlan(_refinementPlan, passageSession, passageWorld);
+            foreach (var state in pedestrianPlan.States)
+                if (_passagePresentationInstancesByFacilityId.TryGetValue(
+                        state.FacilityId, out var presentationInstance))
+                    presentationInstance.Apply(state);
+            ActivePedestrianBlockerCount =
+                _passagePresentationInstancesByFacilityId.Values.Count(item =>
+                    item.BlocksPedestrianTraversal);
+            DamagedPassagePresentationCount =
+                _passagePresentationInstancesByFacilityId.Values.Count(item =>
+                    string.Equals(item.TraversalStatusId,
+                        LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                        StringComparison.Ordinal));
+            DestroyedPassagePresentationCount =
+                _passagePresentationInstancesByFacilityId.Values.Count(item =>
+                    string.Equals(item.TraversalStatusId,
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .DestroyedStatusId,
+                        StringComparison.Ordinal));
+            ActiveRepairScaffoldCount =
+                _passagePresentationInstancesByFacilityId.Values.Count(item =>
+                    item.IsRepairing);
+            if (_pedestrianInstance != null &&
+                _pedestrianInstance.IsWalking &&
+                _pedestrianInstance.RemainingFacilityIds().Any(item =>
+                    passageSession.TryGet(item, out var passage) &&
+                    !passage.CanTraverse))
+            {
+                _pedestrianInstance.Stop(
+                    LuoyangClickToWalkPedestrianIds.BlockedPassageReasonId,
+                    true);
+                ClearPedestrianRouteVisual();
+            }
             var blockedVertices = new List<Vector3>();
             var blockedTriangles = new List<int>();
             var damagedVertices = new List<Vector3>();
@@ -318,6 +1059,18 @@ namespace Mandate.Presentation
             _selectionRenderer.enabled = false;
         }
 
+        public LuoyangPassagePedestrianPresentationInstance
+            GetPassagePresentation(string facilityId)
+        {
+            if (string.IsNullOrWhiteSpace(facilityId) ||
+                !_passagePresentationInstancesByFacilityId.TryGetValue(
+                    facilityId, out var instance))
+                throw new KeyNotFoundException(
+                    "The Luoyang passage is not resident in the current " +
+                    "presentation window: " + facilityId);
+            return instance;
+        }
+
         public void Dispose()
         {
             if (Root != null) UnityEngine.Object.DestroyImmediate(Root);
@@ -331,6 +1084,10 @@ namespace Mandate.Presentation
                 UnityEngine.Object.DestroyImmediate(_damagedPassageMesh);
             if (_selectionMesh != null)
                 UnityEngine.Object.DestroyImmediate(_selectionMesh);
+            if (_passageStateCubeMesh != null)
+                UnityEngine.Object.DestroyImmediate(_passageStateCubeMesh);
+            if (_pedestrianRouteMesh != null)
+                UnityEngine.Object.DestroyImmediate(_pedestrianRouteMesh);
             if (_navigationMaterial != null)
                 UnityEngine.Object.DestroyImmediate(_navigationMaterial);
             if (_modeledConnectorMaterial != null)
@@ -341,6 +1098,24 @@ namespace Mandate.Presentation
                 UnityEngine.Object.DestroyImmediate(_damagedPassageMaterial);
             if (_selectionMaterial != null)
                 UnityEngine.Object.DestroyImmediate(_selectionMaterial);
+            if (_passageOpenMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_passageOpenMaterial);
+            if (_passageClosedMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_passageClosedMaterial);
+            if (_passageDamagedMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_passageDamagedMaterial);
+            if (_passageDestroyedMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_passageDestroyedMaterial);
+            if (_passageRepairingMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_passageRepairingMaterial);
+            if (_pedestrianBodyMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_pedestrianBodyMaterial);
+            if (_pedestrianSkinMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_pedestrianSkinMaterial);
+            if (_pedestrianRouteMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_pedestrianRouteMaterial);
+            if (_pedestrianTargetMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_pedestrianTargetMaterial);
         }
 
         private static Mesh BuildNavigationMesh(
@@ -431,6 +1206,70 @@ namespace Mandate.Presentation
             triangles.Add(start);
             triangles.Add(start + 2);
             triangles.Add(start + 3);
+        }
+
+        private static float ResolvePassageYawDegrees(
+            LuoyangRoadTraversalRefinementPlan plan, string facilityId)
+        {
+            var passage = plan.NavigationNodesByFacilityId[facilityId];
+            var approachNodes = plan.NavigationEdges.Where(edge =>
+                    string.Equals(edge.EdgeProfileId,
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .PassageApproachEdgeProfileId,
+                        StringComparison.Ordinal) &&
+                    (string.Equals(edge.FromNodeId, passage.NodeId,
+                         StringComparison.Ordinal) ||
+                     string.Equals(edge.ToNodeId, passage.NodeId,
+                         StringComparison.Ordinal)))
+                .Select(edge => edge.FromNodeId == passage.NodeId
+                    ? edge.ToNodeId : edge.FromNodeId)
+                .Select(nodeId => plan.NavigationNodes.First(node =>
+                    string.Equals(node.NodeId, nodeId,
+                        StringComparison.Ordinal)))
+                .OrderBy(node => node.NodeId, StringComparer.Ordinal).ToArray();
+            var rowDelta = approachNodes.Length >= 2
+                ? approachNodes[1].GridRow - approachNodes[0].GridRow
+                : approachNodes.Length == 1
+                    ? approachNodes[0].GridRow - passage.GridRow
+                    : 1;
+            var columnDelta = approachNodes.Length >= 2
+                ? approachNodes[1].GridColumn - approachNodes[0].GridColumn
+                : approachNodes.Length == 1
+                    ? approachNodes[0].GridColumn - passage.GridColumn
+                    : 0;
+            if (rowDelta == 0 && columnDelta == 0) rowDelta = 1;
+            return Mathf.Atan2(columnDelta, rowDelta) * Mathf.Rad2Deg;
+        }
+
+        private static Mesh CreateUnitCubeMesh()
+        {
+            var mesh = new Mesh
+            {
+                name = "Luoyang Passage Stateful Presentation Unit Cube V1"
+            };
+            mesh.vertices = new[]
+            {
+                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(0.5f, -0.5f, -0.5f),
+                new Vector3(0.5f, 0.5f, -0.5f),
+                new Vector3(-0.5f, 0.5f, -0.5f),
+                new Vector3(-0.5f, -0.5f, 0.5f),
+                new Vector3(0.5f, -0.5f, 0.5f),
+                new Vector3(0.5f, 0.5f, 0.5f),
+                new Vector3(-0.5f, 0.5f, 0.5f)
+            };
+            mesh.triangles = new[]
+            {
+                0, 2, 1, 0, 3, 2,
+                4, 5, 6, 4, 6, 7,
+                0, 1, 5, 0, 5, 4,
+                3, 7, 6, 3, 6, 2,
+                0, 4, 7, 0, 7, 3,
+                1, 2, 6, 1, 6, 5
+            };
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         private static Material CreateMaterial(Color color)

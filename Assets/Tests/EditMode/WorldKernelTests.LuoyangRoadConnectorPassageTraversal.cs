@@ -397,6 +397,222 @@ namespace Mandate.Tests
                 .FindFacilityPath(plan, session, gate, gate), Is.Empty);
         }
 
+        [Test]
+        public void LuoyangPassagePedestrianPresentation_ProjectsDeterministicBlockingWithoutPersistence()
+        {
+            var plan = BuildLuoyangPassagePlan();
+            var session = LuoyangRoadConnectorPassageTraversalRules
+                .CreateInitialSession(plan);
+            var gateId = plan.PassageFacilityIds.First(item =>
+                !string.Equals(plan.NavigationNodesByFacilityId[item]
+                        .FacilityDefinitionId, "facility.public.bridge",
+                    System.StringComparison.Ordinal));
+            var bridgeId = plan.PassageFacilityIds.First(item =>
+                string.Equals(plan.NavigationNodesByFacilityId[item]
+                        .FacilityDefinitionId, "facility.public.bridge",
+                    System.StringComparison.Ordinal));
+
+            var opening = LuoyangPassagePedestrianPresentationRules.CreatePlan(
+                plan, session);
+            Assert.That(opening.States.Count, Is.EqualTo(20));
+            Assert.That(opening.ChangesSaveSchema, Is.False);
+            Assert.That(opening.PersistsAcrossSave, Is.False);
+            Assert.That(opening.IsWorldStateProjection, Is.False);
+            Assert.That(opening.States.All(item =>
+                !item.BlocksPedestrianTraversal &&
+                item.VisualStateId ==
+                    LuoyangPassagePedestrianPresentationIds.OpenVisualStateId),
+                Is.True);
+
+            session.SetStatus(gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                1, "passage.reason.pedestrian-closed.v1");
+            session.SetStatus(bridgeId,
+                LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                1, "passage.reason.pedestrian-damaged.v1");
+            var first = LuoyangPassagePedestrianPresentationRules.CreatePlan(
+                plan, session);
+            var second = LuoyangPassagePedestrianPresentationRules.CreatePlan(
+                plan, session);
+            Assert.That(first.Get(gateId).BlocksPedestrianTraversal, Is.True);
+            Assert.That(first.Get(gateId).VisualStateId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.ClosedVisualStateId));
+            Assert.That(first.Get(bridgeId).BlocksPedestrianTraversal,
+                Is.False);
+            Assert.That(first.Get(bridgeId).ConditionBasisPoints,
+                Is.EqualTo(5_000));
+            Assert.That(second.States.Select(item => string.Join("|",
+                    item.FacilityId, item.TraversalStatusId,
+                    item.VisualStateId, item.BlocksPedestrianTraversal,
+                    item.ConditionBasisPoints, item.PassageRevision)).ToArray(),
+                Is.EqualTo(first.States.Select(item => string.Join("|",
+                    item.FacilityId, item.TraversalStatusId,
+                    item.VisualStateId, item.BlocksPedestrianTraversal,
+                    item.ConditionBasisPoints, item.PassageRevision)).ToArray()));
+
+            session.SetStatus(bridgeId,
+                LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                2, "passage.reason.pedestrian-destroyed.v1");
+            var destroyed = LuoyangPassagePedestrianPresentationRules
+                .CreatePlan(plan, session).Get(bridgeId);
+            Assert.That(destroyed.BlocksPedestrianTraversal, Is.True);
+            Assert.That(destroyed.ConditionBasisPoints, Is.Zero);
+            Assert.That(destroyed.VisualStateId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.DestroyedVisualStateId));
+        }
+
+        [Test]
+        public void LuoyangClickToWalkPedestrian_UsesStableWidthsCostsAndDynamicPassageRules()
+        {
+            var plan = BuildLuoyangPassagePlan();
+            var session = LuoyangRoadConnectorPassageTraversalRules
+                .CreateInitialSession(plan);
+            var gateId = plan.PassageFacilityIds.First(item =>
+                !string.Equals(plan.NavigationNodesByFacilityId[item]
+                        .FacilityDefinitionId, "facility.public.bridge",
+                    System.StringComparison.Ordinal));
+            var bridgeId = plan.PassageFacilityIds.First(item =>
+                string.Equals(plan.NavigationNodesByFacilityId[item]
+                        .FacilityDefinitionId, "facility.public.bridge",
+                    System.StringComparison.Ordinal));
+            var gateNode = plan.NavigationNodesByFacilityId[gateId];
+            var bridgeNode = plan.NavigationNodesByFacilityId[bridgeId];
+            var nodeById = plan.NavigationNodes.ToDictionary(item =>
+                item.NodeId, System.StringComparer.Ordinal);
+            var gateRoadIds = plan.NavigationEdges.Where(item =>
+                    item.EdgeProfileId ==
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .PassageApproachEdgeProfileId &&
+                    (item.FromNodeId == gateNode.NodeId ||
+                     item.ToNodeId == gateNode.NodeId))
+                .Select(item => item.FromNodeId == gateNode.NodeId
+                    ? nodeById[item.ToNodeId].FacilityId
+                    : nodeById[item.FromNodeId].FacilityId)
+                .OrderBy(item => item, System.StringComparer.Ordinal).ToArray();
+            var gateRoadId = gateRoadIds[0];
+            var bridgeRoadId = plan.NavigationEdges.Where(item =>
+                    item.EdgeProfileId ==
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .PassageApproachEdgeProfileId &&
+                    (item.FromNodeId == bridgeNode.NodeId ||
+                     item.ToNodeId == bridgeNode.NodeId))
+                .Select(item => item.FromNodeId == bridgeNode.NodeId
+                    ? nodeById[item.ToNodeId].FacilityId
+                    : nodeById[item.FromNodeId].FacilityId).First();
+
+            const string actorId = "person.luoyang.walking-core-test";
+            var open = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, gateRoadId, gateId);
+            var repeated = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, gateRoadId, gateId);
+            Assert.That(open.ContractId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.ContractId));
+            Assert.That(open.StatusId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.StatusId));
+            Assert.That(open.CanWalk, Is.True);
+            Assert.That(open.CreatesPermanentPerson, Is.False);
+            Assert.That(open.ChangesSaveSchema, Is.False);
+            Assert.That(open.PersistsAcrossSave, Is.False);
+            Assert.That(open.FacilityIds, Is.EqualTo(repeated.FacilityIds));
+            Assert.That(open.Segments.Select(item => string.Join("|",
+                    item.EdgeId, item.WidthProfileId, item.WidthMetres,
+                    item.LateralOffsetMetres)).ToArray(),
+                Is.EqualTo(repeated.Segments.Select(item => string.Join("|",
+                    item.EdgeId, item.WidthProfileId, item.WidthMetres,
+                    item.LateralOffsetMetres)).ToArray()));
+            Assert.That(open.Segments.Single().WidthProfileId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.GateWidthProfileId));
+            Assert.That(open.Segments.Single().WidthMetres, Is.EqualTo(12f));
+            Assert.That(open.Segments.Single().UsesPassage, Is.True);
+            var crossing = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, gateRoadIds[0], gateRoadIds[1]);
+            Assert.That(crossing.CanWalk, Is.True);
+            Assert.That(crossing.FacilityIds, Does.Contain(gateId));
+
+            session.SetStatus(gateId,
+                LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId, 1,
+                "passage.reason.walking-core-damaged.v1");
+            var damaged = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, gateRoadId, gateId);
+            Assert.That(damaged.CanWalk, Is.True);
+            Assert.That(damaged.UsesDamagedPassage, Is.True);
+            Assert.That(damaged.WeightedDistanceMetres,
+                Is.GreaterThan(open.WeightedDistanceMetres));
+            Assert.That(damaged.EstimatedDurationSeconds,
+                Is.GreaterThan(open.EstimatedDurationSeconds));
+
+            session.SetStatus(gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId, 2,
+                "passage.reason.walking-core-closed.v1");
+            var blocked = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, gateRoadId, gateId);
+            Assert.That(blocked.CanWalk, Is.False);
+            Assert.That(blocked.FailureReasonId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.BlockedPassageReasonId));
+
+            var bridge = LuoyangClickToWalkPedestrianRules.CreatePlan(plan,
+                session, actorId, bridgeRoadId, bridgeId);
+            Assert.That(bridge.CanWalk, Is.True);
+            Assert.That(bridge.Segments.Single().WidthProfileId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.BridgeWidthProfileId));
+            Assert.That(bridge.Segments.Single().WidthMetres, Is.EqualTo(8f));
+
+            var connectorWalk = plan.ModeledConnectors.Select(connector =>
+                LuoyangClickToWalkPedestrianRules.CreatePlan(plan, session,
+                    actorId, nodeById[connector.FromNodeId].FacilityId,
+                    nodeById[connector.ToNodeId].FacilityId)).First(item =>
+                item.CanWalk && item.UsesModeledConnector);
+            Assert.That(connectorWalk.Segments.First(item =>
+                    item.UsesModeledConnector).WidthProfileId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds
+                    .ModeledConnectorWidthProfileId));
+            Assert.That(connectorWalk.Segments.First(item =>
+                    item.UsesModeledConnector).WidthMetres, Is.EqualTo(12f));
+        }
+
+        [Test]
+        public void LuoyangPassagePedestrianPresentation_UsesV75IntegrityAndActiveRepairReadOnly()
+        {
+            var fixture = CreateLuoyangPassageOperationsFixture();
+            var world = fixture.World;
+            var runtime = fixture.Runtime;
+            var system = fixture.System;
+            system.EnqueueGuardAssignment(world, runtime, fixture.FacilityId,
+                fixture.GuardArmyId, fixture.GuardCommanderPersonId);
+            runtime.ProcessDue(world);
+            runtime.DispatchPublishedEvents(world);
+            system.EnqueueBattleDamage(world, runtime, fixture.FacilityId,
+                fixture.BattleId, 4_000,
+                "passage.reason.pedestrian-projection-damage.v1",
+                fixture.AttackerCommanderPersonId);
+            runtime.ProcessDue(world);
+            runtime.DispatchPublishedEvents(world);
+            system.EnqueueStartRepair(world, runtime, fixture.FacilityId,
+                fixture.GuardCommanderPersonId,
+                fixture.GuardCommanderPersonId,
+                fixture.InventoryContainerId);
+            runtime.ProcessDue(world);
+            runtime.DispatchPublishedEvents(world);
+            var serializedBefore = WorldSnapshotSerializer.Serialize(world);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var session = LuoyangRoadConnectorPassageTraversalRules
+                .CreateSessionFromWorldState(passagePlan, world);
+
+            var presentation = LuoyangPassagePedestrianPresentationRules
+                .CreatePlan(passagePlan, session, world);
+            var state = presentation.Get(fixture.FacilityId);
+            Assert.That(presentation.IsWorldStateProjection, Is.True);
+            Assert.That(state.ConditionBasisPoints, Is.EqualTo(6_000));
+            Assert.That(state.IntegrityRevision, Is.EqualTo(1));
+            Assert.That(state.IsRepairing, Is.True);
+            Assert.That(state.BlocksPedestrianTraversal, Is.False);
+            Assert.That(state.VisualStateId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds
+                    .RepairingVisualStateId));
+            Assert.That(WorldSnapshotSerializer.Serialize(world),
+                Is.EqualTo(serializedBefore));
+        }
+
         private static LuoyangRoadTraversalRefinementPlan
             BuildLuoyangPassagePlan()
         {

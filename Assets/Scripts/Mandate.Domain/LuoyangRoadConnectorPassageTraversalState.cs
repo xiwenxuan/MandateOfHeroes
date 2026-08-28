@@ -129,7 +129,7 @@ namespace Mandate.Domain
         public const string TaskId =
             "LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1";
         public const string StatusId =
-            "LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1_IMPLEMENTED_CORE_VERIFICATION_PASSED_UNITY_STARTUP_BLOCKED";
+            "LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW";
 
         public const string GuardAssignmentCommandTypeId =
             "mandate.command.luoyang.passage.assign_guard";
@@ -231,6 +231,562 @@ namespace Mandate.Domain
 
         public static string RepairStartEventId(string repairOrderId) =>
             new StableId(repairOrderId).Value + ".started.event";
+    }
+
+    public static class LuoyangPassagePedestrianPresentationIds
+    {
+        public const string ContractId =
+            "mandate.luoyang.passage-stateful-presentation-pedestrian-blocking.v1";
+        public const string TaskId =
+            "LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1";
+        public const string StatusId =
+            "LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW";
+        public const string OpenVisualStateId =
+            "passage.presentation.open.v1";
+        public const string ClosedVisualStateId =
+            "passage.presentation.closed.v1";
+        public const string DamagedVisualStateId =
+            "passage.presentation.damaged.v1";
+        public const string DestroyedVisualStateId =
+            "passage.presentation.destroyed.v1";
+        public const string RepairingVisualStateId =
+            "passage.presentation.repairing.v1";
+
+        public const int PassageCount = 20;
+        public const bool ChangesSaveSchema = false;
+        public const bool PersistsAcrossSave = false;
+    }
+
+    public sealed class LuoyangPassagePedestrianState
+    {
+        public string FacilityId { get; internal set; }
+        public string FacilityDefinitionId { get; internal set; }
+        public string TraversalStatusId { get; internal set; }
+        public string VisualStateId { get; internal set; }
+        public bool BlocksPedestrianTraversal { get; internal set; }
+        public bool IsRepairing { get; internal set; }
+        public bool IsBridge { get; internal set; }
+        public int ConditionBasisPoints { get; internal set; }
+        public long PassageRevision { get; internal set; }
+        public long IntegrityRevision { get; internal set; }
+    }
+
+    public sealed class LuoyangPassagePedestrianPresentationPlan
+    {
+        private readonly IReadOnlyDictionary<string,
+            LuoyangPassagePedestrianState> _statesByFacilityId;
+
+        internal LuoyangPassagePedestrianPresentationPlan(
+            IReadOnlyList<LuoyangPassagePedestrianState> states,
+            bool isWorldStateProjection)
+        {
+            States = states ?? throw new ArgumentNullException(nameof(states));
+            IsWorldStateProjection = isWorldStateProjection;
+            _statesByFacilityId = states.ToDictionary(item => item.FacilityId,
+                StringComparer.Ordinal);
+        }
+
+        public string ContractId =>
+            LuoyangPassagePedestrianPresentationIds.ContractId;
+        public string TaskId => LuoyangPassagePedestrianPresentationIds.TaskId;
+        public string StatusId =>
+            LuoyangPassagePedestrianPresentationIds.StatusId;
+        public bool ChangesSaveSchema =>
+            LuoyangPassagePedestrianPresentationIds.ChangesSaveSchema;
+        public bool PersistsAcrossSave =>
+            LuoyangPassagePedestrianPresentationIds.PersistsAcrossSave;
+        public bool IsWorldStateProjection { get; }
+        public IReadOnlyList<LuoyangPassagePedestrianState> States { get; }
+
+        public LuoyangPassagePedestrianState Get(string facilityId)
+        {
+            if (string.IsNullOrWhiteSpace(facilityId) ||
+                !_statesByFacilityId.TryGetValue(facilityId, out var state))
+                throw new KeyNotFoundException(
+                    "Unknown Luoyang pedestrian-passage Facility ID: " +
+                    facilityId);
+            return state;
+        }
+    }
+
+    public static class LuoyangPassagePedestrianPresentationRules
+    {
+        private const string BridgeDefinitionId = "facility.public.bridge";
+
+        public static LuoyangPassagePedestrianPresentationPlan CreatePlan(
+            LuoyangRoadTraversalRefinementPlan refinementPlan,
+            LuoyangPassageTraversalSession passageSession,
+            WorldState world = null)
+        {
+            if (refinementPlan == null)
+                throw new ArgumentNullException(nameof(refinementPlan));
+            if (passageSession == null)
+                throw new ArgumentNullException(nameof(passageSession));
+            LuoyangRoadConnectorPassageTraversalRules.Validate(refinementPlan);
+            if (world != null)
+            {
+                if (!passageSession.IsWorldStateProjection)
+                    throw new InvalidOperationException(
+                        "A persisted Luoyang pedestrian projection requires " +
+                        "the read-only WorldState passage session.");
+                LuoyangPassageTraversalWorldRules.ValidateWorld(world);
+                LuoyangPassageOperationalRules.ValidateWorld(world);
+            }
+
+            var controls = world == null
+                ? new Dictionary<string,
+                    LuoyangPassageOperationalControlState>(StringComparer.Ordinal)
+                : world.LuoyangPassageOperationalControls.ToDictionary(
+                    item => item.FacilityId, StringComparer.Ordinal);
+            var activeRepairFacilityIds = world == null
+                ? new HashSet<string>(StringComparer.Ordinal)
+                : new HashSet<string>(world.LuoyangPassageRepairOrders.Where(
+                        item => item.Status ==
+                            LuoyangPassageRepairStatus.InProgress)
+                    .Select(item => item.FacilityId), StringComparer.Ordinal);
+            var states = passageSession.Records.OrderBy(
+                    item => item.FacilityId, StringComparer.Ordinal)
+                .Select(record =>
+                {
+                    controls.TryGetValue(record.FacilityId, out var control);
+                    var isRepairing = activeRepairFacilityIds.Contains(
+                        record.FacilityId);
+                    return new LuoyangPassagePedestrianState
+                    {
+                        FacilityId = record.FacilityId,
+                        FacilityDefinitionId = record.FacilityDefinitionId,
+                        TraversalStatusId = record.TraversalStatusId,
+                        VisualStateId = isRepairing
+                            ? LuoyangPassagePedestrianPresentationIds
+                                .RepairingVisualStateId
+                            : ResolveVisualStateId(record.TraversalStatusId),
+                        BlocksPedestrianTraversal = !record.CanTraverse,
+                        IsRepairing = isRepairing,
+                        IsBridge = string.Equals(record.FacilityDefinitionId,
+                            BridgeDefinitionId, StringComparison.Ordinal),
+                        ConditionBasisPoints = control == null
+                            ? InferConditionBasisPoints(
+                                record.TraversalStatusId)
+                            : control.CurrentConditionBasisPoints,
+                        PassageRevision = record.Revision,
+                        IntegrityRevision = control?.IntegrityRevision ?? 0
+                    };
+                }).ToArray();
+            var plan = new LuoyangPassagePedestrianPresentationPlan(states,
+                world != null);
+            Validate(plan, refinementPlan, passageSession);
+            return plan;
+        }
+
+        public static void Validate(
+            LuoyangPassagePedestrianPresentationPlan plan,
+            LuoyangRoadTraversalRefinementPlan refinementPlan,
+            LuoyangPassageTraversalSession passageSession)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            if (refinementPlan == null)
+                throw new ArgumentNullException(nameof(refinementPlan));
+            if (passageSession == null)
+                throw new ArgumentNullException(nameof(passageSession));
+            if (plan.ChangesSaveSchema || plan.PersistsAcrossSave ||
+                plan.States.Count !=
+                    LuoyangPassagePedestrianPresentationIds.PassageCount ||
+                plan.States.Select(item => item.FacilityId).Distinct(
+                    StringComparer.Ordinal).Count() != plan.States.Count)
+                throw new InvalidOperationException(
+                    "Invalid Luoyang pedestrian-passage projection totals.");
+            var passageIds = new HashSet<string>(
+                refinementPlan.PassageFacilityIds, StringComparer.Ordinal);
+            foreach (var state in plan.States)
+            {
+                if (state == null || !passageIds.Contains(state.FacilityId) ||
+                    state.ConditionBasisPoints < 0 ||
+                    state.ConditionBasisPoints > 10_000 ||
+                    state.PassageRevision < 0 || state.IntegrityRevision < 0)
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang pedestrian-passage projection state.");
+                var record = passageSession.Get(state.FacilityId);
+                if (!string.Equals(state.FacilityDefinitionId,
+                        record.FacilityDefinitionId, StringComparison.Ordinal) ||
+                    !string.Equals(state.TraversalStatusId,
+                        record.TraversalStatusId, StringComparison.Ordinal) ||
+                    state.BlocksPedestrianTraversal == record.CanTraverse ||
+                    state.PassageRevision != record.Revision ||
+                    state.IsRepairing != string.Equals(state.VisualStateId,
+                        LuoyangPassagePedestrianPresentationIds
+                            .RepairingVisualStateId,
+                        StringComparison.Ordinal))
+                    throw new InvalidOperationException(
+                        "Luoyang pedestrian-passage projection drifted from " +
+                        "the authoritative traversal session.");
+            }
+        }
+
+        private static string ResolveVisualStateId(string traversalStatusId)
+        {
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                    StringComparison.Ordinal))
+                return LuoyangPassagePedestrianPresentationIds
+                    .OpenVisualStateId;
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                    StringComparison.Ordinal))
+                return LuoyangPassagePedestrianPresentationIds
+                    .ClosedVisualStateId;
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                    StringComparison.Ordinal))
+                return LuoyangPassagePedestrianPresentationIds
+                    .DamagedVisualStateId;
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                    StringComparison.Ordinal))
+                return LuoyangPassagePedestrianPresentationIds
+                    .DestroyedVisualStateId;
+            throw new InvalidOperationException(
+                "Unknown Luoyang passage traversal status projection: " +
+                traversalStatusId);
+        }
+
+        private static int InferConditionBasisPoints(string traversalStatusId)
+        {
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                    StringComparison.Ordinal)) return 5_000;
+            if (string.Equals(traversalStatusId,
+                    LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                    StringComparison.Ordinal)) return 0;
+            return 10_000;
+        }
+    }
+
+    public static class LuoyangClickToWalkPedestrianIds
+    {
+        public const string ContractId =
+            "presentation.luoyang.click-to-walk-pedestrian.v1";
+        public const string TaskId =
+            "LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1";
+        public const string StatusId =
+            "LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW";
+        public const string PreviewActorId =
+            "presentation-person.luoyang.walk-review.v1";
+        public const string RoadWidthProfileId =
+            "pedestrian.corridor.luoyang-road-18m.v1";
+        public const string ModeledConnectorWidthProfileId =
+            "pedestrian.corridor.luoyang-modeled-connector-12m.v1";
+        public const string GateWidthProfileId =
+            "pedestrian.corridor.luoyang-gate-12m.v1";
+        public const string BridgeWidthProfileId =
+            "pedestrian.corridor.luoyang-bridge-8m.v1";
+        public const string ReadyStateId = "pedestrian.walk.ready.v1";
+        public const string WalkingStateId = "pedestrian.walk.walking.v1";
+        public const string ArrivedStateId = "pedestrian.walk.arrived.v1";
+        public const string BlockedStateId = "pedestrian.walk.blocked.v1";
+        public const string CancelledStateId = "pedestrian.walk.cancelled.v1";
+        public const string UnknownNodeReasonId =
+            "pedestrian.walk.failure.unknown-node.v1";
+        public const string BlockedPassageReasonId =
+            "pedestrian.walk.failure.blocked-passage.v1";
+        public const string NoRouteReasonId =
+            "pedestrian.walk.failure.no-route.v1";
+        public const string OutsideResidentWindowReasonId =
+            "pedestrian.walk.failure.outside-resident-window.v1";
+        public const string DynamicBlockerReasonId =
+            "pedestrian.walk.failure.dynamic-blocker.v1";
+
+        public const float RoadWidthMetres = 18f;
+        public const float ModeledConnectorWidthMetres = 12f;
+        public const float GateWidthMetres = 12f;
+        public const float BridgeWidthMetres = 8f;
+        public const float PersonClearanceRadiusMetres = 0.45f;
+        public const float WalkingSpeedMetresPerSecond = 1.35f;
+        public const bool ChangesSaveSchema = false;
+        public const bool PersistsAcrossSave = false;
+        public const bool CreatesPermanentPerson = false;
+    }
+
+    public sealed class LuoyangPedestrianWalkSegment
+    {
+        public int Sequence { get; internal set; }
+        public string EdgeId { get; internal set; }
+        public string FromFacilityId { get; internal set; }
+        public string ToFacilityId { get; internal set; }
+        public string WidthProfileId { get; internal set; }
+        public float WidthMetres { get; internal set; }
+        public float DistanceMetres { get; internal set; }
+        public float WeightedDistanceMetres { get; internal set; }
+        public float LateralOffsetMetres { get; internal set; }
+        public bool UsesModeledConnector { get; internal set; }
+        public bool UsesPassage { get; internal set; }
+        public bool UsesDamagedPassage { get; internal set; }
+    }
+
+    public sealed class LuoyangPedestrianWalkPlan
+    {
+        internal LuoyangPedestrianWalkPlan(string actorId,
+            string startFacilityId, string targetFacilityId,
+            IReadOnlyList<string> facilityIds,
+            IReadOnlyList<LuoyangPedestrianWalkSegment> segments,
+            string failureReasonId)
+        {
+            ActorId = actorId;
+            StartFacilityId = startFacilityId;
+            TargetFacilityId = targetFacilityId;
+            FacilityIds = facilityIds ?? throw new ArgumentNullException(
+                nameof(facilityIds));
+            Segments = segments ?? throw new ArgumentNullException(
+                nameof(segments));
+            FailureReasonId = failureReasonId ?? string.Empty;
+            TotalDistanceMetres = segments.Sum(item => item.DistanceMetres);
+            WeightedDistanceMetres = segments.Sum(item =>
+                item.WeightedDistanceMetres);
+            EstimatedDurationSeconds = WeightedDistanceMetres /
+                LuoyangClickToWalkPedestrianIds.WalkingSpeedMetresPerSecond;
+        }
+
+        public string ContractId => LuoyangClickToWalkPedestrianIds.ContractId;
+        public string TaskId => LuoyangClickToWalkPedestrianIds.TaskId;
+        public string StatusId => LuoyangClickToWalkPedestrianIds.StatusId;
+        public bool ChangesSaveSchema =>
+            LuoyangClickToWalkPedestrianIds.ChangesSaveSchema;
+        public bool PersistsAcrossSave =>
+            LuoyangClickToWalkPedestrianIds.PersistsAcrossSave;
+        public bool CreatesPermanentPerson =>
+            LuoyangClickToWalkPedestrianIds.CreatesPermanentPerson;
+        public string ActorId { get; }
+        public string StartFacilityId { get; }
+        public string TargetFacilityId { get; }
+        public IReadOnlyList<string> FacilityIds { get; }
+        public IReadOnlyList<LuoyangPedestrianWalkSegment> Segments { get; }
+        public string FailureReasonId { get; }
+        public bool CanWalk => FacilityIds.Count > 0 &&
+                               string.IsNullOrEmpty(FailureReasonId);
+        public float TotalDistanceMetres { get; }
+        public float WeightedDistanceMetres { get; }
+        public float EstimatedDurationSeconds { get; }
+        public bool UsesModeledConnector => Segments.Any(item =>
+            item.UsesModeledConnector);
+        public bool UsesPassage => Segments.Any(item => item.UsesPassage);
+        public bool UsesDamagedPassage => Segments.Any(item =>
+            item.UsesDamagedPassage);
+    }
+
+    public static class LuoyangClickToWalkPedestrianRules
+    {
+        private const string RoadDefinitionId = "facility.public.road";
+        private const string BridgeDefinitionId = "facility.public.bridge";
+
+        public static LuoyangPedestrianWalkPlan CreatePlan(
+            LuoyangRoadTraversalRefinementPlan refinementPlan,
+            LuoyangPassageTraversalSession passageSession,
+            string actorId, string startFacilityId, string targetFacilityId)
+        {
+            if (refinementPlan == null)
+                throw new ArgumentNullException(nameof(refinementPlan));
+            if (passageSession == null)
+                throw new ArgumentNullException(nameof(passageSession));
+            actorId = new StableId(actorId).Value;
+            if (string.IsNullOrWhiteSpace(startFacilityId) ||
+                string.IsNullOrWhiteSpace(targetFacilityId) ||
+                !refinementPlan.NavigationNodesByFacilityId.ContainsKey(
+                    startFacilityId) ||
+                !refinementPlan.NavigationNodesByFacilityId.ContainsKey(
+                    targetFacilityId))
+                return Failed(actorId, startFacilityId, targetFacilityId,
+                    LuoyangClickToWalkPedestrianIds.UnknownNodeReasonId);
+
+            var facilityPath = LuoyangRoadConnectorPassageTraversalRules
+                .FindFacilityPath(refinementPlan, passageSession,
+                    startFacilityId, targetFacilityId);
+            if (facilityPath.Count == 0)
+            {
+                var blocked = IsBlockedPassage(passageSession,
+                                  startFacilityId) ||
+                              IsBlockedPassage(passageSession,
+                                  targetFacilityId);
+                return Failed(actorId, startFacilityId, targetFacilityId,
+                    blocked
+                        ? LuoyangClickToWalkPedestrianIds
+                            .BlockedPassageReasonId
+                        : LuoyangClickToWalkPedestrianIds.NoRouteReasonId);
+            }
+
+            var nodesByFacility = refinementPlan.NavigationNodesByFacilityId;
+            var segments = new List<LuoyangPedestrianWalkSegment>(
+                Math.Max(0, facilityPath.Count - 1));
+            var laneSign = StableLaneSign(actorId);
+            for (var index = 1; index < facilityPath.Count; index++)
+            {
+                var from = nodesByFacility[facilityPath[index - 1]];
+                var to = nodesByFacility[facilityPath[index]];
+                var edge = refinementPlan.NavigationEdges.Single(item =>
+                    item.FromNodeId == from.NodeId &&
+                    item.ToNodeId == to.NodeId ||
+                    item.FromNodeId == to.NodeId &&
+                    item.ToNodeId == from.NodeId);
+                ResolveWidth(edge, from, to, out var profileId,
+                    out var widthMetres, out var usesPassage);
+                var damaged = usesPassage &&
+                              (IsDamagedPassage(passageSession,
+                                   from.FacilityId) ||
+                               IsDamagedPassage(passageSession,
+                                   to.FacilityId));
+                var multiplier = passageSession.TryGet(to.FacilityId,
+                    out var destinationPassage)
+                    ? destinationPassage.TraversalCostPermille / 1000f
+                    : 1f;
+                segments.Add(new LuoyangPedestrianWalkSegment
+                {
+                    Sequence = segments.Count,
+                    EdgeId = edge.EdgeId,
+                    FromFacilityId = from.FacilityId,
+                    ToFacilityId = to.FacilityId,
+                    WidthProfileId = profileId,
+                    WidthMetres = widthMetres,
+                    DistanceMetres = edge.TraversalCostMetres,
+                    WeightedDistanceMetres = edge.TraversalCostMetres *
+                                             multiplier,
+                    LateralOffsetMetres = laneSign * Math.Min(1.2f,
+                        widthMetres * 0.18f),
+                    UsesModeledConnector = string.Equals(edge.EdgeProfileId,
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .ModeledConnectorEdgeProfileId,
+                        StringComparison.Ordinal),
+                    UsesPassage = usesPassage,
+                    UsesDamagedPassage = damaged
+                });
+            }
+
+            var plan = new LuoyangPedestrianWalkPlan(actorId,
+                startFacilityId, targetFacilityId, facilityPath.ToArray(),
+                segments.ToArray(), string.Empty);
+            Validate(plan);
+            return plan;
+        }
+
+        public static void Validate(LuoyangPedestrianWalkPlan plan)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            if (plan.ChangesSaveSchema || plan.PersistsAcrossSave ||
+                plan.CreatesPermanentPerson ||
+                string.IsNullOrWhiteSpace(plan.ActorId))
+                throw new InvalidOperationException(
+                    "Invalid Luoyang click-to-walk persistence boundary.");
+            if (!plan.CanWalk)
+            {
+                if (plan.FacilityIds.Count != 0 || plan.Segments.Count != 0 ||
+                    string.IsNullOrWhiteSpace(plan.FailureReasonId))
+                    throw new InvalidOperationException(
+                        "Invalid failed Luoyang pedestrian walk plan.");
+                return;
+            }
+            if (plan.FacilityIds.Count != plan.Segments.Count + 1 ||
+                !string.Equals(plan.FacilityIds[0], plan.StartFacilityId,
+                    StringComparison.Ordinal) ||
+                !string.Equals(plan.FacilityIds[plan.FacilityIds.Count - 1],
+                    plan.TargetFacilityId, StringComparison.Ordinal) ||
+                plan.Segments.Any(item => item == null ||
+                    item.Sequence < 0 ||
+                    string.IsNullOrWhiteSpace(item.EdgeId) ||
+                    string.IsNullOrWhiteSpace(item.WidthProfileId) ||
+                    item.WidthMetres <=
+                        LuoyangClickToWalkPedestrianIds
+                            .PersonClearanceRadiusMetres * 2f ||
+                    item.DistanceMetres <= 0f ||
+                    item.WeightedDistanceMetres <= 0f ||
+                    Math.Abs(item.LateralOffsetMetres) +
+                        LuoyangClickToWalkPedestrianIds
+                            .PersonClearanceRadiusMetres >=
+                        item.WidthMetres * 0.5f) ||
+                plan.Segments.Select(item => item.Sequence).Distinct().Count() !=
+                    plan.Segments.Count || plan.TotalDistanceMetres < 0f ||
+                plan.WeightedDistanceMetres < plan.TotalDistanceMetres ||
+                plan.EstimatedDurationSeconds < 0f)
+                throw new InvalidOperationException(
+                    "Invalid Luoyang pedestrian walk route geometry.");
+        }
+
+        private static LuoyangPedestrianWalkPlan Failed(string actorId,
+            string startFacilityId, string targetFacilityId, string reasonId)
+        {
+            var plan = new LuoyangPedestrianWalkPlan(actorId,
+                startFacilityId ?? string.Empty, targetFacilityId ?? string.Empty,
+                Array.Empty<string>(),
+                Array.Empty<LuoyangPedestrianWalkSegment>(), reasonId);
+            Validate(plan);
+            return plan;
+        }
+
+        private static void ResolveWidth(LuoyangRoadNavigationEdge edge,
+            LuoyangRoadNavigationNode from, LuoyangRoadNavigationNode to,
+            out string profileId, out float widthMetres,
+            out bool usesPassage)
+        {
+            var passage = !string.Equals(from.FacilityDefinitionId,
+                    RoadDefinitionId, StringComparison.Ordinal)
+                ? from
+                : !string.Equals(to.FacilityDefinitionId, RoadDefinitionId,
+                    StringComparison.Ordinal)
+                    ? to
+                    : null;
+            usesPassage = passage != null;
+            if (passage != null && string.Equals(
+                    passage.FacilityDefinitionId, BridgeDefinitionId,
+                    StringComparison.Ordinal))
+            {
+                profileId = LuoyangClickToWalkPedestrianIds
+                    .BridgeWidthProfileId;
+                widthMetres = LuoyangClickToWalkPedestrianIds
+                    .BridgeWidthMetres;
+                return;
+            }
+            if (passage != null)
+            {
+                profileId = LuoyangClickToWalkPedestrianIds.GateWidthProfileId;
+                widthMetres = LuoyangClickToWalkPedestrianIds.GateWidthMetres;
+                return;
+            }
+            if (string.Equals(edge.EdgeProfileId,
+                    LuoyangRoadConnectorPassageTraversalIds
+                        .ModeledConnectorEdgeProfileId,
+                    StringComparison.Ordinal))
+            {
+                profileId = LuoyangClickToWalkPedestrianIds
+                    .ModeledConnectorWidthProfileId;
+                widthMetres = LuoyangClickToWalkPedestrianIds
+                    .ModeledConnectorWidthMetres;
+                return;
+            }
+            profileId = LuoyangClickToWalkPedestrianIds.RoadWidthProfileId;
+            widthMetres = LuoyangClickToWalkPedestrianIds.RoadWidthMetres;
+        }
+
+        private static bool IsBlockedPassage(
+            LuoyangPassageTraversalSession session, string facilityId) =>
+            session.TryGet(facilityId, out var passage) &&
+            !passage.CanTraverse;
+
+        private static bool IsDamagedPassage(
+            LuoyangPassageTraversalSession session, string facilityId) =>
+            session.TryGet(facilityId, out var passage) && string.Equals(
+                passage.TraversalStatusId,
+                LuoyangRoadConnectorPassageTraversalIds.DamagedStatusId,
+                StringComparison.Ordinal);
+
+        private static float StableLaneSign(string actorId)
+        {
+            unchecked
+            {
+                uint hash = 2166136261;
+                foreach (var character in actorId)
+                {
+                    hash ^= character;
+                    hash *= 16777619;
+                }
+                return (hash & 1) == 0 ? -1f : 1f;
+            }
+        }
     }
 
     [Serializable]

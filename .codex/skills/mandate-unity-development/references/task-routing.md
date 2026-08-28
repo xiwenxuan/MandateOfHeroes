@@ -642,6 +642,45 @@ outside the restricted workspace; the current target status is
 This is targeted evidence, not a complete grouped Unity regression. Full siege, siege engines, bridge load/flood,
 animation and character-scale NavMesh remain out of scope.
 
+### Current Luoyang passage stateful presentation and pedestrian blocking V1 route
+
+For work that changes the 20-passage read-only pedestrian projection, open/closed/damaged/destroyed runtime
+pieces, non-trigger pedestrian blockers, active-repair scaffold projection, approach-axis orientation, CITY/WORLD
+lifecycle, passage-presentation metrics or the close-up review evidence, read
+`Docs/TASK_LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1/README.md`
+together with the V75 guard/damage/repair task and the preceding interaction/navigation and persisted-passage routes.
+
+The current status is
+`LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+The projection changes no save field and never writes back to V75. `closed` and `destroyed` enable one reusable
+non-trigger BoxCollider per resident passage; `open` and `damaged` disable it and retain the existing domain path
+rules. An active V75 repair order adds scaffold presentation without inventing a passage transition. The low-poly
+pieces and colliders are independent runtime children, not modifications to the 54 final Prefabs, and WORLD view
+cleans them with the existing interaction root. Compilation, targeted core 6/6, exact EditMode 1/1, target graphical
+PlayMode 1/1, bound-world PlayMode 1/1 and the preceding interaction graphical regression 1/1 passed. This is
+targeted evidence, not complete grouped regression, full NavMesh baking, character animation, indoor walking or
+final gate/bridge animation art.
+
+### Current Luoyang click-to-walk pedestrian vertical slice V1 route
+
+For work that changes the Luoyang pedestrian corridor widths, stable actor-lane offset, click snapping, focused
+pedestrian runtime, route/target presentation, dynamic passage route cancellation, CapsuleCollider safety stop,
+CITY/WORLD lifecycle or the walking close-up evidence, read
+`Docs/TASK_LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1/README.md` together with
+the preceding stateful-passage, refined-road, facility-interaction, M12 permanent-population and M26 playable-loop
+routes.
+
+The current status is
+`LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+The read-only Domain plan freezes 18m road, 12m modeled-connector, 12m gate, 8m bridge, 0.45m personal-clearance
+and 1.35m/s walking contracts while retaining the existing passage-aware Dijkstra cost. CITY instantiates one
+focused presentation actor, a non-trigger CapsuleCollider, a visible current route and target; a required passage
+closing or being destroyed cancels the remaining route in the same refresh. The preview actor is not a new
+PermanentPerson, and no per-frame position or route enters V75. This targeted slice is not a whole-city NavMesh,
+indoor navigation, crowd/RVO simulation, final character animation or a replacement for formal M26 travel commands.
+
 ### Current family-organization center and historical-family reference contract
 
 For work that changes Clan/Branch/Household/FamilyOrganization separation, family-organization assets, Primary or

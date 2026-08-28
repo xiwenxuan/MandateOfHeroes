@@ -233,6 +233,21 @@ namespace Mandate.Presentation
         public int RuntimeLuoyangPassageStateMarkerCount =>
             _luoyangFacilityInteractionNavigationRuntime?
                 .ResidentPassageMarkerCount ?? 0;
+        public int RuntimeLuoyangPassagePresentationCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .ResidentPassagePresentationCount ?? 0;
+        public int RuntimeLuoyangActivePedestrianBlockerCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .ActivePedestrianBlockerCount ?? 0;
+        public int RuntimeLuoyangDamagedPassagePresentationCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .DamagedPassagePresentationCount ?? 0;
+        public int RuntimeLuoyangDestroyedPassagePresentationCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .DestroyedPassagePresentationCount ?? 0;
+        public int RuntimeLuoyangActiveRepairScaffoldCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .ActiveRepairScaffoldCount ?? 0;
         public int LuoyangRoadComponentCountBeforeConnectors =>
             _luoyangFacilityInteractionNavigationPlan?
                 .RoadComponentCountBeforeConnectors ?? 0;
@@ -245,6 +260,43 @@ namespace Mandate.Presentation
             _luoyangRoadTraversalRefinementPlan == null
                 ? "NOT_READY"
                 : _luoyangRoadTraversalRefinementPlan.StatusId;
+        public string LuoyangPassagePedestrianPresentationStatus =>
+            _luoyangRoadTraversalRefinementPlan == null
+                ? "NOT_READY"
+                : LuoyangPassagePedestrianPresentationIds.StatusId;
+        public string LuoyangClickToWalkPedestrianStatus =>
+            _luoyangRoadTraversalRefinementPlan == null
+                ? "NOT_READY"
+                : LuoyangClickToWalkPedestrianIds.StatusId;
+        public string LuoyangPedestrianActorId =>
+            _luoyangFacilityInteractionNavigationRuntime?.PedestrianActorId;
+        public string LuoyangPedestrianCurrentFacilityId =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianCurrentFacilityId;
+        public string LuoyangPedestrianTargetFacilityId =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianTargetFacilityId;
+        public string LuoyangPedestrianMovementStateId =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianMovementStateId;
+        public string LuoyangPedestrianLastStopReasonId =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianLastStopReasonId;
+        public bool LuoyangPedestrianIsWalking =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianIsWalking ?? false;
+        public int LuoyangPedestrianRouteNodeCount =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianRouteNodeCount ?? 0;
+        public float LuoyangPedestrianRouteDistanceMetres =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianRouteDistanceMetres ?? 0f;
+        public float LuoyangPedestrianEstimatedDurationSeconds =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianEstimatedDurationSeconds ?? 0f;
+        public IReadOnlyList<string> LuoyangPedestrianRouteFacilityIds =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .PedestrianRouteFacilityIds ?? Array.Empty<string>();
         public LuoyangBuildingBatchMetrics LuoyangBuildingBatchMetrics =>
             _luoyangBuildingBatchMetrics;
         public string ProductionBuildingKitStatus =>
@@ -930,6 +982,7 @@ namespace Mandate.Presentation
                         _luoyangFacilityInteractionNavigationPlan,
                         _luoyangRoadTraversalRefinementPlan,
                         _luoyangPassageTraversalSession,
+                        _luoyangPassageWorld,
                         window.Facilities, BuildingPerformanceLocalPosition,
                         BuildingPerformanceRotation,
                         BuildingPerformanceCellPosition,
@@ -1089,8 +1142,86 @@ namespace Mandate.Presentation
             _luoyangFacilityInteractionNavigationRuntime?.ClearSelection();
         }
 
+        public bool PlaceLuoyangPedestrianAtFacility(string facilityId,
+            string actorId = null) =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .TryPlacePedestrianAtFacility(facilityId, actorId) ?? false;
+
+        public bool SetLuoyangPedestrianDestination(string facilityId) =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .TrySetPedestrianDestination(facilityId) ?? false;
+
+        public bool TrySetLuoyangPedestrianDestination(Ray ray)
+        {
+            if (_luoyangFacilityInteractionNavigationRuntime == null)
+                return false;
+            var hit = Physics.RaycastAll(ray, _camera == null
+                    ? float.MaxValue : _camera.farClipPlane,
+                    Physics.DefaultRaycastLayers,
+                    QueryTriggerInteraction.Ignore)
+                .Where(item => item.collider.GetComponentInParent<
+                    LuoyangClickWalkPedestrianInstance>() == null)
+                .OrderBy(item => item.distance)
+                .FirstOrDefault();
+            if (hit.collider != null)
+                return _luoyangFacilityInteractionNavigationRuntime
+                    .TrySetPedestrianDestination(hit.point);
+            var ground = new Plane(Vector3.up, Vector3.zero);
+            return ground.Raycast(ray, out var distance) &&
+                   _luoyangFacilityInteractionNavigationRuntime
+                       .TrySetPedestrianDestination(ray.GetPoint(distance));
+        }
+
+        public bool StepLuoyangPedestrian(float deltaSeconds) =>
+            _luoyangFacilityInteractionNavigationRuntime?
+                .StepPedestrian(deltaSeconds) ?? false;
+
+        public IReadOnlyList<string> GetLuoyangPassageApproachFacilityIds(
+            string facilityId)
+        {
+            if (_luoyangRoadTraversalRefinementPlan == null ||
+                string.IsNullOrWhiteSpace(facilityId) ||
+                !_luoyangRoadTraversalRefinementPlan
+                    .NavigationNodesByFacilityId.TryGetValue(facilityId,
+                        out var passage)) return Array.Empty<string>();
+            var nodeById = _luoyangRoadTraversalRefinementPlan.NavigationNodes
+                .ToDictionary(item => item.NodeId, StringComparer.Ordinal);
+            return _luoyangRoadTraversalRefinementPlan.NavigationEdges.Where(
+                    item => string.Equals(item.EdgeProfileId,
+                        LuoyangRoadConnectorPassageTraversalIds
+                            .PassageApproachEdgeProfileId,
+                        StringComparison.Ordinal) &&
+                        (item.FromNodeId == passage.NodeId ||
+                         item.ToNodeId == passage.NodeId))
+                .Select(item => item.FromNodeId == passage.NodeId
+                    ? nodeById[item.ToNodeId].FacilityId
+                    : nodeById[item.FromNodeId].FacilityId)
+                .OrderBy(item => item, StringComparer.Ordinal).ToArray();
+        }
+
+        public LuoyangClickWalkPedestrianInstance
+            GetLuoyangClickWalkPedestrian()
+        {
+            if (_luoyangFacilityInteractionNavigationRuntime?
+                    .PedestrianInstance == null)
+                throw new InvalidOperationException(
+                    "The Luoyang click-to-walk pedestrian is not active.");
+            return _luoyangFacilityInteractionNavigationRuntime
+                .PedestrianInstance;
+        }
+
         public string GetLuoyangPassageTraversalStatus(string facilityId) =>
             _luoyangPassageTraversalSession?.Get(facilityId).TraversalStatusId;
+
+        public LuoyangPassagePedestrianPresentationInstance
+            GetLuoyangPassagePedestrianPresentation(string facilityId)
+        {
+            if (_luoyangFacilityInteractionNavigationRuntime == null)
+                throw new InvalidOperationException(
+                    "The Luoyang passage presentation runtime is not active.");
+            return _luoyangFacilityInteractionNavigationRuntime
+                .GetPassagePresentation(facilityId);
+        }
 
         public WorldCommandExecutionReport BindLuoyangPassageWorld(
             WorldState world,
@@ -1140,7 +1271,8 @@ namespace Mandate.Presentation
                 LuoyangRoadConnectorPassageTraversalRules.CreateInitialSession(
                     _luoyangRoadTraversalRefinementPlan);
             _luoyangFacilityInteractionNavigationRuntime?
-                .RefreshTraversalState(_luoyangPassageTraversalSession);
+                .RefreshTraversalState(_luoyangPassageTraversalSession,
+                    _luoyangPassageWorld);
         }
 
         public bool SetLuoyangPassageTraversalStatus(string facilityId,
@@ -1179,7 +1311,8 @@ namespace Mandate.Presentation
                 statusId, absoluteTick, reasonId);
             if (changed)
                 _luoyangFacilityInteractionNavigationRuntime?
-                    .RefreshTraversalState(_luoyangPassageTraversalSession);
+                    .RefreshTraversalState(_luoyangPassageTraversalSession,
+                        _luoyangPassageWorld);
             return changed;
         }
 
@@ -1196,7 +1329,8 @@ namespace Mandate.Presentation
                 LuoyangRoadConnectorPassageTraversalRules.CreateInitialSession(
                     _luoyangRoadTraversalRefinementPlan);
             _luoyangFacilityInteractionNavigationRuntime?
-                .RefreshTraversalState(_luoyangPassageTraversalSession);
+                .RefreshTraversalState(_luoyangPassageTraversalSession,
+                    _luoyangPassageWorld);
         }
 
         private void RefreshPersistedLuoyangPassageProjection()
@@ -1210,7 +1344,8 @@ namespace Mandate.Presentation
                         _luoyangRoadTraversalRefinementPlan,
                         _luoyangPassageWorld);
             _luoyangFacilityInteractionNavigationRuntime?
-                .RefreshTraversalState(_luoyangPassageTraversalSession);
+                .RefreshTraversalState(_luoyangPassageTraversalSession,
+                    _luoyangPassageWorld);
         }
 
         public IReadOnlyList<string> FindLuoyangFacilityPath(

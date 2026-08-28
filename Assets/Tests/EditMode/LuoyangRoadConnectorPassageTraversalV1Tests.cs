@@ -225,6 +225,40 @@ namespace Mandate.Tests
             migrated.Validate();
         }
 
+        [Test]
+        public void PedestrianPresentationProjection_MapsAllStablePassageStates()
+        {
+            var plan = Load().Refinement;
+            var session = LuoyangRoadConnectorPassageTraversalRules
+                .CreateInitialSession(plan);
+            const string gateId =
+                LuoyangGateIdentityKitIds.NorthPalaceSouthGate;
+            var bridgeId = session.Records.First(item => string.Equals(
+                item.FacilityDefinitionId, "facility.public.bridge",
+                StringComparison.Ordinal)).FacilityId;
+            session.SetStatus(gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                20, "passage.reason.editmode-pedestrian-close.v1");
+            session.SetStatus(bridgeId,
+                LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                20, "passage.reason.editmode-pedestrian-destroy.v1");
+
+            var projection = LuoyangPassagePedestrianPresentationRules
+                .CreatePlan(plan, session);
+            Assert.That(projection.ContractId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.ContractId));
+            Assert.That(projection.StatusId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.StatusId));
+            Assert.That(projection.States.Count, Is.EqualTo(20));
+            Assert.That(projection.States.Count(item =>
+                item.BlocksPedestrianTraversal), Is.EqualTo(2));
+            Assert.That(projection.Get(gateId).VisualStateId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.ClosedVisualStateId));
+            Assert.That(projection.Get(bridgeId).VisualStateId, Is.EqualTo(
+                LuoyangPassagePedestrianPresentationIds.DestroyedVisualStateId));
+            Assert.That(projection.Get(bridgeId).IsBridge, Is.True);
+        }
+
         private static LoadedPlans Load()
         {
             var coverage = new LuoyangFacilityModelCoverageSource(WorldMapRoot);

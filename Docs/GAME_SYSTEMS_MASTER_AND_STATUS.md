@@ -2173,3 +2173,45 @@ V74→V75只建立空守军、战损和维修集合，并把旧库存事务新�
 EngineSmoke通过、目标EditMode 1/1通过、相关图形PlayMode 1/1通过。当前状态为
 `LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`；
 以上是定向验收，不替代完整分组回归。完整攻城、攻城器械、桥梁载重/洪水、门扇/瓦砾动画和人物尺度 NavMesh仍未实现。
+
+## 42. 洛阳门桥状态化表现与人物尺度通行阻断 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1.md`](TASK_LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1.md)。
+本阶段不增加新的世界事实或存档字段，只从 V75 的20项门桥状态、真实完整度和活动维修工单生成
+只读、确定性人物通行投影。`closed`与`destroyed`在CITY当前驻留窗口启用独立非Trigger
+`BoxCollider`；`open`与`damaged`关闭阻断，并继续服从既有路径规则，其中受损通行代价保持1,800‰。
+活动维修只增加脚手表现，不自行开闭门桥。
+
+每项当前驻留门桥最多建立一个可复用运行时实例，使用共享低多边形网格表现开放门叶、关闭门叶、
+受损残片、毁坏瓦砾和维修脚手；朝向由既有两侧道路接近边确定。所有对象独立于54项最终Prefab、
+FBX、LOD、锚点和`FinalArtApproved`，绑定/解绑、命令刷新、会话重置和WORLD切换复用同一生命周期，
+不会把Presentation状态写回世界账。
+
+当前状态为
+`LUOYANG_PASSAGE_STATEFUL_PRESENTATION_AND_PEDESTRIAN_BLOCKING_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+全工程编译、定向核心6/6、目标EditMode 1/1、目标图形PlayMode 1/1、正式世界绑定PlayMode 1/1、
+上一交互导航图形回归1/1和`git diff --check`均通过；门桥近景已人工确认可同时辨认门楼、道路接近线、
+选择框、关闭标记和闭门构件。以上为定向验收，不替代完整分组回归，也不表示完整NavMesh、角色动画、
+室内行走、最终门桥动画、围城或攻城器械已经实现。全局推荐顺序仍由0E节决定，本洛阳连续任务不自动
+改写M26玩家玩法主线。
+
+## 43. 洛阳可点击道路步行与动态门桥阻断竖切片 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1.md`](TASK_LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1.md)。
+本阶段继续只读复用 379 节点、402 边精化道路图和 V75 门桥状态，建立一名玩家关注范围人物的 CITY
+步行表现。Domain 冻结普通道路 18m、玩法重建连接 12m、城门 12m、桥梁 8m、人物净空半径 0.45m
+和步速 1.35m/s；相同稳定角色、起终节点和门桥状态产生相同路线、侧移、距离与预计时长。
+
+CITY 当前驻留窗口建立一名低多边形人物、非 Trigger CapsuleCollider、亮黄色当前路线和洋红目标；
+右键落点或显式目标只吸附正式道路/门桥节点，左键 Facility 选择保持不变。移动中的必要门桥关闭或
+毁坏后，同一刷新周期取消路线；启用的门桥阻断体仍是最终碰撞安全门。地图的 2km Cell 与角色近景
+可读性存在表现比例差异，人物和路线带的画面尺寸不得解释为 1:1 历史测绘。
+
+当前状态为
+`LUOYANG_CLICK_TO_WALK_PEDESTRIAN_VERTICAL_SLICE_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+本任务不创建或复制 PermanentPerson，不改变正式 Person Location、世界时间、体力或旅行事实，不升级
+V75，也不保存逐帧坐标或路线。它只证明单关注角色的点击步行、稳定侧移与动态门桥停止，不代表全城
+NavMesh、室内、多人物 RVO/拥堵、最终角色 FBX/动画或 M26 正式旅行命令已经完成。全局推荐顺序仍由
+0E 节决定，本连续洛阳任务不自动改写 M26 玩家玩法主线。
