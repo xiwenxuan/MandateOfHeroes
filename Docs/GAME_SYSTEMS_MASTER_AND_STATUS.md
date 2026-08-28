@@ -1053,6 +1053,16 @@ M26-P0 已于 2026-08-06 完成首个可玩主循环竖切片，任务与证据�
 
 ## 0E. 推荐后续建设顺序
 
+2026-08-29，`TASK_LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1` 已完成 V77 核心实现：同一正式
+洛阳被展开为5,980个派生LocalSpace，2,084/2,084 Facility取得人物尺度Capability/Anchor/
+Footprint，1,959节点、1,976边和4,920个跨Cell Transition接入同一个M26 Person、同一个
+`MovePersonCommand`、WorldTime、体力、口粮、存档和重放。完整核心回归766/766通过，3/3重放一致；
+LocalSpace不是SubCell，Streaming不卸载世界事实。当前受控Unity EditMode/PlayMode均因编辑器进程
+45秒内不生成启动日志而在安全入口返回`blocked/125`，没有实际执行测试，因此任务状态为
+`IMPLEMENTED_CORE_VERIFIED_UNITY_ENVIRONMENT_BLOCKED / NOT ACCEPTED`。当前最先收口Unity环境门禁与
+Unity点击、碰撞、Streaming和性能证据；只有该任务达到ACCEPTED后，才执行食品库存守恒差额RCA与
+修复，之后再进入洛阳外围供应区与城市物流V1。
+
 2026-08-12，`LUOYANG-184-T4-LIVING-WORLD-COMPLETION-MASTER-V1` 已达到
 `T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS`。受保护的 400,000 Person、
 80,899 Household 与 2,084 opening Facility 未重建；产权/建设、真实外部供应、市场、家族、
@@ -2238,3 +2248,26 @@ NavMesh、室内、多人物 RVO/拥堵、最终角色 FBX/动画或 M26 正式�
 通过；其余核心和 Unity 继续使用 300 秒上限。一次可选生活证据刷新另行暴露既有食品守恒差额，未由本次
 移动引入且未在本任务越权修复。固定下一阶段是“洛阳人物尺度近景地图与局部导航 V1”，而不是继续
 扩充移动功能、建筑资产、NPC 群体寻路或外围供应区。
+
+## 45. 洛阳人物尺度近景地图与局部导航 V1（2026-08-29）
+
+正式入口为
+[`TASK_LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1.md`](TASK_LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1.md)，
+当前门禁见
+[`LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1_ACCEPTANCE_REPORT.md`](LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1_ACCEPTANCE_REPORT.md)。
+本阶段不建立第二张洛阳或微型Simulation Cell，而是泛化V68/M26-P5B既有城镇坐标与占地合同，将
+同一2km Global Cell内的正式Facility投影为人物尺度Anchor、Footprint、Access与导航拓扑。
+正式Road、Gate、Bridge和Facility状态继续由世界账唯一持有；Local Graph实时读取状态，Unity只
+表现已经由Domain规划和Simulation结算的路线。
+
+V77为同一Person Location增加LocalSpace、Local Anchor及厘米整数坐标，并让既有持久
+`MovePersonCommand`保存局部路段快照；V76迁移只标记战略精度，不虚构局部位置。全城派生计划包含
+5,980 LocalSpace、2,084 Facility Capability/Footprint、1,580 Access Point、1,959节点、1,976边、
+4,920个连续跨Cell Transition，18项Gate-type Facility和2座Bridge均映射。3×3表现Streaming只
+装卸地形、道路Mesh/Collider、阻挡占地与点击代理，不创建或删除永久人物、设施或库存。
+
+当前状态为`LUOYANG_HUMAN_SCALE_LOCAL_MAP_V1_IMPLEMENTED_CORE_VERIFIED_UNITY_ENVIRONMENT_BLOCKED`：
+全工程编译、专项核心19/19、完整核心766/766、三次重放和差异检查通过；Domain地图生成和50条路径
+采样已记录。受控Unity EditMode/PlayMode分别启动独立PID后，均因45秒内没有非空启动日志返回
+`blocked/125`，没有测试XML，因此Formal Acceptance必须保持`NOT ACCEPTED`。不得用旧11/11、4/4
+Unity结果或Domain性能替代本阶段Unity证据。
