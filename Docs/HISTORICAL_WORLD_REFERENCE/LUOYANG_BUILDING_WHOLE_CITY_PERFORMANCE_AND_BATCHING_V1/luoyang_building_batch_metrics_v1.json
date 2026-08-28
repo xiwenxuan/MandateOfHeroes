@@ -1,0 +1,16 @@
+{
+    "BudgetId": "LUOYANG_BUILDING_WHOLE_CITY_PERFORMANCE_AND_BATCHING_V1",
+    "FullCityFacilityCount": 2084,
+    "FullCitySpatialBatchCount": 64,
+    "ResidentFacilityCount": 549,
+    "ResidentSpatialBatchCount": 9,
+    "SourceModuleRendererCount": 1673,
+    "BuildingRendererBatchCount": 97,
+    "CombinedMeshCount": 97,
+    "UniqueSourceMeshCount": 11,
+    "CombinedVertexCount": 17512,
+    "BatchBuildMilliseconds": 24.093300000000004,
+    "RendererReductionRatio": 0.9420203227734608,
+    "AllowsSpatialOcclusion": true,
+    "WithinBudget": true
+}

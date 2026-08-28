@@ -535,7 +535,8 @@ namespace Mandate.Tests
             var loaded = RoundTripDecisionWorld();
             Assert.That(loaded.WorldDecisionAgents[0].ModelVersion,
                 Is.EqualTo("merchant-mlp-v1"));
-            Assert.That(loaded.SchemaVersion, Is.EqualTo(72));
+            Assert.That(loaded.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
         }
 
         [Test]
@@ -554,7 +555,8 @@ namespace Mandate.Tests
                 Memory = null
             });
             var migrated = WorldSnapshotMigrator.MigrateToCurrent(world);
-            Assert.That(migrated.SchemaVersion, Is.EqualTo(72));
+            Assert.That(migrated.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(migrated.WorldDecisionAgents[0].ModelId, Is.EqualTo("none"));
             Assert.That(migrated.WorldDecisionAgents[0].Memory, Is.Empty);
         }

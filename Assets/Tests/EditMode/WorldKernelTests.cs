@@ -12,6 +12,401 @@ namespace Mandate.Tests
     public sealed partial class WorldKernelTests
     {
         [Test]
+        public void LuoyangInfrastructureProductionKit_Freezes37ActualFacilitiesAndTwoWaterways()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog);
+            var source = new LuoyangInfrastructureProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, performance.Plan);
+            var plan = source.Plan;
+
+            Assert.That(source.Catalog.Profiles.Count, Is.EqualTo(3));
+            Assert.That(source.Catalog.Profiles.Sum(item =>
+                item.OpeningUsageCount), Is.EqualTo(37));
+            Assert.That(source.Catalog.ProducedOpeningFacilityCount,
+                Is.EqualTo(1995));
+            Assert.That(plan.Facilities.Count, Is.EqualTo(37));
+            Assert.That(plan.Facilities.Select(item => item.FacilityId)
+                .Distinct().Count(), Is.EqualTo(37));
+            Assert.That(plan.Facilities.Select(item => item.CellId64)
+                .Distinct().Count(), Is.EqualTo(37));
+            Assert.That(plan.Facilities.Count(item => item.ModelId ==
+                LuoyangInfrastructureProductionKitIds.CanalModel),
+                Is.EqualTo(19));
+            Assert.That(plan.Facilities.Count(item => item.ModelId ==
+                LuoyangInfrastructureProductionKitIds.WellModel),
+                Is.EqualTo(16));
+            Assert.That(plan.Facilities.Count(item => item.ModelId ==
+                LuoyangInfrastructureProductionKitIds.BridgeModel),
+                Is.EqualTo(2));
+            Assert.That(plan.WaterwayComponentCount, Is.EqualTo(2));
+            Assert.That(plan.WaterwayEndpointCount, Is.EqualTo(4));
+            Assert.That(plan.WaterwayStraightCount, Is.EqualTo(17));
+            Assert.That(plan.Facilities.Count(item => item.TopologyId ==
+                LuoyangInfrastructureProductionKitIds.TopologyIsolated),
+                Is.EqualTo(16));
+            Assert.That(plan.Facilities.Where(item => item.ConnectionMask != 0)
+                .All(item => item.RotationDegrees == 0f), Is.True);
+        }
+
+        [Test]
+        public void LuoyangLowFrequencyDefenseProductionKit_Freezes28ActualFacilitiesAndIdentityReuse()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var gates = new LuoyangGateIdentityKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog);
+            var source =
+                new LuoyangLowFrequencyDefenseProductionKitSource(worldMapRoot,
+                    coverage.CombinedCatalog, gates, performance.Plan);
+            var plan = source.Plan;
+
+            Assert.That(source.Catalog.Profiles.Count, Is.EqualTo(5));
+            Assert.That(source.Catalog.Profiles.Sum(item =>
+                item.OpeningUsageCount), Is.EqualTo(28));
+            Assert.That(source.Catalog.ProducedOpeningFacilityCount,
+                Is.EqualTo(2023));
+            Assert.That(plan.Facilities.Count, Is.EqualTo(28));
+            Assert.That(plan.Facilities.Select(item => item.FacilityId)
+                .Distinct().Count(), Is.EqualTo(28));
+            Assert.That(plan.Facilities.Select(item => item.CellId64)
+                .Distinct().Count(), Is.EqualTo(28));
+            Assert.That(plan.IdentityReuseCount, Is.EqualTo(14));
+            Assert.That(plan.ProceduralCount, Is.EqualTo(14));
+            Assert.That(plan.Facilities.Count(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.CityGateDefinition),
+                Is.EqualTo(12));
+            Assert.That(plan.Facilities.Count(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.PalaceGateDefinition),
+                Is.EqualTo(2));
+            Assert.That(plan.Facilities.Count(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.MilitaryGateDefinition),
+                Is.EqualTo(4));
+            Assert.That(plan.Facilities.Count(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.FortifiedManorDefinition),
+                Is.EqualTo(7));
+            Assert.That(plan.Facilities.Count(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.BeaconDefinition),
+                Is.EqualTo(3));
+            Assert.That(plan.Facilities.Where(item => item.FacilityDefinitionId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds.MilitaryGateDefinition)
+                .All(item => item.RotationDegrees == 0f &&
+                    item.VisualFacing == "south" && item.DirectionBasisId ==
+                    LuoyangLowFrequencyDefenseProductionKitIds
+                        .GenericGateDefaultFacingPolicyId), Is.True);
+        }
+
+        [Test]
+        public void LuoyangResourceAgricultureProductionKit_Freezes26ActualFacilitiesAndFourProfiles()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog);
+            var source =
+                new LuoyangResourceAgricultureProductionKitSource(worldMapRoot,
+                    coverage.CombinedCatalog, performance.Plan);
+            var plan = source.Plan;
+
+            Assert.That(source.Catalog.Profiles.Count, Is.EqualTo(4));
+            Assert.That(source.Catalog.Profiles.Sum(item =>
+                item.OpeningUsageCount), Is.EqualTo(26));
+            Assert.That(source.Catalog.ProducedOpeningFacilityCount,
+                Is.EqualTo(2049));
+            Assert.That(plan.Facilities.Count, Is.EqualTo(26));
+            Assert.That(plan.Facilities.Select(item => item.FacilityId)
+                .Distinct().Count(), Is.EqualTo(26));
+            Assert.That(plan.Facilities.Select(item => item.CellId64)
+                .Distinct().Count(), Is.EqualTo(26));
+            Assert.That(plan.Facilities.Count(item =>
+                    item.FacilityDefinitionId ==
+                    LuoyangResourceAgricultureProductionKitIds
+                        .ForestryDefinition), Is.EqualTo(9));
+            Assert.That(plan.Facilities.Count(item =>
+                    item.FacilityDefinitionId ==
+                    LuoyangResourceAgricultureProductionKitIds
+                        .QuarryDefinition), Is.EqualTo(6));
+            Assert.That(plan.Facilities.Count(item =>
+                    item.FacilityDefinitionId ==
+                    LuoyangResourceAgricultureProductionKitIds.MineDefinition),
+                Is.EqualTo(5));
+            Assert.That(plan.Facilities.Count(item =>
+                    item.FacilityDefinitionId ==
+                    LuoyangResourceAgricultureProductionKitIds
+                        .RiceFieldDefinition), Is.EqualTo(6));
+            Assert.That(plan.Facilities.All(item => item.EvidenceBasisId ==
+                LuoyangResourceAgricultureProductionKitIds.EvidenceBasisId),
+                Is.True);
+        }
+
+        [Test]
+        public void LuoyangFinalCivicProductionKit_ClosesAll35FacilitiesAnd2084Coverage()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var landmarks = new LuoyangHistoricalLandmarkKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog);
+            var source =
+                new LuoyangFinalCivicRitualMedicalProductionKitSource(
+                    worldMapRoot, coverage.CombinedCatalog, landmarks,
+                    performance.Plan);
+            var plan = source.Plan;
+
+            Assert.That(source.Catalog.Profiles.Count, Is.EqualTo(12));
+            Assert.That(source.Catalog.Profiles.Sum(item =>
+                item.OpeningUsageCount), Is.EqualTo(35));
+            Assert.That(source.Catalog.ProducedOpeningFacilityCount,
+                Is.EqualTo(2084));
+            Assert.That(plan.Facilities.Count, Is.EqualTo(35));
+            Assert.That(plan.Facilities.Select(item => item.FacilityId)
+                .Distinct().Count(), Is.EqualTo(35));
+            Assert.That(plan.Facilities.Select(item => item.CellId64)
+                .Distinct().Count(), Is.EqualTo(35));
+            Assert.That(plan.IdentityReuseCount, Is.EqualTo(10));
+            Assert.That(plan.ProceduralCount, Is.EqualTo(25));
+            Assert.That(plan.Facilities.Where(item =>
+                    item.ProductionModeId ==
+                    LuoyangFinalCivicRitualMedicalProductionKitIds
+                        .IdentityReuseModeId).Select(item => item.FacilityId),
+                Is.EquivalentTo(LuoyangHistoricalLandmarkKitIds.FacilityIds));
+            foreach (var expected in
+                     LuoyangFinalCivicRitualMedicalProductionKitIds
+                         .OpeningUsageByDefinition)
+                Assert.That(plan.Facilities.Count(item =>
+                        item.FacilityDefinitionId == expected.Key),
+                    Is.EqualTo(expected.Value), expected.Key);
+        }
+
+        [Test]
+        public void LuoyangFinalAssetReviewManifest_Covers54SlotsAnd2084Facilities()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var production = new LuoyangProductionBuildingKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var landmarks = new LuoyangHistoricalLandmarkKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var gates = new LuoyangGateIdentityKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var fabric = new LuoyangMediumFrequencyUrbanFabricKitSource(
+                worldMapRoot, coverage.CombinedCatalog).Catalog;
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog).Plan;
+            var infrastructure = new LuoyangInfrastructureProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, performance).Catalog;
+            var defense = new LuoyangLowFrequencyDefenseProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, gates,
+                performance).Catalog;
+            var resources = new LuoyangResourceAgricultureProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, performance).Catalog;
+            var finalCivic =
+                new LuoyangFinalCivicRitualMedicalProductionKitSource(
+                    worldMapRoot, coverage.CombinedCatalog, landmarks,
+                    performance).Catalog;
+            var review = new LuoyangFinalAssetReviewManifestSource(worldMapRoot,
+                production, landmarks, gates, fabric, infrastructure, defense,
+                resources, finalCivic, performance);
+
+            Assert.That(review.Catalog.Items, Has.Count.EqualTo(54));
+            Assert.That(review.Catalog.AuditGroups, Has.Count.EqualTo(9));
+            Assert.That(review.Catalog.Items.Sum(item =>
+                item.FacilityUsageCount), Is.EqualTo(2084));
+            Assert.That(review.Plan.FacilityAssetVariants,
+                Has.Count.EqualTo(2084));
+            Assert.That(review.Plan.FacilityAssetVariants.Values.Distinct()
+                .Count(), Is.EqualTo(54));
+            Assert.That(review.Catalog.Items.Count(item => item.PriorityId ==
+                    LuoyangFinalAssetReviewIds.PriorityP0), Is.EqualTo(24));
+            Assert.That(review.Catalog.Items.Count(item => item.PriorityId ==
+                    LuoyangFinalAssetReviewIds.PriorityP1), Is.EqualTo(10));
+            Assert.That(review.Catalog.Items.Count(item => item.PriorityId ==
+                    LuoyangFinalAssetReviewIds.PriorityP2), Is.EqualTo(14));
+            Assert.That(review.Catalog.Items.Count(item => item.PriorityId ==
+                    LuoyangFinalAssetReviewIds.PriorityP3), Is.EqualTo(6));
+        }
+
+        [Test]
+        public void LuoyangP0FinalAssetVerticalSlice_FreezesFourExistingSlots()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var production = new LuoyangProductionBuildingKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var landmarks = new LuoyangHistoricalLandmarkKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var gates = new LuoyangGateIdentityKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+            var fabric = new LuoyangMediumFrequencyUrbanFabricKitSource(
+                worldMapRoot, coverage.CombinedCatalog).Catalog;
+            var performance = new LuoyangBuildingPerformancePlanSource(
+                worldMapRoot, coverage.Bindings, coverage.CombinedCatalog).Plan;
+            var infrastructure = new LuoyangInfrastructureProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, performance).Catalog;
+            var defense = new LuoyangLowFrequencyDefenseProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, gates,
+                performance).Catalog;
+            var resources = new LuoyangResourceAgricultureProductionKitSource(
+                worldMapRoot, coverage.CombinedCatalog, performance).Catalog;
+            var finalCivic =
+                new LuoyangFinalCivicRitualMedicalProductionKitSource(
+                    worldMapRoot, coverage.CombinedCatalog, landmarks,
+                    performance).Catalog;
+            var review = new LuoyangFinalAssetReviewManifestSource(worldMapRoot,
+                production, landmarks, gates, fabric, infrastructure, defense,
+                resources, finalCivic, performance);
+            var p0 = new LuoyangP0FinalAssetVerticalSliceSource(worldMapRoot,
+                coverage.CombinedCatalog, landmarks, gates, review.Catalog);
+
+            Assert.That(p0.Catalog.Profiles, Has.Count.EqualTo(4));
+            Assert.That(p0.Catalog.Materials, Has.Count.EqualTo(6));
+            Assert.That(p0.Plan.ProfilesByFacilityId.Keys,
+                Is.EquivalentTo(LuoyangP0FinalAssetVerticalSliceIds.FacilityIds));
+            Assert.That(p0.Catalog.UserReviewDecisionStatusId,
+                Is.EqualTo(LuoyangP0FinalAssetVerticalSliceIds
+                    .UserReviewDecisionStatusId));
+            Assert.That(p0.Catalog.SourceArchiveStatusId,
+                Is.EqualTo(LuoyangP0FinalAssetVerticalSliceIds
+                    .SourceArchiveStatusId));
+            Assert.That(p0.Catalog.Profiles.All(item =>
+                item.ReplacementSlotId == item.AssetVariantId &&
+                item.ArtistPrefabPresent && item.FinalArtApproved), Is.True);
+        }
+
+        [Test]
+        public void LuoyangBuildingPerformancePlan_Freezes2084FacilitiesAnd64Batches()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var source = new LuoyangBuildingPerformancePlanSource(worldMapRoot,
+                coverage.Bindings, coverage.CombinedCatalog);
+            var plan = source.Plan;
+            var window = LuoyangBuildingPerformanceRules
+                .SelectDensestResidentWindow(plan);
+
+            Assert.That(plan.Facilities.Count, Is.EqualTo(2084));
+            Assert.That(plan.Facilities.Select(item => item.CellId64)
+                .Distinct().Count(), Is.EqualTo(2084));
+            Assert.That(plan.Facilities.Select(item => item.FacilityDefinitionId)
+                .Distinct().Count(), Is.EqualTo(61));
+            Assert.That(plan.Facilities.Select(item => item.ModelId)
+                .Distinct().Count(), Is.EqualTo(35));
+            Assert.That(plan.SpatialBatches.Count, Is.EqualTo(64));
+            Assert.That(plan.SpatialBatches.Max(item => item.Facilities.Count),
+                Is.EqualTo(64));
+            Assert.That(plan.ResidentWindowCount, Is.EqualTo(11));
+            Assert.That(window.Facilities.Count, Is.EqualTo(549));
+            Assert.That(window.SpatialBatches.Count, Is.EqualTo(9));
+        }
+
+        [Test]
+        public void LuoyangMediumFrequencyUrbanFabricKit_FreezesFiveTypesAnd158Facilities()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var fabric = new LuoyangMediumFrequencyUrbanFabricKitSource(
+                worldMapRoot, coverage.CombinedCatalog).Catalog;
+
+            Assert.That(fabric.Profiles, Has.Count.EqualTo(5));
+            Assert.That(fabric.Profiles.Select(item => item.ModelId),
+                Is.EqualTo(LuoyangMediumFrequencyUrbanFabricKitIds.ModelIds));
+            Assert.That(fabric.Profiles.Sum(item => item.OpeningUsageCount),
+                Is.EqualTo(158));
+            Assert.That(fabric.ProducedOpeningFacilityCount, Is.EqualTo(1958));
+            Assert.That(fabric.Profiles.All(item =>
+                item.Lod2ModuleIds.All(item.Lod1ModuleIds.Contains)), Is.True);
+            Assert.That(fabric.Profiles.Single(item => item.ModelId ==
+                    LuoyangMediumFrequencyUrbanFabricKitIds.LocalOffice)
+                .AvailabilityIds, Does.Not.Contain("Player"));
+            Assert.That(fabric.Profiles.Single(item => item.ModelId ==
+                    LuoyangMediumFrequencyUrbanFabricKitIds.MilitaryCamp)
+                .AvailabilityIds, Does.Not.Contain("Ai"));
+        }
+
+        [Test]
+        public void LuoyangGateIdentityKit_FreezesTwelveCityAndTwoPalaceGates()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var gates = new LuoyangGateIdentityKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+
+            Assert.That(gates.Profiles, Has.Count.EqualTo(14));
+            Assert.That(gates.Profiles.Select(item => item.FacilityId),
+                Is.EqualTo(LuoyangGateIdentityKitIds.FacilityIds));
+            Assert.That(gates.Profiles.Count(item => item.GateClassId ==
+                LuoyangGateIdentityKitIds.CityGateClassId), Is.EqualTo(12));
+            Assert.That(gates.Profiles.Count(item => item.GateClassId ==
+                LuoyangGateIdentityKitIds.PalaceGateClassId), Is.EqualTo(2));
+            Assert.That(gates.Profiles.All(item =>
+                item.AvailabilityIds.Contains("HistoricalInit") &&
+                !item.AvailabilityIds.Contains("Player") &&
+                !item.AvailabilityIds.Contains("Ai")), Is.True);
+            Assert.That(gates.Profiles.Where(item => item.GateClassId ==
+                    LuoyangGateIdentityKitIds.PalaceGateClassId)
+                .All(item => string.IsNullOrEmpty(item.FacilityDirection) &&
+                    item.DirectionBasisId ==
+                    "presentation.derived_from_display_name"), Is.True);
+        }
+
+        [Test]
+        public void LuoyangProductionBuildingKit_FreezesHighFrequencyCoverageContract()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var production = new LuoyangProductionBuildingKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+
+            Assert.That(production.Profiles, Has.Count.EqualTo(10));
+            Assert.That(production.Profiles.Select(item => item.ModelId),
+                Is.EqualTo(LuoyangProductionBuildingKitIds.HighFrequencyModelIds));
+            Assert.That(production.Profiles.Sum(item => item.OpeningUsageCount),
+                Is.EqualTo(LuoyangProductionBuildingKitIds
+                    .CoveredOpeningFacilityCount));
+            Assert.That(production.OpeningFacilityCount,
+                Is.EqualTo(LuoyangProductionBuildingKitIds.OpeningFacilityCount));
+            Assert.That(production.Profiles.All(item =>
+                item.Lod2ModuleIds.All(item.Lod1ModuleIds.Contains)), Is.True);
+        }
+
+        [Test]
+        public void LuoyangHistoricalLandmarkKit_FreezesTenAuthoritativeFacilityBindings()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var coverage = new LuoyangFacilityModelCoverageSource(worldMapRoot);
+            var landmarks = new LuoyangHistoricalLandmarkKitSource(worldMapRoot,
+                coverage.CombinedCatalog).Catalog;
+
+            Assert.That(landmarks.Profiles, Has.Count.EqualTo(10));
+            Assert.That(landmarks.Profiles.Select(item => item.FacilityId),
+                Is.EqualTo(LuoyangHistoricalLandmarkKitIds.FacilityIds));
+            Assert.That(landmarks.Profiles.Select(item => item.SilhouetteId)
+                .Distinct().Count(), Is.EqualTo(10));
+            Assert.That(landmarks.Profiles.All(item =>
+                item.CellId64 == LuoyangHistoricalLandmarkKitIds.CellIds[item.FacilityId] &&
+                item.BaseModelId ==
+                    LuoyangHistoricalLandmarkKitIds.BaseModelIds[item.FacilityId] &&
+                item.AvailabilityIds.Contains("HistoricalInit") &&
+                !item.AvailabilityIds.Contains("Player")), Is.True);
+        }
+
+        [Test]
         public void WorldTime_CarriesSegmentsIntoNextDay()
         {
             var start = new WorldTime(12, DaySegment.Dusk);

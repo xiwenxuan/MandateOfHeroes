@@ -1,0 +1,110 @@
+{
+  "SchemaId": "mandate.luoyang-infrastructure-production-kit.v1",
+  "KitId": "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1",
+  "RegionalStyleId": "regional_style.central_plains.han.v1",
+  "OpeningFacilityCount": 2084,
+  "InfrastructureFacilityCount": 37,
+  "ProducedOpeningFacilityCount": 1995,
+  "Profiles": [
+    {
+      "ProfileId": "infrastructure.luoyang.canal.stone_bank.v1",
+      "ModelId": "model.han.luoyang.public.canal.v1",
+      "DisplayName": "洛阳连续石岸水渠",
+      "FacilityDefinitionId": "facility.public.canal",
+      "OpeningUsageCount": 19,
+      "AssetVariantId": "HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A",
+      "InfrastructureRoleId": "infrastructure.role.irrigation_canal",
+      "AlignmentModeId": "infrastructure.alignment.waterway_four_neighbor",
+      "LodProfileId": "lod.han.strategy.infrastructure.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "PlacementAnchorId": "anchor.infrastructure.canal.center",
+      "Anchors": [
+        {"AnchorId":"anchor.infrastructure.canal.water.west","RoleId":"infrastructure.connector.water.west","X":-0.44,"Y":0.04,"Z":0.0},
+        {"AnchorId":"anchor.infrastructure.canal.water.east","RoleId":"infrastructure.connector.water.east","X":0.44,"Y":0.04,"Z":0.0},
+        {"AnchorId":"anchor.infrastructure.canal.maintenance","RoleId":"infrastructure.service.maintenance","X":0.0,"Y":0.06,"Z":0.35}
+      ],
+      "Modules": [
+        {"ModuleId":"bed","PrimitiveId":"han.terrain_pad","MaterialId":"material.han.coverage.soil","PositionX":0.0,"PositionY":0.015,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.03,"ScaleZ":0.52},
+        {"ModuleId":"water","PrimitiveId":"cube","MaterialId":"material.han.coverage.water","PositionX":0.0,"PositionY":0.038,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.025,"ScaleZ":0.24},
+        {"ModuleId":"bank.n","PrimitiveId":"han.rammed_block","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.075,"PositionZ":0.20,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.12,"ScaleZ":0.12},
+        {"ModuleId":"bank.s","PrimitiveId":"han.rammed_block","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.075,"PositionZ":-0.20,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.12,"ScaleZ":0.12},
+        {"ModuleId":"coping.n","PrimitiveId":"han.wall_coping","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.155,"PositionZ":0.20,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.07,"ScaleZ":0.14},
+        {"ModuleId":"coping.s","PrimitiveId":"han.wall_coping","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.155,"PositionZ":-0.20,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.07,"ScaleZ":0.14},
+        {"ModuleId":"walkway","PrimitiveId":"han.terrain_pad","MaterialId":"material.han.coverage.soil","PositionX":0.0,"PositionY":0.055,"PositionZ":0.35,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.08,"ScaleZ":0.16}
+      ],
+      "Lod1ModuleIds": ["bed","water","bank.n","bank.s","coping.n","coping.s","walkway"],
+      "Lod2ModuleIds": ["water","bank.n","bank.s","coping.n","coping.s"]
+    },
+    {
+      "ProfileId": "infrastructure.luoyang.well.timber_canopy.v1",
+      "ModelId": "model.han.luoyang.public.well.v1",
+      "DisplayName": "洛阳井台与木构井亭",
+      "FacilityDefinitionId": "facility.public.well",
+      "OpeningUsageCount": 16,
+      "AssetVariantId": "HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A",
+      "InfrastructureRoleId": "infrastructure.role.public_water_well",
+      "AlignmentModeId": "infrastructure.alignment.point_service",
+      "LodProfileId": "lod.han.strategy.infrastructure.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "PlacementAnchorId": "anchor.infrastructure.well.center",
+      "Anchors": [
+        {"AnchorId":"anchor.infrastructure.well.draw","RoleId":"infrastructure.service.water_draw","X":0.0,"Y":0.22,"Z":0.0},
+        {"AnchorId":"anchor.infrastructure.well.approach","RoleId":"infrastructure.service.pedestrian_approach","X":0.0,"Y":0.03,"Z":-0.36}
+      ],
+      "Modules": [
+        {"ModuleId":"apron","PrimitiveId":"han.terrain_pad","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.025,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.72,"ScaleY":0.05,"ScaleZ":0.72},
+        {"ModuleId":"ring","PrimitiveId":"han.ritual_ring","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.15,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.36,"ScaleY":0.24,"ScaleZ":0.36},
+        {"ModuleId":"water","PrimitiveId":"cylinder","MaterialId":"material.han.coverage.water","PositionX":0.0,"PositionY":0.07,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.24,"ScaleY":0.04,"ScaleZ":0.24},
+        {"ModuleId":"post.w","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":-0.23,"PositionY":0.35,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.58,"ScaleZ":0.07},
+        {"ModuleId":"post.e","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.23,"PositionY":0.35,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.58,"ScaleZ":0.07},
+        {"ModuleId":"beam","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.0,"PositionY":0.60,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":90.0,"ScaleX":0.07,"ScaleY":0.56,"ScaleZ":0.07},
+        {"ModuleId":"roof","PrimitiveId":"han.hip_roof","MaterialId":"material.han.coverage.tile","PositionX":0.0,"PositionY":0.69,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.64,"ScaleY":0.16,"ScaleZ":0.46},
+        {"ModuleId":"axle","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.0,"PositionY":0.39,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":90.0,"ScaleX":0.06,"ScaleY":0.50,"ScaleZ":0.06},
+        {"ModuleId":"rope","PrimitiveId":"cylinder","MaterialId":"material.han.coverage.timber","PositionX":0.0,"PositionY":0.28,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.025,"ScaleY":0.22,"ScaleZ":0.025},
+        {"ModuleId":"bucket","PrimitiveId":"cylinder","MaterialId":"material.han.coverage.timber","PositionX":0.0,"PositionY":0.16,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.10,"ScaleY":0.10,"ScaleZ":0.10},
+        {"ModuleId":"basin","PrimitiveId":"han.ritual_ring","MaterialId":"material.han.coverage.stone","PositionX":0.25,"PositionY":0.10,"PositionZ":-0.22,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.18,"ScaleY":0.12,"ScaleZ":0.18}
+      ],
+      "Lod1ModuleIds": ["apron","ring","water","post.w","post.e","beam","roof","axle"],
+      "Lod2ModuleIds": ["apron","ring","roof"]
+    },
+    {
+      "ProfileId": "infrastructure.luoyang.bridge.timber_stone.v1",
+      "ModelId": "model.han.luoyang.public.bridge.v1",
+      "DisplayName": "洛阳木石跨渠桥",
+      "FacilityDefinitionId": "facility.public.bridge",
+      "OpeningUsageCount": 2,
+      "AssetVariantId": "HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A",
+      "InfrastructureRoleId": "infrastructure.role.waterway_crossing",
+      "AlignmentModeId": "infrastructure.alignment.waterway_and_road_crossing",
+      "LodProfileId": "lod.han.strategy.infrastructure.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "AvailabilityIds": ["Player", "Ai", "Government", "HistoricalInit"],
+      "PlacementAnchorId": "anchor.infrastructure.bridge.center",
+      "Anchors": [
+        {"AnchorId":"anchor.infrastructure.bridge.water.west","RoleId":"infrastructure.connector.water.west","X":-0.44,"Y":0.04,"Z":0.0},
+        {"AnchorId":"anchor.infrastructure.bridge.water.east","RoleId":"infrastructure.connector.water.east","X":0.44,"Y":0.04,"Z":0.0},
+        {"AnchorId":"anchor.infrastructure.bridge.road.north","RoleId":"infrastructure.connector.road.north","X":0.0,"Y":0.25,"Z":0.44},
+        {"AnchorId":"anchor.infrastructure.bridge.road.south","RoleId":"infrastructure.connector.road.south","X":0.0,"Y":0.25,"Z":-0.44}
+      ],
+      "Modules": [
+        {"ModuleId":"water","PrimitiveId":"cube","MaterialId":"material.han.coverage.water","PositionX":0.0,"PositionY":0.03,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.025,"ScaleZ":0.52},
+        {"ModuleId":"bank.n","PrimitiveId":"han.terrain_pad","MaterialId":"material.han.coverage.soil","PositionX":0.0,"PositionY":0.04,"PositionZ":0.35,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.08,"ScaleZ":0.18},
+        {"ModuleId":"bank.s","PrimitiveId":"han.terrain_pad","MaterialId":"material.han.coverage.soil","PositionX":0.0,"PositionY":0.04,"PositionZ":-0.35,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.88,"ScaleY":0.08,"ScaleZ":0.18},
+        {"ModuleId":"abutment.n","PrimitiveId":"han.rammed_block","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.15,"PositionZ":0.31,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.38,"ScaleY":0.24,"ScaleZ":0.18},
+        {"ModuleId":"abutment.s","PrimitiveId":"han.rammed_block","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.15,"PositionZ":-0.31,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.38,"ScaleY":0.24,"ScaleZ":0.18},
+        {"ModuleId":"pier","PrimitiveId":"han.rammed_block","MaterialId":"material.han.coverage.stone","PositionX":0.0,"PositionY":0.12,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.30,"ScaleY":0.20,"ScaleZ":0.20},
+        {"ModuleId":"deck","PrimitiveId":"han.road_crown","MaterialId":"material.han.coverage.timber","PositionX":0.0,"PositionY":0.27,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.36,"ScaleY":0.12,"ScaleZ":0.82},
+        {"ModuleId":"rail.w","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":-0.20,"PositionY":0.40,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.06,"ScaleY":0.18,"ScaleZ":0.78},
+        {"ModuleId":"rail.e","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.20,"PositionY":0.40,"PositionZ":0.0,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.06,"ScaleY":0.18,"ScaleZ":0.78},
+        {"ModuleId":"post.nw","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":-0.20,"PositionY":0.43,"PositionZ":0.34,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.30,"ScaleZ":0.07},
+        {"ModuleId":"post.ne","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.20,"PositionY":0.43,"PositionZ":0.34,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.30,"ScaleZ":0.07},
+        {"ModuleId":"post.sw","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":-0.20,"PositionY":0.43,"PositionZ":-0.34,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.30,"ScaleZ":0.07},
+        {"ModuleId":"post.se","PrimitiveId":"han.timber_beam","MaterialId":"material.han.coverage.timber","PositionX":0.20,"PositionY":0.43,"PositionZ":-0.34,"RotationX":0.0,"RotationY":0.0,"RotationZ":0.0,"ScaleX":0.07,"ScaleY":0.30,"ScaleZ":0.07}
+      ],
+      "Lod1ModuleIds": ["water","bank.n","bank.s","abutment.n","abutment.s","pier","deck","rail.w","rail.e"],
+      "Lod2ModuleIds": ["water","abutment.n","abutment.s","pier","deck"]
+    }
+  ]
+}

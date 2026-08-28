@@ -1,0 +1,20 @@
+{
+  "SchemaId": "mandate.luoyang-building-performance-budget.v1",
+  "BudgetId": "LUOYANG_BUILDING_WHOLE_CITY_PERFORMANCE_AND_BATCHING_V1",
+  "FacilityCount": 2084,
+  "FacilityDefinitionCount": 61,
+  "UniqueCellCount": 2084,
+  "SpatialBatchEdgeCells": 8,
+  "FullCitySpatialBatchCount": 64,
+  "ResidentWindowEdgeCells": 24,
+  "ResidentWindowCount": 11,
+  "DensestWindowFirstColumn": 2040,
+  "DensestWindowFirstRow": 1224,
+  "DensestWindowFacilityCount": 549,
+  "MaxResidentFacilityCount": 576,
+  "MaxResidentSpatialBatchCount": 9,
+  "MaxBuildingRendererBatchCount": 200,
+  "MaxCombinedVertexCount": 250000,
+  "MaxBatchBuildMilliseconds": 3000.0,
+  "MinRendererReductionRatio": 0.85
+}

@@ -28,7 +28,8 @@ internal static class CoreTestRunner
         {
             Console.WriteLine(
                 "Usage: CoreTestRunner <root> [binary-directory] " +
-                "[substring-filter|exact:name1;name2|--list]");
+                "[substring-filter|exclude:substring|batch-exclude:substring;start;count|" +
+                "exact:name1;name2|--list]");
             return 2;
         }
 
@@ -66,6 +67,33 @@ internal static class CoreTestRunner
         }
 
         HashSet<string> exactNames = null;
+        string excludedSubstring = null;
+        var batchStart = 0;
+        var batchCount = int.MaxValue;
+        var batchMode = false;
+        if (filter.StartsWith("batch-exclude:", StringComparison.OrdinalIgnoreCase))
+        {
+            var parts = filter.Substring("batch-exclude:".Length).Split(';');
+            if (parts.Length != 3 || string.IsNullOrWhiteSpace(parts[0]) ||
+                !int.TryParse(parts[1], out batchStart) || batchStart < 0 ||
+                !int.TryParse(parts[2], out batchCount) || batchCount <= 0)
+            {
+                Console.WriteLine(
+                    "Batch filter must be batch-exclude:substring;start;count.");
+                return 2;
+            }
+            excludedSubstring = parts[0];
+            batchMode = true;
+        }
+        else if (filter.StartsWith("exclude:", StringComparison.OrdinalIgnoreCase))
+        {
+            excludedSubstring = filter.Substring("exclude:".Length);
+            if (string.IsNullOrWhiteSpace(excludedSubstring))
+            {
+                Console.WriteLine("No excluded core-test substring was supplied.");
+                return 2;
+            }
+        }
         if (filter.StartsWith("exact:", StringComparison.OrdinalIgnoreCase))
         {
             exactNames = new HashSet<string>(
@@ -82,14 +110,26 @@ internal static class CoreTestRunner
 
         var passed = 0;
         var failed = 0;
+        var eligibleIndex = 0;
 
         foreach (var method in methods)
         {
+            if (excludedSubstring != null && method.Name.IndexOf(
+                    excludedSubstring, StringComparison.OrdinalIgnoreCase) >= 0)
+                continue;
+            if (batchMode)
+            {
+                var currentIndex = eligibleIndex++;
+                if (currentIndex < batchStart ||
+                    currentIndex >= batchStart + batchCount)
+                    continue;
+            }
             if (exactNames != null && !exactNames.Contains(method.Name))
             {
                 continue;
             }
-            if (exactNames == null && !string.IsNullOrEmpty(filter) &&
+            if (exactNames == null && excludedSubstring == null &&
+                !string.IsNullOrEmpty(filter) &&
                 method.Name.IndexOf(
                     filter, StringComparison.OrdinalIgnoreCase) < 0)
             {

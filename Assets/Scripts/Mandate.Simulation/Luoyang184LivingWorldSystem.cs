@@ -31,6 +31,7 @@ namespace Mandate.Simulation
                 "product.food.wheat_grain",
                 "product.food.broomcorn_grain",
                 "product.food.bean",
+                "product.reference.food_equivalent",
                 CoreProductionContent.WheatGrainProductId,
                 CoreProductionContent.WheatFlourProductId,
                 CoreProductionContent.DryRationProductId,
@@ -57,10 +58,21 @@ namespace Mandate.Simulation
 
             BuildWorkforce(runtime);
             BuildHouseholds(runtime);
+            runtime.DailyFoodDemandMilliunits = runtime.Households.Sum(item =>
+                item.DailyFoodDemandMilliunits);
+            runtime.CurrentUnemployedCount = runtime.Workforce.Count(item =>
+                item.Status == LuoyangWorkforceStatus.Unemployed);
+            runtime.CurrentLocalPopulation = runtime.Workforce.Count;
+            BuildFamilyOrganizations(runtime);
             BuildFacilityRuntime(runtime);
+            BuildOpeningProperty(runtime);
             BuildOpeningInventories(runtime);
+            AllocateOpeningHouseholdFood(runtime);
+            BuildExternalSuppliers(runtime);
             BuildCrops(runtime);
             BuildMarkets(runtime);
+            BuildIntelligentAgents(runtime);
+            new Luoyang184T4IntegratedRuntimeSystem().Initialize(runtime);
             runtime.Performance.InitializationMilliseconds = timer.ElapsedMilliseconds;
             runtime.Performance.PeakManagedMemoryBytes = GC.GetTotalMemory(false);
             Luoyang184LivingWorldRules.ValidateRuntime(runtime,
@@ -72,6 +84,11 @@ namespace Mandate.Simulation
             Luoyang184LivingWorldRuntimeState runtime, long targetDay)
         {
             if (runtime == null) throw new ArgumentNullException(nameof(runtime));
+            if (runtime.RequiresSourceRehydration)
+                throw new InvalidOperationException(
+                    "This legacy Luoyang checkpoint requires protected-source " +
+                    "rehydration before simulation can continue: " +
+                    string.Join("; ", runtime.MigrationWarnings));
             if (targetDay < runtime.AbsoluteDay)
                 throw new ArgumentOutOfRangeException(nameof(targetDay));
             var days = checked((int)(targetDay - runtime.AbsoluteDay));
@@ -83,6 +100,14 @@ namespace Mandate.Simulation
             for (var offset = 0; offset < days; offset++)
             {
                 runtime.AbsoluteDay++;
+                var supplyTimer = Stopwatch.StartNew();
+                ResolveExternalSupply(runtime);
+                runtime.Performance.SupplyMilliseconds +=
+                    supplyTimer.ElapsedMilliseconds;
+                var decisionTimer = Stopwatch.StartNew();
+                ResolveIntelligentAgents(runtime);
+                runtime.Performance.DecisionMilliseconds +=
+                    decisionTimer.ElapsedMilliseconds;
                 var productionTimer = Stopwatch.StartNew();
                 ResolveProduction(runtime);
                 runtime.Performance.ProductionMilliseconds +=
@@ -96,11 +121,17 @@ namespace Mandate.Simulation
                 ResolveHouseholdConsumption(runtime);
                 runtime.Performance.ConsumptionMilliseconds +=
                     consumptionTimer.ElapsedMilliseconds;
+                var shortageTimer = Stopwatch.StartNew();
                 ResolveShortageResponses(runtime);
+                runtime.Performance.ShortageMilliseconds +=
+                    shortageTimer.ElapsedMilliseconds;
+                new Luoyang184PropertyConstructionRuntimeSystem().Advance(runtime);
+                new Luoyang184T4IntegratedRuntimeSystem().AdvanceDay(runtime);
 
                 if (IsEvidenceDay(runtime.AbsoluteDay - startingDay, days))
                     CaptureSnapshot(runtime);
             }
+            SettleAllHouseholdConsumption(runtime);
             ReconcilePersonConsumption(runtime, days, householdConsumedBefore);
             var elapsed = totalTimer.ElapsedMilliseconds;
             if (days == 1) runtime.Performance.OneDayMilliseconds = elapsed;
@@ -154,7 +185,7 @@ namespace Mandate.Simulation
                 item.OperationId == "production.crop_harvest" &&
                 FoodProducts.Contains(item.ProductId)).Sum(item => item.QuantityMilliunits);
             var imported = runtime.InventoryFlows.Where(item =>
-                item.OperationId == "supply.reference_arrival" &&
+                item.OperationId == "supply.shipment_delivered" &&
                 FoodProducts.Contains(item.ProductId)).Sum(item => item.QuantityMilliunits);
             var consumption = runtime.Households.Sum(item =>
                 item.CumulativeFoodConsumedMilliunits);
@@ -204,9 +235,10 @@ namespace Mandate.Simulation
                 FoodShortageMilliunits = shortage,
                 HouseholdShortageCount = runtime.Households.Count(item =>
                     item.CumulativeFoodShortageMilliunits > 0),
-                SupplyRegionDependency = demand > 0 &&
-                    localProduction / Math.Max(1, runtime.AbsoluteDay) < demand,
-                SupplyStatusId = SupplyDependencyId,
+                SupplyRegionDependency = false,
+                SupplyStatusId = runtime.ExternalSuppliers.Count > 0
+                    ? "REAL_ORDER_SHIPMENT_NETWORK"
+                    : SupplyDependencyId,
                 DaySnapshots = runtime.DaySnapshots.Select(CopySnapshot).ToList()
             };
         }
@@ -277,10 +309,13 @@ namespace Mandate.Simulation
                             checked((int)ordinal)]);
                     runtime.Households.Add(new LuoyangHouseholdConsumptionState
                     {
+                        HouseholdId = source.GetHouseholdId(household.Ordinal),
                         HouseholdOrdinal = household.Ordinal,
                         HeadPersonOrdinal = household.HeadOrdinal,
                         MemberStartOrdinal = household.MemberStartOrdinal,
                         MemberCount = household.MemberCount,
+                        FamilyOrganizationIndex = household.FamilyOrganizationIndex,
+                        ResidenceFacilityIndex = household.ResidenceFacilityIndex,
                         Wealth = household.Wealth,
                         DailyFoodDemandMilliunits = demand,
                         FoodSecurityBasisPoints = 10_000,
@@ -291,6 +326,34 @@ namespace Mandate.Simulation
             }
             runtime.Households.Sort((left, right) =>
                 left.HouseholdOrdinal.CompareTo(right.HouseholdOrdinal));
+        }
+
+        private void BuildFamilyOrganizations(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            foreach (var sourceOrganization in source.FamilyOrganizations)
+            {
+                runtime.FamilyOrganizations.Add(
+                    new LuoyangFamilyOrganizationRuntimeState
+                    {
+                        Index = sourceOrganization.Index,
+                        Id = sourceOrganization.Id,
+                        HeadPersonId = sourceOrganization.HeadPersonId,
+                        Funds = sourceOrganization.Funds,
+                        AssetValue = sourceOrganization.AssetValue,
+                        HouseholdCount = runtime.Households.Count(item =>
+                            item.FamilyOrganizationIndex == sourceOrganization.Index),
+                        FamilyCenterFacilityId = sourceOrganization.FacilityIds
+                            .OrderBy(item => item, StringComparer.Ordinal)
+                            .FirstOrDefault() ?? string.Empty,
+                        LastStrategyId = "family.monitor_estate"
+                    });
+            }
+            runtime.GovernmentEconomy.Treasury = 100_000_000;
+            runtime.GovernmentEconomy.CurrentFoodPolicyId =
+                "government.food.market_reserve";
+            runtime.GovernmentEconomy.CurrentDevelopmentPolicyId =
+                "government.development.maintain_capital";
         }
 
         private void BuildFacilityRuntime(Luoyang184LivingWorldRuntimeState runtime)
@@ -336,6 +399,7 @@ namespace Mandate.Simulation
                     FacilityId = facility.FacilityId,
                     DefinitionId = facility.DefinitionId,
                     OwnerId = facility.OwnerId,
+                    CellId64 = facility.CellId64,
                     RecipeId = recipe,
                     InputProductId = input,
                     OutputProductId = output,
@@ -356,7 +420,8 @@ namespace Mandate.Simulation
                     AiResponseActionId = status ==
                         LuoyangProductionRuntimeStatus.WaitingWorker
                         ? "facility.request_workers"
-                        : "facility.monitor_plan"
+                        : "facility.monitor_plan",
+                    ConditionBasisPoints = facility.Operational ? 10_000 : 5_000
                 });
             }
             AlignStaffedWorkshopsWithReferenceInputs(runtime);
@@ -423,7 +488,7 @@ namespace Mandate.Simulation
                 var inventory = GetOrCreateInventory(runtime,
                     facility.FacilityId, chain.ProductDefinitionId,
                     OwnerKind(facility.OwnerId), facility.OwnerId,
-                    true);
+                    false);
                 var quantity = checked(chain.DeliveredUnits * MilliunitsPerUnit);
                 var available = AvailableCapacity(runtime, facility.FacilityId);
                 var stored = Math.Min(quantity, available);
@@ -432,7 +497,7 @@ namespace Mandate.Simulation
                 {
                     Id = chain.ChainId + ".opening",
                     Day = runtime.AbsoluteDay,
-                    OperationId = "supply.reference_arrival",
+                    OperationId = "scenario.opening.delivered_stock",
                     ProductId = chain.ProductDefinitionId,
                     DestinationInventoryId = inventory.Id,
                     QuantityMilliunits = stored,
@@ -442,6 +507,412 @@ namespace Mandate.Simulation
                     PersonId = source.GetPersonId(chain.CarrierPersonOrdinal)
                 });
             }
+        }
+
+        private void BuildOpeningProperty(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            foreach (var facility in runtime.Facilities.OrderBy(item =>
+                         item.CellId64).ThenBy(item => item.FacilityId,
+                         StringComparer.Ordinal))
+            {
+                var existing = runtime.CellProperties.Find(item =>
+                    item.CellId64 == facility.CellId64);
+                if (existing == null)
+                {
+                    runtime.CellProperties.Add(new LuoyangCellPropertyRuntimeState
+                    {
+                        CellId64 = facility.CellId64,
+                        OwnerId = facility.OwnerId,
+                        AdministrativeControllerId =
+                            "organization.government.han.luoyang",
+                        BuildingRightHolderId = facility.OwnerId,
+                        FacilityId = facility.FacilityId
+                    });
+                }
+                else if (string.CompareOrdinal(facility.FacilityId,
+                             existing.FacilityId) < 0)
+                {
+                    existing.FacilityId = facility.FacilityId;
+                }
+            }
+            AddVacantDevelopmentProperties(runtime, source.DevelopableCellIds, 64);
+        }
+
+        private static void AddVacantDevelopmentProperties(
+            Luoyang184LivingWorldRuntimeState runtime,
+            IReadOnlyList<ulong> developableCellIds, int count)
+        {
+            var used = new HashSet<ulong>(runtime.CellProperties.Select(item =>
+                item.CellId64));
+            var candidates = developableCellIds.Where(item => !used.Contains(item))
+                .OrderBy(item => item).Take(count).ToArray();
+            if (candidates.Length < count)
+                throw new InvalidOperationException(
+                    "The canonical Luoyang map has insufficient vacant developable Cells.");
+            foreach (var cellId64 in candidates)
+            {
+                runtime.CellProperties.Add(new LuoyangCellPropertyRuntimeState
+                {
+                    CellId64 = cellId64,
+                    OwnerId = runtime.GovernmentEconomy.OrganizationId,
+                    AdministrativeControllerId =
+                        runtime.GovernmentEconomy.OrganizationId,
+                    BuildingRightHolderId =
+                        runtime.GovernmentEconomy.OrganizationId,
+                    FacilityId = string.Empty
+                });
+            }
+        }
+
+        private void BuildExternalSuppliers(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            foreach (var sourceSupplier in source.ExternalSuppliers.OrderBy(
+                         item => item.SupplierId, StringComparer.Ordinal))
+            {
+                runtime.ExternalSuppliers.Add(
+                    new LuoyangExternalSupplierRuntimeState
+                    {
+                        SupplierId = sourceSupplier.SupplierId,
+                        Level = sourceSupplier.Level,
+                        CountyId = sourceSupplier.CountyId,
+                        SettlementId = sourceSupplier.SettlementId,
+                        FacilityId = sourceSupplier.FacilityId,
+                        InventoryId = sourceSupplier.InventoryId,
+                        OrganizationId = sourceSupplier.OrganizationId,
+                        ManagerPersonId = sourceSupplier.ManagerPersonId,
+                        ManagerHouseholdId = sourceSupplier.ManagerHouseholdId,
+                        ProductId = sourceSupplier.ProductId,
+                        InventoryQuantityMilliunits =
+                            sourceSupplier.OpeningQuantityMilliunits,
+                        StorageCapacityMilliunits =
+                            sourceSupplier.StorageCapacityMilliunits,
+                        DailyProductionMilliunits =
+                            sourceSupplier.DailyProductionMilliunits,
+                        CashBalance = 1_000_000,
+                        RouteId = sourceSupplier.RouteId,
+                        DistanceKilometers = sourceSupplier.DistanceKilometers,
+                        TravelDays = sourceSupplier.TravelDays,
+                        NaturalLossBasisPoints =
+                            sourceSupplier.NaturalLossBasisPoints,
+                        RiskLossBasisPoints =
+                            sourceSupplier.RiskLossBasisPoints,
+                        EvidenceGrade = sourceSupplier.EvidenceGrade,
+                        SourceReferenceId = sourceSupplier.SourceReferenceId
+                    });
+            }
+        }
+
+        private static void AllocateOpeningHouseholdFood(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            var sources = runtime.Inventories.Where(item =>
+                    FoodProducts.Contains(item.ProductId) &&
+                    item.QuantityMilliunits > 0)
+                .OrderBy(item => item.Id, StringComparer.Ordinal).ToList();
+            if (sources.Count == 0) return;
+            var sourceIndex = 0;
+            var movedBySource = new Dictionary<string, long>(
+                StringComparer.Ordinal);
+            foreach (var household in runtime.Households)
+            {
+                var required = checked(household.DailyFoodDemandMilliunits * 7);
+                while (required > 0 && sourceIndex < sources.Count)
+                {
+                    var source = sources[sourceIndex];
+                    var moved = Math.Min(required, source.QuantityMilliunits);
+                    source.QuantityMilliunits -= moved;
+                    required -= moved;
+                    household.FoodReserveMilliunits += moved;
+                    household.CumulativeFoodAcquiredMilliunits += moved;
+                    household.LastAcquisitionSourceId = "scenario.opening.food_allocation";
+                    if (!movedBySource.ContainsKey(source.Id))
+                        movedBySource[source.Id] = 0;
+                    movedBySource[source.Id] += moved;
+                    if (source.QuantityMilliunits == 0) sourceIndex++;
+                }
+                if (sourceIndex >= sources.Count) break;
+            }
+            foreach (var entry in movedBySource.OrderBy(item => item.Key,
+                         StringComparer.Ordinal))
+            {
+                var source = sources.First(item => item.Id == entry.Key);
+                runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
+                {
+                    Id = "flow.scenario.opening.household_food." +
+                         runtime.InventoryFlows.Count,
+                    Day = runtime.AbsoluteDay,
+                    OperationId = "scenario.opening.household_food_allocation",
+                    ProductId = source.ProductId,
+                    SourceInventoryId = source.Id,
+                    DestinationInventoryId = "household.compact_reserves",
+                    QuantityMilliunits = entry.Value,
+                    FacilityId = source.FacilityId
+                });
+            }
+        }
+
+        private void ResolveExternalSupply(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            var deliveredConstructionRequesters = new HashSet<string>(
+                StringComparer.Ordinal);
+            foreach (var supplier in runtime.ExternalSuppliers)
+            {
+                if (supplier.Level ==
+                    LuoyangSupplierMaterializationLevel.DeferredExternalTrade)
+                    continue;
+                var produced = Math.Min(
+                    supplier.DailyProductionMilliunits,
+                    supplier.StorageCapacityMilliunits -
+                    supplier.InventoryQuantityMilliunits);
+                var operatingCost = Math.Min(supplier.CashBalance,
+                    (produced + 9_999L) / 10_000L);
+                if (operatingCost > 0)
+                {
+                    supplier.CashBalance -= operatingCost;
+                    supplier.CumulativeOperatingExpense += operatingCost;
+                    var household = runtime.Households.FirstOrDefault(item =>
+                        item.HouseholdId == supplier.ManagerHouseholdId);
+                    if (household != null) household.Wealth += operatingCost;
+                }
+                supplier.InventoryQuantityMilliunits += produced;
+                supplier.CumulativeProducedMilliunits += produced;
+            }
+
+            foreach (var shipment in runtime.Shipments.Where(item =>
+                         !item.Delivered &&
+                         item.ArrivalDay <= runtime.AbsoluteDay).OrderBy(
+                         item => item.Id, StringComparer.Ordinal))
+            {
+                var destination = runtime.Inventories.Find(item =>
+                    item.Id == shipment.DestinationInventoryId);
+                if (destination == null)
+                    throw new InvalidOperationException(
+                        "Shipment destination inventory disappeared.");
+                var stored = Math.Min(
+                    shipment.DeliveredQuantityMilliunits,
+                    destination.CapacityMilliunits -
+                    destination.QuantityMilliunits);
+                destination.QuantityMilliunits += stored;
+                shipment.Delivered = true;
+                var order = runtime.SupplyOrders.Find(item =>
+                    item.Id == shipment.OrderId);
+                order.DeliveredQuantityMilliunits = stored;
+                order.Status = LuoyangSupplyOrderStatus.Delivered;
+                runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
+                {
+                    Id = "flow.supply.delivery." + runtime.AbsoluteDay + "." +
+                         runtime.InventoryFlows.Count,
+                    Day = runtime.AbsoluteDay,
+                    OperationId = "supply.shipment_delivered",
+                    ProductId = shipment.ProductId,
+                    SourceInventoryId = shipment.SourceInventoryId,
+                    DestinationInventoryId = destination.Id,
+                    QuantityMilliunits = stored,
+                    LossMilliunits = checked(
+                        shipment.CarrierConsumptionMilliunits +
+                        shipment.NaturalLossMilliunits +
+                        shipment.RiskLossMilliunits),
+                    PersonId = shipment.CarrierPersonId,
+                    FacilityId = destination.FacilityId
+                });
+                if (order.ReasonId != null && order.ReasonId.StartsWith(
+                        "blueprint.material_procurement:",
+                        StringComparison.Ordinal) &&
+                    order.RequestedByAgentId != null &&
+                    !order.RequestedByAgentId.StartsWith("player.",
+                        StringComparison.Ordinal))
+                    deliveredConstructionRequesters.Add(
+                        order.RequestedByAgentId);
+            }
+
+            foreach (var requester in deliveredConstructionRequesters)
+                TryStartDeliveredAiBlueprint(runtime, requester);
+
+            var dailyFoodDemand = runtime.DailyFoodDemandMilliunits;
+            if (runtime.IntelligentAgents.Count > 0)
+                return;
+            foreach (var productGroup in runtime.ExternalSuppliers.Where(item =>
+                         item.Level != LuoyangSupplierMaterializationLevel
+                             .DeferredExternalTrade).GroupBy(item =>
+                         item.ProductId).OrderBy(item => item.Key,
+                         StringComparer.Ordinal))
+            {
+                var destination = FindSupplyDestination(runtime,
+                    productGroup.Key);
+                if (destination == null) continue;
+                var targetStock = FoodProducts.Contains(productGroup.Key)
+                    ? checked(dailyFoodDemand * 30)
+                    : Math.Max(100_000L,
+                        destination.CapacityMilliunits / 4);
+                var inbound = runtime.Shipments.Where(item =>
+                        !item.Delivered && item.ProductId == productGroup.Key)
+                    .Sum(item => item.DeliveredQuantityMilliunits);
+                var shortage = targetStock - destination.QuantityMilliunits -
+                               inbound;
+                if (shortage <= 0) continue;
+                var supplier = productGroup.Where(item =>
+                        item.InventoryQuantityMilliunits > 0)
+                    .OrderBy(item => item.Level)
+                    .ThenBy(item => item.DistanceKilometers)
+                    .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
+                    .FirstOrDefault();
+                if (supplier == null) continue;
+                DispatchSupply(runtime, supplier, destination, shortage);
+            }
+        }
+
+        private static void TryStartDeliveredAiBlueprint(
+            Luoyang184LivingWorldRuntimeState runtime, string requester)
+        {
+            if (runtime.ConstructionProjects.Exists(item =>
+                    !item.Cancelled && item.RequestedByAgentId == requester))
+                return;
+            var orders = runtime.SupplyOrders.Where(item =>
+                    item.RequestedByAgentId == requester &&
+                    item.ReasonId != null && item.ReasonId.StartsWith(
+                        "blueprint.material_procurement:",
+                        StringComparison.Ordinal))
+                .OrderBy(item => item.Id, StringComparer.Ordinal).ToArray();
+            if (orders.Length == 0 || orders.Any(item =>
+                    item.Status != LuoyangSupplyOrderStatus.Delivered))
+                return;
+            var blueprintId = orders[0].ReasonId.Substring(
+                "blueprint.material_procurement:".Length);
+            if (orders.Any(item => !item.ReasonId.EndsWith(blueprintId,
+                    StringComparison.Ordinal)))
+                throw new InvalidOperationException(
+                    "AI construction procurement mixes Blueprint identities.");
+            var owner = runtime.GovernmentEconomy.OrganizationId;
+            var property = runtime.CellProperties.Where(item =>
+                    item.OwnerId == owner &&
+                    item.BuildingRightHolderId == owner &&
+                    string.IsNullOrEmpty(item.FacilityId) &&
+                    !runtime.ConstructionProjects.Exists(project =>
+                        !project.Completed && !project.Cancelled &&
+                        project.CellId64 == item.CellId64))
+                .OrderBy(item => item.CellId64).FirstOrDefault();
+            if (property == null) return;
+            new LuoyangVisualPresentationSystem().StartFromBlueprint(runtime,
+                blueprintId, property.CellId64, owner, requester);
+        }
+
+        private static LuoyangInventoryBalanceState FindSupplyDestination(
+            Luoyang184LivingWorldRuntimeState runtime, string productId)
+        {
+            var existing = runtime.Inventories.Where(item =>
+                    item.ProductId == productId &&
+                    (item.OwnerKind == LuoyangInventoryOwnerKind.Market ||
+                     item.OwnerKind == LuoyangInventoryOwnerKind.Government))
+                .OrderBy(item => item.OwnerKind ==
+                    LuoyangInventoryOwnerKind.Market ? 0 : 1)
+                .ThenBy(item => item.Id, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (existing != null) return existing;
+            var template = runtime.Inventories.Where(item =>
+                    item.OwnerKind == LuoyangInventoryOwnerKind.Market ||
+                    item.OwnerKind == LuoyangInventoryOwnerKind.Government)
+                .OrderByDescending(item => item.CapacityMilliunits)
+                .ThenBy(item => item.Id, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (template == null) return null;
+            var created = new LuoyangInventoryBalanceState
+            {
+                Id = "inventory.supply_destination." + productId,
+                OwnerKind = template.OwnerKind,
+                OwnerId = template.OwnerId,
+                FacilityId = template.FacilityId,
+                ProductId = productId,
+                CapacityMilliunits = template.CapacityMilliunits,
+                QuantityMilliunits = 0,
+                IsTransitionalReferenceSupply = false
+            };
+            runtime.Inventories.Add(created);
+            return created;
+        }
+
+        private void DispatchSupply(
+            Luoyang184LivingWorldRuntimeState runtime,
+            LuoyangExternalSupplierRuntimeState supplier,
+            LuoyangInventoryBalanceState destination,
+            long requested)
+        {
+            var shipped = Math.Min(requested,
+                supplier.InventoryQuantityMilliunits);
+            var market = runtime.Markets.Find(item =>
+                item.ProductId == supplier.ProductId);
+            var unitPrice = Math.Max(1L, (market?.BasePrice ?? 1) * 8 / 10);
+            var payerCash = market?.CashBalance ?? 0;
+            shipped = Math.Min(shipped, payerCash * 1_000 / unitPrice);
+            if (shipped <= 0) return;
+            var purchaseCost = checked((shipped * unitPrice + 999) / 1_000);
+            if (market != null) market.CashBalance -= purchaseCost;
+            supplier.CashBalance += purchaseCost;
+            supplier.CumulativeSalesRevenue += purchaseCost;
+            var carrierConsumption = Math.Min(shipped,
+                checked((long)Math.Max(1, supplier.TravelDays) *
+                    2_000L));
+            var remaining = shipped - carrierConsumption;
+            var naturalLoss = remaining *
+                supplier.NaturalLossBasisPoints / 10_000;
+            var riskRoll = new NamedRandom(runtime.MasterSeed).Range(
+                "luoyang.supply.risk",
+                new StableId(supplier.SupplierId),
+                runtime.AbsoluteDay,
+                "shipment_loss",
+                0,
+                10_000,
+                checked((uint)runtime.SupplyOrders.Count));
+            var riskLoss = riskRoll < supplier.RiskLossBasisPoints
+                ? (remaining - naturalLoss) *
+                  supplier.RiskLossBasisPoints / 10_000
+                : 0;
+            var delivered = shipped - carrierConsumption - naturalLoss - riskLoss;
+            if (delivered <= 0) return;
+            supplier.InventoryQuantityMilliunits -= shipped;
+            supplier.CumulativeDispatchedMilliunits += shipped;
+            var orderId = "supply_order." + runtime.AbsoluteDay + "." +
+                          runtime.SupplyOrders.Count.ToString("D6");
+            var shipmentId = "shipment." + runtime.AbsoluteDay + "." +
+                             runtime.Shipments.Count.ToString("D6");
+            runtime.SupplyOrders.Add(new LuoyangSupplyOrderRuntimeState
+            {
+                Id = orderId,
+                RequestedDay = runtime.AbsoluteDay,
+                ProductId = supplier.ProductId,
+                SupplierId = supplier.SupplierId,
+                DestinationInventoryId = destination.Id,
+                RequestedQuantityMilliunits = requested,
+                DispatchedQuantityMilliunits = shipped,
+                UnitPrice = unitPrice,
+                PurchaseCost = purchaseCost,
+                Status = LuoyangSupplyOrderStatus.InTransit,
+                ShipmentId = shipmentId,
+                RequestedByAgentId = "settlement.luoyang.supply_manager",
+                ReasonId = "inventory.below_target"
+            });
+            runtime.Shipments.Add(new LuoyangShipmentRuntimeState
+            {
+                Id = shipmentId,
+                OrderId = orderId,
+                ProductId = supplier.ProductId,
+                SupplierId = supplier.SupplierId,
+                SourceInventoryId = supplier.InventoryId,
+                DestinationInventoryId = destination.Id,
+                RouteId = supplier.RouteId,
+                CarrierPersonId = supplier.ManagerPersonId,
+                DispatchDay = runtime.AbsoluteDay,
+                ArrivalDay = checked(runtime.AbsoluteDay +
+                    supplier.TravelDays),
+                ShippedQuantityMilliunits = shipped,
+                CarrierConsumptionMilliunits = carrierConsumption,
+                NaturalLossMilliunits = naturalLoss,
+                RiskLossMilliunits = riskLoss,
+                DeliveredQuantityMilliunits = delivered,
+                PurchaseCost = purchaseCost
+            });
         }
 
         private void BuildCrops(Luoyang184LivingWorldRuntimeState runtime)
@@ -492,15 +963,46 @@ namespace Mandate.Simulation
 
         private void BuildMarkets(Luoyang184LivingWorldRuntimeState runtime)
         {
-            foreach (var productId in FoodProducts.OrderBy(item => item,
+            var marketStorage = source.Facilities.Where(item =>
+                    item.StorageCapacity > 0)
+                .OrderByDescending(item => item.StorageCapacity)
+                .ThenBy(item => item.FacilityId, StringComparer.Ordinal)
+                .First();
+            var marketProducts = new HashSet<string>(FoodProducts,
+                StringComparer.Ordinal);
+            foreach (var supplier in runtime.ExternalSuppliers)
+                marketProducts.Add(supplier.ProductId);
+            foreach (var productId in marketProducts.OrderBy(item => item,
                          StringComparer.Ordinal))
+            {
                 runtime.Markets.Add(new LuoyangMarketRuntimeState
                 {
                     ProductId = productId,
                     BasePrice = 1,
                     CurrentPriceBasisPoints = 10_000
                 });
+                runtime.Inventories.Add(new LuoyangInventoryBalanceState
+                {
+                    Id = "inventory.market.luoyang.184." + productId,
+                    OwnerKind = LuoyangInventoryOwnerKind.Market,
+                    OwnerId = "market.luoyang.184",
+                    FacilityId = marketStorage.FacilityId,
+                    ProductId = productId,
+                    CapacityMilliunits = checked(
+                        Math.Max(1L, marketStorage.StorageCapacity) *
+                        MilliunitsPerUnit)
+                });
+            }
         }
+
+        private void BuildIntelligentAgents(
+            Luoyang184LivingWorldRuntimeState runtime) =>
+            new Luoyang184IntelligentAgentRuntimeSystem().BuildAgents(
+                runtime, source);
+
+        private static void ResolveIntelligentAgents(
+            Luoyang184LivingWorldRuntimeState runtime) =>
+            new Luoyang184IntelligentAgentRuntimeSystem().AdvanceDay(runtime);
 
         private void ResolveProduction(Luoyang184LivingWorldRuntimeState runtime)
         {
@@ -713,8 +1215,7 @@ namespace Mandate.Simulation
 
         private void UpdateMarkets(Luoyang184LivingWorldRuntimeState runtime)
         {
-            var dailyDemand = runtime.Households.Sum(item =>
-                item.DailyFoodDemandMilliunits);
+            var dailyDemand = runtime.DailyFoodDemandMilliunits;
             foreach (var market in runtime.Markets)
             {
                 var stock = runtime.Inventories.Where(item =>
@@ -725,81 +1226,140 @@ namespace Mandate.Simulation
                 market.DemandMilliunits = dailyDemand;
                 market.TransferredMilliunits = 0;
                 market.FailedDemandMilliunits = Math.Max(0, dailyDemand - stock);
-                market.CurrentPriceBasisPoints = dailyDemand <= 0
-                    ? 10_000
-                    : 10_000 + (int)Math.Min(20_000,
-                        market.FailedDemandMilliunits * 20_000 / dailyDemand);
+                market.TransportCostBasisPoints = AverageTransportCost(runtime,
+                    market.ProductId);
+                market.RiskBasisPoints = AverageSupplyRisk(runtime,
+                    market.ProductId);
+                market.SeasonBasisPoints = SeasonalBasisPoints(
+                    runtime.AbsoluteDay);
+                market.ShortageBasisPoints = dailyDemand <= 0 ? 0 :
+                    (int)Math.Min(10_000,
+                        market.FailedDemandMilliunits * 10_000 / dailyDemand);
+                var recentTrade = market.RecentTradeQuantityMilliunits <= 0
+                    ? 0
+                    : (int)Math.Min(2_000,
+                        market.RecentTradeQuantityMilliunits * 2_000 /
+                        Math.Max(1L, dailyDemand));
+                market.CurrentPriceBasisPoints = Math.Max(2_000,
+                    Math.Min(40_000, 10_000 +
+                        market.ShortageBasisPoints * 2 +
+                        market.TransportCostBasisPoints +
+                        market.RiskBasisPoints +
+                        (10_000 - market.SeasonBasisPoints) + recentTrade));
+                market.RecentTradeQuantityMilliunits =
+                    market.RecentTradeQuantityMilliunits * 9 / 10;
+                market.RecentTradeValue = market.RecentTradeValue * 9 / 10;
             }
         }
 
         private void ResolveHouseholdConsumption(
             Luoyang184LivingWorldRuntimeState runtime)
         {
-            var food = runtime.Inventories.Where(item =>
-                    FoodProducts.Contains(item.ProductId) &&
-                    item.QuantityMilliunits > 0)
-                .OrderBy(item => item.OwnerKind)
-                .ThenBy(item => item.Id, StringComparer.Ordinal).ToList();
-            var dailyFlows = new Dictionary<string, long>(StringComparer.Ordinal);
-            foreach (var household in runtime.Households)
+            long consumedTotal = 0;
+            long shortageTotal = 0;
+            var bucket = (int)(runtime.AbsoluteDay % 30);
+            for (var index = bucket; index < runtime.Households.Count;
+                 index += 30)
             {
-                var demand = household.DailyFoodDemandMilliunits;
-                var remaining = demand;
-                var sourceId = "acquisition.failed";
-                foreach (var inventory in food)
-                {
-                    if (remaining <= 0) break;
-                    if (inventory.QuantityMilliunits <= 0) continue;
-                    var quantity = Math.Min(remaining, inventory.QuantityMilliunits);
-                    inventory.QuantityMilliunits -= quantity;
-                    remaining -= quantity;
-                    sourceId = inventory.OwnerKind == LuoyangInventoryOwnerKind.Government
-                        ? "acquisition.government_relief"
-                        : inventory.OwnerKind == LuoyangInventoryOwnerKind.Market
-                            ? "acquisition.market_purchase"
-                            : "acquisition.local_distribution";
-                    var key = inventory.Id + "\n" + inventory.ProductId;
-                    dailyFlows.TryGetValue(key, out var transferred);
-                    dailyFlows[key] = transferred + quantity;
-                }
-                var consumed = demand - remaining;
+                SettleHouseholdConsumption(runtime.Households[index],
+                    runtime.AbsoluteDay, ref consumedTotal, ref shortageTotal);
+            }
+            RecordHouseholdConsumptionFlow(runtime, consumedTotal,
+                shortageTotal);
+        }
+
+        private static void SettleHouseholdConsumption(
+            LuoyangHouseholdConsumptionState household,
+            long targetDay,
+            ref long consumedTotal,
+            ref long shortageTotal)
+        {
+            var elapsedDays = targetDay - household.LastConsumptionSettlementDay;
+            if (elapsedDays <= 0) return;
+            var demand = checked(household.DailyFoodDemandMilliunits *
+                elapsedDays);
+                var consumed = Math.Min(demand,
+                    household.FoodReserveMilliunits);
+                household.FoodReserveMilliunits -= consumed;
+                var remaining = demand - consumed;
+                consumedTotal += consumed;
+                shortageTotal += remaining;
                 household.CumulativeFoodDemandMilliunits += demand;
-                household.CumulativeFoodAcquiredMilliunits += consumed;
                 household.CumulativeFoodConsumedMilliunits += consumed;
                 household.CumulativeFoodShortageMilliunits += remaining;
                 household.FoodSecurityBasisPoints = demand <= 0
                     ? 10_000
                     : (int)Math.Min(10_000, consumed * 10_000 / demand);
-                household.LastAcquisitionSourceId = sourceId;
+                household.LastAcquisitionSourceId = consumed > 0
+                    ? "household.reserve" : "acquisition.required";
                 household.AiResponseActionId = remaining <= 0
                     ? "household.consume_and_monitor"
                     : household.CumulativeFoodShortageMilliunits > demand * 7
                         ? "household.seek_relief_or_migration"
                         : "household.seek_market_or_relief";
-            }
-            foreach (var pair in dailyFlows.OrderBy(item => item.Key,
-                         StringComparer.Ordinal))
+            household.LastConsumptionSettlementDay = targetDay;
+        }
+
+        private static void SettleAllHouseholdConsumption(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            long consumed = 0;
+            long shortage = 0;
+            foreach (var household in runtime.Households)
+                SettleHouseholdConsumption(household, runtime.AbsoluteDay,
+                    ref consumed, ref shortage);
+            RecordHouseholdConsumptionFlow(runtime, consumed, shortage);
+        }
+
+        private static void RecordHouseholdConsumptionFlow(
+            Luoyang184LivingWorldRuntimeState runtime,
+            long consumedTotal,
+            long shortageTotal)
+        {
+            if (consumedTotal == 0 && shortageTotal == 0) return;
+            runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
             {
-                var split = pair.Key.Split(
-                    new[] { '\n' }, StringSplitOptions.None);
-                runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
-                {
-                    Id = "flow.consumption." + runtime.AbsoluteDay + "." +
-                         runtime.InventoryFlows.Count,
-                    Day = runtime.AbsoluteDay,
-                    OperationId = "household.food_consumed",
-                    ProductId = split[1],
-                    SourceInventoryId = split[0],
-                    QuantityMilliunits = pair.Value
-                });
-            }
+                Id = "flow.consumption." + runtime.AbsoluteDay + "." +
+                    runtime.InventoryFlows.Count,
+                Day = runtime.AbsoluteDay,
+                OperationId = "household.food_reserve_consumed",
+                ProductId = "product.reference.food_equivalent",
+                SourceInventoryId = "household.compact_reserves",
+                QuantityMilliunits = consumedTotal,
+                LossMilliunits = shortageTotal
+            });
+        }
+
+        private static int AverageTransportCost(
+            Luoyang184LivingWorldRuntimeState runtime, string productId)
+        {
+            var suppliers = runtime.ExternalSuppliers.Where(item =>
+                item.ProductId == productId).ToList();
+            return suppliers.Count == 0 ? 0 : (int)Math.Min(5_000,
+                suppliers.Average(item => item.DistanceKilometers) * 10);
+        }
+
+        private static int AverageSupplyRisk(
+            Luoyang184LivingWorldRuntimeState runtime, string productId)
+        {
+            var suppliers = runtime.ExternalSuppliers.Where(item =>
+                item.ProductId == productId).ToList();
+            return suppliers.Count == 0 ? 0 : (int)suppliers.Average(item =>
+                item.RiskLossBasisPoints);
+        }
+
+        private static int SeasonalBasisPoints(long day)
+        {
+            var dayOfYear = (int)(day % 365);
+            return dayOfYear >= 240 && dayOfYear <= 330 ? 11_000 :
+                dayOfYear >= 90 && dayOfYear <= 180 ? 9_000 : 10_000;
         }
 
         private void ResolveShortageResponses(
             Luoyang184LivingWorldRuntimeState runtime)
         {
             runtime.ShortageResponses.Clear();
-            var demand = runtime.Households.Sum(item => item.DailyFoodDemandMilliunits);
+            var demand = runtime.DailyFoodDemandMilliunits;
             var stock = TotalFoodStock(runtime);
             var level = ShortageFor(stock, demand);
             if (level != LuoyangShortageLevel.Normal)
@@ -875,7 +1435,7 @@ namespace Mandate.Simulation
 
         private void CaptureSnapshot(Luoyang184LivingWorldRuntimeState runtime)
         {
-            var demand = runtime.Households.Sum(item => item.DailyFoodDemandMilliunits);
+            var demand = runtime.DailyFoodDemandMilliunits;
             var consumed = runtime.Households.Sum(item =>
                 item.CumulativeFoodConsumedMilliunits);
             var shortage = runtime.Households.Sum(item =>
@@ -891,7 +1451,7 @@ namespace Mandate.Simulation
                     FoodProducts.Contains(item.ProductId)).Sum(item =>
                     item.QuantityMilliunits),
                 FoodImportedMilliunits = runtime.InventoryFlows.Where(item =>
-                    item.OperationId == "supply.reference_arrival" &&
+                    item.OperationId == "supply.shipment_delivered" &&
                     FoodProducts.Contains(item.ProductId)).Sum(item =>
                     item.QuantityMilliunits),
                 FoodConsumedMilliunits = consumed,
@@ -946,7 +1506,7 @@ namespace Mandate.Simulation
             var id = "inventory.luoyang.184." + facilityId + "." + productId;
             var existing = runtime.Inventories.Find(item => item.Id == id);
             if (existing != null) return existing;
-            var facility = source.Facilities.First(item =>
+            var facility = source.Facilities.FirstOrDefault(item =>
                 item.FacilityId == facilityId);
             existing = new LuoyangInventoryBalanceState
             {
@@ -955,8 +1515,10 @@ namespace Mandate.Simulation
                 OwnerId = ownerId,
                 FacilityId = facilityId,
                 ProductId = productId,
-                CapacityMilliunits = checked(
-                    Math.Max(0, facility.StorageCapacity) * MilliunitsPerUnit),
+                CapacityMilliunits = facility == null
+                    ? 1_000_000L
+                    : checked(Math.Max(0, facility.StorageCapacity) *
+                        MilliunitsPerUnit),
                 IsTransitionalReferenceSupply = transitional
             };
             runtime.Inventories.Add(existing);
@@ -978,10 +1540,14 @@ namespace Mandate.Simulation
         private long AvailableCapacity(
             Luoyang184LivingWorldRuntimeState runtime, string facilityId)
         {
-            var sourceFacility = source.Facilities.First(item =>
+            var sourceFacility = source.Facilities.FirstOrDefault(item =>
                 item.FacilityId == facilityId);
-            var capacity = checked(
-                Math.Max(0, sourceFacility.StorageCapacity) * MilliunitsPerUnit);
+            var capacity = sourceFacility == null
+                ? Math.Max(1_000_000L, runtime.Inventories.Where(item =>
+                    item.FacilityId == facilityId).Sum(item =>
+                    item.CapacityMilliunits))
+                : checked(Math.Max(0, sourceFacility.StorageCapacity) *
+                    MilliunitsPerUnit);
             var used = runtime.Inventories.Where(item =>
                 item.FacilityId == facilityId).Sum(item => item.QuantityMilliunits);
             return Math.Max(0, capacity - used);

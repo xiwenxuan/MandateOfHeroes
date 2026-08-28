@@ -1,5 +1,33 @@
 # Project Knowledge Base
 
+## Style D 战略山河视觉细化 V2
+
+查询表现地形分辨率、河流弯道/Join、河岸同步、森林三层LOD、Style D V2固定相机、15张审图证据、性能基准或中华三国志源码恢复状态时，先读：
+
+- `Docs/TASK_HAN_WORLD_STYLE_D_STRATEGIC_LANDSCAPE_VISUAL_REFINEMENT_AND_ZHONGHUA_SOURCE_RECOVERY_V2.md`
+- `Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_STYLE_D_STRATEGIC_LANDSCAPE_VISUAL_REFINEMENT_V2/README.md`
+
+当前门禁是`READY_FOR_USER_REVIEW`；源码克隆是`BLOCKED_BY_NETWORK`，许可证未解决，禁止把API静态研究当成本地源码确认。
+
+## Latest playable map and construction asset package
+
+- `LUOYANG-PLAYABLE-VERTICAL-SLICE-MAP-PRESENTATION-AND-CONSTRUCTION-ASSET-LIBRARY-V1`：同一洛阳Runtime上的Golden Slice、BuildBlueprint/VisualProfile/VisualAnchor、玩家/AI/历史初始化复用建设、真实Person/Shipment/Crop/Lifecycle视觉绑定。入口见 `DEVELOPMENT_MANIFESTS/LUOYANG_PLAYABLE_VERTICAL_SLICE_MAP_PRESENTATION_AND_CONSTRUCTION_ASSET_LIBRARY_V1_MANIFEST.md`。
+- 冻结决策：Cell仍是Simulation权威；VisualAnchor不创建SubCell；历史独特Composition可限制为HistoricalInitOnly；核心Scene建筑必须绑定Runtime FacilityId；普通模式隐藏Cell；缩放只改变LOD；区域建筑差异切换VisualProfile而不复制FacilityDefinition。
+
+## Latest formal runtime completion package
+
+- `LUOYANG_184_T4_LIVING_WORLD_COMPLETION_MASTER_V1`：184洛阳40万永久人物统一世界的AI、正式可开发Cell地产建设、供应市场、家族个人、行政军需、189/190事件、玩家命令、v6存档/v5迁移与六年性能基线。入口见 `DEVELOPMENT_MANIFESTS/LUOYANG_184_T4_LIVING_WORLD_COMPLETION_MANIFEST.md`。
+
+## Latest Luoyang passage persistence package
+
+- `LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1`：在V74正式门桥状态上增加V75显式守军、真实
+  Organization/Army/Person权限、既有战斗支持的战损，以及复用Facility建设、木料/铁料批次和具体
+  人物劳动的真实维修。入口见`../TASK_LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1.md`。
+- 冻结边界：V74→V75不倒推守军、战损或维修历史；维修后保持关闭并须另行授权开启。本包不创建
+  战斗，也不代表完整围城、攻城器械、桥梁载重/洪水、动画或人物尺度NavMesh已经完成。
+- 前置V74包仍由`../TASK_LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1.md`维护初始化、
+  expected-revision转换和M25-P7命令/结果/事务/Outbox合同。
+
 ## Document Governance
 
 - Purpose：作为Codex和开发人员寻找项目Source of Truth的第一入口。
@@ -105,3 +133,59 @@ Worker、Recipe、Inventory和Transport；1114个未解析县的分析点不得�
 `../HISTORICAL_WORLD_REFERENCE/WORLD_INTELLIGENT_DECISION_POLICY_AND_SIMULATION_ARENA_V1/`
 
 查询顺序为总报告→性能/确定性/Neural报告→工作簿→`ARENA/`和`MODEL/`原始证据。V72只保存Profile、Goal、Model与有界DecisionMemory；Utility为可解释主基线，Merchant Neural仅为候选实验，Runtime Online Training继续禁止。当前Arena没有证明成熟Facility、产业、贸易网络、政府财政或400K全HOT性能，下一候选是`WORLD-HOT-WARM-COLD-PERMANENT-PERSON-SIMULATION-V1`。
+
+## 洛阳184 T4 Living World Completion V1
+
+任务书：`../TASK_LUOYANG_184_T4_LIVING_WORLD_COMPLETION_MASTER_V1.md`
+
+正式报告、11份工作簿、189/190事件、多种子、性能、验收矩阵和机器摘要位于：
+`../HISTORICAL_WORLD_REFERENCE/LUOYANG_184_T4_LIVING_WORLD_COMPLETION_MASTER_V1/`
+
+当前结论为`T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS`。查询时先读总报告和
+`validation_summary.json`，再读验收矩阵；400,000 Person、80,899 Household、2,084 opening
+Facility是受保护开局事实。实物税历史深化、逐路线城门延误、复杂犯罪/继承/仕途和最终美术交互
+继续是Deferred，不得由“洛阳T4完成”推断为已实现。
+
+## 全国统一空间基础 V1
+
+所有地图、GIS、Terrain、Chunk、Region 与 Floating Origin 工作必须先读：
+
+`../HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/GLOBAL_SPATIAL_FOUNDATION_CONTRACT_V1.md`
+
+验收报告、专项空间起点摘要和15份审计工作簿位于同目录。当前结论为
+`GLOBAL_SPATIAL_FOUNDATION_V1_FROZEN / B_REUSABLE_WITH_NON_ID_MIGRATION`。3314×2176、2000m、
+7,211,264 个 Cell ID 不变。Region 的权威范围只由完整 `IncludedGlobalCellIds` 决定，边界由成员 Cell
+外边派生；Polygon、Bounds 与16×16索引均不是成员权威。16×16 的28,288个旧 ID 保留为技术
+Spatial / Simulation Aggregation Block，不是 Terrain 或 Streaming；64×64 只是旧压缩存储块。
+当前语义收口报告见
+`../HISTORICAL_WORLD_REFERENCE/WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1/WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1_REPORT.md`。
+
+## 全国自然地貌统一底图 V1
+
+查询全国 Terrain、DEM、Surface、河流、森林、Terrain Tile、Cell 拾取、Floating Origin 或 Background-Off 地图时，先读：
+
+`../HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1_REPORT.md`
+
+机器状态为同目录 `validation_summary.json`，12 份工作簿保存来源、采样合同、4/8/16 实测、完整 Tile 行范围索引、Surface、河流、植被、共享边、Cell 绑定、Floating Origin、视觉和生产状态。当前 Terrain Tile 已按真实 DEM 基准冻结为 8×8 Global Cell；24×24 Cell Streaming Unit 仍为暂定运行参数。洛水折线为 `NOT_PROVEN_SOURCE_GAP`，不得从历史文字直接伪造几何。
+
+## 全国自然地图视觉表现 V2
+
+查询全国/河南尹自然地图画面、Terrain LOD、Surface 混合、河岸、森林密度、相机预设、Grid Off、Background Off、Tile 接缝或 Golden 截图时，先读：
+
+`../HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_REPORT.md`
+
+当前状态为 `HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_PLAYABLE_WITH_ART_LIMITS`。工程和地图验收已通过，但程序化树冠、简化河岸、2km 近景低多边形与远景调色仍是美术债。14 张 Game View 截图尚待用户认可，不是已批准 Golden；认可前不得进入下一 Region 高细节阶段。
+
+## 全国自然地图 Art Direction V1
+
+查询三套自然地图候选、Profile参数、固定样板Camera、Game View三联图、性能比较或用户选择门禁时，先读：
+
+`../HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1_REPORT.md`
+
+当前已具备 STYLE A/B/C 三套同数据候选，状态为 `HAN_WORLD_ART_DIRECTION_V1_CANDIDATES_READY`。`USER_SELECTED_STYLE=PENDING`；推荐 STYLE B 仅是 Codex 建议。全国推广、河南尹高精 Terrain 和洛阳城市美术仍被用户审美门禁阻断。
+
+### 《中华三国志》启发 Style D 地图原型
+
+`../HISTORICAL_WORLD_REFERENCE/HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1/README.md`
+
+当前新增第四套同世界候选，状态为 `STYLE_D_ZHONGHUA_SANGUOZHI_FUSION_PROTOTYPE_READY`。它使用本项目原创 DEM 派生特征和 Shader，森林以连续面表达，外部代码/地图/资产均未导入。候选仓库固定 HEAD 的 API 静态研究已完成，但完整 Git clone 因网络硬阻断未完成，来源研究不得写成 COMPLETE。全国、河南尹高精和洛阳城市仍待用户审美批准。

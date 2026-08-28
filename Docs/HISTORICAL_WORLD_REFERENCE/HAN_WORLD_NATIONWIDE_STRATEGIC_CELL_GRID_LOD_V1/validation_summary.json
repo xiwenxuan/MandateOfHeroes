@@ -1,0 +1,42 @@
+{
+  "schema": "hanworld.nationwide-strategic-cell-grid-lod.validation.v1",
+  "date": "2026-08-26",
+  "status": "NATIONWIDE_GRID_IMPLEMENTED_STATIC_CHECKS_PASSED_UNITY_RUNTIME_BLOCKED",
+  "contract_id": "presentation.han-world.nationwide-strategic-cell-grid-lod.v1",
+  "authoritative_cells": {
+    "schema": "hanworld.square-grid.v1",
+    "rows": 2176,
+    "columns": 3314,
+    "cell_size_metres": 2000,
+    "cell_count": 7211264,
+    "changes_persistence": false,
+    "creates_simulation_subcells": false
+  },
+  "world_lod": {
+    "display_step_cells": 32,
+    "display_step_metres": 64000,
+    "materialized_cell_ids": 0,
+    "logical_edge_segments": 14316,
+    "vertices": 57264,
+    "render_objects": 1,
+    "is_world_fact": false
+  },
+  "region_exact": {
+    "display_step_cells": 1,
+    "visible_rows": 24,
+    "visible_columns": 24,
+    "visible_cells": 576,
+    "render_objects": 2
+  },
+  "checks": {
+    "offline_geometry": "PASSED: RESULT passed=17 failed=0",
+    "csharp_syntax": "PASSED: RESULT parsed=4 errors=0",
+    "full_compile": "BLOCKED: required Unity/MSBuild environment unavailable",
+    "core_tests": "NOT_RUN",
+    "unity_tests": "BLOCKED: Unity 2022 absent and Unity 6 unlicensed",
+    "runtime_screenshot": "NOT_GENERATED",
+    "concept_preview": "GENERATED_NOT_RUNTIME_EVIDENCE",
+    "git_diff_check": "PASSED"
+  },
+  "concept_preview_path": "Concept/NATIONWIDE_STRATEGIC_CELL_GRID_LOD_V1_CONCEPT_NOT_RUNTIME.png"
+}

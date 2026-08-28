@@ -1,0 +1,61 @@
+{
+  "schema": "hanworld.explicit-strategic-cell-map.validation.v1",
+  "date": "2026-08-26",
+  "status": "IMPLEMENTED_STATIC_CHECKS_PASSED_UNITY_RUNTIME_BLOCKED",
+  "contract_id": "presentation.han-world.explicit-strategic-cell-map.v1",
+  "source_grid": {
+    "schema": "hanworld.square-grid.v1",
+    "cell_size_metres": 2000,
+    "rows": 2176,
+    "columns": 3314,
+    "cell_count": 7211264,
+    "creates_simulation_subcells": false,
+    "changes_persistence": false
+  },
+  "review_window": {
+    "region": "河南尹",
+    "rows": 24,
+    "columns": 24,
+    "visible_cells": 576,
+    "batched_render_objects": 2
+  },
+  "checks": {
+    "offline_geometry": {
+      "status": "PASSED",
+      "summary": "RESULT passed=11 failed=0"
+    },
+    "csharp_syntax": {
+      "status": "PASSED",
+      "summary": "RESULT parsed=4 errors=0"
+    },
+    "full_project_compile": {
+      "status": "BLOCKED",
+      "reason": "Unity 2022.3.62f3c1 and supported Visual Studio MSBuild/.NET 4.7.1 targeting pack are unavailable on this host"
+    },
+    "core_tests": {
+      "status": "NOT_RUN",
+      "reason": "full compile environment unavailable"
+    },
+    "unity_editmode": {
+      "status": "BLOCKED",
+      "reason": "required Unity 2022.3.62f3c1 executable is not installed"
+    },
+    "unity_playmode": {
+      "status": "NOT_RUN",
+      "reason": "required Unity 2022.3.62f3c1 executable is not installed"
+    },
+    "unity6_isolated_compatibility_smoke": {
+      "status": "BLOCKED",
+      "reason": "no valid Unity Editor license; exit code 198; no test XML",
+      "summary_path": "C:/Users/89733/.codex/visualizations/2026/08/26/01a03d16-463c-7942-8b10-e06e0ecb606e/unity6-strategic-cell-review/validation-escalated/unity-PlayMode-20260826-170826-517.summary.json"
+    },
+    "git_diff_check": {
+      "status": "PASSED"
+    }
+  },
+  "screenshots": {
+    "runtime_game_view_status": "NOT_GENERATED",
+    "concept_preview_status": "GENERATED_NOT_RUNTIME_EVIDENCE",
+    "concept_preview_path": "Concept/EXPLICIT_STRATEGIC_CELL_MAP_V1_CONCEPT_PREVIEW_NOT_RUNTIME.png"
+  }
+}

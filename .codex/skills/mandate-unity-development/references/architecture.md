@@ -20,6 +20,8 @@ Confirm actual `.asmdef` and `.csproj` references before changing dependencies. 
 - `Mandate.Simulation`: world progression and systems such as population, education, travel, trade, warfare, medicine, construction, and NPC decisions.
 - `Mandate.Persistence`: snapshot serialization, schema validation, and version migration.
 - `Mandate.Presentation`: dashboard, map rendering, input, views, and Unity-facing presentation.
+- `Mandate.Editor`: editor-only generators and import/export tooling. It may depend on Domain, Persistence, and
+  Presentation to materialize validated runtime content, but no runtime assembly may depend on it.
 - `Mandate.Domain.Tests`: core NUnit regression suite, including `WorldKernelTests`.
 
 ## Important locations

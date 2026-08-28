@@ -92,3 +92,11 @@ V0.1
 文件编号：MAP-ART-SPEC-001
 状态：第一版／待项目确认
 ```
+
+## Global Spatial Foundation V1 补充
+
+所有地图美术必须建立在同一全国 Global Grid 上。Region 只提高细节，不能重排城市、切割 Global Cell、
+重采一套不对齐 DEM 或移动稳定锚点。Region 由完整 Global Cell 成员集合定义，视觉边界从 Cell 外边派生。
+16×16 仅为技术 Spatial / Simulation Aggregation Block；Terrain Tile 和 Streaming Unit 待实测，64×64仅为旧压缩存储块。
+Terrain、道路和河流跨 Region 边界时必须共享全局采样坐标和父级 ID。Floating Origin 仅服务 Unity
+浮点精度，不能改变任何世界事实。

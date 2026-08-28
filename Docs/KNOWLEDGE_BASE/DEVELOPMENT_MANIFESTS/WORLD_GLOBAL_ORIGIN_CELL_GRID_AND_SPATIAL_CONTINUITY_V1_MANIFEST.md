@@ -1,0 +1,22 @@
+# WORLD GLOBAL ORIGIN CELL GRID AND SPATIAL CONTINUITY V1 MANIFEST
+
+- Status: `GLOBAL_SPATIAL_FOUNDATION_V1_FROZEN`
+- Reuse conclusion: `B_REUSABLE_WITH_NON_ID_MIGRATION`
+- Task: `Docs/TASK_WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1.md`
+- Canonical contract: `Docs/HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/GLOBAL_SPATIAL_FOUNDATION_CONTRACT_V1.md`
+- Acceptance report: `Docs/HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1_REPORT.md`
+- Spatial origin summary: `Docs/HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/SPATIAL_ORIGIN_SUMMARY.md`
+- Spatial origin workbook: `Docs/HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/15_GLOBAL_AND_REGION_ORIGIN_SUMMARY.xlsx`
+- Runtime package: `Assets/StreamingAssets/WorldMap/GlobalSpatialFoundationV1/`
+- Source world: `Assets/StreamingAssets/WorldMap/HanWorldV1/`
+- Grid: 3314 × 2176; 2000m; 7,211,264 stable Cells.
+- Original decision: 208 × 136 `Canonical chunks`, 16 × 16 Cells, 28,288 total.
+- Current status: `SUPERSEDED / SEMANTICALLY_RECLASSIFIED`; IDs retained as technical spatial/simulation aggregation blocks, not Terrain or Streaming units.
+- Legacy storage: 64 × 64 compression blocks only.
+- Global Origin: `(-3417344.395965772, 6199580.451937504)`, `GLOBAL_GRID_NORTHWEST_CORNER`; rows north-to-south, columns west-to-east.
+- Global Grid Envelope: X=`[-3417344.395965772, 3210655.604034228]`, Y=`[1847580.451937504, 6199580.451937504]`.
+- First Region: `HENAN_YIN_REGION`, 228 Global Chunks / 58,368 Global Cells / 0 generated Cells.
+- Henan Yin Local Origin: Global=`(262655.6040342278, 3511580.451937504)`, southwest corner of `cell.hanworld.v0.4452542`; Region Local=`(0,0)`.
+- Protected Luoyang: 400,000 Persons / 80,899 Households / 2,084 Facilities / 5,740 Buildable Cells.
+- Historical next-task record: `HENAN-YIN-REGION-TERRAIN-AND-LUOYANG-BUILDABLE-MAP-V1`.
+- Current next task: `MAP-TERRAIN-STREAMING-BLOCK-SIZE-BENCHMARK-V1` after Region Cell boundary semantic correction.

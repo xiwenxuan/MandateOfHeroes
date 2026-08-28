@@ -1,0 +1,21 @@
+{
+  "name": "Mandate.Editor",
+  "rootNamespace": "Mandate.Editor",
+  "references": [
+    "Mandate.Domain",
+    "Mandate.Persistence",
+    "Mandate.Presentation",
+    "Unity.Formats.Fbx.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

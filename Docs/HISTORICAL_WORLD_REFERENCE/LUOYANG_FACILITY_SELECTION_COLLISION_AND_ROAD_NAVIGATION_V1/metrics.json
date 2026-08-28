@@ -1,0 +1,18 @@
+{
+  "task_id": "LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1",
+  "status": "TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW",
+  "selection_proxy_plan_count": 2084,
+  "dense_city_runtime_trigger_count": 549,
+  "road_node_count": 359,
+  "passage_node_count": 20,
+  "navigation_node_count": 379,
+  "strict_cardinal_road_edge_count": 334,
+  "road_component_count_before_connectors": 29,
+  "largest_strict_road_component_count": 115,
+  "provisional_connector_edge_count": 28,
+  "gate_bridge_connector_edge_count": 20,
+  "navigation_edge_count": 382,
+  "creates_simulation_subcells": false,
+  "changes_save_schema": false,
+  "final_art_prefab_colliders_added": 0
+}

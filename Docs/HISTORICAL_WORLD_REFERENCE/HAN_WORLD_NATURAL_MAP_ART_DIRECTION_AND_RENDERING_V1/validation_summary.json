@@ -1,0 +1,47 @@
+{
+  "schema": "hanworld.natural-map-art-direction-rendering.validation.v1",
+  "status": "HAN_WORLD_ART_DIRECTION_V1_CANDIDATES_READY",
+  "style_a": "READY_FOR_REVIEW",
+  "style_b": "READY_FOR_REVIEW",
+  "style_c": "READY_FOR_REVIEW",
+  "user_selected_style": "PENDING",
+  "nationwide_style_rollout": "BLOCKED_PENDING_USER_APPROVAL",
+  "authoritative_world": {
+    "crs": "hanworld.albers.china.v0",
+    "global_origin_x": -3417344.395965772,
+    "global_origin_y": 6199580.451937504,
+    "rows": 2176,
+    "columns": 3314,
+    "cell_size_metres": 2000,
+    "permanent_global_cells": 7211264,
+    "terrain_tile_cells_per_side": 8,
+    "terrain_tile_count": 112880,
+    "henan_yin_cells": 58368
+  },
+  "evidence": {
+    "game_view_candidate_screenshots": 18,
+    "three_panel_comparisons": 3,
+    "workbooks": 12,
+    "same_world_data": true,
+    "same_camera_per_sample_and_view": true,
+    "debug_grid_visible": false,
+    "legacy_background_used": false,
+    "gpu_timing": "UNAVAILABLE_IN_BATCH_GRAPHICS_BACKEND"
+  },
+  "validation": {
+    "full_compile": "PASSED",
+    "core_regression": "PASSED_709_OF_709_GROUPED_12",
+    "art_profile_editmode": "PASSED_3_OF_3",
+    "profile_switch_playmode": "PASSED_1_OF_1",
+    "graphics_candidate_capture_playmode": "PASSED_1_OF_1",
+    "candidate_image_content_assertions": "PASSED_18_OF_18",
+    "workbook_render_and_formula_scan": "PASSED_12_OF_12",
+    "natural_map_v2_editmode": "PASSED_5_OF_5",
+    "natural_basemap_editmode": "PASSED_4_OF_4",
+    "world_region_clean_layers_playmode": "PASSED_1_OF_1",
+    "git_diff_check": "PASSED",
+    "credential_scan": "PASSED_NO_MATCHES",
+    "local_path_scan": "PASSED_NO_MATCHES_IN_FORMAL_SCOPE",
+    "unity_residual_process_check": "PASSED_ZERO_PROCESSES"
+  }
+}

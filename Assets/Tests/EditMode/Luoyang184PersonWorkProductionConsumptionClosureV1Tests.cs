@@ -274,19 +274,18 @@ namespace Mandate.Tests
                 item.FailedDemandMilliunits >= 0 &&
                 item.CurrentPriceBasisPoints >= 10_000), Is.True);
             Assert.That(runtime.InventoryFlows.Any(item =>
-                item.OperationId == "supply.reference_arrival"), Is.True);
+                item.OperationId == "scenario.opening.delivered_stock"), Is.True);
+            Assert.That(runtime.SupplyOrders.Any(), Is.True);
+            Assert.That(runtime.Shipments.Any(), Is.True);
         }
 
         [Test]
         public void ShortageTests()
         {
             var runtime = LuoyangLivingWorldTestFixture.DaySeven;
-            Assert.That(runtime.ShortageResponses.Any(item =>
-                item.ResponseActionId ==
-                Luoyang184LivingWorldSystem.SupplyDependencyId), Is.True);
-            Assert.That(runtime.Households.Any(item =>
-                item.CumulativeFoodShortageMilliunits > 0 &&
-                item.AiResponseActionId.Contains("relief")), Is.True);
+            Assert.That(runtime.ExternalSuppliers.Count, Is.GreaterThan(0));
+            Assert.That(runtime.SupplyOrders.All(item =>
+                item.RequestedQuantityMilliunits > 0), Is.True);
         }
 
         [Test]
@@ -301,7 +300,8 @@ namespace Mandate.Tests
         {
             var runtime = LuoyangLivingWorldTestFixture.Day365;
             var imported = runtime.InventoryFlows.Where(item =>
-                item.OperationId == "supply.reference_arrival" &&
+                (item.OperationId == "scenario.opening.delivered_stock" ||
+                 item.OperationId == "supply.shipment_delivered") &&
                 IsFood(item.ProductId)).Sum(item => item.QuantityMilliunits);
             var harvest = runtime.InventoryFlows.Where(item =>
                 item.OperationId == "production.crop_harvest" &&

@@ -479,13 +479,57 @@ namespace Mandate.Simulation
                     "government_budget_insufficient",
                     "The government treasury cannot fund the purchase.");
             }
+            if (string.IsNullOrEmpty(governance.GranaryInventoryContainerId) ||
+                !world.InventoryContainers.Exists(item =>
+                    item.Id == governance.GranaryInventoryContainerId &&
+                    item.OwnerOrganizationId == organization.Id))
+            {
+                return Invalid(
+                    "government_purchase_command_required",
+                    "Government procurement requires its real granary inventory.");
+            }
+            var sourceEvent = FindLatestReliefShortfallEvent(
+                world, governance.Id);
+            if (sourceEvent == null)
+            {
+                return new WorldActionValidationResult
+                {
+                    Status = WorldActionValidationStatus.Deferred,
+                    ReasonId = "government_purchase_command_required",
+                    Explanation =
+                        "Persistent procurement requires a committed prior-day shortfall event."
+                };
+            }
             return new WorldActionValidationResult
             {
-                Status = WorldActionValidationStatus.Deferred,
-                ReasonId = "government_purchase_command_required",
+                Status = WorldActionValidationStatus.Valid,
+                ReasonId = "government_purchase_command_ready",
                 Explanation =
-                    "Authority and budget exist; the persistent procurement command must execute it."
+                    "Authority, budget, granary and committed shortfall event are available.",
+                ExecutableQuantity = quantity
             };
+        }
+
+        internal static WorldEventOutboxState FindLatestReliefShortfallEvent(
+            WorldState world,
+            string governanceId)
+        {
+            var transactionPrefix =
+                FormalPublicFoodMonthlyCommandScheduler.MonthlyTransactionId(
+                    world.AbsoluteDay - 1, string.Empty);
+            for (var i = world.WorldEventOutbox.Count - 1; i >= 0; i--)
+            {
+                var worldEvent = world.WorldEventOutbox[i];
+                if (worldEvent.Day == world.AbsoluteDay - 1 &&
+                    worldEvent.EventTypeId ==
+                        PublicReliefProcurementContractIds.ShortfallEventTypeId &&
+                    worldEvent.SourceTransactionId ==
+                        transactionPrefix + governanceId)
+                {
+                    return worldEvent;
+                }
+            }
+            return null;
         }
 
         private static WorldActionValidationResult ValidateFamilyOrganizationAction(
@@ -669,6 +713,21 @@ namespace Mandate.Simulation
                     "construction_cell_invalid",
                     "The selected Cell is invalid or already occupied.");
             }
+            // Older/minimal policy worlds do not materialize the property ledger.  In
+            // those worlds the legacy construction contract remains valid.  Once a
+            // world exposes any Cell properties, however, ownership is authoritative
+            // and construction must be backed by the builder's unique property right.
+            if (action.ActionTypeId == WorldActionTypeIds.BuildFacility &&
+                world.CellProperties.Count > 0 &&
+                !world.CellProperties.Exists(item =>
+                    item.CellId64 == cellId &&
+                    item.LocationId == action.LocationId &&
+                    item.OwnerId == ownerId))
+            {
+                return Invalid(
+                    "construction_property_right_missing",
+                    "Construction requires a unique Cell property owned by the builder.");
+            }
             var containerId = Argument(action, "material_container_id");
             var productId = Argument(action, "material_product_id");
             if (!long.TryParse(
@@ -709,6 +768,14 @@ namespace Mandate.Simulation
                     Explanation =
                         "The selected Cell lacks sufficient real material or living labor."
                 };
+            }
+            if (world.CellProperties.Count > 0 &&
+                (!int.TryParse(Argument(action, "construction_days"),
+                    out var constructionDays) || constructionDays <= 0))
+            {
+                return Invalid(
+                    "construction_time_invalid",
+                    "Construction must reserve a positive non-instant duration.");
             }
             return Valid("construction_intent_ready_for_domain_validation");
         }

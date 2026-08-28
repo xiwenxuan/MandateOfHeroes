@@ -1,0 +1,114 @@
+{
+  "schema": "mandate.han-world-natural-map-visual-presentation-v2.validation.v1",
+  "task": "HAN-WORLD-NATURAL-MAP-VISUAL-PRESENTATION-V2",
+  "completed_at": "2026-08-16T05:35:00+08:00",
+  "final_status": "HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_PLAYABLE_WITH_ART_LIMITS",
+  "engineering_status": "PASS",
+  "visual_status": "PASS_WITH_ART_LIMITS",
+  "golden_approval_status": "PENDING_USER_APPROVAL",
+  "protected_spatial_contract": {
+    "crs_id": "hanworld.albers.china.v0",
+    "global_origin_x": -3417344.395965772,
+    "global_origin_y": 6199580.451937504,
+    "origin_meaning": "GLOBAL_GRID_NORTHWEST_CORNER",
+    "columns": 3314,
+    "rows": 2176,
+    "cell_size_metres": 2000,
+    "cell_count": 7211264,
+    "terrain_tile_cells_per_side": 8,
+    "terrain_tile_count": 112880,
+    "henan_yin_included_cell_count": 58368,
+    "status": "PASS_UNCHANGED"
+  },
+  "presentation": {
+    "world_continuous_surface": "PASS",
+    "region_continuous_surface": "PASS",
+    "terrain_relief": "PASS",
+    "surface_blend": "PASS",
+    "river_presentation": "PASS_WITH_ART_LIMITS",
+    "forest_presentation": "PASS_WITH_ART_LIMITS",
+    "grid_off": "PASS",
+    "background_independence": "PASS",
+    "world_region_transition": "PASS",
+    "tile_edge_visibility": "PASS",
+    "global_cell_binding": "PASS"
+  },
+  "evidence": {
+    "screenshots": 14,
+    "screenshots_source": "UNITY_GAME_VIEW_PLAYMODE",
+    "workbooks": 12,
+    "workbook_build_status": "PASS",
+    "workbook_structure_inspection": "PASS",
+    "workbook_formula_error_scan": "PASS",
+    "workbook_render_qa": "PASS",
+    "report": "HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_REPORT.md",
+    "visual_report": "VISUAL_ACCEPTANCE_REPORT.md"
+  },
+  "verification": {
+    "compile": {
+      "status": "PASS",
+      "evidence": "tmp/core-test-groups/han-natural-visual-v2-final-20260816/compile-20260816-043145-391.out.log"
+    },
+    "core_regression": {
+      "status": "PASS",
+      "groups": 12,
+      "total": 709,
+      "passed": 709,
+      "failed": 0,
+      "source_fingerprint": "6AE28235B6D1421832825F28429424572F7A2BB1011021361FF72D4271D40390",
+      "evidence": "tmp/core-test-groups/han-natural-visual-v2-final-20260816/aggregate.json"
+    },
+    "map_editmode": {
+      "status": "PASS",
+      "filter": "GlobalSpatialFoundationV1Tests;HanWorldNaturalBasemapV1Tests;NaturalMapVisualPresentationV2Tests",
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "evidence": "tmp/unity-validation/unity-EditMode-20260816-053018-838.summary.json"
+    },
+    "six_year_long_run_editmode": {
+      "status": "PASS",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 104.481,
+      "evidence": "tmp/unity-validation/unity-EditMode-20260816-052640-350.summary.json"
+    },
+    "full_playmode": {
+      "status": "PASS",
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "evidence": "tmp/unity-validation/unity-PlayMode-20260816-053114-354.summary.json"
+    },
+    "full_editmode_attempt": {
+      "status": "BLOCKED_300_SECOND_ENVIRONMENT_BOUNDARY",
+      "claim": "NOT_CLAIMED_AS_PASS_OR_FAILURE",
+      "single_process_evidence": "tmp/unity-validation/unity-EditMode-20260816-045536-158.summary.json",
+      "group_attempt_note": "24-group run was stopped when group 6 combined the six-year long run with 33 other tests and exceeded 300 seconds; required map suites and the long test were then verified independently."
+    },
+    "git_diff_check": "PASS_WITH_LINE_ENDING_WARNING_ONLY",
+    "credential_scan": "PASS_NO_MATCH",
+    "absolute_local_path_scan": "PASS_NO_MATCH_IN_FORMAL_TASK_TEXT_OR_RUNTIME_CODE",
+    "residual_unity_or_core_process": "PASS_NONE"
+  },
+  "performance": {
+    "world_terrain_generation_ms": 1525.858,
+    "region_terrain_generation_ms": 151.127,
+    "world_region_transition_ms": 345.158,
+    "world_terrain_resident_count": 1,
+    "region_terrain_resident_count": 10,
+    "world_terrain_memory_bytes": 6797568,
+    "region_terrain_memory_bytes": 800808,
+    "vegetation_draw_batches": 1,
+    "river_mesh_count": 1,
+    "batchmode_frame_timing_status": "NOT_PROVEN_BATCHMODE_TIMING"
+  },
+  "known_art_limits": [
+    "Procedural seven-sided canopy remains a placeholder asset.",
+    "River banks are simplified ribbons without shoals, branches, water normals or bridge presentation.",
+    "The 2000m DEM remains visibly low-poly at close regional camera distances.",
+    "World colour grading, antialiasing, atmospheric depth and coast detail are not final art."
+  ],
+  "next_gate": "WAIT_FOR_USER_NATURAL_MAP_DIRECTION_APPROVAL"
+}

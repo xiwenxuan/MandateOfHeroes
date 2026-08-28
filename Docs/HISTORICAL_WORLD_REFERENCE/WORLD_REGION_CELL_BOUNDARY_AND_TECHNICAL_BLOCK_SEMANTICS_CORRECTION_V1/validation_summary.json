@@ -1,0 +1,101 @@
+{
+  "schema": "mandate.world-region-cell-boundary-semantics-correction.v1",
+  "status": "REGION_CELL_BOUNDARY_CONTRACT_FROZEN",
+  "passed": true,
+  "validation_fields": {
+    "REGION_CELL_BOUNDARY_CONTRACT": "FROZEN",
+    "GLOBAL_ORIGIN_CHANGED": false,
+    "GLOBAL_GRID_CHANGED": false,
+    "GLOBAL_CELL_COUNT": 7211264,
+    "GLOBAL_CELL_IDS_CHANGED": 0,
+    "CELL_SIZE": 2000,
+    "REGION_GENERATED_NEW_CELL": 0,
+    "REGION_CUT_CELL": 0,
+    "REGION_BOUNDARY_AUTHORITY": "CELL_MEMBERSHIP",
+    "REGION_BOUNDARY_MODEL": "CELL_EDGE_DERIVED",
+    "REGION_POLYGON_AUTHORITY": false,
+    "HENAN_YIN_CELL_COUNT": 58368,
+    "HENAN_YIN_LOCAL_ORIGIN_CHANGED": false,
+    "HENAN_YIN_BOUNDARY_EDGE_COUNT": 992,
+    "HENAN_YIN_ACROSS_BOUNDARY_NEIGHBOR_CELL_COUNT": 992,
+    "16X16_BLOCK_COUNT": 28288,
+    "16X16_IS_WORLD_FACT": false,
+    "16X16_IS_SIMULATION_AGGREGATION": true,
+    "16X16_TERRAIN_TILE_FROZEN": false,
+    "16X16_STREAMING_UNIT_FROZEN": false,
+    "64X64_IS_WORLD_CHUNK": false,
+    "64X64_STATUS": "STORAGE_COMPRESSION_ONLY",
+    "TERRAIN_TILE_SIZE": "NOT_FROZEN",
+    "STREAMING_UNIT_SIZE": "NOT_FROZEN",
+    "GLOBAL_TO_HENAN_LOCAL_TO_GLOBAL_MAX_ERROR_M": 0.0,
+    "LUOYANG_PERMANENT_PERSON": 400000,
+    "LUOYANG_HOUSEHOLD": 80899,
+    "LUOYANG_INITIAL_FACILITY": 2084,
+    "LUOYANG_BUILDABLE_CELL": 5740,
+    "FORMAL_TERRAIN_GENERATED": false
+  },
+  "checks": {
+    "included_membership_matches_protected_58368_cells": true,
+    "included_membership_has_no_duplicate": true,
+    "all_membership_ids_are_global_ids": true,
+    "no_region_specific_cell_id": true,
+    "derived_block_index_matches_legacy_compatibility_list": true,
+    "derived_block_index_does_not_define_membership": true,
+    "region_authority_is_membership": true,
+    "region_boundary_is_cell_edge_derived": true,
+    "region_polygon_is_not_authority": true,
+    "region_does_not_cut_cells": true,
+    "block16_reclassified_without_id_change": true,
+    "block16_not_terrain_or_streaming": true,
+    "storage64_is_compression_only": true,
+    "terrain_and_streaming_sizes_unfrozen": true,
+    "non_block_aligned_region_membership_supported_by_contract": true,
+    "region_local_round_trip_exact": true,
+    "protected_luoyang_counts_unchanged": true
+  },
+  "membership_sha256": "28d5c805a558fa7b07d47e40f98d7ab314b03ef39f63615106b569bb0db38728",
+  "region_boundary": {
+    "authority": "INCLUDED_GLOBAL_CELL_IDS",
+    "model": "CELL_EDGE_DERIVED",
+    "edge_count": 992,
+    "neighbor_cell_count": 992,
+    "adjacent_named_regions_in_current_catalog": [],
+    "note": "Only HENAN_YIN_REGION is currently catalogued; outside neighbor Cells retain Global identity without invented Region assignment."
+  },
+  "technical_blocks": {
+    "block16_count": 28288,
+    "block16_rows": 136,
+    "block16_columns": 208,
+    "block16_status": "TECHNICAL_SPATIAL_OR_SIMULATION_AGGREGATION_BLOCK",
+    "storage64_count": 1768,
+    "storage64_status": "STORAGE_COMPRESSION_ONLY",
+    "terrain_tile_size": "NOT_YET_FROZEN",
+    "streaming_unit_size": "NOT_YET_FROZEN"
+  },
+  "verification": {
+    "full_project_compile": "PASSED",
+    "core_regression": {
+      "status": "PASSED",
+      "total": 705,
+      "passed": 705,
+      "failed": 0,
+      "run_id": "region-boundary-semantics-24g-20260815"
+    },
+    "unity_editmode_global_spatial": {
+      "status": "PASSED",
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "unity_editmode_world_map_pipeline": {
+      "status": "PASSED",
+      "total": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "playmode": "NOT_RUN_NO_PRESENTATION_RUNTIME_CHANGE",
+    "luoyang_t4_golden_smoke": "NOT_RUN_NO_T4_OR_GOLDEN_RUNTIME_CHANGE",
+    "workbook_formula_error_scan": "PASSED_0_MATCHES",
+    "workbook_visual_qa": "PASSED_7_WORKBOOKS"
+  }
+}

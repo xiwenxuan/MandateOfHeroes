@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "contract_id": "art_source.luoyang.p0-landmark-third-batch.user-accepted-fbx-source-validated-final-activation.v1",
+  "task_id": "LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1",
+  "status_id": "LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1",
+  "selection_policy_id": "selection.lowest-review-order.remaining-p0.after-two-activated-batches.four.v1",
+  "review_decision_status_id": "user_review.luoyang-p0-landmark-third-batch.accepted.v1",
+  "user_review_decision_record_id": "decision.luoyang-p0-landmark-third-batch.accepted.2026-08-27.v1",
+  "user_review_decision_date": "2026-08-27",
+  "final_art_approval_status_id": "final_art.user_accepted.fbx_source_validated.approved.v1",
+  "source_archive_status_id": "source_archive.unity_native_and_fbx_complete.v1",
+  "source_license_id": "license.project-original.unity-native-and-fbx.v1",
+  "fbx_source_toolchain_id": "toolchain.unity-fbx-exporter.4.2.1",
+  "fbx_toolchain_license_id": "license.unity-companion.v1",
+  "fbx_anchor_name_mapping_id": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+  "user_review_decision": "ACCEPTED_ALL_FOUR",
+  "source_file_count": 60,
+  "toolchain_file_count": 2,
+  "fbx_source_count": 4,
+  "fbx_missing_count": 0,
+  "user_review_ready": true,
+  "final_art_activation_ready": true,
+  "final_art_approved": true,
+  "toolchain": {
+    "unity_editor_version": "2022.3.62f3c1",
+    "exporter_package": "com.unity.formats.fbx@4.2.1",
+    "fbx_sdk_package": "com.autodesk.fbx@4.2.1",
+    "license": "Unity Companion License",
+    "official_documentation": "https://docs.unity3d.com/2022.3/Manual/com.unity.formats.fbx.html"
+  },
+  "toolchain_files": [
+    {
+      "path": "Packages/manifest.json",
+      "length": 1985,
+      "sha256": "f5995ec810ab94a3fe13c4698bada51a23681b971a3e994d6ccd7731a1655960"
+    },
+    {
+      "path": "Packages/packages-lock.json",
+      "length": 11345,
+      "sha256": "2d24248b4e919dd05e50b902ad85bfb1013307a514ac4d1e79deac7df6a38cbf"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Arsenal.fbx",
+      "length": 74975,
+      "sha256": "b2e0baacb3d71e249c0c59e7f849317364a4f6643ebd22190bf979e458fec64f"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Arsenal.fbx.meta",
+      "length": 2830,
+      "sha256": "28968d139465133c7137faa8f4bb5a97a8a26f22024d984e71b998f5b7723981"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Lingtai.fbx",
+      "length": 67366,
+      "sha256": "0c81d1949823f06174b2007ca7ae2c173b8a9088cbee38991f0f6973f2ea7f60"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Lingtai.fbx.meta",
+      "length": 2830,
+      "sha256": "591342f87380d4d404ba2a7cf0b1004906f16c37ec633e6fd5c6b2d272106ffe"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Taicang.fbx",
+      "length": 77573,
+      "sha256": "f3918155a1251076831b03660bc24e66f44241115c22e5649302cb05b10b4e0d"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Taicang.fbx.meta",
+      "length": 2830,
+      "sha256": "a66c3dff81bcf625d7b7c30c439b0541d59b82cebc39520ba666b9851fc5cf95"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/ZhuolongGarden.fbx",
+      "length": 586039,
+      "sha256": "a77f33628d7ef0d82761237732f29212cbb9054a6902e293e975823a9c5b087c"
+    },
+    {
+      "path": "Assets/ArtSource/Han/Luoyang/P0Batch3/ZhuolongGarden.fbx.meta",
+      "length": 2830,
+      "sha256": "23da12a40eb903ec23b96951f0b1f345eebfff34a9f9264c2bc78899c02b1a31"
+    },
+    {
+      "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkThirdBatchArtBuilder.cs",
+      "length": 22232,
+      "sha256": "57cf3b2ab9663bd6ec6443c1320b02e7c867d0ef0df354f354a99f88060614d5"
+    },
+    {
+      "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkThirdBatchArtBuilder.cs.meta",
+      "length": 243,
+      "sha256": "51e7e5de6df9b48240d661c9286b41521bf4861175bc34f58cb0339124e47b2a"
+    },
+    {
+      "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkThirdBatchFbxExporter.cs",
+      "length": 9856,
+      "sha256": "194a552e9752268dac1675383345138f2b90698f7834424f7a1b66031c29216c"
+    },
+    {
+      "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkThirdBatchFbxExporter.cs.meta",
+      "length": 243,
+      "sha256": "e3105b271ef09e6b9486e482dd61e1c1f406b0a86b41cae66763a78759fe7cdc"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Foliage.mat",
+      "length": 2189,
+      "sha256": "59791e6549ff38e220be0598a7300c60a9ef860afe04cce07128ef1bf300daec"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Foliage.mat.meta",
+      "length": 188,
+      "sha256": "33792d3b86bcf0aaec56ff4d63dee700e28a5ceef356e6e801ff45d1e287e7a6"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat",
+      "length": 2191,
+      "sha256": "21aff64491290768654429a7363b6126a8b137ba2acc5aadac8bdf53519b12e4"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat.meta",
+      "length": 188,
+      "sha256": "0c2bfe6a0e0571206770961fd1c4164aa1e3912cd26624e84f9b646bb402c95d"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeTreeCanopy.asset",
+      "length": 70043,
+      "sha256": "4de1ca072107fbe69b91d81459d33f7635b86c674c388769a9b50707e4b4f747"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeTreeCanopy.asset.meta",
+      "length": 188,
+      "sha256": "482cf283b6fd47b62716b03c15374ee7ed2e6a9c727dd3f3c51dba1fa11819a9"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeWaterDisc.asset",
+      "length": 14043,
+      "sha256": "dbc05b3ae31eb1b74df45bca68df91f72f3118e695f0a118ec33a89bacf58599"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeWaterDisc.asset.meta",
+      "length": 188,
+      "sha256": "a14f33d94f11cb290d95a3b0f4a47689a60e4d9ebe4c4700792c7aad05818f11"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Arsenal.prefab",
+      "length": 78686,
+      "sha256": "31fb907dabc72d5f016b90c4a5b3074fd493ce25f4cdf5cdebeb2657c9206648"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Arsenal.prefab.meta",
+      "length": 154,
+      "sha256": "4491d4371b20aef60c3f8586b65ee1f4e2e0d8c9082f226b96ac94e1c0b357a7"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Lingtai.prefab",
+      "length": 63518,
+      "sha256": "1a26d229486ec7f6929d519880c3cfb3bbf5c21ed0938d1686ffffbdf7cbf5a3"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Lingtai.prefab.meta",
+      "length": 154,
+      "sha256": "2db9a1a5886908459e3a710b4cc07e0d802f5147ce578a13200ef6032a1fbaf1"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Taicang.prefab",
+      "length": 88606,
+      "sha256": "d504687c4c01c72e1a24749ccd8adb68a780e57cc9d1ddcdd46467e39f302f60"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/Taicang.prefab.meta",
+      "length": 154,
+      "sha256": "4a3fca680263354cdcaf55a41fd22d70729682d1de9cd8d7b76a711b8d94b76f"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/ZhuolongGarden.prefab",
+      "length": 73819,
+      "sha256": "2b8c04872f0a21e093f3f49b3f4e861c7a02077cb3deaec78762d475e8616435"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Batch3/ZhuolongGarden.prefab.meta",
+      "length": 154,
+      "sha256": "781b245e10491480a26d5db316bb2f030d34d4afe758b3f2cba6e3fa85480110"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat",
+      "length": 2192,
+      "sha256": "55febebf346833aeb5dc634a0dab1dbb7c59e0c18f84f72665d80c57c5237a92"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat.meta",
+      "length": 188,
+      "sha256": "b6eb7075b59557ba38dac2ef4126faf74df8fa42c72e8338dda3c88351eb1bc0"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat",
+      "length": 2196,
+      "sha256": "e9d3c1fa86ab00664916272c8a47084fd003a07c62852400c71d6e7f99d38783"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat.meta",
+      "length": 188,
+      "sha256": "b00859b22de7bcd74f3bb6b51621060b668b89a8a75c732293739e25d3e3121b"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat",
+      "length": 2193,
+      "sha256": "8d8c7182672fc9d548403db8aaa90fd4f7f6126a5652891153f178847e26f4ca"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat.meta",
+      "length": 188,
+      "sha256": "04b3771f7717aaca65cfe421a42cdf7f5de647a911f65199b0505a5252c47472"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat",
+      "length": 2186,
+      "sha256": "ab5a5157461e29410d92c9a82e209199b7769b531df91d4b0e0a7e349ef6e3bd"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat.meta",
+      "length": 188,
+      "sha256": "311d4d526b6f927bc11a1f23e078b98c8ecbefd75502e5f7efc4f6da66cd62b7"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat",
+      "length": 2188,
+      "sha256": "de0b62cda7f54993966aeb3528339f08798142bb30c68bc9ce67e73bda28a334"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat.meta",
+      "length": 188,
+      "sha256": "72c1e1e09fe1061c1b70c917b5e50ab5414378889230086a3098f1224cf83028"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat",
+      "length": 2193,
+      "sha256": "16bbbd5e154f0a97bbad6ba6bf19f0b3583200f4d716b5ab456383cd9384e869"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat.meta",
+      "length": 188,
+      "sha256": "685fb1cc24633454c91c1eab923709ca98a9e3f301b780ace85851f80f39f450"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset",
+      "length": 5960,
+      "sha256": "da2e3d353d729814de2463fd546e877d9936aaa259377a8b8f4ff78273029355"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset.meta",
+      "length": 188,
+      "sha256": "3c8ba2af91423a152225222dc12bdc55b65fdd2e2ea59ea32b9614fe1d1c49d6"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset",
+      "length": 3512,
+      "sha256": "124fa480d45805e3557d2987785c5eec0da8a76097cd0595433d628030d02a1e"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset.meta",
+      "length": 188,
+      "sha256": "914f2e1f530be89b9edbf64a0b6d728734488c59e334c668d3df2cee7dcd8861"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset",
+      "length": 14047,
+      "sha256": "6bfa444efae6362f97de88d2869c3cdc7124bc412f54cc7ccd24d35597e0f6ec"
+    },
+    {
+      "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset.meta",
+      "length": 188,
+      "sha256": "9edd3e0175c1d42c0c1f887cb4ab50370a96c13f30394924cf4dafe7c56fb09e"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Domain/LuoyangP0LandmarkThirdBatchState.cs",
+      "length": 19166,
+      "sha256": "a1754a6622338dc3268eaff0f297b709c406797138d9116f0f6bed39974a4948"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Domain/LuoyangP0LandmarkThirdBatchState.cs.meta",
+      "length": 243,
+      "sha256": "f0ffe265bb3787fb282b845a543fe74fb880df58e6380b84802e481c3379f52a"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Persistence/LuoyangP0LandmarkThirdBatchSource.cs",
+      "length": 1702,
+      "sha256": "43af290df915d70761c3f2414f6380a652c932c632718cfc351e1436559d8e2a"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Persistence/LuoyangP0LandmarkThirdBatchSource.cs.meta",
+      "length": 243,
+      "sha256": "718497d82ab07d2fbd6d10aec4068c52c6bd3444be5bcfcc4c9ea2f71e8ed8ad"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/ExplicitStrategicCellMapV1.cs",
+      "length": 43867,
+      "sha256": "c79edb1eb8bea48bea0a66cd12952ee7ce2c84b1c863985e3ca17c37c3adfcda"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/ExplicitStrategicCellMapV1.cs.meta",
+      "length": 240,
+      "sha256": "18e1d837826351439f77bdcaf5721e60a67770cf722ddc3f2f56849f86c358a4"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs",
+      "length": 108349,
+      "sha256": "ba04d9d65dd4e086dc86aac7a0706029bbaefb065ebb08520555517431930b2b"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs.meta",
+      "length": 243,
+      "sha256": "3ac0df8dcb7f0750daa14ddf5b4ff19191a9cc2dc7241f95d5c1a10f21d2503d"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs",
+      "length": 47741,
+      "sha256": "2500a472881403f54f28ce007f6eede9a6037eb1137d84c09d9c96067b4e40fc"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs.meta",
+      "length": 243,
+      "sha256": "7c8ffdea430300b1b2aa23759d0b0f1661676d641633828a8762c1a1e0f7b8a0"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.cs",
+      "length": 64462,
+      "sha256": "52dbb5ee2e6b7fb5904da5e01b6a5bedbdfa384688a3c4bdae79dd2f20aec758"
+    },
+    {
+      "path": "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.cs.meta",
+      "length": 243,
+      "sha256": "47b2d2a16253ad3e5a57c60c721f6dcc421f187ed9b1ed67c0fd77c6f782c4dd"
+    },
+    {
+      "path": "Assets/StreamingAssets/WorldMap/LuoyangP0LandmarkThirdBatchV1/luoyang_p0_landmark_third_batch_v1.json",
+      "length": 6083,
+      "sha256": "901e2509cde1c0ea879cd8e3d51cff5faf8cdf1bcdc5da62af4f2b20fc978aac"
+    },
+    {
+      "path": "Assets/StreamingAssets/WorldMap/LuoyangP0LandmarkThirdBatchV1/luoyang_p0_landmark_third_batch_v1.json.meta",
+      "length": 155,
+      "sha256": "5bca2ad02c97a1fb8e5d6ad8e4381ca5a28bdcb468dbf55b52b84d274271b082"
+    }
+  ],
+  "pieces": [
+    {
+      "review_order": 6,
+      "facility_id": "facility.instance.luoyang.184.lingtai",
+      "candidate_id": "candidate.luoyang.p0.batch3.lingtai.v1",
+      "replacement_slot_id": "HAN_LANDMARK_LINGTAI_STEPPED_OBSERVATORY_A",
+      "user_review_decision": "ACCEPTED",
+      "artist_prefab_resource_path": "Art/Han/Luoyang/P0Batch3/Lingtai",
+      "fbx_source_path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Lingtai.fbx",
+      "fbx_length": 67366,
+      "fbx_sha256": "0c81d1949823f06174b2007ca7ae2c173b8a9088cbee38991f0f6973f2ea7f60",
+      "fbx_source_status": "PRESENT_UNITY_REIMPORT_VALIDATED",
+      "anchor_name_mapping_id": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+      "anchor_mappings": [
+        {
+          "stable_anchor_id": "anchor.p0.batch3.lingtai.placement",
+          "fbx_node_name": "anchor_p0_batch3_lingtai_placement"
+        },
+        {
+          "stable_anchor_id": "anchor.p0.batch3.lingtai.entrance",
+          "fbx_node_name": "anchor_p0_batch3_lingtai_entrance"
+        }
+      ],
+      "final_art_approved": true
+    },
+    {
+      "review_order": 7,
+      "facility_id": "facility.instance.luoyang.184.taicang",
+      "candidate_id": "candidate.luoyang.p0.batch3.taicang.v1",
+      "replacement_slot_id": "HAN_LANDMARK_TAICANG_FOUR_GRANARIES_A",
+      "user_review_decision": "ACCEPTED",
+      "artist_prefab_resource_path": "Art/Han/Luoyang/P0Batch3/Taicang",
+      "fbx_source_path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Taicang.fbx",
+      "fbx_length": 77573,
+      "fbx_sha256": "f3918155a1251076831b03660bc24e66f44241115c22e5649302cb05b10b4e0d",
+      "fbx_source_status": "PRESENT_UNITY_REIMPORT_VALIDATED",
+      "anchor_name_mapping_id": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+      "anchor_mappings": [
+        {
+          "stable_anchor_id": "anchor.p0.batch3.taicang.placement",
+          "fbx_node_name": "anchor_p0_batch3_taicang_placement"
+        },
+        {
+          "stable_anchor_id": "anchor.p0.batch3.taicang.entrance",
+          "fbx_node_name": "anchor_p0_batch3_taicang_entrance"
+        }
+      ],
+      "final_art_approved": true
+    },
+    {
+      "review_order": 8,
+      "facility_id": "facility.instance.luoyang.184.arsenal",
+      "candidate_id": "candidate.luoyang.p0.batch3.arsenal.v1",
+      "replacement_slot_id": "HAN_LANDMARK_ARSENAL_FORTIFIED_YARD_A",
+      "user_review_decision": "ACCEPTED",
+      "artist_prefab_resource_path": "Art/Han/Luoyang/P0Batch3/Arsenal",
+      "fbx_source_path": "Assets/ArtSource/Han/Luoyang/P0Batch3/Arsenal.fbx",
+      "fbx_length": 74975,
+      "fbx_sha256": "b2e0baacb3d71e249c0c59e7f849317364a4f6643ebd22190bf979e458fec64f",
+      "fbx_source_status": "PRESENT_UNITY_REIMPORT_VALIDATED",
+      "anchor_name_mapping_id": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+      "anchor_mappings": [
+        {
+          "stable_anchor_id": "anchor.p0.batch3.arsenal.placement",
+          "fbx_node_name": "anchor_p0_batch3_arsenal_placement"
+        },
+        {
+          "stable_anchor_id": "anchor.p0.batch3.arsenal.entrance",
+          "fbx_node_name": "anchor_p0_batch3_arsenal_entrance"
+        }
+      ],
+      "final_art_approved": true
+    },
+    {
+      "review_order": 9,
+      "facility_id": "facility.instance.luoyang.184.zhuolong_garden",
+      "candidate_id": "candidate.luoyang.p0.batch3.zhuolong_garden.v1",
+      "replacement_slot_id": "HAN_LANDMARK_ZHUOLONG_GARDEN_POND_PAVILION_A",
+      "user_review_decision": "ACCEPTED",
+      "artist_prefab_resource_path": "Art/Han/Luoyang/P0Batch3/ZhuolongGarden",
+      "fbx_source_path": "Assets/ArtSource/Han/Luoyang/P0Batch3/ZhuolongGarden.fbx",
+      "fbx_length": 586039,
+      "fbx_sha256": "a77f33628d7ef0d82761237732f29212cbb9054a6902e293e975823a9c5b087c",
+      "fbx_source_status": "PRESENT_UNITY_REIMPORT_VALIDATED",
+      "anchor_name_mapping_id": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+      "anchor_mappings": [
+        {
+          "stable_anchor_id": "anchor.p0.batch3.zhuolong_garden.placement",
+          "fbx_node_name": "anchor_p0_batch3_zhuolong_garden_placement"
+        },
+        {
+          "stable_anchor_id": "anchor.p0.batch3.zhuolong_garden.entrance",
+          "fbx_node_name": "anchor_p0_batch3_zhuolong_garden_entrance"
+        }
+      ],
+      "final_art_approved": true
+    }
+  ]
+}

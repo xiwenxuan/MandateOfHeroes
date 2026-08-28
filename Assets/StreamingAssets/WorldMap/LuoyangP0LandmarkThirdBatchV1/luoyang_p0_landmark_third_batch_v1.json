@@ -1,0 +1,111 @@
+{
+  "SchemaId": "mandate.luoyang-p0-landmark-third-batch.v1",
+  "TaskId": "LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1",
+  "StatusId": "LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1",
+  "RegionalStyleId": "regional_style.central_plains.han.v1",
+  "SelectionPolicyId": "selection.lowest-review-order.remaining-p0.after-two-activated-batches.four.v1",
+  "ReplacementIdentityPolicyId": "replacement.identity.keep_model_asset_profile_facility.v1",
+  "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+  "ReviewDecisionStatusId": "user_review.luoyang-p0-landmark-third-batch.accepted.v1",
+  "UserReviewDecisionRecordId": "decision.luoyang-p0-landmark-third-batch.accepted.2026-08-27.v1",
+  "UserReviewDecisionDate": "2026-08-27",
+  "FinalArtApprovalStatusId": "final_art.user_accepted.fbx_source_validated.approved.v1",
+  "SourceArchiveStatusId": "source_archive.unity_native_and_fbx_complete.v1",
+  "SourceLicenseId": "license.project-original.unity-native-and-fbx.v1",
+  "MaterialSetId": "material_set.han.luoyang.p0.landmark_third_batch.v1",
+  "LodProfileId": "lod.han.luoyang.p0.landmark_third_batch.three_tier.v1",
+  "FbxSourceToolchainId": "toolchain.unity-fbx-exporter.4.2.1",
+  "FbxToolchainLicenseId": "license.unity-companion.v1",
+  "FbxAnchorNameMappingId": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+  "ProfileCount": 4,
+  "Profiles": [
+    {
+      "CandidateId": "candidate.luoyang.p0.batch3.lingtai.v1",
+      "CandidateStatusId": "candidate.native_prefab_fbx_source_validated.user_accepted.final_art_activated.v1",
+      "DisplayName": "灵台四级观象台审模候选V1",
+      "ReviewOrder": 6,
+      "FacilityId": "facility.instance.luoyang.184.lingtai",
+      "SourceProfileId": "landmark.luoyang.lingtai.v1",
+      "ModelId": "model.han.luoyang.ritual.observatory.v1",
+      "AssetVariantId": "HAN_LANDMARK_LINGTAI_STEPPED_OBSERVATORY_A",
+      "ReplacementSlotId": "HAN_LANDMARK_LINGTAI_STEPPED_OBSERVATORY_A",
+      "CellId64": 4161107,
+      "GridColumn": 2037,
+      "GridRow": 1255,
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Batch3/Lingtai",
+      "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Batch3/Lingtai.fbx",
+      "ArtistPrefabPresent": true,
+      "FinalArtApproved": true,
+      "Anchors": [
+        {"AnchorId":"anchor.p0.batch3.lingtai.placement","RoleId":"anchor_role.placement","X":0.0,"Y":0.0,"Z":0.0},
+        {"AnchorId":"anchor.p0.batch3.lingtai.entrance","RoleId":"anchor_role.entrance","X":0.0,"Y":0.07,"Z":-0.39}
+      ]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.batch3.taicang.v1",
+      "CandidateStatusId": "candidate.native_prefab_fbx_source_validated.user_accepted.final_art_activated.v1",
+      "DisplayName": "太仓四廪审模候选V1",
+      "ReviewOrder": 7,
+      "FacilityId": "facility.instance.luoyang.184.taicang",
+      "SourceProfileId": "landmark.luoyang.taicang.v1",
+      "ModelId": "model.han.luoyang.storage.imperial_granary.v1",
+      "AssetVariantId": "HAN_LANDMARK_TAICANG_FOUR_GRANARIES_A",
+      "ReplacementSlotId": "HAN_LANDMARK_TAICANG_FOUR_GRANARIES_A",
+      "CellId64": 4134598,
+      "GridColumn": 2040,
+      "GridRow": 1247,
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Batch3/Taicang",
+      "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Batch3/Taicang.fbx",
+      "ArtistPrefabPresent": true,
+      "FinalArtApproved": true,
+      "Anchors": [
+        {"AnchorId":"anchor.p0.batch3.taicang.placement","RoleId":"anchor_role.placement","X":0.0,"Y":0.0,"Z":0.0},
+        {"AnchorId":"anchor.p0.batch3.taicang.entrance","RoleId":"anchor_role.entrance","X":0.0,"Y":0.05,"Z":-0.41}
+      ]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.batch3.arsenal.v1",
+      "CandidateStatusId": "candidate.native_prefab_fbx_source_validated.user_accepted.final_art_activated.v1",
+      "DisplayName": "武库封闭围院审模候选V1",
+      "ReviewOrder": 8,
+      "FacilityId": "facility.instance.luoyang.184.arsenal",
+      "SourceProfileId": "landmark.luoyang.arsenal.v1",
+      "ModelId": "model.han.luoyang.military.arsenal.v1",
+      "AssetVariantId": "HAN_LANDMARK_ARSENAL_FORTIFIED_YARD_A",
+      "ReplacementSlotId": "HAN_LANDMARK_ARSENAL_FORTIFIED_YARD_A",
+      "CellId64": 4134604,
+      "GridColumn": 2046,
+      "GridRow": 1247,
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Batch3/Arsenal",
+      "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Batch3/Arsenal.fbx",
+      "ArtistPrefabPresent": true,
+      "FinalArtApproved": true,
+      "Anchors": [
+        {"AnchorId":"anchor.p0.batch3.arsenal.placement","RoleId":"anchor_role.placement","X":0.0,"Y":0.0,"Z":0.0},
+        {"AnchorId":"anchor.p0.batch3.arsenal.entrance","RoleId":"anchor_role.entrance","X":0.0,"Y":0.06,"Z":-0.41}
+      ]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.batch3.zhuolong_garden.v1",
+      "CandidateStatusId": "candidate.native_prefab_fbx_source_validated.user_accepted.final_art_activated.v1",
+      "DisplayName": "濯龙园池台林苑审模候选V1",
+      "ReviewOrder": 9,
+      "FacilityId": "facility.instance.luoyang.184.zhuolong_garden",
+      "SourceProfileId": "landmark.luoyang.zhuolong_garden.v1",
+      "ModelId": "model.han.luoyang.public.imperial_garden.v1",
+      "AssetVariantId": "HAN_LANDMARK_ZHUOLONG_GARDEN_POND_PAVILION_A",
+      "ReplacementSlotId": "HAN_LANDMARK_ZHUOLONG_GARDEN_POND_PAVILION_A",
+      "CellId64": 4101464,
+      "GridColumn": 2046,
+      "GridRow": 1237,
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Batch3/ZhuolongGarden",
+      "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Batch3/ZhuolongGarden.fbx",
+      "ArtistPrefabPresent": true,
+      "FinalArtApproved": true,
+      "Anchors": [
+        {"AnchorId":"anchor.p0.batch3.zhuolong_garden.placement","RoleId":"anchor_role.placement","X":0.0,"Y":0.0,"Z":0.0},
+        {"AnchorId":"anchor.p0.batch3.zhuolong_garden.entrance","RoleId":"anchor_role.entrance","X":0.41,"Y":0.04,"Z":0.0}
+      ]
+    }
+  ]
+}

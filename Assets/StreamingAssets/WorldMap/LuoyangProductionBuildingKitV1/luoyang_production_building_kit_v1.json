@@ -1,0 +1,277 @@
+{
+  "SchemaId": "mandate.luoyang-production-building-kit.v1",
+  "KitId": "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+  "RegionalStyleId": "regional_style.central_plains.han.v1",
+  "OpeningFacilityCount": 2084,
+  "CoveredOpeningFacilityCount": 1800,
+  "Profiles": [
+    {
+      "ProfileId": "production_profile.han.luoyang.residence.courtyard.v1",
+      "ModelId": "model.han.buildable.residence.general.v1",
+      "AssetVariantId": "HAN_RES_COMMON_SMALL_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.cell_center",
+      "EntranceAnchorId": "anchor.entrance.south_gate",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 552,
+      "PrimitiveOverrides": [
+        { "ModuleId": "yard", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "wall.west", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "wall.east", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "wall.north", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "hall.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "hall.roof.front", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "hall.roof.back", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "wing.west", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "wing.west.roof", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "wing.east", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "wing.east.roof", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "gate.west", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "gate.east", "PrimitiveId": "han.timber_beam" }
+      ],
+      "Lod1ModuleIds": [
+        "yard", "wall.west", "wall.east", "wall.north", "hall.body",
+        "hall.roof.front", "hall.roof.back", "wing.west", "wing.east"
+      ],
+      "Lod2ModuleIds": [
+        "yard", "hall.body", "hall.roof.front", "hall.roof.back"
+      ]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.agriculture.dry_field.v1",
+      "ModelId": "model.han.luoyang.agriculture.dry_field.v1",
+      "AssetVariantId": "HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.terrain_center",
+      "EntranceAnchorId": "anchor.entrance.south_field_edge",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": true,
+      "OpeningUsageCount": 361,
+      "PrimitiveOverrides": [
+        { "ModuleId": "soil", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "crop.1", "PrimitiveId": "han.field_ridge" },
+        { "ModuleId": "crop.2", "PrimitiveId": "han.field_ridge" },
+        { "ModuleId": "crop.3", "PrimitiveId": "han.field_ridge" },
+        { "ModuleId": "crop.4", "PrimitiveId": "han.field_ridge" },
+        { "ModuleId": "crop.5", "PrimitiveId": "han.field_ridge" }
+      ],
+      "Lod1ModuleIds": ["soil", "crop.1", "crop.3", "crop.5"],
+      "Lod2ModuleIds": ["soil", "crop.3"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.public.road_segment.v1",
+      "ModelId": "model.han.luoyang.public.road_segment.v1",
+      "AssetVariantId": "HAN_ROAD_SEGMENT_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.terrain_center",
+      "EntranceAnchorId": "anchor.connection.road_south",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.43,
+      "TerrainConforming": true,
+      "OpeningUsageCount": 359,
+      "PrimitiveOverrides": [
+        { "ModuleId": "road", "PrimitiveId": "han.road_crown" },
+        { "ModuleId": "shoulder.w", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "shoulder.e", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "track.w", "PrimitiveId": "han.wall_coping" },
+        { "ModuleId": "track.e", "PrimitiveId": "han.wall_coping" }
+      ],
+      "Lod1ModuleIds": ["road", "shoulder.w", "shoulder.e"],
+      "Lod2ModuleIds": ["road"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.workshop.courtyard.v1",
+      "ModelId": "model.han.buildable.workshop.general.v1",
+      "AssetVariantId": "HAN_PRODUCTION_WORKSHOP_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.cell_center",
+      "EntranceAnchorId": "anchor.entrance.south_yard",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 94,
+      "PrimitiveOverrides": [
+        { "ModuleId": "yard", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "hall.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "hall.roof.front", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "hall.roof.back", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "lean.body", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "lean.roof", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "kiln.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "bench.west", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "bench.east", "PrimitiveId": "han.timber_beam" }
+      ],
+      "Lod1ModuleIds": [
+        "yard", "hall.body", "hall.roof.front", "hall.roof.back",
+        "lean.body", "lean.roof", "kiln.body"
+      ],
+      "Lod2ModuleIds": ["yard", "hall.body", "hall.roof.front", "hall.roof.back"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.agriculture.garden.v1",
+      "ModelId": "model.han.luoyang.agriculture.garden.v1",
+      "AssetVariantId": "HAN_AGRICULTURE_GARDEN_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.terrain_center",
+      "EntranceAnchorId": "anchor.entrance.south_garden_path",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": true,
+      "OpeningUsageCount": 92,
+      "PrimitiveOverrides": [
+        { "ModuleId": "ground", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "tree.nw.trunk", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "tree.nw.crown", "PrimitiveId": "han.foliage_cluster" },
+        { "ModuleId": "tree.ne.trunk", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "tree.ne.crown", "PrimitiveId": "han.foliage_cluster" },
+        { "ModuleId": "herb.bed.w", "PrimitiveId": "han.field_ridge" },
+        { "ModuleId": "herb.bed.e", "PrimitiveId": "han.field_ridge" }
+      ],
+      "Lod1ModuleIds": [
+        "ground", "tree.nw.trunk", "tree.nw.crown", "tree.ne.trunk",
+        "tree.ne.crown", "herb.bed.w", "herb.bed.e"
+      ],
+      "Lod2ModuleIds": ["ground", "tree.nw.crown", "tree.ne.crown"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.warehouse.courtyard.v1",
+      "ModelId": "model.han.buildable.warehouse.general.v1",
+      "AssetVariantId": "HAN_STORAGE_WAREHOUSE_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.cell_center",
+      "EntranceAnchorId": "anchor.entrance.south_loading_yard",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 85,
+      "PrimitiveOverrides": [
+        { "ModuleId": "yard", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "store.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "store.roof.front", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "store.roof.back", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "shed.body", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "shed.roof", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "loading.platform", "PrimitiveId": "han.wall_coping" }
+      ],
+      "Lod1ModuleIds": [
+        "yard", "store.body", "store.roof.front", "store.roof.back",
+        "shed.body", "shed.roof", "loading.platform"
+      ],
+      "Lod2ModuleIds": ["yard", "store.body", "store.roof.front", "store.roof.back"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.fortification.city_wall.v1",
+      "ModelId": "model.han.buildable.city_wall.segment.v1",
+      "AssetVariantId": "HAN_CITY_WALL_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.wall_center",
+      "EntranceAnchorId": "anchor.connection.wall_west",
+      "EntranceX": -0.44,
+      "EntranceY": 0.0,
+      "EntranceZ": 0.0,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 76,
+      "PrimitiveOverrides": [
+        { "ModuleId": "foundation", "PrimitiveId": "han.wall_coping" },
+        { "ModuleId": "wall.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "tower.body", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "tower.upper", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "tower.roof.front", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "tower.roof.back", "PrimitiveId": "han.tile_slab" }
+      ],
+      "Lod1ModuleIds": [
+        "foundation", "wall.body", "tower.body", "tower.upper",
+        "tower.roof.front", "tower.roof.back"
+      ],
+      "Lod2ModuleIds": ["foundation", "wall.body", "tower.body"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.fortification.palace_wall.v1",
+      "ModelId": "model.han.luoyang.fortification.palace_wall.v1",
+      "AssetVariantId": "HAN_PALACE_WALL_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.wall_center",
+      "EntranceAnchorId": "anchor.connection.wall_west",
+      "EntranceX": -0.44,
+      "EntranceY": 0.0,
+      "EntranceZ": 0.0,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 70,
+      "PrimitiveOverrides": [
+        { "ModuleId": "foundation", "PrimitiveId": "han.wall_coping" },
+        { "ModuleId": "wall", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "coping", "PrimitiveId": "han.wall_coping" },
+        { "ModuleId": "watch", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "watch.roof", "PrimitiveId": "han.tile_slab" }
+      ],
+      "Lod1ModuleIds": ["foundation", "wall", "coping", "watch", "watch.roof"],
+      "Lod2ModuleIds": ["foundation", "wall", "coping"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.service.inn_post.v1",
+      "ModelId": "model.han.luoyang.service.inn_post.v1",
+      "AssetVariantId": "HAN_INN_POST_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.cell_center",
+      "EntranceAnchorId": "anchor.entrance.south_inn_yard",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": false,
+      "OpeningUsageCount": 60,
+      "PrimitiveOverrides": [
+        { "ModuleId": "yard", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "main", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "main.roof", "PrimitiveId": "han.tile_slab" },
+        { "ModuleId": "stable", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "kitchen", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "sign", "PrimitiveId": "han.timber_beam" }
+      ],
+      "Lod1ModuleIds": ["yard", "main", "main.roof", "stable", "kitchen", "sign"],
+      "Lod2ModuleIds": ["yard", "main", "main.roof"]
+    },
+    {
+      "ProfileId": "production_profile.han.luoyang.agriculture.pasture.v1",
+      "ModelId": "model.han.luoyang.agriculture.pasture.v1",
+      "AssetVariantId": "HAN_AGRICULTURE_PASTURE_PRODUCTION_A",
+      "LodProfileId": "lod.han.strategy.building.three_tier.v1",
+      "MaterialSetId": "material_set.han.central_plains.shared.v1",
+      "PlacementAnchorId": "anchor.placement.terrain_center",
+      "EntranceAnchorId": "anchor.entrance.south_pasture_gate",
+      "EntranceX": 0.0,
+      "EntranceY": 0.0,
+      "EntranceZ": -0.42,
+      "TerrainConforming": true,
+      "OpeningUsageCount": 51,
+      "PrimitiveOverrides": [
+        { "ModuleId": "grass", "PrimitiveId": "han.terrain_pad" },
+        { "ModuleId": "fence.w", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "fence.e", "PrimitiveId": "han.timber_beam" },
+        { "ModuleId": "shelter", "PrimitiveId": "han.rammed_block" },
+        { "ModuleId": "shelter.roof", "PrimitiveId": "han.tile_slab" }
+      ],
+      "Lod1ModuleIds": [
+        "grass", "fence.w", "fence.e", "hay.1", "hay.2", "shelter", "shelter.roof"
+      ],
+      "Lod2ModuleIds": ["grass", "shelter", "shelter.roof"]
+    }
+  ]
+}

@@ -1,6 +1,260 @@
 # 游戏系统总纲、当前状态与生产科研设计
 
+> 2026-08-12：`LUOYANG-PLAYABLE-VERTICAL-SLICE-MAP-PRESENTATION-AND-CONSTRUCTION-ASSET-LIBRARY-V1` 已建立同一洛阳Runtime上的Golden Slice表现投影、正式BuildBlueprint/VisualProfile/VisualAnchor合同、四类玩家/AI/历史初始化复用建设资产、真实Person/Shipment/Crop/Lifecycle视觉绑定及默认可玩场景。当前状态为`LUOYANG_GOLDEN_SLICE_V1_PLAYABLE_WITH_PROCEDURAL_ART_LIMITS`；全国DEM Chunk Terrain、最终3D汉代Prefab、全洛阳A-Tier Composition和完整Force近景仍不得写成已完成。
+
 ## Document Governance
+
+## 当前地图审图门禁：全国战略格 LOD V1（2026-08-26）
+
+用户已进一步明确授权全国格子化。当前实施在 WORLD 使用 32×32 Cell、约 64km 的纯视觉 LOD 引导格，以一个合批对象覆盖全部 7,211,264 个既有 Cell；进入任意地区后切换为 1×1 的 2000m 精确格，河南尹审查窗口仍为 24×24、576 格和两个合批对象。32×32 不是新的 Chunk、Region、行政或模拟语义。
+
+正式入口为 `TASK_HAN_WORLD_NATIONWIDE_STRATEGIC_CELL_GRID_LOD_V1.md`，河南尹基线见 `TASK_HAN_WORLD_EXPLICIT_STRATEGIC_CELL_MAP_V1.md`。当前代码状态为 `NATIONWIDE_GRID_IMPLEMENTED_STATIC_CHECKS_PASSED_UNITY_RUNTIME_BLOCKED`；全国表现层已授权，但仍不等于最终 Golden 或全国美术资产量产。下述 Style D V2 文本继续记录其历史交付状态，其中“正常画面不显示格线”的旧门禁已被本次用户决定在战术格视图范围内取代。
+
+## 当前建筑审图门禁：洛阳第一批可建设建筑模型套件 V1（2026-08-26）
+
+用户已接受东汉中原半写实、中低模战略微缩风格，并授权第一批住宅、仓库、工坊、市场、战地医院、
+城墙和城门七类模型执行。当前已建立数据驱动程序化模型目录、共享材质、Runtime Binding 与正式
+Global Cell 直接摆放接口；`BUILDINGS` 审查视角在洛阳附近七个互异正式 Cell 各摆放一类模型。
+预览不是新的 Facility，不改变建设结算、产权、存档或一 Cell 一个基础 Facility 槽规则。
+
+正式入口为 `TASK_LUOYANG_BUILDABLE_FACILITY_MODEL_KIT_V1.md`。当前状态为
+`IMPLEMENTED_TARGET_TESTS_PASSED_FORMAL_UNITY2022_VERIFICATION_BLOCKED`：隔离 Unity 6000.5 兼容副本
+完成全脚本编译和 11/11 项目标/相关回归，但本机缺少项目锁定的 Unity 2022.3.62f3c1 与脚本要求的
+Visual Studio MSBuild，正式版本验证未执行。当前交付仍是可直接摆放的程序化 V1，不得描述为最终
+艺术家 FBX、贴图烘焙或正式 LOD 量产完成。
+
+## 当前建筑建设：洛阳设施模型覆盖与A级历史建筑组合 V1（2026-08-26）
+
+用户已授权继续完成洛阳建筑设置。正式入口为
+`TASK_LUOYANG_FACILITY_MODEL_COVERAGE_AND_A_TIER_COMPOSITION_V1.md`。本任务保留第一批七项稳定资产，
+新增29项程序化模型，使合并目录达到36项；以显式稳定ID数据绑定覆盖正式Urban与Metropolitan组合
+世界的2,084项Facility和61种开局Definition，并为运行定义沿用普通仓库的武库保留带历史依据的
+Facility实例覆盖。道路、水渠和桥梁属于基础设施表现，不解释为普通院落。
+
+当前实施状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。2026-08-27 已在项目
+锁定的 Unity 2022.3.62f3c1 下完成全工程编译、相关核心测试 4/4、目标 EditMode 5/5 和图形化
+PlayMode 1/1；验收中修复了中央官署门楼屋顶超出单 Cell 占地 0.01 的问题，并输出36项模型同屏
+Game View。全量核心/Unity 分组回归与用户审图仍是独立门禁。它不修改任何Facility、人口、产权、
+建设结算或存档，也不代表最终FBX、贴图、LOD、损毁、全城Streaming或十二城门独立高模已经完成。
+
+## 当前建筑生产：洛阳高频建筑生产模块包 V1（2026-08-27）
+
+覆盖任务之后的正式入口为
+`TASK_LUOYANG_PRODUCTION_BUILDING_MODULAR_KIT_AND_HIGH_FREQUENCY_CITY_FABRIC_V1.md`。本任务保持既有
+36个稳定Model ID、2,084项Facility和建设权限不变，对住宅、旱田、道路、工坊、园圃、仓库、城墙、
+宫墙、客栈驿舍和牧场10类增加独立Production Profile、Asset Variant、入口/放置锚点、八种原创
+缓存Mesh与三级LOD。这10类对应开局1,800项Facility，覆盖率约86.4%；宫墙等受限模型不会因进入
+生产包而成为普通玩家可建设项。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心合同
+测试1/1、目标EditMode 2/2和图形化PlayMode 1/1已通过，并输出1600×1000实际Game View。全量回归
+和最终FBX/贴图仍未完成；A级地标独立轮廓、十二城门/宫门身份化、中频城市肌理和全城LOD2批处理
+预算已经由后续专项完成，但这不代表最终平台GPU、Addressables或全城高精资产验收完成。
+
+## 当前建筑生产：洛阳A级历史地标独立轮廓 V1（2026-08-27）
+
+高频生产模块之后的正式入口为
+`TASK_LUOYANG_A_TIER_HISTORICAL_LANDMARK_DISTINCT_SILHOUETTES_V1.md`。本任务以184年洛阳正式设施
+数据为依据，为南宫、北宫、永安宫、太学、明堂、辟雍、灵台、太仓、武库和濯龙园10项历史设施
+建立精确Facility ID绑定的独立Asset Variant、Silhouette、历史元数据、锚点和三级LOD；审图入口
+直接使用原10个Global Cell，不建立展示专用虚构Cell。三座宫殿不再共用轮廓，明堂与辟雍分别以
+方形重台和环水中堂识别。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心合同
+测试1/1、目标EditMode 3/3和图形化PlayMode 1/1已通过，并输出1600×1000实际Game View。新增表现
+不移动或创建Facility，不改变建设权限、产权、控制权、结算或存档；宫殿、太仓、武库等仍只允许
+政府/军事/历史初始化/事件路径。交付是原创程序化战略轮廓V1，不是最终FBX、贴图烘焙或考古单体
+复原。十二城门/宫门身份化、中频城市肌理和全城性能门禁已经由后续专项完成。
+
+## 当前建筑生产：洛阳十二城门与宫门身份化 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1.md`。本任务严格绑定洛阳184设施
+数据中的十二座大城门和北宫南门、南宫北门两座宫门，明确排除4个 `facility.military.gate`
+通用推荐设施。14项分别具有独立Asset Variant、Silhouette、门楼类型、三档LOD和门外/门内通行
+锚点，并直接摆放到权威Global Cell。十二城门朝向读取Facility；两座宫门原始`gate_direction`
+为空，表现层只由显示名称派生南向/北向，未回写世界事实。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心合同
+测试1/1、目标EditMode 3/3和图形化PlayMode 1/1已通过，并输出1600×1000全城门实际Game View。
+门楼预览为战略视距可读性放大，轮廓差异是原创程序化V1，不是最终FBX、考古立面、城门开闭/破坏
+动画或完整攻城系统。它不修改Facility、城防状态、建设权限或存档。洛阳中频城市肌理和全城
+LOD2批处理性能门禁均已由后续专项完成。
+
+## 当前建筑生产：洛阳中频城市肌理建筑 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1.md`。本任务依据Urban与Metropolitan
+开局数据，为市场/商铺48项、商队院45项、学校39项、地方官署16项和军营10项建立五个差异化
+Asset Variant、街面/密度角色、入口/放置锚点和三级LOD，合计158项。与既有高频生产Profile
+合并后，生产模型覆盖1,958/2,084项开局Facility，约94.0%；A级地标和城门身份资产不重复计数。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形化PlayMode 1/1已通过，并输出1600×1000的15格代表街坊Game
+View。预览Cell只用于Presentation审图，不声称是158项Facility的实际位置；模型升级不增加Facility、
+不扩大官署/军营建设权限，不改变结算、产权或存档。水渠、水井、桥梁等仍属基础设施专项。
+后续“洛阳建筑全城性能预算与批处理 V1”已经完成目标门禁。
+
+## 当前建筑性能：洛阳建筑全城性能预算与批处理 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_BUILDING_WHOLE_CITY_PERFORMANCE_AND_BATCHING_V1.md`。本任务从两份正式
+开局Facility数据建立2,084项轻量表现计划，保持2,084个唯一Global Cell和61种Definition；8×8
+Global Cell只作为Presentation合批单位，全城共64批。24×24只作为当前审查窗口，最密窗口为
+Column 2040—2063、Row 1224—1247，包含549项Facility和9个8×8表现批次，不冻结为最终Streaming
+Unit，也不建立新的世界、行政、模拟或存档语义。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形化PlayMode 1/1通过，并输出1600×1000实际Game View和指标JSON。
+接入 P0 四件套 LOD2 后的最密窗口1,673个LOD2源模块按空间批次与材质合并为97个
+Renderer/Combined Mesh、17,512个顶点，最新本机Editor回归构建22.9509ms，Renderer降幅94.20%，满足≤200 Renderer、
+≤250,000顶点、≤3,000ms和
+≥85%降幅的冻结预算。切回WORLD后合并对象和Mesh归零。
+
+这些数字只证明Unity 2022当前目标场景的建筑侧LOD2合批预算，不是平台GPU Draw Call、全量回归、
+最终高精FBX/贴图、烘焙遮挡或Addressables Streaming完成。后续基础设施生产专项已经完成目标门禁。
+
+## 当前建筑生产：洛阳水渠、水井与桥梁基础设施模型生产化 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1.md`。本任务使用Urban与
+Metropolitan正式开局数据，为19项水渠、16项水井和2项桥梁建立三个独立Production Profile、
+Asset Variant、角色、连接/服务锚点和三级LOD，并把37项全部放回其正式Global Cell审图。19渠＋2桥
+按四邻接Cell确定性派生为2条水系、4个端点和17个直线内部节点；16口井保持离散点设施。连接结果
+只属于Presentation，不写回Facility或建立新水利/道路事实。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形化PlayMode 1/1通过，已输出37项总览、17格主渠和2桥＋2渠支段
+三张1600×1000实际Game View。三级LOD已进入既有全城空间批次＋材质合批路径；生产覆盖由1,958
+提升至1,995/2,084。它不修改建设权限、产权、库存、结算、人口或Save Schema，也不代表最终FBX、
+贴图、水流动画、碰撞、导航或灌溉/桥梁通行模拟完成。
+
+后续“洛阳低频防御设施生产化 V1”已经完成目标门禁，生产覆盖达到2,023/2,084。
+
+## 当前建筑生产：洛阳低频防御设施生产化 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1.md`。本任务使用Urban正式开局数据，
+冻结12座历史城门、2座宫门、4座通用军用门、7座坞堡和3座烽燧，共28项正式Facility和28个
+唯一Global Cell。14座有名城门继续复用既有身份资产；通用军门、坞堡和烽燧新增3套独立程序化
+Profile、Asset Variant、角色、锚点和三级LOD。4座通用军门缺少世界方向，只使用显式
+Presentation默认南向，不回写Facility事实。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形化PlayMode 1/1通过，已输出28项总览、7坞堡＋4通用军门和北侧
+双烽燧三张1600×1000实际Game View。全城批处理定向回归通过；生产覆盖由1,995提升至
+2,023/2,084。它不修改建设权限、产权、库存、结算、人口或Save Schema，也不代表攻城、守军、
+城门开闭、损毁维修、烽火传播、最终FBX或考古复原完成。
+
+后续“洛阳资源与农业设施生产化 V1”已经完成目标门禁，生产覆盖达到2,049/2,084。
+
+## 当前建筑生产：洛阳资源与农业设施生产化 V1（2026-08-27）
+
+正式入口为`TASK_LUOYANG_RESOURCE_AND_AGRICULTURE_PRODUCTION_V1.md`。本任务使用Urban与
+Metropolitan正式开局数据，冻结9项林场、6项采石场、5项矿场和6项稻田，共26项正式Facility与
+26个唯一Global Cell。四类分别使用管理林场/木料堆场、露天阶梯采石、浅层平硐矿场和分埂浅水
+稻田轮廓，具有独立Asset Variant、角色、证据边界、锚点和三级LOD。矿场和采石场共享基础Model，
+但只按正式Facility/Definition分流；未知绑定不猜测类型。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形PlayMode 1/1通过；受影响的全城批处理EditMode 3/3和图形
+PlayMode 1/1回归通过；已输出26项总览、林场/矿场/采石带、南部采石场与六块稻田四张
+1600×1000实际Game View。生产覆盖由2,023提升至2,049/2,084。
+
+26项原始历史精度均为`GameplayReconstruction + Approximate + GeneratedForTest + C`且无逐项
+`source_ids`，因此只属于当前权威开局位置和汉代中原通用生产形态玩法重建，不是洛阳考古复原。
+静态表现不建立资源体、储量、矿脉、采掘/采伐、灌溉、作物生长、库存或产出结算事实。
+
+后续“洛阳剩余低频公共、礼制与医疗设施生产化收口 V1”已经完成目标门禁，生产覆盖达到
+2,084/2,084。
+
+## 当前建筑生产：洛阳剩余低频公共、礼制与医疗设施生产化收口 V1（2026-08-27）
+
+正式入口为
+`TASK_LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1.md`。本任务冻结最后35项
+正式Facility：南宫、北宫、永安宫、太学、明堂、辟雍、灵台、太仓、武库和濯龙园10项继续按精确
+Facility ID复用既有A级地标身份资产；9项医馆、6项通用礼制堂、4项公共庭院、4项公共广场和2项
+中央官署使用5套新程序化Asset Variant与三级LOD。明堂/辟雍不会与通用礼制堂混淆，庭院与广场
+虽然共享基础Model ID，仍按正式Facility/Definition解析为不同视觉变体。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：全工程编译、相关核心
+合同1/1、目标EditMode 3/3和图形PlayMode 1/1通过；受影响的全城批处理EditMode 3/3和图形
+PlayMode 1/1回归通过；已输出35项总览、9项医馆、8项礼制堂和庭院/广场/中央官署四张
+1600×1000实际Game View。生产覆盖由2,049提升至2,084/2,084。
+
+本任务没有新增、移动或改写Facility，不改变建设权限、产权、控制权、医疗/礼制/行政模拟、库存
+结算或Save Schema。2,084/2,084只表示现有开局Facility均具有程序化视觉生产或实名身份资产，
+不表示最终FBX、考古复原、室内、碰撞、导航、损毁、全量回归或平台性能已经完成。后续全城视觉
+验收与最终资产替换优先级清单已进入实施门禁，不再以增加基础覆盖数字为目标。
+
+## 当前建筑审阅：洛阳全城视觉验收与可替换最终资产清单 V1（2026-08-27）
+
+正式入口为
+`TASK_LUOYANG_WHOLE_CITY_VISUAL_REVIEW_AND_REPLACEABLE_FINAL_ASSET_MANIFEST_V1.md`。按模型工厂真实解析
+顺序审计2,084项开局Facility后，36个基础Model最终落到54个互异实际Asset Variant；防御和最终
+收口目录中的9个`REUSE_*`复用声明不是运行时资产，不进入替换槽位。
+
+54项按生产风险冻结为P0实名身份24项、P1高频曝光10项、P2系统可读14项、P3环境支撑6项，分别
+影响24、1,800、226和34项Facility。替换时保持Model/Asset/Profile/Facility稳定身份，程序化V1
+继续作为回退；任何外部候选必须完成来源和许可证登记后才能进入槽位。
+
+当前状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`：内容合同、机器清单、
+2,084项逐项解析、实例审阅元数据、54项PreviewOnly审阅板和四个固定优先级镜头已经实现；全工程
+编译、定向核心1/1、目标EditMode 3/3和图形PlayMode 1/1通过，受影响的全城批处理EditMode 3/3和
+图形PlayMode 1/1回归通过，并生成四张1600×1000 Game View。此状态不等于54项最终FBX已制作或
+最终美术已经通过；下一阶段受门禁限制为南宫、明堂、广阳门、北宫南门四项P0替换竖切片。
+
+## 当前建筑终模切片：洛阳 P0 四件套 V1（2026-08-27）
+
+正式入口为 `TASK_LUOYANG_P0_FINAL_ASSET_FOUR_PIECE_VERTICAL_SLICE_V1.md`。本轮锁定南宫、明堂、
+广阳门、北宫南门四个既有 P0 替换槽位，保留 Facility/Model/Asset/Profile、Global Cell、史料置信度
+与原建设权限。每项现有一个项目原创三级 LOD 集成候选、稳定锚点、六材质参数和目标
+Resources/FBX 路径；运行时优先校验并加载合规美术 Prefab，缺失时显式使用程序候选。
+
+后续 `TASK_LUOYANG_P0_FOUR_PIECE_NATIVE_PREFAB_ART_DELIVERY_V1.md` 已按冻结 Resources 路径交付
+四套实际 Unity 原生 Prefab、六个材质和四个共享网格；其上的
+`TASK_LUOYANG_P0_FOUR_PIECE_VISUAL_REFINEMENT_AND_REVIEW_READABILITY_V2.md` 又补强双朝院、三重台、
+门扇、短瓮城、双阙、屋脊、台阶与旗杆等远景识别特征，并把近景镜头改为按建筑实际包围盒中心
+取景。每项包含三个非空且严格递减的 LOD、全部稳定锚点且无 Collider；V2 四件套合计
+LOD Renderer 为 137/37/21。运行时四项均实际加载 Prefab，程序化回退保留但本次未激活。
+
+后续 `TASK_LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1.md` 已在不改模型、材质、LOD、
+权威 Cell 或玩法数据的前提下，建立 4 座 × 3 角度、12 个稳定相机 ID 和运行时循环切换控制；四个
+前斜视图继续复用 V2 近景，另补后斜与低角视图。当前状态为
+`MULTI_ANGLE_REVIEW_PACK_V1_READY_FOR_USER_DECISION_FINAL_APPROVAL_PENDING`：全工程编译、定向核心 1/1、
+多角度 EditMode 2/2、13 图图形 PlayMode 1/1、既有 V2 五图 PlayMode 1/1 与 549 Facility 全城批处理
+图形 PlayMode 1/1 已通过，共生成一张总览和十二张 1600×1000 多角度近景。完整核心套件上游
+300 秒超时事实仍保留，不能记为通过。四项仍无独立 FBX/DCC 源、手绘贴图和用户最终批准，
+`FinalArtApproved` 全为 false；下一步只进行用户逐项审图与四件套迭代，未通过前不批量替换其余
+50 个槽位。
+
+后续 `TASK_LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1.md` 已把十二张已验证近景按建筑整理为
+四张 3000×900 前斜/后斜/低角决策板，并生成无时间戳 SHA-256 机器清单。当前审阅状态为
+`P0_FOUR_PIECE_REVIEW_DECISION_BOARDS_V1_READY_FOR_USER_DECISION_FINAL_APPROVAL_PENDING`；脚本首次生成、
+4 件/12 源/4 板清单核验、五个输出文件重复生成哈希一致和四板人工视觉检查均通过。
+
+用户于 2026-08-27 对整套决策板回复“接受”，按上下文登记为南宫、明堂、广阳门、北宫南门四件
+全部接受。正式入口为
+`TASK_LUOYANG_P0_FOUR_PIECE_USER_ACCEPTANCE_AND_SOURCE_ARCHIVE_READINESS_V1.md`。该阶段状态为
+`LUOYANG_P0_FOUR_PIECE_USER_ACCEPTED_UNITY_NATIVE_SOURCE_ARCHIVED_INDEPENDENT_DCC_FBX_REQUIRED_FINAL_ACTIVATION_PENDING`：
+静态内容合同已区分用户接受与最终激活，生成器、P0 目录、4 Prefab、6 Material、4 Mesh 及其
+`.meta` 共 32 个文件已建立 SHA-256 归档；全工程编译、定向核心 1/1、原生 Prefab EditMode 1/1、
+源清单 EditMode 1/1、既有 P0 EditMode 4/4、13 视图图形 PlayMode 1/1 和最密 549 Facility 批处理
+图形 PlayMode 1/1 通过。四个冻结 FBX 目标均缺失，且本机没有 Blender、Assimp、FBX 转换器或
+Unity FBX Exporter；因此没有伪造源文件，`FinalArtApproved` 仍全为 false。若不明确改变旧门禁，
+真实独立 DCC/FBX 到位并完成一致性验证前不执行最终激活，也不批量替换其余 50 个槽位。
+
+后续 `TASK_LUOYANG_P0_FOUR_PIECE_FBX_SOURCE_FREEZE_AND_FINAL_ACTIVATION_V1.md` 已接入 Unity 2022.3
+官方发布的 FBX Exporter 4.2.1 与 Autodesk FBX SDK Unity 绑定 4.2.1，按冻结路径生成南宫、明堂、
+广阳门、北宫南门四个真实 FBX。Unity 回读已逐件验证 `LOD0/LOD1/LOD2` 渲染器数量、材质、可逆
+锚点映射、锚点位置、几何包围盒和零 Collider；最终清单冻结 42 个项目源/`.meta` 文件、2 个工具链
+文件和 4 个 FBX 哈希。当前状态为
+`LUOYANG_P0_FOUR_PIECE_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`，四项静态
+`FinalArtApproved=true`。运行时只有真实 Prefab 加载成功时实例批准为真，程序回退实例仍为假。
+这关闭四件套战略地图 P0 竖切片，不代表考古复原、手绘/PBR 贴图终稿或其余 50 个槽位获批。
+
+## 当前地图审图门禁：Style D 战略山河 V2（2026-08-16）
+
+当前已建立`presentation.han-world.visual-terrain-detail.v2`：WORLD/REGION/CITY/CLOSE_PREVIEW分别使用1×/2×/4×/8×表现顶点密度，但正式Global Cell仍为2000m、3314×2176、7,211,264个永久空间身份。该实现不建立SubCell、不改变Global Origin、不向Domain或Persistence回写视觉微起伏。
+
+河流已接入自适应采样、限幅Miter/Bevel、统一水面/河岸横断面与地形采样；森林已接入WORLD地表密度、REGION合并树冠簇、CITY合并单树网格。15张核心Game View截图与15份工作簿已形成用户审图包。
+
+当前状态为`STYLE_D_STRATEGIC_LANDSCAPE_V2_READY_FOR_USER_REVIEW`，而非最终Golden。河流源线段端点接缝、汇流junction mesh、CITY低频块状感和连续LOD morph仍为`PARTIAL`。中华三国志候选源码因GitHub 443网络阻断未取得，许可证仍为`UNRESOLVED`，本轮没有复制外部代码或资产。用户确认前禁止全国Style D生产、河南尹正式高精地形和洛阳城市建筑生产。
 
 - Purpose：统一报告各系统当前状态、跨系统关系、技术债与全局建设顺序。
 - Authority：L2 CURRENT SYSTEM STATUS。
@@ -798,6 +1052,17 @@ M26-P0 已于 2026-08-06 完成首个可玩主循环竖切片，任务与证据�
 20—30分钟可玩性冒烟与交互修正，再按本总纲选择下一项世界系统建设。
 
 ## 0E. 推荐后续建设顺序
+
+2026-08-12，`LUOYANG-184-T4-LIVING-WORLD-COMPLETION-MASTER-V1` 已达到
+`T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS`。受保护的 400,000 Person、
+80,899 Household 与 2,084 opening Facility 未重建；产权/建设、真实外部供应、市场、家族、
+个人成长、Office/财政、军需、社会压力、189—190 离屏事件、玩家领域指令和洛阳最小 UI 已在
+同一世界账接通。657条既有核心回归、27条T4核心测试（含人口压力、真实可开发Cell、玩家产业与v5→v6迁移）、T4 Unity EditMode按18项功能、5项长期/性能/迁移与4×5 Seed Suite拆分，完整覆盖Seed 1—20，并有两条洛阳
+PlayMode Smoke 通过。完整证据入口为
+`HISTORICAL_WORLD_REFERENCE/LUOYANG_184_T4_LIVING_WORLD_COMPLETION_MASTER_V1/`。
+实物税已从真实家庭/市场食物进入政府官仓，精确历史税率仍需深化；逐路线城门延误、完整犯罪/继承/仕途和最终美术交互仍明确 Deferred；这些缺口
+不允许被后续任务写成完成。下一大阶段可以洛阳为已验证样板，恢复 HOT/WARM/COLD 永久人物
+世界扩张，但不得顺手物化第二个 T4 城市或全国 5,350 万 Runtime。
 
 M14已经完成200—500人的真实村庄与家庭生活闭环。M15-P4/P5形成“100万人分区二进制
 完整合同通过”“累计1000万冷热档案”和“5000万全部在世基础索引与日/月/年到期推进”的
@@ -1673,3 +1938,238 @@ City Development Pack是把某个`CanonicalPlaceId`的历史身份、分期状�
 Simulation Arena 已完成 10 Benchmark × 100 Seed × 4 Policy 的 4,000 次合同级运行，并输出 176,000 条决策、检查点、独立决策/事件 Trace 和 189/190 条件事件多分支证据。V72 只因新增 Agent Profile、Goal、Model 与有界 DecisionMemory 持久字段而升级，并提供 V71→V72 顺序迁移。
 
 本证据没有证明 400K 洛阳完整性能、成熟 Facility/产业/贸易/政府差异或全国 AI 已完成。下一全局候选为 `WORLD-HOT-WARM-COLD-PERMANENT-PERSON-SIMULATION-V1`：先对 400K 洛阳执行混合热度与全 HOT 压力门禁，再扩全国；Rule/Utility 仍是生产基线，Merchant Neural 只作为版本化候选实验。
+
+## 31. 全国统一空间基础 V1（ONE WORLD / ONE GLOBAL GRID）
+
+正式合同与验收入口为
+[`GLOBAL_SPATIAL_FOUNDATION_CONTRACT_V1.md`](HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/GLOBAL_SPATIAL_FOUNDATION_CONTRACT_V1.md)
+、[总报告](HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1_REPORT.md)
+和[空间起点摘要](HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/SPATIAL_ORIGIN_SUMMARY.md)。
+
+当前状态为 `GLOBAL_SPATIAL_FOUNDATION_V1_FROZEN`：全国唯一 CRS 继续采用
+`hanworld.albers.china.v0`，唯一原点为 `(-3417344.395965772, 6199580.451937504)`；
+该点严格表示规则母格网及 Cell(0,0) 的西北/左上角，行号由北向南增加，列号由西向东增加；
+3314×2176、2000m、7,211,264 个 0 基 row-major Cell 及其既有 ID 全部保留。后续
+[`WORLD-REGION-CELL-BOUNDARY-AND-TECHNICAL-BLOCK-SEMANTICS-CORRECTION-V1`](TASK_WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1.md)
+已把 Region 与技术分块语义正式收口：16×16 的 28,288 个既有 ID 和索引行为继续保留，但当前含义是
+`SIMULATION_AGGREGATION_BLOCK_16`，不是世界事实、Terrain Tile 或 Streaming Unit。旧地图二进制中的
+64×64 继续仅是 `STORAGE_COMPRESSION_ONLY`。该语义修正不涉及 Cell、Place、Facility、Person、Force
+或存档重编号。
+
+`HENAN_YIN_REGION` 是第一块地图生产 Region，其权威范围严格由 58,368 个
+`IncludedGlobalCellIds` 决定；当前矩形和 228 个 16×16 索引只是已有数据形状与派生技术索引，不构成
+未来 Region 必须按完整 16×16 Block 划分的规则。Region 边界由成员 Cell 外边派生，允许阶梯状，不切
+Cell，不建立 Seam/Border/Transition Cell，也不需要第二套权威 Polygon。河南尹行政 Overlay 的 7,763
+个 Cell 继续是独立历史行政信息。Region Local、技术块 Local 与 Unity Floating Origin 都只是可逆转换
+或表现坐标。
+
+空间骨架、Region Cell 边界合同、DEM 全局采样合同、河路地点锚点与转换服务保持冻结。后续
+`HAN-WORLD-NATURAL-TERRAIN-AND-LANDSCAPE-BASEMAP-V1` 已完成 4×4、8×8、16×16 真实 DEM 与
+3×3/5×5 Unity 基准，Terrain Tile 因此冻结为 8×8 Cell（16km）；24×24 Cell Streaming Unit 仅为
+V1 暂定运行参数。该完成状态只代表全国自然地貌基线，不代表河南尹最终高精 Terrain、汉代河道精修
+或全国最终美术已经完成。
+
+## 32. 全国自然地貌统一底图 V1（HAN WORLD NATURAL BASEMAP）
+
+正式入口为[实施与验收报告](HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1_REPORT.md)。
+
+- 已有原型：Unity `HanWorldNaturalBasemap` 场景在不加载旧背景图时显示全国低 LOD 自然地形，并可切换河南尹/洛阳 3×3 Terrain Tile 区域视角；河流和植被为批处理 Mesh。
+- 已有底座：真实 `HanWorldV1` DEM、233 个许可河流参考 Feature、稳定 Surface ID、共享边 Terrain Generator、Global↔Terrain↔Cell 绑定和 Floating Origin 往返。
+- 已定方案：Terrain Tile = 8×8 Global Cell（16km）；全国 112,880 个 Tile 是可派生表现索引，不是世界身份或 GameObject 清单。
+- 暂定方案：Streaming Unit = 24×24 Cell / 3×3 Terrain Tile；后续压力测试可调整，不得改写 Global Cell 或 Terrain Tile 身份。
+- 待研究：高精 DEM、汉代河道与湖岸复核、洛水许可折线、季节/天气/雾、最终水墨材质、河岸湿地细化、GPU 时间戳和大范围异步加载。
+- 兼容规则：16×16 继续只用于模拟聚合，64×64 继续只用于二进制压缩；Region 继续是完整 Global Cell 成员集合。
+- 下一阶段允许进入“河南尹高精自然地形与历史水系 V1”，但不得把 2km 全国底图误报为城市近景最终资产。
+
+## 33. 东汉全国自然地图视觉表现 V2
+
+正式入口为 [`TASK_HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2.md`](TASK_HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2.md) 与 [`HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_REPORT.md`](HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_REPORT.md)。当前状态为“已有可操作原型与正式验证证据”，最终标记是 `HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_PLAYABLE_WITH_ART_LIMITS`，不得写成最终美术 COMPLETE。
+
+V2 继续使用唯一 `hanworld.albers.china.v0`、Global Origin、3314×2176、2000m Global Cell、7,211,264 Cell ID、河南尹 58,368 成员 Cell 和冻结的 8×8 Terrain Tile。WORLD 为同源 DEM 的连续远景网格；REGION 为连续 2km Cell 显示网格，3×3 Terrain Tile 只承担驻留、碰撞和未来流式边界，不重复绘制地表。格网和行政信息只属可切换信息层；旧背景图不参与自然地图事实或正式截图。
+
+当前河流已具备平滑中心线、宽度变化和河岸，森林已具备连续密度与合并批次，但树冠、河岸细节、2km 近景低多边形、全国调色与抗锯齿仍是明确美术债。14 张 Game View 截图只是 Golden 候选，下一阶段必须等待用户确认自然地图方向。
+
+## 34. 东汉全国自然地图美术方向与渲染 V1
+
+正式入口为 [`TASK_HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1.md`](TASK_HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1.md) 与 [`HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1_REPORT.md`](HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1_REPORT.md)。当前状态是 `HAN_WORLD_ART_DIRECTION_V1_CANDIDATES_READY`。
+
+同一真实 DEM、Global Cell、河流、森林、Floating Origin 和固定 Camera 已产生 STYLE A 半写实自然、STYLE B 国风半写实战略沙盘、STYLE C 强化战略可读性沙盘三套可切换候选，并有18张独立 Game View、3张三联图和12份工作簿证据。三套只改变 Presentation Profile；112,880个8×8 Terrain Tile、河南尹58,368 Cell、洛阳及人口设施事实均未改变。
+
+本状态只表示“候选可供用户审美决策”，不是全国最终美术完成。`USER_SELECTED_STYLE=PENDING`，Codex 推荐 STYLE B 但无权代替用户决定；全国风格推广、河南尹高精 Terrain、洛阳城市/城墙/建筑/道路全部保持 `BLOCKED_PENDING_USER_APPROVAL`。
+
+## 35. 《中华三国志》启发 Style D 地图原型 V1
+
+正式入口为 [`TASK_HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1.md`](TASK_HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1.md) 与 [`HISTORICAL_WORLD_REFERENCE/HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1/README.md`](HISTORICAL_WORLD_REFERENCE/HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1/README.md)。
+
+本阶段在用户明确要求下增加第四套 `STYLE_D_ZHONGHUA_SANGUOZHI_FUSION` 候选，不改变此前 A/B/C 的同源比较合同。Style D 在同一 DEM、Global Cell、河流、森林与 Floating Origin 上派生坡度、局部起伏、脊、谷、山体、平原、连续森林面和河谷权重，并以 Presentation UV 通道驱动 Shader；不建立第二套地图、不复制外部地图或贴图、不修改任何历史地理事实。
+
+当前状态为 `STYLE_D_ZHONGHUA_SANGUOZHI_FUSION_PROTOTYPE_READY`，已有10张固定 Game View、14份工作簿、EditMode 2/2 与 PlayMode 1/1。候选仓库固定 HEAD 的 API 静态审计已经完成，但完整 Git clone 因 GitHub 443 连接失败/重置硬阻断，故不得声称 `ZHONGHUA_SANGUOZHI_SOURCE_RESEARCH_V1_COMPLETE`。`USER_SELECTED_STYLE` 仍为 `PENDING`，全国推广、河南尹高精与洛阳城市继续阻断。
+
+## 36. 洛阳全城建筑最终资产分批审模状态
+
+正式清单入口为
+[`TASK_LUOYANG_WHOLE_CITY_VISUAL_REVIEW_AND_REPLACEABLE_FINAL_ASSET_MANIFEST_V1.md`](TASK_LUOYANG_WHOLE_CITY_VISUAL_REVIEW_AND_REPLACEABLE_FINAL_ASSET_MANIFEST_V1.md)。
+54个稳定Asset Variant替换槽位、2,084项Facility映射和P0/P1/P2/P3优先级继续冻结；最终艺术替换不得
+改变Facility、Model、Asset Variant、Global Cell、建设权限、模拟或Save Schema。
+
+首批南宫、明堂、广阳门、北宫南门已经完成用户接受、真实FBX回读和
+`FinalArtApproved=true`激活。第二批原生源入口为
+[`TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`](TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md)：
+按最低剩余P0评审序号1/2/3/5选择北宫、永安宫、太学、辟雍，已完成4个项目原创原生Prefab、4个
+真实FBX、三级LOD、稳定锚点、运行时回退和来源哈希清单。
+
+第二批审图输入为
+[`TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1.md`](TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1.md)：
+固定4件×3角度相机合同，生成一张总览、十二张1600×1000 Game View与四张3000×900决策板；
+PreviewOnly审模实例改用平缓评审Cell后，太学与辟雍主体地形线遮挡项已关闭。决策板中的
+`PENDING/false`保留为用户决定前的历史证据。
+
+用户随后对北宫、永安宫、太学、辟雍明确回复“全部接受”。当前正式入口为
+[`TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`](TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md)，
+状态为
+`LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`。四项现均为
+`FinalArtApproved=true`，真实Prefab/FBX、三级LOD、材质、锚点、包围盒、零Collider和来源哈希已
+通过门禁；运行时只有真实Prefab加载成功才报告批准，程序回退实例仍为false。全工程编译、定向
+核心1/1、接受/回退与FBX回读EditMode各1/1、真实Prefab五视图PlayMode 1/1和最密549 Facility
+批处理PlayMode 1/1通过。
+
+第三批原生源血统入口为
+[`TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`](TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md)：
+按最低剩余P0评审序号6/7/8/9选择灵台、太仓、武库、濯龙园，已完成4个项目原创原生Prefab、4个
+真实FBX、三级LOD、稳定锚点、运行时独立身份与回退、来源哈希清单，以及一张总览和四张1600×1000
+Unity Game View。
+
+用户随后在该五视图审模上下文中明确回复“接受”，按四件全部接受登记。当前正式入口为
+[`TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`](TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md)，
+状态为
+`LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`。四项现均为
+`FinalArtApproved=true`，运行时只有真实Prefab加载成功才报告批准，程序回退仍为false。全工程编译、
+定向核心1/1、FBX回读与接受/回退EditMode各1/1、真实Prefab五视图PlayMode 1/1和最密549 Facility
+批处理PlayMode 1/1通过。
+
+洛阳54个最终资产槽位中，首批、第二批、第三批各4项，共12项先行最终激活。用户随后以“给出下一步
+任务书，并执行”单独授权有限第四批候选生产；候选血统入口为
+[`TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`](TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md)。
+本批跳过首批已激活的评审序号10广阳门，选择最低剩余P0序号11/12/13/14：谷门、津门、开阳门、
+旄门。
+四件项目原创原生Prefab和四个Unity回读FBX已经完成，具有三级严格递减LOD、稳定放置/内外通行
+锚点、权威朝向、真实Prefab优先与程序回退；五张1600×1000 Game View已形成候选审图输入。
+
+用户随后在该上下文中表示“上一个接受”，按第四批四件全部接受登记。当前正式入口为
+[`TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`](TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md)，
+状态为
+`LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`。四项静态
+`FinalArtApproved=true`；运行时只有真实Prefab成功加载才报告批准，程序回退实例仍为false。至此
+首批至第四批共16/54项最终激活，剩余38项未最终批准；第五批未启动。来源清单哈希与本轮编译、
+核心、Unity和批处理验收结果以第四批最终激活任务书的执行记录为准。
+
+用户随后明确要求“直接开发剩下的38个，不用审批直接接受”，因此另建
+[`TASK_LUOYANG_REMAINING_38_USER_PREACCEPTED_FINAL_ASSET_COMPLETION_V1.md`](TASK_LUOYANG_REMAINING_38_USER_PREACCEPTED_FINAL_ASSET_COMPLETION_V1.md)
+一次关闭评审序号`15—21、23—53`。本轮冻结8个P0、10个P1、14个P2和6个P3槽位，影响
+2,068项Facility；与既有16项合计覆盖54个稳定替换槽位和2,084项正式Facility。38个项目原创
+Unity原生Prefab、38个真实FBX、22个材质、12个网格、三级LOD、稳定锚点和零Collider已完成
+Unity重载/回读，来源清单覆盖240个源/元数据文件并逐项冻结SHA-256。运行时真实Prefab加载时批准
+为true，程序回退强制为false；全54项真实Prefab图形场景与最密549 Facility批处理均通过定向门禁。
+当前状态为
+`LUOYANG_REMAINING_38_USER_PREACCEPTED_NATIVE_PREFAB_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`，至此
+洛阳最终资产槽位为`54/54`激活、剩余`0`。这不代表考古复原、手绘/PBR贴图、室内、碰撞、导航或
+建筑动画终稿完成，也不改变Facility、建设、模拟或存档事实。
+
+## 37. 洛阳实际全城构图与地形融合 V1（2026-08-27）
+
+正式入口为
+[`TASK_LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1.md`](TASK_LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1.md)。
+本阶段不再增加最终资产槽位，而是在同一2,000米Global Cell世界中，为2,084项Facility及其54项最终
+Asset Variant逐项建立确定性Visual Local Anchor。构图形成宫城政务、里坊住宅、市肆工坊、城防、
+交通水利和农业资源六个Presentation构图区；道路、沟渠与墙体从相邻真实Facility推导中心线连接，
+普通建筑朝向最近的真实道路Facility。局部偏移不超过420米且不创建SubCell。
+
+现有最密24×24窗口的549项Facility使用偏移后的全局坐标重新采样同一Terrain高度，并继续进入原
+8×8空间＋材质合批路径。该状态只表示全城构图合同和目标窗口运行时接地已实施；全国自然Style仍
+未冻结，洛阳高分辨率DEM、碰撞、导航、桥门通行、室内、损毁动画、外围供给实体化及发布级Streaming
+仍不在本任务完成声明内。
+
+当前状态为
+`LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+六区计数为农业资源746、城防184、市肆工坊258、宫城政务100、里坊住宅324、交通水利472；524项
+道路/沟渠/墙体保持Cell中心线。定向核心1/1、目标EditMode 3/3、目标图形PlayMode 1/1和既有549
+批处理图形回归1/1通过；完整回归未运行。
+
+## 38. 洛阳建筑选择、碰撞代理与道路通行图 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1.md`](TASK_LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1.md)。
+本阶段为2,084项Facility建立独立选择代理合同，CITY最密窗口只常驻549个轻量BoxCollider触发器，
+不向54项最终美术Prefab添加Collider。射线命中可回读稳定Facility ID并显示选择高亮，切回WORLD后
+交互根和选择状态全部清理。
+
+静态通行图包含359个道路节点、18个城门/宫门/军门节点和2个桥节点。源数据严格四邻接形成334条
+道路边和29个连通片；当前以28条`Provisional=true`临时边连接断点，并以20条桥门接入边完成379节点、
+382边的确定性可查询图。临时边不表示史实道路，后续道路数据细化必须替换；本V1也不等于角色尺度
+NavMesh、实体阻挡、城门开闭、桥梁损毁或攻城通行。
+
+当前状态为
+`LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+全工程编译、定向核心1/1、目标EditMode 3/3与目标图形PlayMode 1/1已通过；图形证据新增像素方差门禁，
+Null Graphics纯背景图不能被登记为通过。最终统一门禁为编译通过、核心1/1、EditMode 3/3、
+`git diff --check`通过；既有全城构图图形回归1/1也通过。完整回归未运行。
+
+## 39. 洛阳身份化道路连接与动态门桥通行 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1.md`](TASK_LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1.md)。
+上一阶段379节点/382边基础图保持历史兼容；当前运行时新增402边精化层：334条严格四邻接道路边、
+28条带稳定ID/来源边/逐格折线/玩法重建证据的身份化连接，以及20个门桥各两条、合计40条道路接近边。
+28条连接统一标记`historical_evidence.gameplay_reconstruction`、Cell精度和
+`ClaimsHistoricalExactness=false`，不得写成汉代精确道路。
+
+20个城门/宫门/军门/桥现具有纯C# Domain会话态，支持开放、关闭、受损和毁坏；状态变更使用稳定
+原因ID、单调时间和Revision，确定性Dijkstra会跳过关闭/毁坏节点并提高受损节点代价。CITY用青色、
+橙色和红/橙黄状态层显示，549个独立选择Trigger和WORLD清理保持不变。
+
+当前状态为
+`LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+目标核心1/1、EditMode 3/3、图形PlayMode 1/1和非空白截图已经通过；最终统一门禁与相关图形回归
+以任务书完成记录为准。当前门桥状态没有进入WorldState、命令/事件账、快照或迁移，明确不跨读档；
+人物尺度NavMesh、守军/权限/围城、桥梁载重/洪水/维修和动画门扇均未实现。
+
+## 40. 洛阳门桥 WorldState、命令事件与存档 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1.md`](TASK_LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1.md)。
+本阶段将上一节20项门桥Domain会话态提升为V74正式世界事实，复用M25-P7持久命令、批次结果、
+事务摘要和事件Outbox。一个显式初始化命令冻结完整Facility/Definition清单并原子建立20项开放
+状态；逐门桥转换命令保存expected revision、目标状态和稳定原因，同门桥同Revision的同批冲突
+在写入前拒绝。
+
+V73→V74迁移只建立空集合，不把此前Presentation会话倒推为历史事实。地图控制器绑定正式
+`WorldState`后只读取只读投影，并通过命令改变状态；未绑定审图模式继续保留会话态兼容。当前
+实现不包含守军/权限/围城、桥梁载重/洪水、维修材料/劳动工单、门扇/损毁动画、人物尺度NavMesh
+或城外供应道路。
+
+当前状态为
+`LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。
+最终全工程编译、定向核心3/3、目标EditMode 5/5、正式世界绑定图形PlayMode 1/1、上一门桥图形
+回归1/1、全城构图图形回归1/1和`git diff --check`均通过；以上为目标验收，不替代完整回归。
+
+## 41. 洛阳门桥守军权限、战斗损坏与真实维修 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1.md`](TASK_LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1.md)。
+本阶段把 V74 的无权限门桥转换收紧为 V75 可审计操作：每项启用的门桥显式绑定既有
+`Facility` Controller、真实组织、真实 `Army`、主将和具体永久 `Person`。建立守军后，正常开闭
+只接受控制组织领袖或守军 Army 级主将；地图表现层身份不能作为权限来源。
+
+战损不创建战斗，只消费既有 `BattleRecordState`：战斗必须发生在门桥所属地点、守军必须是防守方、
+攻击军必须敌对且由其主将确认。损坏记录追加保存完整度开闭值、门桥 Revision、命令、事务与事件；
+同一战斗不能重复损坏同一门桥。维修复用 V73 既有 `FacilityConstructionProjectState(Repair)`、
+组织库存中的木料/铁料批次、带工程来源的库存事务和具体人物每日劳动。门类为8木料、2铁料、
+960分钟、至少2日和100钱；桥梁为12木料、2铁料、1,440分钟、至少3日和100钱。完工恢复
+Facility与10,000完整度，但门桥保持关闭，必须另发守军授权命令开启。
+
+V74→V75只建立空守军、战损和维修集合，并把旧库存事务新增工程来源字段置空；不倒推旧守军、
+战斗、损坏程度、材料或劳动历史。当前代码、全工程编译、定向核心闭环与建设回归已经通过；
+受限工作区内的首次Unity尝试在创建启动日志前超时，但同一安全脚本随后在工作区外重跑通过：
+EngineSmoke通过、目标EditMode 1/1通过、相关图形PlayMode 1/1通过。当前状态为
+`LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`；
+以上是定向验收，不替代完整分组回归。完整攻城、攻城器械、桥梁载重/洪水、门扇/瓦砾动画和人物尺度 NavMesh仍未实现。

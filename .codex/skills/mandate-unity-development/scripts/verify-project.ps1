@@ -13,10 +13,94 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# PowerShell 5 Start-Process fails when the host exposes both Path and PATH.
-$processPath = $env:Path
-[Environment]::SetEnvironmentVariable("PATH", $null, "Process")
-[Environment]::SetEnvironmentVariable("Path", $processPath, "Process")
+function Get-NormalizedProcessEnvironment {
+    # Codex and some CI hosts can place both `Path` and `PATH` in one Windows
+    # process. Win32 treats them as the same variable, but MSBuild/Roslyn builds
+    # a case-insensitive dictionary and fails with MSB3883 when both survive.
+    # Build a clean environment block only for child processes; never modify
+    # the current, user- or machine-level environment.
+    $processEnvironment = [Environment]::GetEnvironmentVariables(
+        [EnvironmentVariableTarget]::Process)
+    $pathEntries = @(
+        foreach ($key in $processEnvironment.Keys) {
+            if (([string]$key) -ieq "Path") {
+                [pscustomobject]@{
+                    Key = [string]$key
+                    Value = [string]$processEnvironment[$key]
+                }
+            }
+        }
+    )
+    $normalized = New-Object `
+        "System.Collections.Generic.Dictionary[string,string]" `
+        ([StringComparer]::OrdinalIgnoreCase)
+    foreach ($key in $processEnvironment.Keys) {
+        if (([string]$key) -ine "Path") {
+            $normalized[[string]$key] = [string]$processEnvironment[$key]
+        }
+    }
+    if ($pathEntries.Count -gt 0) {
+        # Prefer the longest entry: Codex normally extends the ordinary Windows
+        # Path with its sandbox tools, so choosing the shorter value would
+        # silently make executables disappear from child processes.
+        $selectedEntry = $pathEntries |
+            Sort-Object { $_.Value.Length } -Descending |
+            Select-Object -First 1
+        $normalized["Path"] = [string]$selectedEntry.Value
+    }
+
+    return [pscustomobject]@{
+        Variables = $normalized
+        PathVariantCount = $pathEntries.Count
+        NormalizedPathCount = if ($normalized.ContainsKey("Path")) { 1 } else { 0 }
+    }
+}
+
+function Set-MSBuildSdkFallback {
+    param([Parameter(Mandatory = $true)][string]$MSBuildPath)
+
+    # The lightweight Visual Studio Build Tools installation on this machine
+    # has Roslyn/MSBuild but no bundled Microsoft.NET.Sdk resolver. Unity's
+    # generated projects still import that SDK, so inherit the newest complete
+    # SDK already installed by dotnet when MSBuildSDKsPath is not usable.
+    $currentSdkPath = [Environment]::GetEnvironmentVariable(
+        "MSBuildSDKsPath", [EnvironmentVariableTarget]::Process)
+    if (-not [string]::IsNullOrWhiteSpace($currentSdkPath) -and
+        (Test-Path -LiteralPath (Join-Path $currentSdkPath "Microsoft.NET.Sdk\Sdk\Sdk.props"))) {
+        return $currentSdkPath
+    }
+
+    $sdkRoots = @(
+        "C:\Program Files\dotnet\sdk",
+        "C:\Program Files (x86)\dotnet\sdk"
+    )
+    $sdkPath = $sdkRoots |
+        Where-Object { Test-Path -LiteralPath $_ } |
+        ForEach-Object { Get-ChildItem -LiteralPath $_ -Directory } |
+        Where-Object {
+            Test-Path -LiteralPath (Join-Path $_.FullName "Sdks\Microsoft.NET.Sdk\Sdk\Sdk.props")
+        } |
+        Sort-Object {
+            $parsedVersion = [version]"0.0"
+            [version]::TryParse($_.Name, [ref]$parsedVersion) | Out-Null
+            $parsedVersion
+        } -Descending |
+        Select-Object -First 1 -ExpandProperty FullName
+    if (-not $sdkPath) {
+        throw "$MSBuildPath requires Microsoft.NET.Sdk, but no complete dotnet SDK installation was found."
+    }
+
+    $resolvedSdkPath = Join-Path $sdkPath "Sdks"
+    [Environment]::SetEnvironmentVariable(
+        "MSBuildSDKsPath", $resolvedSdkPath, [EnvironmentVariableTarget]::Process)
+    [Environment]::SetEnvironmentVariable(
+        "MSBuildEnableWorkloadResolver", "false", [EnvironmentVariableTarget]::Process)
+    return $resolvedSdkPath
+}
+
+$initialEnvironment = Get-NormalizedProcessEnvironment
+$pathVariantCount = $initialEnvironment.PathVariantCount
+$normalizedPathCount = $initialEnvironment.NormalizedPathCount
 
 function Stop-OwnedProcessTree {
     param([Parameter(Mandatory = $true)][int]$ProcessId)
@@ -62,14 +146,28 @@ function Invoke-BoundedProcess {
             }
         }
     )
-    $process = Start-Process `
-        -FilePath "powershell.exe" `
-        -ArgumentList $runnerArguments `
-        -WorkingDirectory $WorkingDirectory `
-        -RedirectStandardOutput $stdoutPath `
-        -RedirectStandardError $stderrPath `
-        -PassThru `
-        -WindowStyle Hidden
+    $processEnvironment = Get-NormalizedProcessEnvironment
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = "powershell.exe"
+    $startInfo.Arguments = $runnerArguments -join " "
+    $startInfo.WorkingDirectory = $WorkingDirectory
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.Environment.Clear()
+    foreach ($entry in $processEnvironment.Variables.GetEnumerator()) {
+        $startInfo.Environment[$entry.Key] = $entry.Value
+    }
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    if (-not $process.Start()) {
+        throw "$Name could not be launched."
+    }
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
 
     Write-Host "$Name PID: $($process.Id)"
     Write-Host "$Name stdout: $stdoutPath"
@@ -83,6 +181,11 @@ function Invoke-BoundedProcess {
 
     if (-not $process.HasExited) {
         Stop-OwnedProcessTree -ProcessId $process.Id
+        try { $process.WaitForExit() } catch { }
+        $stdoutText = $stdoutTask.GetAwaiter().GetResult()
+        $stderrText = $stderrTask.GetAwaiter().GetResult()
+        [System.IO.File]::WriteAllText($stdoutPath, $stdoutText)
+        [System.IO.File]::WriteAllText($stderrPath, $stderrText)
         Write-Host "$Name exceeded $HardTimeoutSeconds seconds." -ForegroundColor Red
         if (Test-Path -LiteralPath $stdoutPath) {
             Get-Content -LiteralPath $stdoutPath -Tail 80
@@ -94,6 +197,10 @@ function Invoke-BoundedProcess {
     }
 
     $process.WaitForExit()
+    $stdoutText = $stdoutTask.GetAwaiter().GetResult()
+    $stderrText = $stderrTask.GetAwaiter().GetResult()
+    [System.IO.File]::WriteAllText($stdoutPath, $stdoutText)
+    [System.IO.File]::WriteAllText($stderrPath, $stderrText)
     if (-not (Test-Path -LiteralPath $exitCodePath)) {
         throw "$Name exited without an exit-code result file."
     }
@@ -126,12 +233,29 @@ $unityTestScript = Join-Path $resolvedProject "Tools\Run-UnityTestsSafe.ps1"
 $binaryDirectory = Join-Path $resolvedProject "Temp\bin\Debug"
 $coreRunnerPath = Join-Path $binaryDirectory "CoreTestRunner.exe"
 $logDirectory = Join-Path $resolvedProject "tmp\skill-verification"
+$projectVersionPath = Join-Path $resolvedProject "ProjectSettings\ProjectVersion.txt"
+$unityEditorVersion = if (Test-Path -LiteralPath $projectVersionPath) {
+    $versionMatch = Select-String -LiteralPath $projectVersionPath `
+        -Pattern '^m_EditorVersion:\s*(\S+)' |
+        Select-Object -First 1
+    if ($versionMatch) { $versionMatch.Matches[0].Groups[1].Value } else { "" }
+}
+else {
+    ""
+}
+$unityMonoPath = if ([string]::IsNullOrWhiteSpace($unityEditorVersion)) {
+    ""
+}
+else {
+    "C:\Program Files\Unity\Hub\Editor\$unityEditorVersion\Editor\Data\MonoBleedingEdge\bin\mono.exe"
+}
 
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 
 Write-Host "Project: $resolvedProject"
 Write-Host "Logs: $logDirectory"
 Write-Host "Hard timeout per external tool: $TimeoutSeconds seconds"
+Write-Host "Process Path variants before normalization: $pathVariantCount; child environment: $normalizedPathCount"
 
 Push-Location $resolvedProject
 try {
@@ -145,6 +269,9 @@ try {
     }
 
     $msbuildCandidates = @(
+        "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe",
         "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
     )
@@ -154,12 +281,16 @@ try {
     if (-not $msbuildPath) {
         throw "MSBuild.exe was not found in the supported Visual Studio locations."
     }
+    $msbuildSdkPath = Set-MSBuildSdkFallback -MSBuildPath $msbuildPath
+    Write-Host "MSBuild: $msbuildPath"
+    Write-Host "MSBuild SDKs: $msbuildSdkPath"
 
     Invoke-BoundedProcess `
         -Name "compile" `
         -FilePath $msbuildPath `
         -ArgumentList @(
             $solutionPath,
+            "/restore",
             "/t:Build",
             "/p:Configuration=Debug",
             "/nologo",
@@ -202,9 +333,18 @@ try {
     if (-not [string]::IsNullOrWhiteSpace($CoreTestFilter)) {
         $coreArguments += $CoreTestFilter
     }
+    $coreHostPath = $coreRunnerPath
+    if (-not [string]::IsNullOrWhiteSpace($unityMonoPath) -and
+        (Test-Path -LiteralPath $unityMonoPath)) {
+        # Unity package assemblies can fail Windows CLR strong-name validation
+        # even though they are valid in the project's Unity Mono runtime.
+        $coreHostPath = $unityMonoPath
+        $coreArguments = @($coreRunnerPath) + $coreArguments
+        Write-Host "Core test runtime: $unityMonoPath"
+    }
     $coreResult = Invoke-BoundedProcess `
         -Name "core-tests" `
-        -FilePath $coreRunnerPath `
+        -FilePath $coreHostPath `
         -ArgumentList $coreArguments `
         -WorkingDirectory $resolvedProject `
         -LogDirectory $logDirectory `

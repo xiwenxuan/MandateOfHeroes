@@ -120,6 +120,23 @@ namespace Mandate.Persistence
             return new WorldMapChunkSnapshot(chunkRow, chunkColumn, rowCount, columnCount, cells);
         }
 
+        public WorldMapChunkSnapshot ReadCanonicalGlobalChunk(int chunkRow, int chunkColumn,
+            int canonicalCellsPerSide = GlobalSpatialFoundationV1.CanonicalChunkSizeCells)
+        {
+            if (canonicalCellsPerSide <= 0) throw new ArgumentOutOfRangeException(nameof(canonicalCellsPerSide));
+            var rowStart = checked(chunkRow * canonicalCellsPerSide);
+            var columnStart = checked(chunkColumn * canonicalCellsPerSide);
+            if (!Grid.Contains(rowStart, columnStart)) throw new ArgumentOutOfRangeException(nameof(chunkRow));
+            var rowCount = Math.Min(canonicalCellsPerSide, Grid.Rows - rowStart);
+            var columnCount = Math.Min(canonicalCellsPerSide, Grid.Columns - columnStart);
+            var cells = new WorldMapCellRecord[rowCount * columnCount];
+            var index = 0;
+            for (var row = rowStart; row < rowStart + rowCount; row++)
+                for (var column = columnStart; column < columnStart + columnCount; column++)
+                    cells[index++] = ReadCell(row, column);
+            return new WorldMapChunkSnapshot(chunkRow, chunkColumn, rowCount, columnCount, cells);
+        }
+
         public string ResolveProvince(ushort code) => Resolve(AdminCatalog.Provinces, code);
         public string ResolveCommandery(ushort code) => Resolve(AdminCatalog.Commanderies, code);
         public string ResolveCounty(ushort code) => Resolve(AdminCatalog.Counties, code);

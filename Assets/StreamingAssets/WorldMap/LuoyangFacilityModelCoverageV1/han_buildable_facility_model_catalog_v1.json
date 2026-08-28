@@ -1,0 +1,349 @@
+{
+  "SchemaId": "mandate.han-buildable-facility-model-catalog.v1",
+  "RegionalStyleId": "regional_style.central_plains.han.v1",
+  "Materials": [
+    { "MaterialId": "material.han.coverage.soil", "Red": 0.38, "Green": 0.27, "Blue": 0.15, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.03 },
+    { "MaterialId": "material.han.coverage.rammed_earth", "Red": 0.58, "Green": 0.43, "Blue": 0.25, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.06 },
+    { "MaterialId": "material.han.coverage.timber", "Red": 0.17, "Green": 0.09, "Blue": 0.05, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.16 },
+    { "MaterialId": "material.han.coverage.tile", "Red": 0.18, "Green": 0.23, "Blue": 0.20, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.28 },
+    { "MaterialId": "material.han.coverage.thatch", "Red": 0.57, "Green": 0.44, "Blue": 0.20, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.02 },
+    { "MaterialId": "material.han.coverage.cloth", "Red": 0.70, "Green": 0.62, "Blue": 0.46, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.03 },
+    { "MaterialId": "material.han.coverage.faded_red", "Red": 0.40, "Green": 0.09, "Blue": 0.05, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.14 },
+    { "MaterialId": "material.han.coverage.stone", "Red": 0.40, "Green": 0.39, "Blue": 0.34, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.10 },
+    { "MaterialId": "material.han.coverage.crop", "Red": 0.38, "Green": 0.47, "Blue": 0.16, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.01 },
+    { "MaterialId": "material.han.coverage.water", "Red": 0.12, "Green": 0.35, "Blue": 0.43, "Alpha": 0.92, "Metallic": 0.0, "Smoothness": 0.62 },
+    { "MaterialId": "material.han.coverage.foliage", "Red": 0.16, "Green": 0.34, "Blue": 0.13, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.02 },
+    { "MaterialId": "material.han.coverage.fire", "Red": 0.80, "Green": 0.24, "Blue": 0.04, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.08 },
+    { "MaterialId": "material.han.coverage.metal", "Red": 0.16, "Green": 0.17, "Blue": 0.16, "Alpha": 1.0, "Metallic": 0.58, "Smoothness": 0.24 }
+  ],
+  "Models": [
+    {
+      "ModelId": "model.han.luoyang.agriculture.dry_field.v1", "AssetId": "HAN_AGRICULTURE_DRY_FIELD_A", "DisplayName": "洛阳旱作田块", "FacilityDefinitionId": "facility.agriculture.wheat_field", "VisualProfileId": "visual_profile.han.central_plains.agriculture.dry_field.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "soil", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "crop.1", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": -0.30, "PositionY": 0.04, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.06, "ScaleZ": 0.72 },
+        { "ModuleId": "crop.2", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": -0.15, "PositionY": 0.04, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.06, "ScaleZ": 0.72 },
+        { "ModuleId": "crop.3", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.06, "ScaleZ": 0.72 },
+        { "ModuleId": "crop.4", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.15, "PositionY": 0.04, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.06, "ScaleZ": 0.72 },
+        { "ModuleId": "crop.5", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.30, "PositionY": 0.04, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.06, "ScaleZ": 0.72 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.agriculture.rice_field.v1", "AssetId": "HAN_AGRICULTURE_RICE_FIELD_A", "DisplayName": "洛阳水田", "FacilityDefinitionId": "facility.agriculture.rice_field", "VisualProfileId": "visual_profile.han.central_plains.agriculture.rice_field.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "water", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.water", "PositionX": 0.0, "PositionY": 0.015, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.78, "ScaleY": 0.025, "ScaleZ": 0.78 },
+        { "ModuleId": "bank.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": -0.40, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.04, "ScaleY": 0.07, "ScaleZ": 0.84 },
+        { "ModuleId": "bank.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.40, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.04, "ScaleY": 0.07, "ScaleZ": 0.84 },
+        { "ModuleId": "bank.n", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.40, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.76, "ScaleY": 0.07, "ScaleZ": 0.04 },
+        { "ModuleId": "bank.s", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": -0.40, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.76, "ScaleY": 0.07, "ScaleZ": 0.04 },
+        { "ModuleId": "rice.1", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": -0.22, "PositionY": 0.05, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.07, "ScaleZ": 0.62 },
+        { "ModuleId": "rice.2", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.0, "PositionY": 0.05, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.07, "ScaleZ": 0.62 },
+        { "ModuleId": "rice.3", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.22, "PositionY": 0.05, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.07, "ScaleZ": 0.62 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.agriculture.garden.v1", "AssetId": "HAN_AGRICULTURE_GARDEN_A", "DisplayName": "洛阳园圃", "FacilityDefinitionId": "facility.agriculture.orchard", "VisualProfileId": "visual_profile.han.central_plains.agriculture.garden.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "tree.nw.trunk", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.timber", "PositionX": -0.24, "PositionY": 0.12, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.12, "ScaleZ": 0.05 },
+        { "ModuleId": "tree.nw.crown", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": -0.24, "PositionY": 0.30, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.10, "ScaleZ": 0.22 },
+        { "ModuleId": "tree.ne.trunk", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.timber", "PositionX": 0.24, "PositionY": 0.12, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.12, "ScaleZ": 0.05 },
+        { "ModuleId": "tree.ne.crown", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": 0.24, "PositionY": 0.30, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.10, "ScaleZ": 0.22 },
+        { "ModuleId": "herb.bed.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": -0.20, "PositionY": 0.04, "PositionZ": -0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.06, "ScaleZ": 0.24 },
+        { "ModuleId": "herb.bed.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.20, "PositionY": 0.04, "PositionZ": -0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.06, "ScaleZ": 0.24 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.agriculture.pasture.v1", "AssetId": "HAN_AGRICULTURE_PASTURE_A", "DisplayName": "洛阳牧场", "FacilityDefinitionId": "facility.agriculture.pasture", "VisualProfileId": "visual_profile.han.central_plains.agriculture.pasture.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "grass", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "fence.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.40, "PositionY": 0.08, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.14, "ScaleZ": 0.78 },
+        { "ModuleId": "fence.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.40, "PositionY": 0.08, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.14, "ScaleZ": 0.78 },
+        { "ModuleId": "hay.1", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.thatch", "PositionX": -0.18, "PositionY": 0.10, "PositionZ": 0.18, "RotationX": 90.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.10, "ScaleZ": 0.18 },
+        { "ModuleId": "hay.2", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.thatch", "PositionX": 0.18, "PositionY": 0.10, "PositionZ": 0.18, "RotationX": 90.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.10, "ScaleZ": 0.18 },
+        { "ModuleId": "shelter", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.11, "PositionZ": -0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.42, "ScaleY": 0.18, "ScaleZ": 0.20 },
+        { "ModuleId": "shelter.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.thatch", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": -0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.48, "ScaleY": 0.035, "ScaleZ": 0.26 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.government.local_office.v1", "AssetId": "HAN_GOVERNMENT_OFFICE_A", "DisplayName": "汉代地方官署院", "FacilityDefinitionId": "facility.government.local_office", "VisualProfileId": "visual_profile.han.central_plains.government.local_office.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.15, "PositionZ": 0.23, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.54, "ScaleY": 0.24, "ScaleZ": 0.24 },
+        { "ModuleId": "roof.front", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.29, "PositionZ": 0.17, "RotationX": -22.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.04, "ScaleZ": 0.17 },
+        { "ModuleId": "roof.back", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.29, "PositionZ": 0.29, "RotationX": 22.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.04, "ScaleZ": 0.17 },
+        { "ModuleId": "wing.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.29, "PositionY": 0.10, "PositionZ": -0.12, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.16, "ScaleZ": 0.30 },
+        { "ModuleId": "wing.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.29, "PositionY": 0.10, "PositionZ": -0.12, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.16, "ScaleZ": 0.30 },
+        { "ModuleId": "gate", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.12, "PositionZ": -0.38, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.20, "ScaleZ": 0.06 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.government.central_office.v1", "AssetId": "HAN_CENTRAL_OFFICE_A", "DisplayName": "洛阳中央官署组合", "FacilityDefinitionId": "facility.historical.central_office", "VisualProfileId": "visual_profile.han.central_plains.government.central_office.v1", "SourceBuildContractId": "historical_init.luoyang.central_office.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "platform", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.035, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.07, "ScaleZ": 0.82 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.19, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.25, "ScaleZ": 0.24 },
+        { "ModuleId": "hall.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.34, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.68, "ScaleY": 0.05, "ScaleZ": 0.34 },
+        { "ModuleId": "office.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.29, "PositionY": 0.13, "PositionZ": -0.12, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.20, "ScaleZ": 0.34 },
+        { "ModuleId": "office.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.29, "PositionY": 0.13, "PositionZ": -0.12, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.20, "ScaleZ": 0.34 },
+        { "ModuleId": "gatehouse", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.16, "PositionZ": -0.36, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.30, "ScaleY": 0.24, "ScaleZ": 0.14 },
+        { "ModuleId": "gatehouse.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.30, "PositionZ": -0.36, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.38, "ScaleY": 0.045, "ScaleZ": 0.18 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.palace.complex.v1", "AssetId": "HAN_PALACE_A", "DisplayName": "洛阳宫殿政务建筑群", "FacilityDefinitionId": "facility.historical.palace_complex", "VisualProfileId": "visual_profile.han.central_plains.palace.v1", "SourceBuildContractId": "blueprint.han.palace.historical.nangong.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "terrace", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.08, "ScaleZ": 0.84 },
+        { "ModuleId": "main.hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.24, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.32, "ScaleZ": 0.28 },
+        { "ModuleId": "main.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.43, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.055, "ScaleZ": 0.38 },
+        { "ModuleId": "west.hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": -0.27, "PositionY": 0.15, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.22, "ScaleZ": 0.30 },
+        { "ModuleId": "east.hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.27, "PositionY": 0.15, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.22, "ScaleZ": 0.30 },
+        { "ModuleId": "west.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": -0.27, "PositionY": 0.28, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.30, "ScaleY": 0.045, "ScaleZ": 0.36 },
+        { "ModuleId": "east.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.27, "PositionY": 0.28, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.30, "ScaleY": 0.045, "ScaleZ": 0.36 },
+        { "ModuleId": "court.gate", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.14, "PositionZ": -0.37, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.20, "ScaleZ": 0.12 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.education.school.v1", "AssetId": "HAN_EDUCATION_SCHOOL_A", "DisplayName": "汉代学塾院", "FacilityDefinitionId": "facility.service.school", "VisualProfileId": "visual_profile.han.central_plains.education.school.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.13, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.54, "ScaleY": 0.20, "ScaleZ": 0.22 },
+        { "ModuleId": "roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.25, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.045, "ScaleZ": 0.30 },
+        { "ModuleId": "bench.1", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.20, "PositionY": 0.05, "PositionZ": -0.08, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.06, "ScaleZ": 0.08 },
+        { "ModuleId": "bench.2", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.20, "PositionY": 0.05, "PositionZ": -0.08, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.06, "ScaleZ": 0.08 },
+        { "ModuleId": "bench.3", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.05, "PositionZ": -0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.40, "ScaleY": 0.06, "ScaleZ": 0.08 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.education.imperial_academy.v1", "AssetId": "HAN_IMPERIAL_ACADEMY_A", "DisplayName": "洛阳太学组合", "FacilityDefinitionId": "facility.education.academy", "VisualProfileId": "visual_profile.han.central_plains.education.imperial_academy.v1", "SourceBuildContractId": "historical_init.luoyang.taixue.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "platform", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.035, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.07, "ScaleZ": 0.84 },
+        { "ModuleId": "lecture.hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.18, "PositionZ": 0.23, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.24, "ScaleZ": 0.26 },
+        { "ModuleId": "lecture.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.33, "PositionZ": 0.23, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.05, "ScaleZ": 0.36 },
+        { "ModuleId": "study.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.28, "PositionY": 0.11, "PositionZ": -0.15, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.16, "ScaleZ": 0.32 },
+        { "ModuleId": "study.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.28, "PositionY": 0.11, "PositionZ": -0.15, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.16, "ScaleZ": 0.32 },
+        { "ModuleId": "gate", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.14, "PositionZ": -0.37, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.20, "ScaleZ": 0.12 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.military.camp.v1", "AssetId": "HAN_MILITARY_CAMP_A", "DisplayName": "洛阳兵营营盘", "FacilityDefinitionId": "facility.military.camp", "VisualProfileId": "visual_profile.han.central_plains.military.camp.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Military", "Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "tent.n", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.cloth", "PositionX": 0.0, "PositionY": 0.12, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.42, "ScaleY": 0.20, "ScaleZ": 0.24 },
+        { "ModuleId": "tent.sw", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.cloth", "PositionX": -0.24, "PositionY": 0.09, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.14, "ScaleZ": 0.22 },
+        { "ModuleId": "tent.se", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.cloth", "PositionX": 0.24, "PositionY": 0.09, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.14, "ScaleZ": 0.22 },
+        { "ModuleId": "palisade.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.40, "PositionY": 0.10, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.18, "ScaleZ": 0.78 },
+        { "ModuleId": "palisade.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.40, "PositionY": 0.10, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.18, "ScaleZ": 0.78 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.military.beacon.v1", "AssetId": "HAN_MILITARY_BEACON_A", "DisplayName": "汉代烽火台", "FacilityDefinitionId": "facility.military.beacon", "VisualProfileId": "visual_profile.han.central_plains.military.beacon.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.82, "AvailabilityIds": ["Military", "Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "base", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.06, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.56, "ScaleY": 0.12, "ScaleZ": 0.56 },
+        { "ModuleId": "tower.lower", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.23, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.42, "ScaleY": 0.28, "ScaleZ": 0.42 },
+        { "ModuleId": "tower.upper", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.46, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.22, "ScaleZ": 0.28 },
+        { "ModuleId": "brazier", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.metal", "PositionX": 0.0, "PositionY": 0.61, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.06, "ScaleZ": 0.16 },
+        { "ModuleId": "fire", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.fire", "PositionX": 0.0, "PositionY": 0.72, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.10, "ScaleY": 0.10, "ScaleZ": 0.10 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.military.fortified_manor.v1", "AssetId": "HAN_FORTIFIED_MANOR_A", "DisplayName": "汉代坞堡", "FacilityDefinitionId": "facility.military.fortified_manor", "VisualProfileId": "visual_profile.han.central_plains.military.fortified_manor.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Family", "Military", "Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.02, "ScaleZ": 0.86 },
+        { "ModuleId": "wall.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.41, "PositionY": 0.16, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.28, "ScaleZ": 0.80 },
+        { "ModuleId": "wall.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.41, "PositionY": 0.16, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.28, "ScaleZ": 0.80 },
+        { "ModuleId": "wall.n", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.16, "PositionZ": 0.41, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.74, "ScaleY": 0.28, "ScaleZ": 0.08 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.15, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.50, "ScaleY": 0.24, "ScaleZ": 0.24 },
+        { "ModuleId": "hall.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.29, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.045, "ScaleZ": 0.32 },
+        { "ModuleId": "tower", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.27, "PositionY": 0.30, "PositionZ": -0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.50, "ScaleZ": 0.22 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.service.caravan_yard.v1", "AssetId": "HAN_CARAVAN_YARD_A", "DisplayName": "洛阳车马行", "FacilityDefinitionId": "facility.service.caravan_yard", "VisualProfileId": "visual_profile.han.central_plains.service.caravan_yard.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "stable", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.12, "PositionZ": 0.27, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.20, "ScaleZ": 0.20 },
+        { "ModuleId": "stable.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.thatch", "PositionX": 0.0, "PositionY": 0.24, "PositionZ": 0.27, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.66, "ScaleY": 0.04, "ScaleZ": 0.28 },
+        { "ModuleId": "shed.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.29, "PositionY": 0.09, "PositionZ": -0.19, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.14, "ScaleZ": 0.28 },
+        { "ModuleId": "shed.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.29, "PositionY": 0.09, "PositionZ": -0.19, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.14, "ScaleZ": 0.28 },
+        { "ModuleId": "wheel.w", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.timber", "PositionX": -0.12, "PositionY": 0.10, "PositionZ": -0.12, "RotationX": 90.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.05, "ScaleZ": 0.16 },
+        { "ModuleId": "wheel.e", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.timber", "PositionX": 0.12, "PositionY": 0.10, "PositionZ": -0.12, "RotationX": 90.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.05, "ScaleZ": 0.16 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.service.inn_post.v1", "AssetId": "HAN_INN_POST_A", "DisplayName": "汉代客栈驿舍", "FacilityDefinitionId": "facility.service.inn", "VisualProfileId": "visual_profile.han.central_plains.service.inn_post.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "main", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.16, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.56, "ScaleY": 0.26, "ScaleZ": 0.24 },
+        { "ModuleId": "main.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.31, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.64, "ScaleY": 0.05, "ScaleZ": 0.32 },
+        { "ModuleId": "stable", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.27, "PositionY": 0.10, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.16, "ScaleZ": 0.30 },
+        { "ModuleId": "kitchen", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.27, "PositionY": 0.10, "PositionZ": -0.17, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.16, "ScaleZ": 0.30 },
+        { "ModuleId": "sign", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.32, "PositionY": 0.25, "PositionZ": -0.35, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.12, "ScaleY": 0.18, "ScaleZ": 0.035 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.service.clinic.v1", "AssetId": "HAN_CLINIC_A", "DisplayName": "汉代医馆", "FacilityDefinitionId": "facility.service.clinic", "VisualProfileId": "visual_profile.han.central_plains.service.clinic.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.14, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.54, "ScaleY": 0.22, "ScaleZ": 0.24 },
+        { "ModuleId": "roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.27, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.62, "ScaleY": 0.045, "ScaleZ": 0.32 },
+        { "ModuleId": "herb.shed", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.28, "PositionY": 0.10, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.16, "ScaleZ": 0.28 },
+        { "ModuleId": "herb.bed", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.24, "PositionY": 0.045, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.07, "ScaleZ": 0.28 },
+        { "ModuleId": "jar.1", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.16, "PositionY": 0.09, "PositionZ": -0.34, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.10, "ScaleY": 0.09, "ScaleZ": 0.10 },
+        { "ModuleId": "jar.2", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.30, "PositionY": 0.07, "PositionZ": -0.34, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.07, "ScaleZ": 0.08 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.well.v1", "AssetId": "HAN_PUBLIC_WELL_A", "DisplayName": "汉代公共水井", "FacilityDefinitionId": "facility.public.well", "VisualProfileId": "visual_profile.han.central_plains.public.well.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.76, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "apron", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.025, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.68, "ScaleY": 0.05, "ScaleZ": 0.68 },
+        { "ModuleId": "well", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.13, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.32, "ScaleY": 0.13, "ScaleZ": 0.32 },
+        { "ModuleId": "post.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.22, "PositionY": 0.30, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.50, "ScaleZ": 0.05 },
+        { "ModuleId": "post.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.22, "PositionY": 0.30, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.50, "ScaleZ": 0.05 },
+        { "ModuleId": "beam", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.53, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.50, "ScaleY": 0.05, "ScaleZ": 0.06 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.canal.v1", "AssetId": "HAN_PUBLIC_CANAL_A", "DisplayName": "洛阳水渠", "FacilityDefinitionId": "facility.public.canal", "VisualProfileId": "visual_profile.han.central_plains.public.canal.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "water", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.water", "PositionX": 0.0, "PositionY": 0.025, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.03, "ScaleZ": 0.82 },
+        { "ModuleId": "bank.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": -0.19, "PositionY": 0.06, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.10, "ScaleZ": 0.82 },
+        { "ModuleId": "bank.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.19, "PositionY": 0.06, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.10, "ScaleZ": 0.82 },
+        { "ModuleId": "footbridge", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.13, "PositionZ": 0.08, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.52, "ScaleY": 0.07, "ScaleZ": 0.16 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.bridge.v1", "AssetId": "HAN_PUBLIC_BRIDGE_A", "DisplayName": "汉代桥梁", "FacilityDefinitionId": "facility.public.bridge", "VisualProfileId": "visual_profile.han.central_plains.public.bridge.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "water", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.water", "PositionX": 0.0, "PositionY": 0.015, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.025, "ScaleZ": 0.54 },
+        { "ModuleId": "pier.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": -0.25, "PositionY": 0.10, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.12, "ScaleY": 0.18, "ScaleZ": 0.46 },
+        { "ModuleId": "pier.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.25, "PositionY": 0.10, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.12, "ScaleY": 0.18, "ScaleZ": 0.46 },
+        { "ModuleId": "deck", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.78, "ScaleY": 0.10, "ScaleZ": 0.34 },
+        { "ModuleId": "rail.n", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.32, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.78, "ScaleY": 0.08, "ScaleZ": 0.04 },
+        { "ModuleId": "rail.s", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.32, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.78, "ScaleY": 0.08, "ScaleZ": 0.04 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.plaza.v1", "AssetId": "HAN_PUBLIC_PLAZA_A", "DisplayName": "洛阳公共庭院广场", "FacilityDefinitionId": "facility.public.plaza", "VisualProfileId": "visual_profile.han.central_plains.public.plaza.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "paving", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.025, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.05, "ScaleZ": 0.84 },
+        { "ModuleId": "pavilion.platform", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.08, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.38, "ScaleY": 0.10, "ScaleZ": 0.30 },
+        { "ModuleId": "pavilion.body", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.20, "ScaleZ": 0.22 },
+        { "ModuleId": "pavilion.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.35, "PositionZ": 0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.40, "ScaleY": 0.05, "ScaleZ": 0.34 },
+        { "ModuleId": "tree", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": -0.28, "PositionY": 0.20, "PositionZ": -0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.20, "ScaleZ": 0.20 },
+        { "ModuleId": "notice", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.28, "PositionY": 0.17, "PositionZ": -0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.28, "ScaleZ": 0.05 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.resource.forestry.v1", "AssetId": "HAN_FORESTRY_A", "DisplayName": "汉代林场", "FacilityDefinitionId": "facility.resource.forestry", "VisualProfileId": "visual_profile.han.central_plains.resource.forestry.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "tree.1", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": -0.25, "PositionY": 0.24, "PositionZ": 0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.24, "ScaleZ": 0.22 },
+        { "ModuleId": "tree.2", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": 0.05, "PositionY": 0.28, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.28, "ScaleZ": 0.24 },
+        { "ModuleId": "tree.3", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": 0.28, "PositionY": 0.20, "PositionZ": -0.05, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.20, "ScaleZ": 0.20 },
+        { "ModuleId": "logs", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.timber", "PositionX": -0.08, "PositionY": 0.10, "PositionZ": -0.25, "RotationX": 90.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.30, "ScaleZ": 0.16 },
+        { "ModuleId": "shed", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.thatch", "PositionX": 0.22, "PositionY": 0.10, "PositionZ": -0.29, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.30, "ScaleY": 0.16, "ScaleZ": 0.18 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.resource.mine_quarry.v1", "AssetId": "HAN_MINE_QUARRY_A", "DisplayName": "汉代矿场采石场", "FacilityDefinitionId": "facility.resource.mine", "VisualProfileId": "visual_profile.han.central_plains.resource.mine_quarry.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Family", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.02, "ScaleZ": 0.84 },
+        { "ModuleId": "rock.1", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": -0.24, "PositionY": 0.13, "PositionZ": 0.18, "RotationX": 12.0, "RotationY": 28.0, "RotationZ": 8.0, "ScaleX": 0.28, "ScaleY": 0.22, "ScaleZ": 0.30 },
+        { "ModuleId": "rock.2", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.02, "PositionY": 0.16, "PositionZ": 0.25, "RotationX": -8.0, "RotationY": 10.0, "RotationZ": 5.0, "ScaleX": 0.30, "ScaleY": 0.28, "ScaleZ": 0.26 },
+        { "ModuleId": "mine.frame.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.22, "PositionY": 0.20, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.34, "ScaleZ": 0.05 },
+        { "ModuleId": "mine.frame.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.38, "PositionY": 0.20, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.34, "ScaleZ": 0.05 },
+        { "ModuleId": "mine.lintel", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.30, "PositionY": 0.36, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.24, "ScaleY": 0.05, "ScaleZ": 0.06 },
+        { "ModuleId": "ore", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.metal", "PositionX": 0.18, "PositionY": 0.07, "PositionZ": -0.34, "RotationX": 15.0, "RotationY": 20.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.12, "ScaleZ": 0.14 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.ritual.hall.v1", "AssetId": "HAN_RITUAL_HALL_A", "DisplayName": "洛阳礼制建筑", "FacilityDefinitionId": "facility.public.ritual_hall", "VisualProfileId": "visual_profile.han.central_plains.ritual.hall.v1", "SourceBuildContractId": "historical_init.luoyang.ritual_hall.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "terrace", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.08, "ScaleZ": 0.82 },
+        { "ModuleId": "hall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": 0.08, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.60, "ScaleY": 0.30, "ScaleZ": 0.38 },
+        { "ModuleId": "roof.front", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.40, "PositionZ": -0.02, "RotationX": -20.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.05, "ScaleZ": 0.25 },
+        { "ModuleId": "roof.back", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.40, "PositionZ": 0.18, "RotationX": 20.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.05, "ScaleZ": 0.25 },
+        { "ModuleId": "forecourt", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.09, "PositionZ": -0.28, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.05, "ScaleZ": 0.22 },
+        { "ModuleId": "altar", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.17, "PositionZ": -0.29, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.30, "ScaleY": 0.12, "ScaleZ": 0.12 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.ritual.observatory.v1", "AssetId": "HAN_OBSERVATORY_A", "DisplayName": "洛阳灵台", "FacilityDefinitionId": "facility.public.observatory", "VisualProfileId": "visual_profile.han.central_plains.ritual.observatory.v1", "SourceBuildContractId": "historical_init.luoyang.lingtai.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.86, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "base", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.07, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.76, "ScaleY": 0.14, "ScaleZ": 0.76 },
+        { "ModuleId": "middle", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.56, "ScaleY": 0.18, "ScaleZ": 0.56 },
+        { "ModuleId": "upper", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.39, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.36, "ScaleY": 0.18, "ScaleZ": 0.36 },
+        { "ModuleId": "deck", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.0, "PositionY": 0.51, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.50, "ScaleY": 0.06, "ScaleZ": 0.50 },
+        { "ModuleId": "sighting.pole", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.metal", "PositionX": 0.0, "PositionY": 0.66, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.14, "ScaleZ": 0.05 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.fortification.palace_wall.v1", "AssetId": "HAN_PALACE_WALL_A", "DisplayName": "洛阳宫墙段", "FacilityDefinitionId": "facility.fortification.palace_wall", "VisualProfileId": "visual_profile.han.central_plains.fortification.palace_wall.v1", "SourceBuildContractId": "historical_init.luoyang.palace_wall.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "foundation", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.08, "ScaleZ": 0.24 },
+        { "ModuleId": "wall", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.22, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.30, "ScaleZ": 0.20 },
+        { "ModuleId": "coping", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.39, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.05, "ScaleZ": 0.24 },
+        { "ModuleId": "watch", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.28, "PositionY": 0.46, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.20, "ScaleZ": 0.24 },
+        { "ModuleId": "watch.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.28, "PositionY": 0.58, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.045, "ScaleZ": 0.30 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.fortification.palace_gate.v1", "AssetId": "HAN_PALACE_GATE_A", "DisplayName": "洛阳宫门", "FacilityDefinitionId": "facility.fortification.palace_gate", "VisualProfileId": "visual_profile.han.central_plains.fortification.palace_gate.v1", "SourceBuildContractId": "historical_init.luoyang.palace_gate.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "road", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.0, "PositionY": 0.02, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.04, "ScaleZ": 0.86 },
+        { "ModuleId": "pier.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": -0.18, "PositionY": 0.26, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.44, "ScaleZ": 0.26 },
+        { "ModuleId": "pier.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.18, "PositionY": 0.26, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.44, "ScaleZ": 0.26 },
+        { "ModuleId": "lintel", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.48, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.54, "ScaleY": 0.12, "ScaleZ": 0.28 },
+        { "ModuleId": "gatehouse", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.0, "PositionY": 0.62, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.44, "ScaleY": 0.16, "ScaleZ": 0.30 },
+        { "ModuleId": "roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.73, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.56, "ScaleY": 0.05, "ScaleZ": 0.40 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.storage.imperial_granary.v1", "AssetId": "HAN_IMPERIAL_GRANARY_A", "DisplayName": "洛阳太仓", "FacilityDefinitionId": "facility.storage.granary", "VisualProfileId": "visual_profile.han.central_plains.storage.imperial_granary.v1", "SourceBuildContractId": "historical_init.luoyang.taicang.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.02, "ScaleZ": 0.86 },
+        { "ModuleId": "store.n", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.16, "PositionZ": 0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.66, "ScaleY": 0.26, "ScaleZ": 0.24 },
+        { "ModuleId": "store.n.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.31, "PositionZ": 0.25, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.74, "ScaleY": 0.05, "ScaleZ": 0.32 },
+        { "ModuleId": "store.sw", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": -0.25, "PositionY": 0.13, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.20, "ScaleZ": 0.30 },
+        { "ModuleId": "store.se", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.25, "PositionY": 0.13, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.20, "ScaleZ": 0.30 },
+        { "ModuleId": "grain.1", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.thatch", "PositionX": -0.08, "PositionY": 0.10, "PositionZ": -0.16, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.14, "ScaleY": 0.10, "ScaleZ": 0.14 },
+        { "ModuleId": "grain.2", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.thatch", "PositionX": 0.08, "PositionY": 0.10, "PositionZ": -0.16, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.14, "ScaleY": 0.10, "ScaleZ": 0.14 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.military.arsenal.v1", "AssetId": "HAN_ARSENAL_A", "DisplayName": "洛阳武库", "FacilityDefinitionId": "facility.historical.arsenal", "VisualProfileId": "visual_profile.han.central_plains.military.arsenal.v1", "SourceBuildContractId": "historical_init.luoyang.arsenal.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["Military", "Government", "HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "yard", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.02, "ScaleZ": 0.86 },
+        { "ModuleId": "store", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.17, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.64, "ScaleY": 0.28, "ScaleZ": 0.26 },
+        { "ModuleId": "store.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.0, "PositionY": 0.33, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.05, "ScaleZ": 0.34 },
+        { "ModuleId": "rack.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.26, "PositionY": 0.15, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.26, "ScaleZ": 0.28 },
+        { "ModuleId": "rack.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": 0.26, "PositionY": 0.15, "PositionZ": -0.18, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.26, "ScaleZ": 0.28 },
+        { "ModuleId": "weapons.1", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.metal", "PositionX": -0.10, "PositionY": 0.08, "PositionZ": -0.27, "RotationX": 0.0, "RotationY": 20.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.05, "ScaleZ": 0.06 },
+        { "ModuleId": "weapons.2", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.metal", "PositionX": 0.10, "PositionY": 0.08, "PositionZ": -0.10, "RotationX": 0.0, "RotationY": -20.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.05, "ScaleZ": 0.06 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.imperial_garden.v1", "AssetId": "HAN_IMPERIAL_GARDEN_A", "DisplayName": "洛阳皇家苑囿", "FacilityDefinitionId": "facility.historical.imperial_garden", "VisualProfileId": "visual_profile.han.central_plains.public.imperial_garden.v1", "SourceBuildContractId": "historical_init.luoyang.imperial_garden.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.90, "AvailabilityIds": ["HistoricalInit", "Event"],
+      "Modules": [
+        { "ModuleId": "ground", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.crop", "PositionX": 0.0, "PositionY": 0.01, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.86, "ScaleY": 0.02, "ScaleZ": 0.86 },
+        { "ModuleId": "pond", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.water", "PositionX": -0.20, "PositionY": 0.025, "PositionZ": -0.16, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.40, "ScaleY": 0.03, "ScaleZ": 0.34 },
+        { "ModuleId": "pavilion", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.faded_red", "PositionX": 0.20, "PositionY": 0.17, "PositionZ": 0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.28, "ScaleY": 0.24, "ScaleZ": 0.24 },
+        { "ModuleId": "pavilion.roof", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.tile", "PositionX": 0.20, "PositionY": 0.31, "PositionZ": 0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.38, "ScaleY": 0.05, "ScaleZ": 0.34 },
+        { "ModuleId": "tree.w", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": -0.28, "PositionY": 0.22, "PositionZ": 0.24, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.22, "ScaleZ": 0.22 },
+        { "ModuleId": "tree.e", "PrimitiveId": "cylinder", "MaterialId": "material.han.coverage.foliage", "PositionX": 0.27, "PositionY": 0.20, "PositionZ": -0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.20, "ScaleY": 0.20, "ScaleZ": 0.20 },
+        { "ModuleId": "bridge", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.timber", "PositionX": -0.20, "PositionY": 0.09, "PositionZ": -0.16, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.46, "ScaleY": 0.07, "ScaleZ": 0.12 }
+      ]
+    },
+    {
+      "ModelId": "model.han.luoyang.public.road_segment.v1", "AssetId": "HAN_ROAD_SEGMENT_A", "DisplayName": "洛阳道路段", "FacilityDefinitionId": "facility.public.road", "VisualProfileId": "visual_profile.han.central_plains.public.road_segment.v1", "SourceBuildContractId": "visual_contract.luoyang.facility_coverage.v1", "ModularKitId": "HAN_BUILDING_MODULAR_KIT_V1", "StrategicFootprintRatio": 0.88, "AvailabilityIds": ["Player", "Ai", "Government", "HistoricalInit"],
+      "Modules": [
+        { "ModuleId": "road", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.rammed_earth", "PositionX": 0.0, "PositionY": 0.02, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.44, "ScaleY": 0.04, "ScaleZ": 0.86 },
+        { "ModuleId": "shoulder.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": -0.30, "PositionY": 0.015, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.03, "ScaleZ": 0.86 },
+        { "ModuleId": "shoulder.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.soil", "PositionX": 0.30, "PositionY": 0.015, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.16, "ScaleY": 0.03, "ScaleZ": 0.86 },
+        { "ModuleId": "track.w", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": -0.10, "PositionY": 0.045, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.02, "ScaleZ": 0.82 },
+        { "ModuleId": "track.e", "PrimitiveId": "cube", "MaterialId": "material.han.coverage.stone", "PositionX": 0.10, "PositionY": 0.045, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.035, "ScaleY": 0.02, "ScaleZ": 0.82 }
+      ]
+    }
+  ]
+}

@@ -67,7 +67,8 @@ namespace Mandate.Tests
                 new UTF8Encoding(false));
 
             var imported = loaded.InventoryFlows.Where(item =>
-                    item.OperationId == "supply.reference_arrival" &&
+                    (item.OperationId == "scenario.opening.delivered_stock" ||
+                     item.OperationId == "supply.shipment_delivered") &&
                     IsClosureFood(item.ProductId))
                 .Sum(item => item.QuantityMilliunits);
             var harvested = loaded.InventoryFlows.Where(item =>

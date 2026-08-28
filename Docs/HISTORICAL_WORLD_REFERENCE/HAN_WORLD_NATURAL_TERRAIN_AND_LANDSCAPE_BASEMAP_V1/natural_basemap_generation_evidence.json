@@ -1,0 +1,705 @@
+{
+  "source_audit": {
+    "dem_path": "MapData/HanWorld_Master_V0/physical/elevation_master.tif",
+    "runtime_elevation_path": "Assets/StreamingAssets/WorldMap/HanWorldV1/cells/elevation.bin",
+    "source_crs": "hanworld.albers.china.v0 / WGS84 Albers lat_1=25 lat_2=47 lon_0=105",
+    "source_resolution_metres": 2000,
+    "source_origin_x": -3417344.395965772,
+    "source_origin_y": 6199580.451937504,
+    "source_rows": 2176,
+    "source_columns": 3314,
+    "grid_manifest_matches": true,
+    "value_count": 7211264,
+    "nodata_count": 651260,
+    "minimum_valid_elevation": -7770,
+    "maximum_valid_elevation": 8418,
+    "source_fact_status": "SOURCE_FACT_LICENSED_INPUT",
+    "dem_source_ids": [
+      "source.mapzen.terrain-tiles",
+      "source.usgs.srtm",
+      "source.usgs.gmted"
+    ],
+    "river_source_id": "source.natural_earth.rivers.10m",
+    "license_note": "Mapzen/USGS attribution retained; Natural Earth public domain reference layer.",
+    "historical_limit": "Modern physical source; no claim that every river course or shoreline equals 184 CE.",
+    "elevation_histogram_500m": [
+      {
+        "band_min": -8000,
+        "count": 21
+      },
+      {
+        "band_min": -7500,
+        "count": 1067
+      },
+      {
+        "band_min": -7000,
+        "count": 2977
+      },
+      {
+        "band_min": -6500,
+        "count": 23184
+      },
+      {
+        "band_min": -6000,
+        "count": 132376
+      },
+      {
+        "band_min": -5500,
+        "count": 96852
+      },
+      {
+        "band_min": -5000,
+        "count": 79116
+      },
+      {
+        "band_min": -4500,
+        "count": 70047
+      },
+      {
+        "band_min": -4000,
+        "count": 80751
+      },
+      {
+        "band_min": -3500,
+        "count": 69296
+      },
+      {
+        "band_min": -3000,
+        "count": 73480
+      },
+      {
+        "band_min": -2500,
+        "count": 94730
+      },
+      {
+        "band_min": -2000,
+        "count": 77657
+      },
+      {
+        "band_min": -1500,
+        "count": 68848
+      },
+      {
+        "band_min": -1000,
+        "count": 71204
+      },
+      {
+        "band_min": -500,
+        "count": 490421
+      },
+      {
+        "band_min": 0,
+        "count": 1904740
+      },
+      {
+        "band_min": 500,
+        "count": 1023227
+      },
+      {
+        "band_min": 1000,
+        "count": 806712
+      },
+      {
+        "band_min": 1500,
+        "count": 344216
+      },
+      {
+        "band_min": 2000,
+        "count": 176772
+      },
+      {
+        "band_min": 2500,
+        "count": 123642
+      },
+      {
+        "band_min": 3000,
+        "count": 100257
+      },
+      {
+        "band_min": 3500,
+        "count": 103571
+      },
+      {
+        "band_min": 4000,
+        "count": 140119
+      },
+      {
+        "band_min": 4500,
+        "count": 228606
+      },
+      {
+        "band_min": 5000,
+        "count": 146579
+      },
+      {
+        "band_min": 5500,
+        "count": 26998
+      },
+      {
+        "band_min": 6000,
+        "count": 2329
+      },
+      {
+        "band_min": 6500,
+        "count": 173
+      },
+      {
+        "band_min": 7000,
+        "count": 29
+      },
+      {
+        "band_min": 7500,
+        "count": 3
+      },
+      {
+        "band_min": 8000,
+        "count": 4
+      }
+    ]
+  },
+  "benchmark": [
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "3x3",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 225,
+      "triangles": 288,
+      "generation_ms_python_preflight": 4.402,
+      "peak_alloc_bytes_python_preflight": 32058,
+      "estimated_vertex_gpu_bytes": 9000,
+      "estimated_index_gpu_bytes": 3456,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 288,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 247766.5,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "3x3",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 225,
+      "triangles": 288,
+      "generation_ms_python_preflight": 4.471,
+      "peak_alloc_bytes_python_preflight": 32519,
+      "estimated_vertex_gpu_bytes": 9000,
+      "estimated_index_gpu_bytes": 3456,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 288,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 289010.25,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "3x3",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 225,
+      "triangles": 288,
+      "generation_ms_python_preflight": 4.157,
+      "peak_alloc_bytes_python_preflight": 31910,
+      "estimated_vertex_gpu_bytes": 9000,
+      "estimated_index_gpu_bytes": 3456,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 288,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 299269.0,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "3x3",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 225,
+      "triangles": 288,
+      "generation_ms_python_preflight": 3.996,
+      "peak_alloc_bytes_python_preflight": 40880,
+      "estimated_vertex_gpu_bytes": 9000,
+      "estimated_index_gpu_bytes": 3456,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 288,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 44954.75,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "5x5",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 625,
+      "triangles": 800,
+      "generation_ms_python_preflight": 11.901,
+      "peak_alloc_bytes_python_preflight": 4069,
+      "estimated_vertex_gpu_bytes": 25000,
+      "estimated_index_gpu_bytes": 9600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 625177.75,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "5x5",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 625,
+      "triangles": 800,
+      "generation_ms_python_preflight": 12.421,
+      "peak_alloc_bytes_python_preflight": 4069,
+      "estimated_vertex_gpu_bytes": 25000,
+      "estimated_index_gpu_bytes": 9600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 765556.0,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "5x5",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 625,
+      "triangles": 800,
+      "generation_ms_python_preflight": 11.506,
+      "peak_alloc_bytes_python_preflight": 31849,
+      "estimated_vertex_gpu_bytes": 25000,
+      "estimated_index_gpu_bytes": 9600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 787334.0,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 4,
+      "resident_window": "5x5",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 625,
+      "triangles": 800,
+      "generation_ms_python_preflight": 12.232,
+      "peak_alloc_bytes_python_preflight": 4133,
+      "estimated_vertex_gpu_bytes": 25000,
+      "estimated_index_gpu_bytes": 9600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 151938.0,
+      "selection": "REJECTED",
+      "selection_reason": "Excess tile/index overhead."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "3x3",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 729,
+      "triangles": 1152,
+      "generation_ms_python_preflight": 13.891,
+      "peak_alloc_bytes_python_preflight": 4037,
+      "estimated_vertex_gpu_bytes": 29160,
+      "estimated_index_gpu_bytes": 13824,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 1152,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 688851.5,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "3x3",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 729,
+      "triangles": 1152,
+      "generation_ms_python_preflight": 13.706,
+      "peak_alloc_bytes_python_preflight": 4005,
+      "estimated_vertex_gpu_bytes": 29160,
+      "estimated_index_gpu_bytes": 13824,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 1152,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 902667.25,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "3x3",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 729,
+      "triangles": 1152,
+      "generation_ms_python_preflight": 13.585,
+      "peak_alloc_bytes_python_preflight": 42093,
+      "estimated_vertex_gpu_bytes": 29160,
+      "estimated_index_gpu_bytes": 13824,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 1152,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 900148.25,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "3x3",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 729,
+      "triangles": 1152,
+      "generation_ms_python_preflight": 13.666,
+      "peak_alloc_bytes_python_preflight": 4069,
+      "estimated_vertex_gpu_bytes": 29160,
+      "estimated_index_gpu_bytes": 13824,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 1152,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 191166.0,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "5x5",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2025,
+      "triangles": 3200,
+      "generation_ms_python_preflight": 36.834,
+      "peak_alloc_bytes_python_preflight": 47053,
+      "estimated_vertex_gpu_bytes": 81000,
+      "estimated_index_gpu_bytes": 38400,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 3200,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 1795956.25,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "5x5",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2025,
+      "triangles": 3200,
+      "generation_ms_python_preflight": 38.545,
+      "peak_alloc_bytes_python_preflight": 49606,
+      "estimated_vertex_gpu_bytes": 81000,
+      "estimated_index_gpu_bytes": 38400,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 3200,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 2390000.75,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "5x5",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2025,
+      "triangles": 3200,
+      "generation_ms_python_preflight": 37.672,
+      "peak_alloc_bytes_python_preflight": 4197,
+      "estimated_vertex_gpu_bytes": 81000,
+      "estimated_index_gpu_bytes": 38400,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 3200,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 2144329.5,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 8,
+      "resident_window": "5x5",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2025,
+      "triangles": 3200,
+      "generation_ms_python_preflight": 38.069,
+      "peak_alloc_bytes_python_preflight": 4101,
+      "estimated_vertex_gpu_bytes": 81000,
+      "estimated_index_gpu_bytes": 38400,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 3200,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 634780.75,
+      "selection": "SELECTED",
+      "selection_reason": "Balances 16km update granularity, 3x3/5x5 residency and tile count; independent of legacy 16x16 aggregation."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "3x3",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2601,
+      "triangles": 4608,
+      "generation_ms_python_preflight": 47.261,
+      "peak_alloc_bytes_python_preflight": 4197,
+      "estimated_vertex_gpu_bytes": 104040,
+      "estimated_index_gpu_bytes": 55296,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 4608,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 2388442.75,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "3x3",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2601,
+      "triangles": 4608,
+      "generation_ms_python_preflight": 48.503,
+      "peak_alloc_bytes_python_preflight": 4133,
+      "estimated_vertex_gpu_bytes": 104040,
+      "estimated_index_gpu_bytes": 55296,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 4608,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 3503431.0,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "3x3",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2601,
+      "triangles": 4608,
+      "generation_ms_python_preflight": 46.816,
+      "peak_alloc_bytes_python_preflight": 4197,
+      "estimated_vertex_gpu_bytes": 104040,
+      "estimated_index_gpu_bytes": 55296,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 4608,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 2586894.75,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "3x3",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 2601,
+      "triangles": 4608,
+      "generation_ms_python_preflight": 47.995,
+      "peak_alloc_bytes_python_preflight": 33234,
+      "estimated_vertex_gpu_bytes": 104040,
+      "estimated_index_gpu_bytes": 55296,
+      "draw_calls_without_batching": 9,
+      "collider_triangles": 4608,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 909253.5,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "5x5",
+      "sample": "NORTH_CHINA_PLAIN",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 7225,
+      "triangles": 12800,
+      "generation_ms_python_preflight": 129.742,
+      "peak_alloc_bytes_python_preflight": 38688,
+      "estimated_vertex_gpu_bytes": 289000,
+      "estimated_index_gpu_bytes": 153600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 12800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 5862217.25,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "5x5",
+      "sample": "MOUNTAIN_HILL",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 7225,
+      "triangles": 12800,
+      "generation_ms_python_preflight": 130.36,
+      "peak_alloc_bytes_python_preflight": 99276,
+      "estimated_vertex_gpu_bytes": 289000,
+      "estimated_index_gpu_bytes": 153600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 12800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 9952144.5,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "5x5",
+      "sample": "MAJOR_RIVER",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 7225,
+      "triangles": 12800,
+      "generation_ms_python_preflight": 132.938,
+      "peak_alloc_bytes_python_preflight": 50382,
+      "estimated_vertex_gpu_bytes": 289000,
+      "estimated_index_gpu_bytes": 153600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 12800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 6752880.25,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    },
+    {
+      "candidate_cells_per_side": 16,
+      "resident_window": "5x5",
+      "sample": "HENAN_LUOYANG",
+      "source": "REAL_HANWORLD_V1_DEM",
+      "vertices": 7225,
+      "triangles": 12800,
+      "generation_ms_python_preflight": 128.829,
+      "peak_alloc_bytes_python_preflight": 65814,
+      "estimated_vertex_gpu_bytes": 289000,
+      "estimated_index_gpu_bytes": 153600,
+      "draw_calls_without_batching": 25,
+      "collider_triangles": 12800,
+      "shared_edge_formula": "GLOBAL_GRID_VERTEX_AVERAGE_OF_ADJACENT_CELLS",
+      "checksum": 3399259.5,
+      "selection": "REJECTED",
+      "selection_reason": "32km tile is too coarse for regional streaming and rebuild granularity."
+    }
+  ],
+  "shared_edge_validation": [
+    {
+      "sample_row": 1110,
+      "sample_column": 2090,
+      "direction": "EAST_WEST",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0138.c0261",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0138.c0262",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1110,
+      "sample_column": 2090,
+      "direction": "SOUTH_NORTH",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0138.c0261",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0139.c0261",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1390,
+      "sample_column": 1710,
+      "direction": "EAST_WEST",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0173.c0213",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0173.c0214",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1390,
+      "sample_column": 1710,
+      "direction": "SOUTH_NORTH",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0173.c0213",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0174.c0213",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1160,
+      "sample_column": 1970,
+      "direction": "EAST_WEST",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0145.c0246",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0145.c0247",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1160,
+      "sample_column": 1970,
+      "direction": "SOUTH_NORTH",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0145.c0246",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0146.c0246",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1241,
+      "sample_column": 2042,
+      "direction": "EAST_WEST",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0155.c0255",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0155.c0256",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 1241,
+      "sample_column": 2042,
+      "direction": "SOUTH_NORTH",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0155.c0255",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0156.c0255",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 610,
+      "sample_column": 900,
+      "direction": "EAST_WEST",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0076.c0112",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0076.c0113",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    },
+    {
+      "sample_row": 610,
+      "sample_column": 900,
+      "direction": "SOUTH_NORTH",
+      "tile_a": "terrain.tile.hanworld.natural.v1.r0076.c0112",
+      "tile_b": "terrain.tile.hanworld.natural.v1.r0077.c0112",
+      "compared_vertices": 9,
+      "maximum_height_error_metres": 0.0,
+      "status": "PASS"
+    }
+  ],
+  "river_feature_count": 233,
+  "river_source_gaps": [
+    {
+      "river_id": "river.reference.required.luo",
+      "name_zh": "洛水",
+      "status": "NOT_PROVEN_SOURCE_GAP",
+      "reason": "Current licensed vector source has no uniquely attributable projected feature; historical text is not converted into invented geometry."
+    }
+  ]
+}

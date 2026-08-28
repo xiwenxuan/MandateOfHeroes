@@ -1,0 +1,59 @@
+{
+  "schema": "hanworld.style-d-strategic-landscape.validation-summary.v2",
+  "task_id": "HAN-WORLD-STYLE-D-STRATEGIC-LANDSCAPE-VISUAL-REFINEMENT-AND-ZHONGHUA-SOURCE-RECOVERY-V2",
+  "production_status": "STYLE_D_STRATEGIC_LANDSCAPE_V2_READY_FOR_USER_REVIEW",
+  "global_spatial_contract": {
+    "crs_id": "hanworld.albers.china.v0",
+    "global_origin_x": -3417344.395965772,
+    "global_origin_y": 6199580.451937504,
+    "cell_size_metres": 2000,
+    "global_grid_columns": 3314,
+    "global_grid_rows": 2176,
+    "global_cell_count": 7211264,
+    "terrain_tile_cells": "8x8",
+    "creates_simulation_subcells": false
+  },
+  "visual_status": {
+    "mountain_system": "PARTIAL",
+    "river_mesh": "PARTIAL",
+    "river_bank": "PASS_WITH_ART_LIMITS",
+    "forest_world": "PASS",
+    "forest_region": "PASS_WITH_ART_LIMITS",
+    "forest_city": "PASS_WITH_ART_LIMITS",
+    "plain": "PASS",
+    "terrain_city_detail": "PARTIAL",
+    "world_region_transition": "PARTIAL",
+    "background_grid_off": "PASS"
+  },
+  "evidence": {
+    "core_screenshot_count": 15,
+    "river_diagnostic_screenshot_count": 5,
+    "workbook_count": 15,
+    "registry_workbook_updates": 3,
+    "performance_json": "outputs/20260816-1910-style-d-v2/style_d_v2_performance.json"
+  },
+  "source_recovery": {
+    "zhonghua_source_cloned": false,
+    "status": "SOURCE_CLONE_BLOCKED_BY_NETWORK_V2",
+    "research_status": "API_STATIC_RESEARCH_WITH_NETWORK_BLOCKER",
+    "license_status": "UNRESOLVED",
+    "external_source_or_asset_copied": false
+  },
+  "verification": {
+    "compile": "PASS",
+    "compile_log": "tmp/skill-verification/compile-20260816-195309-162.out.log",
+    "core_regression": "PASS_GLOBAL_SPATIAL_FILTER; FULL_SUITE_BLOCKED_AT_300_SECONDS_WITH_NO_RECORDED_FAILURE",
+    "core_target_log": "tmp/skill-verification/core-tests-20260816-195313-550.out.log",
+    "core_full_log": "tmp/skill-verification/core-tests-20260816-194658-956.out.log",
+    "unity_editmode": "PASS_STYLE_D_5_OF_5_AND_RELATED_14_OF_14; FULL_SUITE_BLOCKED_AT_300_SECONDS",
+    "unity_editmode_style_d_summary": "tmp/unity-validation/unity-EditMode-20260816-195347-417.summary.json",
+    "unity_editmode_related_summary": "tmp/unity-validation/unity-EditMode-20260816-200030-115.summary.json",
+    "unity_editmode_full_summary": "tmp/unity-validation/unity-EditMode-20260816-195437-500.summary.json",
+    "unity_playmode": "PASS_1_OF_1",
+    "unity_playmode_summary": "tmp/unity-validation/unity-PlayMode-20260816-200313-240.summary.json",
+    "workbook_render": "PASS_15_OF_15",
+    "workbook_formula_error_scan": "PASS",
+    "credential_scan": "PASS_NO_MATCH_IN_TASK_SCOPE",
+    "git_diff_check": "PASS_WITH_LINE_ENDING_WARNING_ONLY"
+  }
+}

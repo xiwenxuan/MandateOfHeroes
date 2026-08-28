@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LuoyangWorldValidation.unity
     guid: 4f2d2ef9a2784ad6a9d6ba25de752b44
+  - enabled: 1
+    path: Assets/Scenes/HanWorldNaturalBasemap.unity
+    guid: ab000b000b000b000b000b000b000b00
+  - enabled: 1
+    path: Assets/Scenes/HanWorldArtDirectionLab.unity
+    guid: ac010c010c010c010c010c010c010c01
   m_BuildProfiles: []
   m_configObjects: {}
   m_SlimFeaturesWeixinMiniGame:

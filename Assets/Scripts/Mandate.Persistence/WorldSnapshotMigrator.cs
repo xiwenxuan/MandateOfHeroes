@@ -242,6 +242,15 @@ namespace Mandate.Persistence
                     case 71:
                         MigrateVersionSeventyOneToSeventyTwo(world);
                         break;
+                    case 72:
+                        MigrateVersionSeventyTwoToSeventyThree(world);
+                        break;
+                    case 73:
+                        MigrateVersionSeventyThreeToSeventyFour(world);
+                        break;
+                    case 74:
+                        MigrateVersionSeventyFourToSeventyFive(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -2227,6 +2236,58 @@ namespace Mandate.Persistence
                 state.Memory ??= new List<WorldDecisionMemoryEntryState>();
             }
             world.SchemaVersion = 72;
+        }
+
+        private static void MigrateVersionSeventyTwoToSeventyThree(
+            WorldState world)
+        {
+            if (world.Facilities != null)
+            {
+                foreach (var facility in world.Facilities)
+                {
+                    if (facility != null && facility.ConditionBasisPoints == 0)
+                        facility.ConditionBasisPoints = 10_000;
+                }
+            }
+            world.CellProperties ??= new List<WorldCellPropertyState>();
+            world.CellPropertyTransfers ??=
+                new List<CellPropertyTransferState>();
+            world.FacilityConstructionProjects ??=
+                new List<FacilityConstructionProjectState>();
+            world.FacilityConstructionLabor ??=
+                new List<FacilityConstructionLaborState>();
+            world.HouseholdMigrations ??=
+                new List<HouseholdMigrationState>();
+            world.SchemaVersion = 73;
+        }
+
+        private static void MigrateVersionSeventyThreeToSeventyFour(
+            WorldState world)
+        {
+            world.LuoyangPassageTraversals ??=
+                new List<LuoyangPassageTraversalWorldState>();
+            world.SchemaVersion = 74;
+        }
+
+        private static void MigrateVersionSeventyFourToSeventyFive(
+            WorldState world)
+        {
+            world.LuoyangPassageOperationalControls ??=
+                new List<LuoyangPassageOperationalControlState>();
+            world.LuoyangPassageDamageRecords ??=
+                new List<LuoyangPassageDamageRecordState>();
+            world.LuoyangPassageRepairOrders ??=
+                new List<LuoyangPassageRepairOrderState>();
+            if (world.InventoryTransactions != null)
+            {
+                foreach (var transaction in world.InventoryTransactions)
+                {
+                    if (transaction != null)
+                        transaction.SourceFacilityConstructionProjectId ??=
+                            string.Empty;
+                }
+            }
+            world.SchemaVersion = 75;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(

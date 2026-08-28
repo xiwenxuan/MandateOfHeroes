@@ -1,5 +1,7 @@
 using System.Collections;
+using Mandate.Domain;
 using Mandate.Presentation;
+using Mandate.Simulation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,6 +36,12 @@ namespace Mandate.Tests
             Assert.That(controller.SelectLivingHousehold(80_898), Is.True);
             Assert.That(controller.SelectLivingFacility(2_083), Is.True);
             Assert.That(controller.LivingDebugText, Is.Not.Empty);
+            Assert.That(controller.ExecutePlayerCommand(
+                LuoyangPlayerCommandTypeIds.Study), Is.True);
+            Assert.That(controller.LivingRuntime.PlayerCommands,
+                Has.Some.Matches<LuoyangPlayerCommandRuntimeState>(item =>
+                    item.CommandTypeId == LuoyangPlayerCommandTypeIds.Study &&
+                    item.StatusId == "completed"));
             Assert.That(Object.FindObjectsOfType<GameObject>().Length - before,
                 Is.LessThan(32), "Permanent Persons must not become GameObjects.");
         }

@@ -1,0 +1,123 @@
+{
+  "SchemaId": "mandate.luoyang-p0-final-asset-vertical-slice.v1",
+  "TaskId": "LUOYANG_P0_FINAL_ASSET_FOUR_PIECE_VERTICAL_SLICE_V1",
+  "RegionalStyleId": "regional_style.central_plains.han.v1",
+  "ReplacementIdentityPolicyId": "replacement.identity.keep_model_asset_profile_facility.v1",
+  "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+  "ArtistPrefabSourceStatusId": "artist_prefab.project_original_native_prefab_and_fbx_source_present",
+  "FinalArtApprovalStatusId": "final_art.user_accepted.fbx_source_validated.approved.v1",
+  "UserReviewDecisionStatusId": "user_review.luoyang-p0-four-piece.accepted.v1",
+  "UserReviewDecisionRecordId": "decision.luoyang-p0-four-piece.accepted.2026-08-27.v1",
+  "UserReviewDecisionDate": "2026-08-27",
+  "SourceArchiveStatusId": "source_archive.unity_native_and_fbx_complete.v1",
+  "SourceLicenseId": "license.project-original.unity-native-and-fbx.v1",
+  "FbxSourceToolchainId": "toolchain.unity-fbx-exporter.4.2.1",
+  "FbxToolchainLicenseId": "license.unity-companion.v1",
+  "FbxAnchorNameMappingId": "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+  "ProfileCount": 4,
+  "MaterialCount": 6,
+  "Materials": [
+    { "MaterialId": "material.han.p0.rammed_earth", "Red": 0.60, "Green": 0.43, "Blue": 0.24, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.05 },
+    { "MaterialId": "material.han.p0.vermilion", "Red": 0.58, "Green": 0.07, "Blue": 0.035, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.18 },
+    { "MaterialId": "material.han.p0.grey_green_tile", "Red": 0.18, "Green": 0.24, "Blue": 0.19, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.31 },
+    { "MaterialId": "material.han.p0.stone", "Red": 0.50, "Green": 0.48, "Blue": 0.40, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.10 },
+    { "MaterialId": "material.han.p0.timber", "Red": 0.20, "Green": 0.09, "Blue": 0.04, "Alpha": 1.0, "Metallic": 0.0, "Smoothness": 0.16 },
+    { "MaterialId": "material.han.p0.bronze", "Red": 0.38, "Green": 0.32, "Blue": 0.12, "Alpha": 1.0, "Metallic": 0.64, "Smoothness": 0.34 }
+  ],
+  "Profiles": [
+    {
+      "CandidateId": "candidate.luoyang.p0.south_palace.v1", "CandidateStatusId": "candidate.native_prefab_refined_v2.user_accepted.fbx_source_validated.final", "DisplayName": "南宫·精修V2最终激活版",
+      "FacilityId": "facility.instance.luoyang.184.south_palace", "SourceProfileId": "landmark.luoyang.south_palace.v1", "ModelId": "model.han.luoyang.palace.complex.v1", "AssetVariantId": "HAN_LANDMARK_SOUTH_PALACE_DOUBLE_COURT_A", "ReplacementSlotId": "HAN_LANDMARK_SOUTH_PALACE_DOUBLE_COURT_A",
+      "CellId64": 4127973, "GridColumn": 2043, "GridRow": 1245, "HistoricalConfidence": "HistoricalAnchor", "SpatialPrecision": "Probable", "HistoricalBasis": "184年洛阳南宫锚点；本候选仅表达双朝院战略轮廓。",
+      "SourceIds": ["source.cssn.han_wei_luoyang_evolution", "source.pku.han_luoyang_ritual_axis"], "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "MaterialSetId": "material_set.han.luoyang.p0.vertical_slice.v1", "LodProfileId": "lod.han.luoyang.p0.final_candidate.three_tier.v1", "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Final/SouthPalace", "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Final/SouthPalace.fbx", "ArtistPrefabPresent": true, "FinalArtApproved": true,
+      "Anchors": [
+        { "AnchorId": "anchor.p0.south_palace.placement", "RoleId": "anchor_role.placement", "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        { "AnchorId": "anchor.p0.south_palace.entrance", "RoleId": "anchor_role.entrance", "X": 0.0, "Y": 0.0, "Z": -0.43 }
+      ],
+      "Modules": [
+        { "ModuleId": "terrace", "PrimitiveId": "han.terrain_pad", "MaterialId": "material.han.p0.stone", "PositionX": 0.0, "PositionY": 0.035, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.07, "ScaleZ": 0.82 },
+        { "ModuleId": "court.front", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": 0.0, "PositionY": 0.13, "PositionZ": -0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.20, "ScaleZ": 0.24 },
+        { "ModuleId": "court.front.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.0, "PositionY": 0.27, "PositionZ": -0.20, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.66, "ScaleY": 0.09, "ScaleZ": 0.32 },
+        { "ModuleId": "court.rear", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.vermilion", "PositionX": 0.0, "PositionY": 0.20, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.64, "ScaleY": 0.32, "ScaleZ": 0.25 },
+        { "ModuleId": "court.rear.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.0, "PositionY": 0.40, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.72, "ScaleY": 0.11, "ScaleZ": 0.34 },
+        { "ModuleId": "gallery.w", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": -0.38, "PositionY": 0.13, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.20, "ScaleZ": 0.62 },
+        { "ModuleId": "gallery.e", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": 0.38, "PositionY": 0.13, "PositionZ": 0.02, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.08, "ScaleY": 0.20, "ScaleZ": 0.62 },
+        { "ModuleId": "finial", "PrimitiveId": "cylinder", "MaterialId": "material.han.p0.bronze", "PositionX": 0.0, "PositionY": 0.53, "PositionZ": 0.22, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.09, "ScaleZ": 0.05 }
+      ],
+      "Lod1ModuleIds": ["terrace", "court.front", "court.front.roof", "court.rear", "court.rear.roof", "gallery.w", "gallery.e"], "Lod2ModuleIds": ["terrace", "court.front.roof", "court.rear", "court.rear.roof"]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.mingtang.v1", "CandidateStatusId": "candidate.native_prefab_refined_v2.user_accepted.fbx_source_validated.final", "DisplayName": "明堂·精修V2最终激活版",
+      "FacilityId": "facility.instance.luoyang.184.mingtang", "SourceProfileId": "landmark.luoyang.mingtang.v1", "ModelId": "model.han.luoyang.ritual.hall.v1", "AssetVariantId": "HAN_LANDMARK_MINGTANG_SQUARE_ALTAR_A", "ReplacementSlotId": "HAN_LANDMARK_MINGTANG_SQUARE_ALTAR_A",
+      "CellId64": 4161110, "GridColumn": 2040, "GridRow": 1255, "HistoricalConfidence": "HistoricalAnchor", "SpatialPrecision": "Probable", "HistoricalBasis": "洛阳南郊礼制建筑资料；方形重台为战略识别轮廓。",
+      "SourceIds": ["source.pku.han_luoyang_ritual_axis", "source.cass.luoyang_southern_ritual_archaeology"], "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "MaterialSetId": "material_set.han.luoyang.p0.vertical_slice.v1", "LodProfileId": "lod.han.luoyang.p0.final_candidate.three_tier.v1", "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Final/Mingtang", "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Final/Mingtang.fbx", "ArtistPrefabPresent": true, "FinalArtApproved": true,
+      "Anchors": [
+        { "AnchorId": "anchor.p0.mingtang.placement", "RoleId": "anchor_role.placement", "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        { "AnchorId": "anchor.p0.mingtang.entrance", "RoleId": "anchor_role.entrance", "X": 0.0, "Y": 0.0, "Z": -0.42 }
+      ],
+      "Modules": [
+        { "ModuleId": "altar.lower", "PrimitiveId": "han.terrain_pad", "MaterialId": "material.han.p0.stone", "PositionX": 0.0, "PositionY": 0.04, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.84, "ScaleY": 0.08, "ScaleZ": 0.84 },
+        { "ModuleId": "altar.middle", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": 0.0, "PositionY": 0.12, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.64, "ScaleY": 0.10, "ScaleZ": 0.64 },
+        { "ModuleId": "altar.upper", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.vermilion", "PositionX": 0.0, "PositionY": 0.21, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.44, "ScaleY": 0.12, "ScaleZ": 0.44 },
+        { "ModuleId": "hall", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.vermilion", "PositionX": 0.0, "PositionY": 0.34, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.34, "ScaleY": 0.18, "ScaleZ": 0.34 },
+        { "ModuleId": "roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.0, "PositionY": 0.48, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.46, "ScaleY": 0.11, "ScaleZ": 0.46 },
+        { "ModuleId": "stair.s", "PrimitiveId": "han.terrain_pad", "MaterialId": "material.han.p0.stone", "PositionX": 0.0, "PositionY": 0.08, "PositionZ": -0.36, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.07, "ScaleZ": 0.16 },
+        { "ModuleId": "pillar.w", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": -0.12, "PositionY": 0.36, "PositionZ": -0.15, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.04, "ScaleY": 0.20, "ScaleZ": 0.04 },
+        { "ModuleId": "pillar.e", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": 0.12, "PositionY": 0.36, "PositionZ": -0.15, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.04, "ScaleY": 0.20, "ScaleZ": 0.04 }
+      ],
+      "Lod1ModuleIds": ["altar.lower", "altar.middle", "altar.upper", "hall", "roof", "stair.s"], "Lod2ModuleIds": ["altar.lower", "hall", "roof"]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.guangyangmen.v1", "CandidateStatusId": "candidate.native_prefab_refined_v2.user_accepted.fbx_source_validated.final", "DisplayName": "广阳门·精修V2最终激活版",
+      "FacilityId": "facility.instance.luoyang.184.gate.guangyangmen", "SourceProfileId": "gate_identity.luoyang.guangyangmen.v1", "ModelId": "model.han.buildable.city_gate.segment.v1", "AssetVariantId": "HAN_LUOYANG_GATE_GUANGYANGMEN_A", "ReplacementSlotId": "HAN_LUOYANG_GATE_GUANGYANGMEN_A",
+      "CellId64": 4131278, "GridColumn": 2034, "GridRow": 1246, "HistoricalConfidence": "HistoricalAnchor", "SpatialPrecision": "Probable", "HistoricalBasis": "门名、方位与落格依据既有史料数据；短外院为战略识别符号。",
+      "SourceIds": ["source.houhanshu.baiguan_gate_commandants", "source.cssn.han_wei_luoyang_evolution"], "AvailabilityIds": ["Government", "Military", "HistoricalInit", "Event"],
+      "MaterialSetId": "material_set.han.luoyang.p0.vertical_slice.v1", "LodProfileId": "lod.han.luoyang.p0.final_candidate.three_tier.v1", "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Final/Guangyangmen", "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Final/Guangyangmen.fbx", "ArtistPrefabPresent": true, "FinalArtApproved": true,
+      "Anchors": [
+        { "AnchorId": "anchor.p0.guangyangmen.placement", "RoleId": "anchor_role.placement", "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        { "AnchorId": "anchor.p0.guangyangmen.outer", "RoleId": "anchor_role.outer_passage", "X": 0.0, "Y": 0.0, "Z": -0.43 },
+        { "AnchorId": "anchor.p0.guangyangmen.inner", "RoleId": "anchor_role.inner_passage", "X": 0.0, "Y": 0.0, "Z": 0.43 }
+      ],
+      "Modules": [
+        { "ModuleId": "road", "PrimitiveId": "han.road_crown", "MaterialId": "material.han.p0.stone", "PositionX": 0.0, "PositionY": 0.02, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.04, "ScaleZ": 0.84 },
+        { "ModuleId": "wall.w", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": -0.34, "PositionY": 0.14, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.25, "ScaleZ": 0.72 },
+        { "ModuleId": "wall.e", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": 0.34, "PositionY": 0.14, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.18, "ScaleY": 0.25, "ScaleZ": 0.72 },
+        { "ModuleId": "tower", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.vermilion", "PositionX": 0.0, "PositionY": 0.25, "PositionZ": 0.05, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.46, "ScaleY": 0.34, "ScaleZ": 0.32 },
+        { "ModuleId": "tower.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.0, "PositionY": 0.46, "PositionZ": 0.05, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.58, "ScaleY": 0.12, "ScaleZ": 0.44 },
+        { "ModuleId": "barbican", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": 0.0, "PositionY": 0.10, "PositionZ": -0.26, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.38, "ScaleY": 0.16, "ScaleZ": 0.34 },
+        { "ModuleId": "post.w", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": -0.12, "PositionY": 0.20, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.26, "ScaleZ": 0.05 },
+        { "ModuleId": "post.e", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": 0.12, "PositionY": 0.20, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.05, "ScaleY": 0.26, "ScaleZ": 0.05 }
+      ],
+      "Lod1ModuleIds": ["road", "wall.w", "wall.e", "tower", "tower.roof", "barbican"], "Lod2ModuleIds": ["road", "wall.w", "wall.e", "tower.roof"]
+    },
+    {
+      "CandidateId": "candidate.luoyang.p0.north_palace_south_gate.v1", "CandidateStatusId": "candidate.native_prefab_refined_v2.user_accepted.fbx_source_validated.final", "DisplayName": "北宫南门·精修V2最终激活版",
+      "FacilityId": "facility.instance.luoyang.184.north_palace_gate.1240.2043", "SourceProfileId": "gate_identity.luoyang.north_palace_south_gate.v1", "ModelId": "model.han.luoyang.fortification.palace_gate.v1", "AssetVariantId": "HAN_LUOYANG_NORTH_PALACE_SOUTH_GATE_A", "ReplacementSlotId": "HAN_LUOYANG_NORTH_PALACE_SOUTH_GATE_A",
+      "CellId64": 4111403, "GridColumn": 2043, "GridRow": 1240, "HistoricalConfidence": "HistoricalReconstruction", "SpatialPrecision": "Approximate", "HistoricalBasis": "南向朝向仅由北宫南门名称派生；双阙为战略视觉设计。",
+      "SourceIds": ["source.cssn.han_wei_luoyang_evolution", "source.pku.han_luoyang_ritual_axis"], "AvailabilityIds": ["Government", "HistoricalInit", "Event"],
+      "MaterialSetId": "material_set.han.luoyang.p0.vertical_slice.v1", "LodProfileId": "lod.han.luoyang.p0.final_candidate.three_tier.v1", "RuntimeCandidateModeId": "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+      "ArtistPrefabResourcePath": "Art/Han/Luoyang/P0Final/NorthPalaceSouthGate", "ArtistFbxTargetPath": "Assets/ArtSource/Han/Luoyang/P0Final/NorthPalaceSouthGate.fbx", "ArtistPrefabPresent": true, "FinalArtApproved": true,
+      "Anchors": [
+        { "AnchorId": "anchor.p0.north_palace_gate.placement", "RoleId": "anchor_role.placement", "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        { "AnchorId": "anchor.p0.north_palace_gate.outer", "RoleId": "anchor_role.outer_passage", "X": 0.0, "Y": 0.0, "Z": -0.43 },
+        { "AnchorId": "anchor.p0.north_palace_gate.inner", "RoleId": "anchor_role.inner_passage", "X": 0.0, "Y": 0.0, "Z": 0.43 }
+      ],
+      "Modules": [
+        { "ModuleId": "road", "PrimitiveId": "han.road_crown", "MaterialId": "material.han.p0.stone", "PositionX": 0.0, "PositionY": 0.02, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.04, "ScaleZ": 0.84 },
+        { "ModuleId": "gate.body", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.vermilion", "PositionX": 0.0, "PositionY": 0.24, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.48, "ScaleY": 0.36, "ScaleZ": 0.30 },
+        { "ModuleId": "gate.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.0, "PositionY": 0.47, "PositionZ": 0.0, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.60, "ScaleY": 0.12, "ScaleZ": 0.42 },
+        { "ModuleId": "que.w", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": -0.34, "PositionY": 0.23, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.42, "ScaleZ": 0.24 },
+        { "ModuleId": "que.e", "PrimitiveId": "han.rammed_block", "MaterialId": "material.han.p0.rammed_earth", "PositionX": 0.34, "PositionY": 0.23, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.42, "ScaleZ": 0.24 },
+        { "ModuleId": "que.w.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": -0.34, "PositionY": 0.49, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.10, "ScaleZ": 0.32 },
+        { "ModuleId": "que.e.roof", "PrimitiveId": "han.hip_roof", "MaterialId": "material.han.p0.grey_green_tile", "PositionX": 0.34, "PositionY": 0.49, "PositionZ": -0.04, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 0.0, "ScaleX": 0.22, "ScaleY": 0.10, "ScaleZ": 0.32 },
+        { "ModuleId": "lintel", "PrimitiveId": "han.timber_beam", "MaterialId": "material.han.p0.timber", "PositionX": 0.0, "PositionY": 0.27, "PositionZ": -0.16, "RotationX": 0.0, "RotationY": 0.0, "RotationZ": 90.0, "ScaleX": 0.06, "ScaleY": 0.32, "ScaleZ": 0.06 }
+      ],
+      "Lod1ModuleIds": ["road", "gate.body", "gate.roof", "que.w", "que.e", "que.w.roof", "que.e.roof"], "Lod2ModuleIds": ["road", "gate.roof", "que.w", "que.e", "que.w.roof", "que.e.roof"]
+    }
+  ]
+}

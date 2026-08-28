@@ -1,0 +1,31 @@
+{
+  "contract_id": "presentation.luoyang.whole-city-composition-and-terrain-integration.v1",
+  "status_id": "LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW",
+  "facility_anchor_count": 2084,
+  "unique_global_cell_count": 2084,
+  "asset_variant_count": 54,
+  "district_count": 6,
+  "facility_count_by_district": {
+    "district.luoyang.agricultural-resource-hinterland.v1": 746,
+    "district.luoyang.defense-ring.v1": 184,
+    "district.luoyang.market-workshop-band.v1": 258,
+    "district.luoyang.palace-civic-core.v1": 100,
+    "district.luoyang.residential-wards.v1": 324,
+    "district.luoyang.water-transport-network.v1": 472
+  },
+  "corridor_aligned_facility_count": 524,
+  "densest_resident_window_facility_count": 549,
+  "densest_resident_window_terrain_grounded_count": 549,
+  "visual_frontage_offset_metres": 320,
+  "maximum_visual_local_axis_offset_metres": 420,
+  "creates_simulation_subcells": false,
+  "building_batch_metrics": {
+    "spatial_batch_count": 9,
+    "source_module_renderer_count": 1673,
+    "building_renderer_batch_count": 97,
+    "combined_vertex_count": 17512,
+    "batch_build_milliseconds": 24.0933,
+    "renderer_reduction_ratio": 0.9420203227734608,
+    "within_budget": true
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "contract_id": "presentation.luoyang.p0-landmark-second-batch.review-decision-board.v1",
+  "status": "LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_DECISION_BOARDS_READY_FOR_USER_DECISION_V1",
+  "source_contract_id": "presentation.luoyang.p0-landmark-second-batch.multi-angle-review.v1",
+  "source_count": 12,
+  "board_count": 4,
+  "source_edit_policy": "NO_CROP_NO_COLOR_CHANGE_LAYOUT_ONLY",
+  "pieces": [
+    {
+      "piece_id": "candidate.luoyang.p0.batch2.north_palace.v1",
+      "display_name": "NORTH PALACE",
+      "decision": "PENDING",
+      "final_art_approved": false,
+      "sources": [
+        {
+          "angle": "front_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_north_palace_front_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "09ff73374dcd527cc56b8e9e3d0ca72a10b1304174105b69e3cc50ad4d31f723"
+        },
+        {
+          "angle": "rear_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_north_palace_rear_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "14b8f4b4aeae0e12e011054317df705876a2a206afb2a419ab994ff990b78762"
+        },
+        {
+          "angle": "low_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_north_palace_low_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "0d4da6c253d85953db4cde1426ee96516bead6094a3e873fe82da2e6c545a85a"
+        }
+      ],
+      "board": {
+        "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Boards/luoyang_p0_batch2_north_palace_review_decision_board_v1.png",
+        "width": 3000,
+        "height": 900,
+        "sha256": "8abf17aa502de324e10d260c52362e91c7d7a1ccf01e0633c9448c1c08d8f8f4"
+      }
+    },
+    {
+      "piece_id": "candidate.luoyang.p0.batch2.yongan_palace.v1",
+      "display_name": "YONGAN PALACE",
+      "decision": "PENDING",
+      "final_art_approved": false,
+      "sources": [
+        {
+          "angle": "front_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_yongan_palace_front_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "c9a5b1a594d22a38af9997a2ff298f5cd531a3f86d504791ec375c0ff0578242"
+        },
+        {
+          "angle": "rear_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_yongan_palace_rear_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "41e59c13ccd8210e0ee23014cca0e962a00237f77f4d153bd136cc87422d06b2"
+        },
+        {
+          "angle": "low_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_yongan_palace_low_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "ce891bf2a2c433fbcd5cf4e936718ef3c7d48f4677f5c854d25180e536ff48fe"
+        }
+      ],
+      "board": {
+        "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Boards/luoyang_p0_batch2_yongan_palace_review_decision_board_v1.png",
+        "width": 3000,
+        "height": 900,
+        "sha256": "b313e1015189e65f6b45754dae248a6aa558738a74de35ef408605fcff0c0cfc"
+      }
+    },
+    {
+      "piece_id": "candidate.luoyang.p0.batch2.taixue.v1",
+      "display_name": "TAIXUE",
+      "decision": "PENDING",
+      "final_art_approved": false,
+      "sources": [
+        {
+          "angle": "front_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_taixue_front_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "cb6a08717206a7449fb143f39bab887fb4c190c32e4537fa69edc0191458f649"
+        },
+        {
+          "angle": "rear_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_taixue_rear_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "eacbbdb33f7e5fedc18f31af2afdd11356242b5c3ad058831f6bc2f1dd451b5d"
+        },
+        {
+          "angle": "low_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_taixue_low_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "00426288e35207b7c78a581ef5e0fa753cd856f68bfa9c03405106bd8651f20e"
+        }
+      ],
+      "board": {
+        "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Boards/luoyang_p0_batch2_taixue_review_decision_board_v1.png",
+        "width": 3000,
+        "height": 900,
+        "sha256": "3cfee7f4b34513d856675f557d850bf2a738a77eddc504cf33a7a76153f8c4f3"
+      }
+    },
+    {
+      "piece_id": "candidate.luoyang.p0.batch2.biyong.v1",
+      "display_name": "BIYONG",
+      "decision": "PENDING",
+      "final_art_approved": false,
+      "sources": [
+        {
+          "angle": "front_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_biyong_front_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "61acb023c962c2a6e3c6500c9c86322bfedc9a971759073325cd6282452430c7"
+        },
+        {
+          "angle": "rear_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_biyong_rear_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "aeea3ad7739e40a40a4f935a7451357026a16f43c45fe07bd5c01d15b0f4160f"
+        },
+        {
+          "angle": "low_oblique",
+          "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Screenshots/luoyang_p0_batch2_biyong_low_oblique_v1.png",
+          "width": 1600,
+          "height": 1000,
+          "sha256": "3d8e3f4533d60cd3899143feaa6fb7595dd288607825708a581c86c96f284726"
+        }
+      ],
+      "board": {
+        "path": "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/Boards/luoyang_p0_batch2_biyong_review_decision_board_v1.png",
+        "width": 3000,
+        "height": 900,
+        "sha256": "9ca3a5b0ce9cdf23c4cee48889d934feab9a62d13d607df6a27ffb1b37bfc3b4"
+      }
+    }
+  ]
+}

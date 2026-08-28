@@ -1,0 +1,32 @@
+﻿{
+  "schema": "hanworld.terrain-tile-unity-benchmark.v1",
+  "engine": "Unity 2022.3.62f3c1",
+  "gpu_timing_status": "PROXY_ONLY_BATCHMODE_NO_GPU_TIMESTAMP",
+  "load_unload_gc_contract": "REGION_REBUILDS_BOUNDED_3X3_OR_5X5_TILE_WINDOWS",
+  "results": [
+    {"candidate_cells_per_side":4,"resident_window":"3x3","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":15.861,"managed_memory_delta_bytes":0,"vertices":225,"triangles":288,"source_cell_reads":900,"collider_triangles":288,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":4,"resident_window":"3x3","sample":"MOUNTAIN_HILL","generation_ms_unity":3.579,"managed_memory_delta_bytes":0,"vertices":225,"triangles":288,"source_cell_reads":900,"collider_triangles":288,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":4,"resident_window":"3x3","sample":"MAJOR_RIVER","generation_ms_unity":3.066,"managed_memory_delta_bytes":0,"vertices":225,"triangles":288,"source_cell_reads":900,"collider_triangles":288,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":4,"resident_window":"3x3","sample":"HENAN_LUOYANG","generation_ms_unity":4.995,"managed_memory_delta_bytes":0,"vertices":225,"triangles":288,"source_cell_reads":900,"collider_triangles":288,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":4,"resident_window":"5x5","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":7.618,"managed_memory_delta_bytes":0,"vertices":625,"triangles":800,"source_cell_reads":2500,"collider_triangles":800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":4,"resident_window":"5x5","sample":"MOUNTAIN_HILL","generation_ms_unity":8.045,"managed_memory_delta_bytes":0,"vertices":625,"triangles":800,"source_cell_reads":2500,"collider_triangles":800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":4,"resident_window":"5x5","sample":"MAJOR_RIVER","generation_ms_unity":10.002,"managed_memory_delta_bytes":0,"vertices":625,"triangles":800,"source_cell_reads":2500,"collider_triangles":800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":4,"resident_window":"5x5","sample":"HENAN_LUOYANG","generation_ms_unity":7.755,"managed_memory_delta_bytes":0,"vertices":625,"triangles":800,"source_cell_reads":2500,"collider_triangles":800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":8,"resident_window":"3x3","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":8.7,"managed_memory_delta_bytes":0,"vertices":729,"triangles":1152,"source_cell_reads":2916,"collider_triangles":1152,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":8,"resident_window":"3x3","sample":"MOUNTAIN_HILL","generation_ms_unity":9.496,"managed_memory_delta_bytes":814,"vertices":729,"triangles":1152,"source_cell_reads":2916,"collider_triangles":1152,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":8,"resident_window":"3x3","sample":"MAJOR_RIVER","generation_ms_unity":9.38,"managed_memory_delta_bytes":0,"vertices":729,"triangles":1152,"source_cell_reads":2916,"collider_triangles":1152,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":8,"resident_window":"3x3","sample":"HENAN_LUOYANG","generation_ms_unity":8.808,"managed_memory_delta_bytes":0,"vertices":729,"triangles":1152,"source_cell_reads":2916,"collider_triangles":1152,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":8,"resident_window":"5x5","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":28.929,"managed_memory_delta_bytes":0,"vertices":2025,"triangles":3200,"source_cell_reads":8100,"collider_triangles":3200,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":8,"resident_window":"5x5","sample":"MOUNTAIN_HILL","generation_ms_unity":27.732,"managed_memory_delta_bytes":2287,"vertices":2025,"triangles":3200,"source_cell_reads":8100,"collider_triangles":3200,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":8,"resident_window":"5x5","sample":"MAJOR_RIVER","generation_ms_unity":29.68,"managed_memory_delta_bytes":0,"vertices":2025,"triangles":3200,"source_cell_reads":8100,"collider_triangles":3200,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":8,"resident_window":"5x5","sample":"HENAN_LUOYANG","generation_ms_unity":25.623,"managed_memory_delta_bytes":144,"vertices":2025,"triangles":3200,"source_cell_reads":8100,"collider_triangles":3200,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":16,"resident_window":"3x3","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":38.122,"managed_memory_delta_bytes":0,"vertices":2601,"triangles":4608,"source_cell_reads":10404,"collider_triangles":4608,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":16,"resident_window":"3x3","sample":"MOUNTAIN_HILL","generation_ms_unity":32.884,"managed_memory_delta_bytes":1701,"vertices":2601,"triangles":4608,"source_cell_reads":10404,"collider_triangles":4608,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":16,"resident_window":"3x3","sample":"MAJOR_RIVER","generation_ms_unity":36.525,"managed_memory_delta_bytes":0,"vertices":2601,"triangles":4608,"source_cell_reads":10404,"collider_triangles":4608,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":16,"resident_window":"3x3","sample":"HENAN_LUOYANG","generation_ms_unity":33.696,"managed_memory_delta_bytes":0,"vertices":2601,"triangles":4608,"source_cell_reads":10404,"collider_triangles":4608,"draw_call_upper_bound":9},
+    {"candidate_cells_per_side":16,"resident_window":"5x5","sample":"NORTH_CHINA_PLAIN","generation_ms_unity":101.221,"managed_memory_delta_bytes":0,"vertices":7225,"triangles":12800,"source_cell_reads":28900,"collider_triangles":12800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":16,"resident_window":"5x5","sample":"MOUNTAIN_HILL","generation_ms_unity":89.134,"managed_memory_delta_bytes":0,"vertices":7225,"triangles":12800,"source_cell_reads":28900,"collider_triangles":12800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":16,"resident_window":"5x5","sample":"MAJOR_RIVER","generation_ms_unity":82.611,"managed_memory_delta_bytes":0,"vertices":7225,"triangles":12800,"source_cell_reads":28900,"collider_triangles":12800,"draw_call_upper_bound":25},
+    {"candidate_cells_per_side":16,"resident_window":"5x5","sample":"HENAN_LUOYANG","generation_ms_unity":84.28,"managed_memory_delta_bytes":0,"vertices":7225,"triangles":12800,"source_cell_reads":28900,"collider_triangles":12800,"draw_call_upper_bound":25}
+  ]
+}

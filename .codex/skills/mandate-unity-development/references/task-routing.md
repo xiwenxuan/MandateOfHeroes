@@ -34,6 +34,28 @@ Use this index to select the smallest relevant set of project documents. Do not 
 | Historical events and general authored history content | `Docs/DATA_AND_CONTENT_FOUNDATION.md` | The matching `Docs/HISTORICAL_*.md` documents; use the historical-person route above whenever stable Person, Clan, timeline, or scenario-snapshot data is affected |
 | External assets and licenses | `Docs/LEGAL_AND_ASSETS.md` | [content-and-data.md](content-and-data.md) |
 
+### Current Luoyang production building kit
+
+For work that changes the 36-model Luoyang Facility coverage, the top-ten high-frequency
+production profiles, runtime procedural Mesh primitives, placement/entrance anchors, three-tier
+building LOD, or the `LUOYANG KIT` review evidence, read
+`Docs/TASK_LUOYANG_PRODUCTION_BUILDING_MODULAR_KIT_AND_HIGH_FREQUENCY_CITY_FABRIC_V1.md`
+after `Docs/TASK_LUOYANG_FACILITY_MODEL_COVERAGE_AND_A_TIER_COMPOSITION_V1.md`. The production
+kit is Presentation/content data only: it does not grant construction permission, create a
+Facility, change a Global Cell, or upgrade the Save Schema.
+
+### Current Luoyang A-tier historical landmark kit
+
+For work that changes the ten Facility-level silhouettes for South Palace, North Palace, Yongan
+Palace, Taixue, Mingtang, Biyong, Lingtai, Taicang, Arsenal or Zhuolong Garden, their exact 184
+Facility/Global Cell bindings, historical confidence/source metadata, landmark LODs, procedural
+landmark Mesh primitives, or the `LANDMARKS` review evidence, read
+`Docs/TASK_LUOYANG_A_TIER_HISTORICAL_LANDMARK_DISTINCT_SILHOUETTES_V1.md` after the Facility
+coverage and production-building-kit tasks. These variants are selected by exact Facility ID and
+must not broaden Player/AI construction permissions, move the authoritative Facility, change
+ownership/control, or upgrade the Save Schema. They are strategic procedural V1 silhouettes, not
+final archaeological reconstructions or artist-authored FBX assets.
+
 ### Current Luoyang permanent-population and Cell-capacity stress evidence
 
 For Luoyang work involving 20K–500K permanent Persons, housing/job indexes, fixed versus
@@ -547,6 +569,79 @@ MODELED; county aggregates may initialize or calibrate Cell/Resource/Facility/Wo
 facts but may never replace them. Read the M12 permanent-population contract before any selected-area population
 materialization.
 
+### Previous Luoyang Facility selection, collision proxy and road navigation V1 route
+
+For work that changes the 2,084 Facility selection-proxy contract, dense-CITY 549 trigger colliders, Facility
+ray picking, selected-building highlight, 359 road nodes, 20 gate/bridge nodes, strict cardinal road edges,
+provisional gap connectors, deterministic Facility-path lookup, road overlay or WORLD cleanup, read
+`Docs/TASK_LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1/README.md`
+together with the actual whole-city composition route.
+
+The current implementation status is
+`LUOYANG_FACILITY_SELECTION_COLLISION_AND_ROAD_NAVIGATION_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+It creates separate Presentation trigger proxies instead of adding Colliders to final-art Prefabs. The static graph
+contains 379 nodes and 382 edges: 334 authored cardinal road adjacencies, 28 explicitly provisional inter-component
+connectors and 20 gate/bridge-to-road connectors. Provisional connectors are not historical road claims and must be
+replaced as road data is refined. This route does not implement character-scale NavMesh, solid unit collision, gate
+open/close or siege state, bridge damage/load limits, high-resolution Luoyang terrain, or persistence changes.
+
+### Current Luoyang authored road connectors and dynamic passage traversal V1 route
+
+For work that changes the 28 stable modeled connector records, connector cell waypoints and provenance, the
+379-node/402-edge refined graph, 20 two-sided gate/bridge approaches, passage open/closed/damaged/destroyed
+Domain session records, deterministic state-aware pathfinding, cyan/amber/red CITY overlays or controller passage
+APIs, read `Docs/TASK_LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1/README.md`
+together with the previous interaction/navigation task and deterministic save contract.
+
+The current implementation status is
+`LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+The previous 382-edge graph remains a historical base contract; the current runtime consumes the 402-edge
+refinement layer with 334 strict road edges, 28 modeled reconstruction connectors and 40 two-sided passage
+approaches. Modeled connectors explicitly use `historical_evidence.gameplay_reconstruction`, cell precision and
+`ClaimsHistoricalExactness=false`. Passage state is pure Domain session state and does not persist across save;
+do not report WorldState, command/event, snapshot/migration, guard/permission/siege, bridge load/flood/repair,
+door animation, character-scale NavMesh or high-resolution road geometry as implemented.
+
+### Current Luoyang passage WorldState, command/event and save V1 route
+
+For work that changes the V74 persisted state of the 20 Luoyang gates/bridges, explicit atomic initialization,
+passage transition commands, expected-revision conflict handling, command/result/transaction/outbox provenance,
+the V73-to-V74 migration or the map controller's read-only WorldState projection, read
+`Docs/TASK_LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1.md` together with the authored connector task,
+M25-P7 persistent execution contract and deterministic save specification.
+
+V73-to-V74 initializes an empty collection and never invents prior preview-session state. The 20 opening records
+must be created by the explicit frozen initialization command. This route does not implement guards, authority,
+siege, bridge load/flood, repair materials/work orders, passage animation, character-scale NavMesh or outer supply
+roads. Its current status is
+`LUOYANG_PASSAGE_WORLD_STATE_COMMAND_EVENT_AND_SAVE_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+Compilation, targeted core 3/3, target EditMode 5/5, bound-world graphical PlayMode 1/1, previous passage graphical
+regression 1/1, whole-city graphical regression 1/1 and diff validation passed. This targeted evidence is not a
+complete core, EditMode or PlayMode suite.
+
+### Current Luoyang passage guard, battle-damage and real-repair V1 route
+
+For work that changes V75 passage guard assignment, controller/Army/Person authority, battle-backed damage,
+integrity history, real Facility repair projects, timber/iron reservations, construction labor, repair completion,
+`SourceFacilityConstructionProjectId` or the V74-to-V75 migration, read
+`Docs/TASK_LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1.md` together with the V74 passage task,
+M12 permanent-population contract, the unified Facility/authority, combat and production specifications, M25-P7,
+M25-P29 and the deterministic save specification.
+
+V1 normal open/close accepts only the current controller-organization leader or guard-Army commander after an
+explicit guard contract exists. Damage consumes an existing hostile `BattleRecordState`; it does not create or
+resolve combat. Repair reuses `FacilityConstructionProjectState(Repair)`, real product batches, inventory
+transactions and specific Person labor, and completes to a closed passage. V74-to-V75 initializes empty new
+collections and never infers prior guards, damage, battles, materials or labor. Code, compilation and targeted core
+verification have passed. The initial sandboxed Unity attempts were blocked before startup-log creation, but the
+same safe runner subsequently passed EngineSmoke, the exact EditMode test and the related graphical PlayMode test
+outside the restricted workspace; the current target status is
+`LUOYANG_PASSAGE_GUARD_DAMAGE_AND_REAL_REPAIR_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+This is targeted evidence, not a complete grouped Unity regression. Full siege, siege engines, bridge load/flood,
+animation and character-scale NavMesh remain out of scope.
+
 ### Current family-organization center and historical-family reference contract
 
 For work that changes Clan/Branch/Household/FamilyOrganization separation, family-organization assets, Primary or
@@ -664,3 +759,610 @@ prohibited; missing, invalid, NaN or schema-mismatched models must fall back saf
 bounded contract fixture, not proof of mature national Facility, industry, trade, government, 400K Luoyang, or
 HOT/WARM/COLD performance. The next candidate is
 `WORLD-HOT-WARM-COLD-PERMANENT-PERSON-SIMULATION-V1` after an explicit task authorizes it.
+
+### Current Region Cell boundary and technical-block semantic contract
+
+For work that changes Global Region membership, Region boundary edges, Region polygons or bounds, cross-Region
+neighbor queries, the retained 16×16 technical index, 64×64 storage blocks, Terrain Tile sizing, Streaming Unit
+sizing, or the boundary between technical Regions and historical AdministrativeRegions, read
+`Docs/TASK_WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1/WORLD_REGION_CELL_BOUNDARY_AND_TECHNICAL_BLOCK_SEMANTICS_CORRECTION_V1_REPORT.md`.
+
+Global Cell is the final authoritative world-space partition. Region authority is `IncludedGlobalCellIds`, and
+Region boundaries are derived Cell edges that never cut Cells or create seam/border Cells. The retained 16×16
+IDs are technical spatial/simulation aggregation indices, not frozen Terrain or Streaming units; 64×64 remains
+storage/compression only. The benchmark has now been completed by
+`Docs/TASK_HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1.md`: Terrain Tile is frozen at 8x8 Global Cells,
+while the 24x24-Cell Streaming Unit remains provisional. For Global DEM sampling, natural surfaces, Terrain
+generation, river/vegetation presentation, Cell picking, Floating Origin or background-independent maps, read
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1/HAN_WORLD_NATURAL_TERRAIN_AND_LANDSCAPE_BASEMAP_V1_REPORT.md`
+and its machine/visual evidence before changing code or data.
+
+### Current Han world natural-map visual-presentation V2 route
+
+For work that changes natural-map rendering, terrain LOD presentation, terrain surface blending, river banks and
+width, forest density/vegetation batching, fixed map cameras, WORLD-to-REGION transitions, Cell-grid visibility,
+background independence, visual screenshots or Golden-map approval, read
+`Docs/TASK_HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2/HAN_WORLD_NATURAL_MAP_VISUAL_PRESENTATION_V2_REPORT.md`.
+
+The current state is `PLAYABLE_WITH_ART_LIMITS`, not final art. One Global DEM and one Global Cell world remain
+authoritative. WORLD draws one sampled continuous surface; REGION draws one continuous 2km Cell surface. The nine
+resident 8x8 Terrain Tiles retain collision/streaming meaning but do not draw duplicate overlapping rectangles.
+The 14 Game View screenshots remain Golden candidates until the user explicitly approves the visual direction.
+
+### Current Han world natural-map art-direction and rendering V1 route
+
+For work that changes Style A/B/C terrain profiles, natural-map palette, relief shading, lighting, atmosphere,
+water/forest presentation tint, fixed art sample cameras, candidate screenshots, style performance evidence or
+the final style decision gate, read `Docs/TASK_HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1/HAN_WORLD_NATURAL_MAP_ART_DIRECTION_AND_RENDERING_V1_REPORT.md`.
+
+The current status is `HAN_WORLD_ART_DIRECTION_V1_CANDIDATES_READY`, not finalized art. STYLE A/B/C use the
+same authoritative DEM, Global Cells, river/forest inputs and camera per sample/view. `USER_SELECTED_STYLE`
+remains `PENDING`; nationwide rollout, Henan Yin high-detail terrain and Luoyang city art are blocked until the
+user explicitly chooses a style or asks for a revision. Codex's STYLE B recommendation is not user approval.
+
+### Current Zhonghua-Sanguozhi-inspired Style D prototype route
+
+For work that changes the clean-room Style D profile, derived ridge/valley/mountain/plain/forest/river-valley
+feature channels, Style D shader fusion, its fixed cameras, source/license audit or its ten visual evidence
+captures, read `Docs/TASK_HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_ZHONGHUA_SANGUOZHI_INSPIRED_MAP_STYLE_PROTOTYPE_V1/README.md`.
+
+The Unity status is `STYLE_D_ZHONGHUA_SANGUOZHI_FUSION_PROTOTYPE_READY`, not selected final art. The candidate
+repository was pinned and statically audited through the GitHub API, but full Git clone was hard-blocked by
+GitHub 443 failures; do not claim source-research COMPLETE and do not copy candidate code/assets. Nationwide
+rollout, Henan Yin high detail and Luoyang city work remain blocked pending explicit user approval.
+
+### Current Style D strategic-landscape V2 review route
+
+For work that changes presentation-only terrain detail, adaptive river bend/join meshes, synchronized river
+banks, WORLD/REGION/CITY forest LOD, Style D V2 cameras, visual acceptance, performance evidence or the
+finite Zhonghua source-clone recovery audit, read
+`Docs/TASK_HAN_WORLD_STYLE_D_STRATEGIC_LANDSCAPE_VISUAL_REFINEMENT_AND_ZHONGHUA_SOURCE_RECOVERY_V2.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_STYLE_D_STRATEGIC_LANDSCAPE_VISUAL_REFINEMENT_V2/README.md`.
+
+The current gate is `STYLE_D_STRATEGIC_LANDSCAPE_V2_READY_FOR_USER_REVIEW`, not final art. Global Cell
+resolution remains 2000m and must not be confused with presentation vertex density. River source-endpoint
+stitching/confluence, close terrain low-frequency blocks and continuous LOD morph remain PARTIAL. Source clone
+is `SOURCE_CLONE_BLOCKED_BY_NETWORK_V2`; license is unresolved and no candidate code/assets may be copied.
+Do not start nationwide rollout, Henan Yin production terrain or Luoyang city assets without explicit user approval.
+
+### Current explicit strategic-cell map V1 route
+
+For work that changes visible tactical Cell faces/edges, Cell hover or selection, strategic Cell shaders,
+the Henan Yin 24x24 review window, its fixed review cameras, Cell-overlay batching or its three screenshot
+captures, read `Docs/TASK_HAN_WORLD_EXPLICIT_STRATEGIC_CELL_MAP_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_EXPLICIT_STRATEGIC_CELL_MAP_V1/README.md` together with the natural-map
+V2 and Style D V2 routes above.
+
+The user explicitly accepted this presentation direction on 2026-08-26. It displays the existing 2000m
+`hanworld.square-grid.v1` cells and preserves stable IDs, eight-neighbor behavior, Global Origin, Region
+membership and persistence. It creates no SubCells and does not authorize a six-neighbor hex migration.
+That initial gate limited scope to the Henan Yin greybox. Nationwide presentation was subsequently authorized
+by the explicit route below; final Golden art still requires a separate gate.
+
+### Current nationwide strategic-cell grid LOD V1 route
+
+For work that changes nationwide Cell-grid coverage, WORLD grid LOD, the 32x32 visual guide step,
+arbitrary-Cell focus, nationwide grid performance or the nationwide overview screenshot, read
+`Docs/TASK_HAN_WORLD_NATIONWIDE_STRATEGIC_CELL_GRID_LOD_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/HAN_WORLD_NATIONWIDE_STRATEGIC_CELL_GRID_LOD_V1/README.md` together with the
+explicit strategic-cell V1 route above.
+
+The user explicitly authorized nationwide grid presentation on 2026-08-26. WORLD uses a 32x32-Cell visual
+guide LOD in one batch; REGION/CITY uses exact 1x1 2000m Cells. The 32x32 step is presentation-only and must
+never become a Chunk, Region, administrative, simulation, persistence or identity boundary. All 7,211,264
+stable Cell IDs and eight-neighbor behavior remain authoritative.
+
+### Current Luoyang buildable Facility model kit V1 route
+
+For work that changes the accepted first-batch residence, warehouse, workshop, market, field-hospital,
+city-wall or city-gate models, their stable Model/Asset IDs, shared Han material palette, procedural module
+catalog, direct Global Cell placement, BUILDINGS review camera or visual evidence, read
+`Docs/TASK_LUOYANG_BUILDABLE_FACILITY_MODEL_KIT_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_BUILDABLE_FACILITY_MODEL_KIT_V1/README.md` together with the
+explicit strategic-cell and playable-vertical-slice routes.
+
+These seven assets are presentation bindings over existing Facility/build contracts. Preview instances are
+not authoritative Facilities and cannot complete construction, create ownership, consume materials or alter
+saves. Nangong remains historical-only. WORLD creates no building models. The current V1 uses original Unity
+primitive compositions and a limited palette; it is directly placeable but is not final artist-authored FBX,
+baked textures or production LOD art.
+
+### Current Luoyang Facility model coverage and A-tier composition V1 route
+
+For work that changes the complete 36-model Luoyang procedural catalog, the explicit opening
+`FacilityDefinitionId -> ModelId` bindings, historical Facility-instance overrides, palace/office/academy/
+ritual/public/resource/service/agriculture model families, the `LUOYANG KIT` review camera, or its full-catalog
+visual evidence, read `Docs/TASK_LUOYANG_FACILITY_MODEL_COVERAGE_AND_A_TIER_COMPOSITION_V1.md` together with
+the first-batch model-kit, Luoyang historical-city and playable-vertical-slice routes.
+
+The coverage catalog is presentation-only over the protected 2,084 opening Facilities. It does not create or
+move Facilities, change ownership/construction/save facts, introduce SubCells, authorize ordinary reproduction
+of historical-only palace assets, or claim final FBX, baked textures, production LOD, damage or city streaming.
+
+### Current Luoyang production-building modular kit V1 route
+
+For work that changes the ten high-frequency production profiles, cached procedural meshes, placement/entrance
+anchors, three-tier LODs or the production-building visual evidence, read
+`Docs/TASK_LUOYANG_PRODUCTION_BUILDING_MODULAR_KIT_AND_HIGH_FREQUENCY_CITY_FABRIC_V1.md` together with the
+Facility model coverage and first-batch buildable-model routes.
+
+The kit reuses stable Model IDs and does not change Facility facts, construction settlement, ownership, saves or
+restricted availability. It covers 1,800 of the 2,084 opening Facilities through ten high-frequency definitions;
+representative-block performance and final artist assets remain deferred.
+
+### Current Luoyang A-tier historical-landmark silhouettes V1 route
+
+For work that changes the ten Facility-bound silhouettes for South Palace, North Palace, Yongan Palace, Taixue,
+Mingtang, Biyong, Lingtai, Taicang, Arsenal or Zhuolong Garden, their historical metadata, authoritative Cell
+placements, three LODs, LANDMARKS review camera or evidence, read
+`Docs/TASK_LUOYANG_A_TIER_HISTORICAL_LANDMARK_DISTINCT_SILHOUETTES_V1.md` together with the historical-city,
+Facility-coverage and production-building routes.
+
+These are presentation profiles over existing Facilities. They cannot move/create Facilities, broaden historical
+availability or claim archaeological reconstruction. The silhouettes are original strategic V1 assets, not final
+FBX or baked textures.
+
+### Current Luoyang twelve city and palace gate identity V1 route
+
+For work that changes the twelve named city-gate identities, North Palace South Gate, South Palace North Gate,
+their Facility IDs, authoritative Cells, source/derived directions, rotations, gatehouse silhouettes, passage
+anchors, three LODs, GATES camera or evidence, read
+`Docs/TASK_LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1/README.md` together with the
+historical-city and Facility-model routes.
+
+The scope is exactly twelve `facility.fortification.city_gate` Facilities plus two
+`facility.fortification.palace_gate` Facilities; four generic recommended `facility.military.gate` Facilities are
+excluded. City-gate facing comes from authoritative `gate_direction`. Both palace-gate directions are null in the
+source data, so presentation derives south/north facing only from their display names and never writes it back as
+world truth. Identity availability is restricted to Government/Military/HistoricalInit/Event and does not inherit
+Player/Ai construction permission from the generic city-gate base model. The strategic silhouettes and 1.65x
+review-only scale are not archaeological dimensions. The next building route is medium-frequency urban fabric,
+then whole-city draw-call/LOD/occlusion/streaming performance acceptance.
+
+### Current Luoyang medium-frequency urban-fabric V1 route
+
+For work that changes the five market/shopfront, caravan-yard, school, local-office or military-camp production
+profiles, their exact opening Definition counts, urban-fabric roles, street interfaces, three LODs, the 15-Cell
+`FABRIC` review camera or evidence, read
+`Docs/TASK_LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1.md` together with the Facility-coverage and
+production-building routes.
+
+This Presentation/content-data kit covers 158 actual opening Facilities and raises high-plus-medium production
+profile coverage to 1,958/2,084. Its review Cells are PreviewOnly and do not claim Facility positions. It cannot
+create or move Facilities, broaden the base model availability, change ownership/construction/save facts, or
+authorize whole-city per-object instantiation. Canals, wells and bridges remain infrastructure work. The subsequent
+whole-city performance route below has passed its targeted acceptance.
+
+### Current Luoyang whole-city building performance and batching V1 route
+
+For work that changes the 2,084-Facility lightweight presentation plan, 8x8 building spatial batches, the densest
+24x24 review window, LOD2 module extraction, material-grouped combined meshes, the `BATCH` camera/button, building
+renderer/vertex/build-time budgets, cleanup behavior, metrics JSON or visual evidence, read
+`Docs/TASK_LUOYANG_BUILDING_WHOLE_CITY_PERFORMANCE_AND_BATCHING_V1.md` together with the Facility-coverage,
+production-building, landmark, gate and medium-frequency routes.
+
+The status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. The whole-city plan contains exactly
+2,084 actual opening Facilities in 64 presentation batches; the densest review window contains 549 Facilities in
+9 batches. After the final civic/ritual/medical production closure, its 1,669 LOD2 source modules combine into 93
+single-material Renderers/Meshes and 17,476 vertices in 27.0894ms in the latest targeted Unity Editor regression, a 94.43%
+renderer reduction. The 8x8 batch and 24x24 review window are
+Presentation-only and must not become world, Region, administrative, simulation, persistence or final streaming
+boundaries. This acceptance is not final platform GPU, Addressables, baked occlusion or final-art proof. The next
+building route, infrastructure production for the 19 canals, 16 wells and 2 bridges, has now passed targeted
+acceptance.
+
+### Current Luoyang canal, well and bridge infrastructure production V1 route
+
+For work that changes the 19 actual canals, 16 wells or 2 bridges, their infrastructure profiles, permissions,
+four-neighbor waterway topology, connection/service anchors, three LODs, whole-city batch integration, the three
+`INFRA` review cameras or evidence, read
+`Docs/TASK_LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1/README.md` together
+with the Facility-model and whole-city performance routes.
+
+The status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. The scope is exactly 37 actual
+opening Facilities on 37 authoritative Cells. The 19 canals plus 2 bridges form exactly two four-neighbor waterway
+components with four endpoints and seventeen straight interior nodes; the 16 wells remain isolated point
+facilities. Derived topology is Presentation-only and cannot become water-flow, irrigation, road, ownership,
+construction, simulation or persistence truth. Production-profile coverage is 1,995/2,084. The subsequent
+low-frequency defensive route below has passed targeted acceptance.
+
+### Current Luoyang low-frequency defense production V1 route
+
+For work that changes the 12 named city gates, 2 palace gates, 4 generic military gates, 7 fortified manors or
+3 beacons, their identity-reuse boundary, defense profiles, permissions, Presentation-only generic-gate facing,
+three LODs, whole-city batch integration, the three `DEFENSE` review cameras or evidence, read
+`Docs/TASK_LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1/README.md` together with the gate,
+Facility-model and whole-city performance routes.
+
+The status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. The scope is exactly 28 actual
+opening Facilities on 28 authoritative Cells. Fourteen named gates reuse their existing identity assets; only the
+4 generic military gates, 7 fortified manors and 3 beacons use the three new procedural production profiles.
+The generic-gate south facing and static signal fire are Presentation-only and cannot become direction, alarm,
+combat, garrison, construction, simulation or persistence truth. Production-profile coverage is 2,023/2,084.
+The resource/agriculture route and final civic/ritual/medical closure below have now passed targeted acceptance.
+
+### Current Luoyang resource and agriculture production V1 route
+
+For work that changes the 9 forestry sites, 6 quarries, 5 mines or 6 rice fields, their exact Facility/Definition
+disambiguation, production profiles, permissions, evidence boundary, three LODs, whole-city batch integration,
+the four `RESOURCES` review cameras or evidence, read
+`Docs/TASK_LUOYANG_RESOURCE_AND_AGRICULTURE_PRODUCTION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_RESOURCE_AND_AGRICULTURE_PRODUCTION_V1/README.md` together with
+the Facility-model and whole-city performance routes.
+
+The status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. The scope is exactly 26 actual
+opening Facilities on 26 authoritative Cells. Quarry and mine Facilities share one base Model ID but use distinct
+Facility/Definition-bound variants; unknown Model-only bindings must not guess. Their generic Han production form
+is Gameplay Reconstruction, not archaeological proof and not a resource-body, extraction, irrigation, crop-growth,
+inventory or settlement fact. Production-profile coverage is 2,049/2,084. The subsequent final closure route has
+passed targeted acceptance.
+
+### Current Luoyang final civic, ritual and medical production closure V1 route
+
+For work that changes the final 35 opening Facilities, the 10 historical-landmark reuse bindings, the 9 clinics,
+6 generic ritual halls, 4 courtyards, 4 plazas or 2 central offices, their five procedural variants, permissions,
+three LODs, whole-city batch integration, the four `CIVIC` review cameras or evidence, read
+`Docs/TASK_LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1/README.md`
+together with the landmark, Facility-model and whole-city performance routes.
+
+The status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. Exactly 10 named Facilities reuse
+their existing landmark geometry and metadata by Facility ID; 25 ordinary Facilities use five new procedural
+profiles. Mingtang/Biyong remain distinct from six generic ritual halls. Courtyard and plaza share a base Model ID
+but resolve to separate variants by Facility/Definition; unknown Model-only bindings must not guess. Production
+coverage is 2,084/2,084. This is visual production coverage only and cannot become medical, ritual, administrative,
+ownership, construction, simulation or persistence truth, nor claim final FBX, archaeological reconstruction,
+platform performance or complete art acceptance. The next building route is whole-city visual review and a
+replaceable final-asset priority manifest below, not another base-coverage increment.
+
+### Current Luoyang whole-city visual review and replaceable final-asset manifest V1 route
+
+For work that changes the 54 actual runtime Asset Variant replacement slots, their P0/P1/P2/P3 priority,
+visual-readiness audit groups, representative Facilities, stable replacement identity, license intake boundary,
+the `ASSET QA` review board, its four cameras or evidence, read
+`Docs/TASK_LUOYANG_WHOLE_CITY_VISUAL_REVIEW_AND_REPLACEABLE_FINAL_ASSET_MANIFEST_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_WHOLE_CITY_VISUAL_REVIEW_AND_REPLACEABLE_FINAL_ASSET_MANIFEST_V1/README.md`
+together with the whole-city performance and final production-closure routes.
+
+The current status is `IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`. Runtime resolution maps all 2,084 opening
+Facilities to 54 distinct actual Asset Variants: 24 P0 identity slots, 10 P1 high-exposure slots, 14 P2
+system-readable slots and 6 P3 supporting-context slots. Nine `REUSE_*` declarations are intentionally excluded
+because the runtime selects the underlying named gate or landmark Asset Variant. Replacement must keep the stable
+Model/Asset/Profile/Facility identity and the procedural fallback, and any external candidate requires a complete
+license/source record. Compilation, targeted core 1/1, target EditMode 3/3 and graphical PlayMode 1/1 passed;
+affected whole-city batching EditMode 3/3 and graphical PlayMode 1/1 also passed, with four 1600x1000 review images.
+This manifest is not proof that final FBX, textures or art acceptance already exist. The next route is a four-asset
+P0 replacement vertical slice for South Palace, Mingtang, Guangyangmen and North Palace South Gate rather than bulk
+ replacement.
+
+### Current Luoyang P0 four-asset final-art vertical slice V1 route
+
+For work that changes South Palace, Mingtang, Guangyangmen or North Palace South Gate final-art candidates,
+their six-material set, three LODs, stable anchors, Resources prefab intake paths, FBX targets, procedural fallback,
+world-batch LOD2 modules, `P0 SLICE` review board, five fixed cameras or evidence, read
+`Docs/TASK_LUOYANG_P0_FINAL_ASSET_FOUR_PIECE_VERTICAL_SLICE_V1.md` and the screenshot README under
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FINAL_ASSET_FOUR_PIECE_VERTICAL_SLICE_V1/` together with the
+whole-city final-asset manifest and performance routes.
+
+The predecessor status was `INTEGRATION_CANDIDATE_VERIFICATION_PASSED_ARTIST_SOURCE_PENDING_USER_REVIEW` and
+has been superseded by the native-prefab delivery route below.
+Facility/Model/Asset/Profile identity, Global Cell, historical confidence, availability and simulation remain frozen.
+Runtime first attempts the contracted artist prefab and otherwise uses a project-original three-LOD candidate;
+invalid present prefabs fail explicitly. Compilation, targeted core 1/1, target EditMode 4/4, graphical PlayMode
+1/1 and affected whole-city batching graphical PlayMode 1/1 passed, with five 1600x1000 review images. The complete core suite did not finish within the 300-second gate and
+must not be reported as passed. At that stage no approved FBX/prefab/texture source was present. The native-prefab
+delivery below now supplies review prefabs, while all four `FinalArtApproved` flags remain false. Bulk replacement
+of the other 50 slots is still not authorized.
+
+### Current Luoyang P0 four-piece native prefab art delivery V1 route
+
+For work that changes the project-original Unity-native prefabs, six material assets, four shared mesh assets,
+deterministic editor builder, three populated LODs, stable anchors, prefab-first runtime status or the five new
+review images for South Palace, Mingtang, Guangyangmen and North Palace South Gate, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_NATIVE_PREFAB_ART_DELIVERY_V1.md` together with the preceding P0 vertical-slice,
+whole-city final-asset manifest and performance routes.
+
+The current status is `READY_FOR_USER_REVIEW_FINAL_ART_APPROVAL_PENDING`. All four frozen Resources paths now
+contain real Unity prefabs; runtime verification loads all four without activating the procedural fallback. Each
+prefab has exactly three populated LODs, materials, every catalog anchor and no Collider. Compilation, targeted
+core 1/1, native asset builder EditMode 1/1, existing P0 EditMode 4/4, graphical PlayMode 1/1 and affected
+whole-city batching graphical PlayMode 1/1 passed, with five new 1600x1000 images. The latest batching result keeps
+1,673 source modules at 97 renderers, 17,512 vertices and 24.0398ms. Identity, Global Cell, history, availability,
+simulation and saves remain unchanged. These
+assets are project-original review candidates, not archaeological reconstructions or user-approved final art;
+there are no independent FBX/DCC sources or hand-authored textures yet, and all `FinalArtApproved` flags remain
+false. The next route is user review and four-piece iteration/final-source archival, not bulk replacement of the
+remaining 50 slots.
+
+### Current Luoyang P0 four-piece visual refinement and review readability V2 route
+
+For work that changes the refined South Palace, Mingtang, Guangyangmen or North Palace South Gate silhouettes,
+their roof-ridge/eave/gate/stair/paving/barbican/que/banner details, V2 native-prefab recipe, strict LOD reduction,
+close-up building-bounds framing, five V2 review images or user-review gate, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_VISUAL_REFINEMENT_AND_REVIEW_READABILITY_V2.md` and the README under
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_VISUAL_REFINEMENT_AND_REVIEW_READABILITY_V2/`
+together with the V1 native-prefab, P0 vertical-slice, whole-city manifest and batching routes.
+
+The current status is `REFINED_NATIVE_PREFAB_V2_READY_FOR_USER_REVIEW_FINAL_APPROVAL_PENDING`. The deterministic
+builder produces 4 prefabs, 6 materials and 4 shared meshes with 137/37/21 total LOD renderers. Targeted core 1/1,
+V2 EditMode 2/2, native-prefab contract EditMode 1/1, existing P0 EditMode 4/4, graphical five-view PlayMode 1/1
+and the 549-facility batching graphical PlayMode 1/1 passed. Runtime loads all four prefabs without fallback, while
+all `FinalArtApproved` flags remain false. Identity, Global Cell, history, permissions, simulation and saves remain
+frozen. The next route is explicit per-piece user review; final approval/DCC-FBX archival and bulk replacement of
+the remaining 50 slots are not authorized yet.
+
+### Current Luoyang P0 four-piece multi-angle turntable review pack V1 route
+
+For work that changes the four-piece review-camera matrix, front/rear/low-oblique framing, runtime piece/angle
+controls, stable review camera IDs, 13-image evidence pack or the explicit per-piece user-decision gate, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1.md` and the README under
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/` together with
+the V2 refinement, native-prefab, P0 vertical-slice, whole-city manifest and batching routes.
+
+The current status is `MULTI_ANGLE_REVIEW_PACK_V1_READY_FOR_USER_DECISION_FINAL_APPROVAL_PENDING`. The review
+contract fixes 4 pieces x 3 angles as 12 distinct stable cameras, keeps the four existing front-oblique views and
+adds rear-oblique and low-oblique views. Runtime exposes overview, piece and angle cycling without changing geometry,
+materials, prefabs, LODs, anchors, authoritative Cells, gameplay or saves. Compilation, targeted core 1/1,
+multi-angle EditMode 2/2, graphical 13-view PlayMode 1/1, existing V2 five-view PlayMode 1/1 and the densest
+549-facility batching graphical PlayMode 1/1 passed. All four `FinalArtApproved` flags remain false. The next route
+is explicit accept/change/reject review for each piece; final approval/DCC-FBX archival and bulk replacement of the
+remaining 50 slots are not authorized yet.
+
+### Current Luoyang P0 four-piece review decision board V1 route
+
+For work that changes the lossless three-view comparison boards, their source/output SHA-256 manifest, per-piece
+review criteria, reply template or the explicit pending decision gate, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1/README.md` together with the
+multi-angle review pack and V2 refinement routes.
+
+The current status is `P0_FOUR_PIECE_REVIEW_DECISION_BOARDS_V1_READY_FOR_USER_DECISION_FINAL_APPROVAL_PENDING`.
+The deterministic PowerShell builder arranges the 12 verified 1600x1000 Game Views into four 3000x900 per-piece
+boards using proportional scaling only: no crop, color change, repaint or generative modification. Its timestamp-free
+manifest records all input and output paths, dimensions and SHA-256 values. Initial generation, 4-piece/12-source/
+4-board manifest verification, identical hashes across a repeated build and visual inspection of all four boards
+passed. This route changes no Unity asset or world fact. The user subsequently accepted the complete four-piece set;
+the acceptance and source-readiness route below now owns current status.
+
+### Current Luoyang P0 four-piece user acceptance and source archive readiness V1 route
+
+For work that changes the recorded all-four user acceptance, decision/status IDs, Unity-native source/GUID hash
+archive, four frozen FBX target audits, runtime accepted-versus-final distinction or the remaining source gate, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_USER_ACCEPTANCE_AND_SOURCE_ARCHIVE_READINESS_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_USER_ACCEPTANCE_AND_SOURCE_ARCHIVE_READINESS_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Final/README.md` together with the decision-board, multi-angle, V2 refinement,
+native-prefab and original P0 vertical-slice routes.
+
+The historical pre-FBX status was
+`LUOYANG_P0_FOUR_PIECE_USER_ACCEPTED_UNITY_NATIVE_SOURCE_ARCHIVED_INDEPENDENT_DCC_FBX_REQUIRED_FINAL_ACTIVATION_PENDING`.
+The user's 2026-08-27 acceptance is recorded for South Palace, Mingtang, Guangyangmen and North Palace South Gate.
+The deterministic archive covers the generator, P0 catalog, four prefabs, six materials, four meshes and all matching
+`.meta` files: 32 existing files with paths, lengths and SHA-256 values. Compilation, targeted core 1/1, native-prefab
+EditMode 1/1, archive EditMode 1/1, existing P0 EditMode 4/4, graphical 13-view PlayMode 1/1 and graphical densest-
+549 batching PlayMode 1/1 passed. All four frozen FBX targets are absent and no local Blender, Assimp, FBX converter
+or Unity FBX Exporter is available. The task does not fabricate source files: all `FinalArtApproved` flags remain
+false until genuine independent DCC/FBX sources pass consistency validation, unless the user explicitly changes that
+older gate. Bulk replacement of the other 50 slots remains unauthorized.
+
+### Current Luoyang P0 four-piece FBX source freeze and final activation V1 route
+
+For work that changes the four frozen FBX sources, Unity FBX Exporter package/version, export-only anchor markers,
+dot-to-underscore anchor-name mapping, Unity reimport consistency validation, final source hash manifest, runtime
+approval fallback behavior or the four `FinalArtApproved` flags, read
+`Docs/TASK_LUOYANG_P0_FOUR_PIECE_FBX_SOURCE_FREEZE_AND_FINAL_ACTIVATION_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_FBX_SOURCE_FREEZE_AND_FINAL_ACTIVATION_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Final/README.md` together with the preceding acceptance, V2 refinement,
+native-prefab, original P0 vertical-slice and whole-city batching routes.
+
+The current status is `LUOYANG_P0_FOUR_PIECE_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`.
+Unity FBX Exporter 4.2.1 and its Autodesk FBX SDK Unity binding 4.2.1 are frozen in the package manifest/lock under
+the Unity Companion License. South Palace, Mingtang, Guangyangmen and North Palace South Gate now have real FBX
+sources at the four frozen paths. Unity reimport verifies all three named LOD hierarchies, renderer counts, materials,
+reversible anchor mappings/positions, geometry bounds and no Colliders. The final archive covers 42 project source/
+`.meta` files, two package toolchain files and four FBX hashes. All four catalog flags are `FinalArtApproved=true`,
+but a runtime instance reports approval only when the real prefab loads; procedural fallback remains unapproved.
+This closes only the accepted strategic-map four-piece V2 slice and does not claim archaeological reconstruction,
+hand-authored/PBR textures or authorization to bulk-replace the remaining 50 slots.
+
+### Current Luoyang P0 landmark second-batch native Prefab/FBX review V1 route
+
+For work that changes the next lowest-order remaining P0 landmark selection, North Palace/Yongan Palace/Taixue/
+Biyong candidate geometry, P0Batch2 Prefab or FBX paths, second-batch review cameras, pending approval state,
+source manifest or runtime fallback, read
+`Docs/TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1/README.md` and
+`Assets/ArtSource/Han/Luoyang/P0Batch2/README.md` together with the whole-city final-asset manifest, A-tier landmark,
+first-batch final activation and whole-city batching routes.
+
+The historical source-ready status was
+`LUOYANG_P0_LANDMARK_SECOND_BATCH_NATIVE_PREFAB_FBX_SOURCE_READY_FOR_USER_REVIEW_V1`. The frozen selection is
+review order 1/2/3/5. Four project-original native Prefabs and four reimport-validated FBX sources have three nonempty
+LODs, stable anchors, complete materials and no Colliders. Runtime loads all four without fallback; five graphical
+review views, the densest 549-facility batching regression and the approved first-batch regression passed. The source
+manifest froze 54 source/dependency files plus two toolchain lock files. The user later accepted all four, so current
+approval and source-manifest status is owned by the final-activation route below. Third-batch work and the remaining
+46 slots are not authorized.
+
+### Current Luoyang P0 landmark second-batch multi-angle review and decision boards V1 route
+
+For work that changes the North Palace/Yongan Palace/Taixue/Biyong 4x3 camera matrix, PreviewOnly review cells,
+runtime piece/angle controls, 13-image review evidence, lossless per-piece boards, board SHA-256 manifest or explicit
+pending user-decision gate, read
+`Docs/TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_REVIEW_AND_DECISION_BOARDS_V1/README.md`
+together with the second-batch native Prefab/FBX, whole-city manifest and batching routes.
+
+The historical decision-input status is
+`LUOYANG_P0_LANDMARK_SECOND_BATCH_MULTI_ANGLE_DECISION_BOARDS_READY_FOR_USER_DECISION_V1`. The review contract
+fixes 4 pieces x 3 angles as 12 distinct camera IDs and exposes overview, piece and angle cycling. PreviewOnly review
+instances use the already validated flatter review cells; authoritative Facilities and Global Cells are unchanged.
+One overview, twelve 1600x1000 Unity Game Views and four 3000x900 no-crop/no-color-change boards passed automated
+safe-framing/clear-sightline checks and visual review. Compilation, targeted core 1/1, EditMode 2/2, graphical
+13-view PlayMode 1/1, existing second-batch five-view PlayMode 1/1 and densest-549 batching PlayMode 1/1 passed.
+Repeated board generation produced identical hashes for all four PNGs and the timestamp-free manifest. The boards
+retain their pre-decision `PENDING/false` labels as immutable historical inputs. The user later replied “accept all”; the
+current state is the final-activation route below. Third-batch work and the remaining 46 slots are not authorized.
+
+### Current Luoyang P0 landmark second-batch user acceptance and final activation V1 route
+
+For work that changes the accepted North Palace/Yongan Palace/Taixue/Biyong decision record, the four static
+`FinalArtApproved` flags, accepted-source manifest, real-Prefab runtime approval, procedural-fallback denial or the
+remaining-slot boundary, read
+`Docs/TASK_LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Batch2/README.md` together with the two preceding second-batch routes and the
+whole-city final-asset manifest.
+
+The current status is
+`LUOYANG_P0_LANDMARK_SECOND_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`. On 2026-08-27
+the user replied “accept all” after the four multi-angle decision boards; this is frozen as
+`decision.luoyang-p0-landmark-second-batch.accepted.2026-08-27.v1`. All four project-original native Prefabs and
+real FBX sources were already reimport-validated for three nonempty LODs, materials, reversible anchors, geometry
+bounds and zero Colliders, so activation required no model rebuild. The regenerated manifest freezes 54 project
+source/dependency files, two toolchain files and four FBX sources; its SHA-256 is
+`9b380964802400ef7a96838b758b68be48df8063e0380d7b3712c1301baa3142`. All four static flags are
+`FinalArtApproved=true`, while a runtime instance is approved only if the real Prefab loads; procedural fallback is
+always unapproved. Compilation, targeted core 1/1, the targeted fallback and accepted-FBX EditMode tests, real-Prefab
+five-view PlayMode and densest-549 batching PlayMode passed. The eight first- and second-batch slots are activated;
+the third batch was later separately authorized and is now owned by the routes below. The other 42 slots remain
+unauthorized.
+
+### Current Luoyang P0 landmark third-batch native Prefab/FBX review V1 route
+
+For work that changes the Lingtai/Taicang/Arsenal/Zhuolong Garden candidate geometry, P0Batch3 Prefab or FBX
+paths, review-order 6/7/8/9 identities, third-batch review cameras, pending approval state, source manifest or runtime
+fallback, read `Docs/TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1/README.md` and
+`Assets/ArtSource/Han/Luoyang/P0Batch3/README.md` together with the whole-city final-asset manifest, A-tier landmark,
+second-batch final-activation and whole-city batching routes.
+
+The current status is `LUOYANG_P0_LANDMARK_THIRD_BATCH_NATIVE_PREFAB_FBX_SOURCE_READY_FOR_USER_REVIEW_V1`.
+The frozen selection is review order 6/7/8/9: Lingtai, Taicang, Arsenal and Zhuolong Garden. Four project-original
+native Prefabs and four Unity-reimported FBX sources have three nonempty strictly decreasing LODs, stable anchors,
+complete materials and no Colliders. Runtime loads the four real Prefabs under a separate third-batch identity while
+keeping both real and fallback instances unapproved. One overview and four 1600x1000 graphical review views passed
+visual inspection; compilation, targeted core 1/1, targeted EditMode tests, five-view PlayMode 1/1 and densest-549
+batching PlayMode 1/1 passed. The source manifest freezes 60 project source/dependency files, two toolchain files and
+four FBX sources; its SHA-256 is `8d286a6013c9c83c111c2c57b8e9f3fac071de5d82acdaee8c71cf0243a5d444`.
+All four flags were `FinalArtApproved=false` in this historical review input. The user subsequently accepted all four
+from the five-view package; current approval and source-manifest status is owned by the final-activation route below.
+The fourth batch and the other 42 untouched slots are not authorized.
+
+### Current Luoyang P0 landmark third-batch user acceptance and final activation V1 route
+
+For work that changes the accepted Lingtai/Taicang/Arsenal/Zhuolong Garden decision record, the four static
+`FinalArtApproved` flags, accepted-source manifest, real-Prefab runtime approval, procedural-fallback denial or the
+remaining-slot boundary, read
+`Docs/TASK_LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Batch3/README.md` together with the preceding third-batch review route and the
+whole-city final-asset manifest.
+
+The current status is
+`LUOYANG_P0_LANDMARK_THIRD_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`. On 2026-08-27 the
+user replied “accept” after the five-view review package; in that four-piece context this is frozen as
+`decision.luoyang-p0-landmark-third-batch.accepted.2026-08-27.v1` and `ACCEPTED_ALL_FOUR`. The explicit user decision
+supersedes the planned additional multi-angle evidence gate for these four pieces only. All four static flags are
+`FinalArtApproved=true`, while runtime approval still requires a real Prefab and procedural fallback is always
+unapproved. The accepted manifest freezes 60 project source/dependency files, two toolchain files and four FBX
+sources; its SHA-256 is `40e1ccad3af83e9b16119df73b435bc2ae1d9b46c97af9db5087904a53fc50c2`.
+The first three four-piece batches now activate 12 of 54 slots; the fourth batch and the other 42 slots require a
+separately authorized finite selection.
+
+### Historical Luoyang P0 named-gate fourth-batch native Prefab/FBX review V1 route
+
+For work that changes the Gumen/Jinmen/Kaiyangmen/Maomen candidate geometry, P0Batch4 Prefab or FBX paths,
+review-order 11/12/13/14 identities, authoritative gate facings and passage anchors, fourth-batch cameras, pending
+approval state, source manifest or runtime fallback, read
+`Docs/TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_NATIVE_PREFAB_FBX_REVIEW_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Batch4/README.md` together with the gate identity kit, whole-city final-asset
+manifest, third-batch final activation and whole-city batching routes.
+
+The historical candidate status is
+`LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_NATIVE_PREFAB_FBX_SOURCE_READY_FOR_USER_REVIEW_V1`. The user separately
+authorized this finite fourth-batch candidate production after the first three four-piece batches were activated.
+Review order 10 Guangyangmen is skipped because it is already activated in the first batch; the frozen selection is
+11/12/13/14. These four project-original native Prefabs and real FBX sources must preserve the existing gate identity,
+Global Cell, visual facing and placement/outer/inner passage anchors. Both real and fallback instances remain
+unapproved until a later explicit user decision. This route does not authorize a fifth batch or the other 38 untouched
+slots.
+The four native Prefabs and four Unity-reimported FBX sources now have three nonempty strictly decreasing LODs,
+stable placement/outer/inner passage anchors, complete materials and no Colliders. Runtime real-Prefab and forced
+fallback tests both preserve `FinalArtApproved=false`. Five graphical views and the densest-549 batching regression
+passed. The manifest freezes 56 project source/dependency files, two toolchain files and four FBX sources; its
+SHA-256 was `a709f0b53267a0630fcb8fb207fca908484db13b6c3aedf898d2608878d40785` before the
+accepted-source manifest replaced it. Use the final-activation route below for current approval and archive facts.
+
+### Current Luoyang P0 named-gate fourth-batch final activation V1 route
+
+For work that changes the accepted Gumen/Jinmen/Kaiyangmen/Maomen decision record, their four static
+`FinalArtApproved` flags, accepted-source manifest, real-Prefab runtime approval, procedural-fallback denial or the
+remaining-slot boundary, read
+`Docs/TASK_LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/P0Batch4/README.md` together with the preceding fourth-batch candidate route,
+gate identity kit, whole-city final-asset manifest and batching route.
+
+The current status is
+`LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`. On 2026-08-27
+the user said “accept the previous one” in the four-piece fourth-batch context; this is frozen as
+`decision.luoyang-p0-named-gate-fourth-batch.accepted.2026-08-27.v1` and `ACCEPTED_ALL_FOUR`. That explicit
+decision supersedes the planned additional multi-angle review gate for these four pieces only. All four static flags
+are true; runtime real-Prefab instances are approved while procedural fallback instances remain false. First through
+fourth batches now total 16/54 activated slots, with 38 unapproved. This route does not authorize a fifth batch.
+The accepted manifest freezes 56 project source/dependency files, two toolchain files and four reimport-validated
+FBX sources; its SHA-256 is `20c8981a1597314a38a4e211e3a970f22875534d35c48ade33e2b317aaf9c87b`.
+
+This 16/54 boundary is now historical. The user subsequently authorized and preaccepted all remaining 38 slots;
+use the completion route below for the current whole-city final-asset state.
+
+### Current Luoyang remaining-38 preaccepted final-asset completion V1 route
+
+For work that changes review orders 15-21 or 23-53, the remaining-38 decision record, their native Prefabs,
+materials, meshes, FBX sources, three-LOD/stable-anchor contract, real-Prefab approval, procedural-fallback denial,
+source manifest or the current 54/54 completion boundary, read
+`Docs/TASK_LUOYANG_REMAINING_38_USER_PREACCEPTED_FINAL_ASSET_COMPLETION_V1.md`,
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_REMAINING_38_USER_PREACCEPTED_FINAL_ASSET_COMPLETION_V1/README.md`
+and `Assets/ArtSource/Han/Luoyang/FinalRemaining/README.md` together with the whole-city final-asset manifest,
+all eight source-kit routes and the whole-city batching route.
+
+The current status is
+`LUOYANG_REMAINING_38_USER_PREACCEPTED_NATIVE_PREFAB_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1`. On
+2026-08-27 the user explicitly requested direct development of all remaining 38 slots without per-piece approval;
+this is frozen as `decision.luoyang-remaining-38.preaccepted.2026-08-27.v1` and
+`PREACCEPTED_ALL_REMAINING_38`. The selection contains 8 P0, 10 P1, 14 P2 and 6 P3 slots covering 2,068
+Facilities. All 38 have project-original native Prefabs, three populated LODs, stable anchors, real Unity-reimported
+FBX sources and static approval. Runtime approval remains conditional on successful real-Prefab loading; procedural
+fallback is always unapproved. Together with the preceding 16 assets, the current completion state is 54/54 slots
+and 2,084/2,084 opening Facilities, with zero remaining final-asset slots. Do not invent a fifth batch. This route
+does not claim archaeological reconstruction, PBR texture finals, interiors, collision, navigation or animation.
+The source manifest freezes 240 project source/metadata records and 38 FBX sources; its SHA-256 is
+`19d27e5ac9f287c4ad841fe65db7db300f9a07f873d744d2ad914dd049091612`.
+
+### Current Luoyang actual whole-city composition and terrain integration V1 route
+
+For work that changes the 2,084 Facility Visual Local Anchors, six presentation district IDs, nearest-road frontage,
+road/canal/wall adjacency, terrain-grounded dense-549 window, composition scale matrix, CITY review status or the
+no-SubCell boundary, read
+`Docs/TASK_LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1.md` and
+`Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1/README.md`
+together with the whole-city batching, final-asset manifest and remaining-38 completion routes.
+
+The current implementation status is
+`LUOYANG_ACTUAL_WHOLE_CITY_COMPOSITION_AND_TERRAIN_INTEGRATION_V1_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`.
+It deterministically maps all 2,084 opening Facilities and all 54 final Asset Variants into six presentation
+districts without changing Facility, Global Cell, ownership, construction, population or Save Schema. Corridor
+Facilities remain on Cell centers and derive four-way connection shapes from adjacent real Facilities; ordinary
+Facilities receive a bounded Cell-local frontage toward the nearest real road. The dense 549-Facility window uses
+the offset global coordinate for the existing terrain height sampler and remains inside the established 8x8
+presentation batching budget. This route does not freeze the nationwide art style, supply a high-resolution Luoyang
+DEM, create simulation SubCells, or implement collision, navigation, interiors, damage animation or supply-region
+materialization.

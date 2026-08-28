@@ -1,0 +1,2128 @@
+{
+    "schema_version":  1,
+    "contract_id":  "art_source.luoyang.remaining-38.user-preaccepted-native-prefab-fbx-final-activation.v1",
+    "task_id":  "LUOYANG_REMAINING_38_USER_PREACCEPTED_FINAL_ASSET_COMPLETION_V1",
+    "status_id":  "LUOYANG_REMAINING_38_USER_PREACCEPTED_NATIVE_PREFAB_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1",
+    "user_decision_status_id":  "user_review.luoyang-remaining-38.preaccepted.v1",
+    "user_decision_record_id":  "decision.luoyang-remaining-38.preaccepted.2026-08-27.v1",
+    "user_decision_date":  "2026-08-27",
+    "user_decision":  "PREACCEPTED_ALL_REMAINING_38",
+    "final_art_approval_status_id":  "final_art.user_preaccepted.fbx_source_validated.approved.v1",
+    "source_archive_status_id":  "source_archive.unity_native_and_fbx.complete.v1",
+    "source_license_id":  "license.project-original.unity-native-and-fbx.v1",
+    "runtime_mode_id":  "runtime.project_original.native_prefab_with_procedural_fallback.v1",
+    "profile_count":  38,
+    "covered_facility_count":  2068,
+    "priority_counts":  {
+                            "p0":  8,
+                            "p1":  10,
+                            "p2":  14,
+                            "p3":  6
+                        },
+    "resource_asset_count":  72,
+    "source_file_count":  240,
+    "toolchain_file_count":  2,
+    "fbx_source_count":  38,
+    "fbx_missing_count":  0,
+    "all_prefabs_three_lod":  true,
+    "all_sources_unity_reimport_validated":  true,
+    "final_art_activation_ready":  true,
+    "final_art_approved":  true,
+    "toolchain":  {
+                      "unity_editor_version":  "2022.3.62f3c1",
+                      "exporter_package":  "com.unity.formats.fbx@4.2.1",
+                      "fbx_sdk_package":  "com.autodesk.fbx@4.2.1",
+                      "license":  "Unity Companion License",
+                      "official_documentation":  "https://docs.unity3d.com/2022.3/Manual/com.unity.formats.fbx.html"
+                  },
+    "toolchain_files":  [
+                            {
+                                "path":  "Packages/manifest.json",
+                                "length":  1985,
+                                "sha256":  "f5995ec810ab94a3fe13c4698bada51a23681b971a3e994d6ccd7731a1655960"
+                            },
+                            {
+                                "path":  "Packages/packages-lock.json",
+                                "length":  11345,
+                                "sha256":  "2d24248b4e919dd05e50b902ad85bfb1013307a514ac4d1e79deac7df6a38cbf"
+                            }
+                        ],
+    "source_files":  [
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.fbx",
+                             "length":  39327,
+                             "sha256":  "4701be5e8794b79393be43ea4f887f4f089f3229c6866c6b9f5f6230f89e22a7"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "8b180c1e3a52e27f0340a143d5e022300fbbe4eef4a872674d72056e57a43389"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.fbx",
+                             "length":  41988,
+                             "sha256":  "3578d7b38e6f770bf0ebbf81bf337e477043676ad3c3391ab98ba64088a3db1b"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "bf54e88b59e320521e7c59b9c04a7dbd2cfcb75fa2b192d0eacf1587bcfe1e3b"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.fbx",
+                             "length":  42404,
+                             "sha256":  "7dea9b6a2b823bacc43b19ffc4c2b11a1d42b8a8ac564035bd131c63548860e9"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "3bce9e6909bf00cd6db1a7369d4d31c79f950881a958cd5bc5e57ff248a04ca8"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.fbx",
+                             "length":  45765,
+                             "sha256":  "426d6681c91e316588bef366fceedc3e34655d33de4eb901a2e8c4cff70d5c25"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "2cde7dc3a65f90dec351ef6997eb46bd986b52a024255f895d09e1d034934a21"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.fbx",
+                             "length":  46771,
+                             "sha256":  "f329eb48cfee9830a604897c1a42bd7814fc6381b5eee037ed4a4550cd4d6939"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "c933f0794be65da278645f2b194688af07be364a89a7081bbb3aa1b680a8d198"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.fbx",
+                             "length":  71252,
+                             "sha256":  "fc675153085e5aafb1b999be1e2b9a3ca1d829402ac36df979d46fa476b7dc7a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "d7379f9e610b7c007b03a84fb0ce5bb90e76213e69af901d11f47d0e7a063867"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.fbx",
+                             "length":  39551,
+                             "sha256":  "722ff476ac0e169ab0a3affd0463d95a23bb10b48b4a5c5024fad417c082b863"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "a416f7197c08ee335787eaf466b69a6dedd15dc23cdd077497cf5d0db833e44f"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.fbx",
+                             "length":  42055,
+                             "sha256":  "243abc0fbde770ca34635d2380127eeea71593af94c14abb09280fb81f1008f3"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "ff181856019c41e288864dd8e9c43057353a709e7b65627f2bd7b7cef6713a4a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.fbx",
+                             "length":  62755,
+                             "sha256":  "7da16500925d050178fabd5dbea4c2d1da79c2971e0847c207482365127629a7"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "451d8931eb2434a7347513d184e2e2514e9836279a6260ad2a3b2593261b1bcf"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.fbx",
+                             "length":  31883,
+                             "sha256":  "2cd522a0f2268e0282dbe8ad51e22c7fda9ca458d6b486769cb4edd416009e4a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "e15e06ba819edf1367fd3e7a461401c3eeb8fc9df9705b6816630103be38e45e"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.fbx",
+                             "length":  33343,
+                             "sha256":  "94bba6a94de2a5c776500f43ca9db7ecfeeaa0723c9ebc4c9c8ef6925bc5b79d"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "56320e4d19f7fe248bb419ce97b29858ac057fd9268e19cba699a13f76be2065"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.fbx",
+                             "length":  89027,
+                             "sha256":  "0e650702e7a254f1821739f82937c97c5122a75e47d273524c54c52eb0b0e829"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "2a95f9c570ebc5a0b9371a05a2b533afa21227f79c48e61b1b16f340b21cf305"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.fbx",
+                             "length":  48136,
+                             "sha256":  "8e505fa8a02b43b31b3b7d44eb425b84555fe3688142120edc11e84fd274cf4e"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "920e8ae9a59a03b13b6b5944760fd460b3e22bdfc787efa5febe93d1e0392757"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.fbx",
+                             "length":  93720,
+                             "sha256":  "323c84e820d52e57e370cb4308a62183590f3c97f783284e5b1030c23fc431f0"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "1f39a2b613e90497d678f9f6c042012d73581fd209a642a5ac5434a99ebdb6bd"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.fbx",
+                             "length":  48189,
+                             "sha256":  "150cb36f245810ded1ca3b6dc28b9dd0dea0a97244bb22d86b82ad2a39c9bd48"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "e9a7ae49dc3520a182058d6ab889b603d68401a3e9022411a6d5906e57342a70"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.fbx",
+                             "length":  37903,
+                             "sha256":  "105a4f56b2400b42c7a6f3d864f0c55cbab0df830bed17523438bc7ad53a0478"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "db680a3c7b7b7bec8949c477aa4d7e1fa98016572866ca78e2da16040a2fa80b"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.fbx",
+                             "length":  46932,
+                             "sha256":  "2b98cceca3797f6c63847d196f45330e70837a5e357f05f9201ad000383d5e24"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "60821508c73153d5dcc98f92fc68b68f8f66f67449755c4f4fdb8193a1364bcf"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.fbx",
+                             "length":  78348,
+                             "sha256":  "897994594edbe06d7b50191e07e39dbf8696974f281cc0e3a956acf321dbd71c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "df4c52552d4755455348d601733c6bdd7ecac3844250c1e1fc6a8d43423e8b55"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.fbx",
+                             "length":  92967,
+                             "sha256":  "a704e4a52bf8400f6b3bb037cdbaf0c1fd0922f25fd2c15ae93630eb58464093"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "fc3f5501d64ec4e063a280284178a955944c0212bb9ca44a8cb92fa5bca5d177"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.fbx",
+                             "length":  88271,
+                             "sha256":  "17765874b94297cef1585e7b04f53c0f18654602e3150a4c17ec92cbdba9f03e"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "b0b7b9ddf83f6d8d5359064682c63a95f39e9ca6a05150838faca6e46423ca9c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.fbx",
+                             "length":  62158,
+                             "sha256":  "b94e246991d402c62df24971ca56b63fad3dac4fefda36bb882af343691d695a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "2d48b06bfcfd5123043a3bb6f16249685ed6a93d341dcd370af9082dbfbe366f"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.fbx",
+                             "length":  55831,
+                             "sha256":  "1119a125bc8c103b7629bb5ef973b5808b4ff3435d6817326bf5068e053fa785"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "beb3c3187c57c2d3780c6f26aa953c25ced655f1df0c5e72fdbdebbe94616b6a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.fbx",
+                             "length":  61659,
+                             "sha256":  "1d86bf087c7c8e152be0c0a974ea8f1a7da45997612322cb5de667f8c15a0f8b"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "35abb02d290bcf8bf67f73416cf9c2bd116b2869a3f12946a24e2e9ade0bcf18"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.fbx",
+                             "length":  45209,
+                             "sha256":  "b4b3d7537223c2e1b527cc937006d808680aca62c72fd8c05c48b2651860450c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "cc0d3e8492ce7a286cce4eb39506ee0b9c5d85ade5e6dae58be9829b1c719c2a"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.fbx",
+                             "length":  106046,
+                             "sha256":  "eba6b4cfec97dc595545ac89d0cf6ea541ac55bc9ccd3479c5f17552ee49de33"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "c36678c643983ac193caf6b513a42abed7352eea9203977372ddbf4b2f11daf8"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.fbx",
+                             "length":  61093,
+                             "sha256":  "f30d4fb988a92ce284fe508ceb338797bb27e2a2bd9a6586dad85b2399ac462c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "2284f658a25e9a2cd2d203471f27dcd5af84fbaa9dc336f8f4e72b07c3dd1b2c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.fbx",
+                             "length":  59812,
+                             "sha256":  "f3e6fa2295fe5d5d6d1152f94b850a89fb6689acdbe739fa55a5bd5b1a2ae327"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "b12b8b10e50823ebbe232878f95ca3b06ac7161abc8763e0210e1e63250dd677"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.fbx",
+                             "length":  62079,
+                             "sha256":  "49c37145978b1e501f1cfb1b3d7fdbe7a074f69b30907410718de6af787453d1"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "96199f82fccd78454a231a45b5f93d3a2e9b4e6d13faf31c2bb37e97c236ccb5"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.fbx",
+                             "length":  84705,
+                             "sha256":  "809b145455b215a31c688a22122eb3ef1e4d92fb4c7fb24f3326286a3b649d7f"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "348308d831c2f829f213b681a0b15f09c2491aa22de31693ec6d034744f6d9d0"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.fbx",
+                             "length":  59856,
+                             "sha256":  "976ac4f957a506e53c6abc53f1896f4edc0e47a0a143d9b2eff7b1dbe74a4f50"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "578f179348b1b8ec85ef769f540f29440f2794ad951e47f3e72d51937f4f1448"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.fbx",
+                             "length":  51291,
+                             "sha256":  "35b9b5b18dd4878baa6dde240f50807955f4b7e1192c8c5574cb9c7648004c6e"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "066458761a68bebf758fb03f47203f4666ec0eb3369747225b27ef5ae68bc190"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.fbx",
+                             "length":  58048,
+                             "sha256":  "22f4b0f82c6ecda49c620f258f2ec6dcf9532f99f5cb7d3b1f9fbb196138eeee"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "39ccf404b0d91ffffacef3c3d54bda6727ab0b0e860f8faf50e414fc4ece8830"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.fbx",
+                             "length":  83626,
+                             "sha256":  "6a3090f63baa9885ef3df5714ff2684814db2c4f94decfbd0641db2c459bfb85"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "181915f1d9c6ba97924d417de2d8e035cdac9a946ae8e750d4e1169b3f92a134"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.fbx",
+                             "length":  53266,
+                             "sha256":  "7c717f71887214b2ee3f19630fc0edf25ed7d477cc5eb01faa11d4bd8a98c756"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "9501d4152cdc54b9957aa74a7be74bb1f96d5b8e197fb6ee86197e1bd6c0c019"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.fbx",
+                             "length":  59214,
+                             "sha256":  "562eb106b94fa369c4116cdafbd26ca839c353838e7b0645b79bd19b12c529ee"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "0069d6c580b16448e6b48c0716fba74f322c91643ae4b85fa9f618bde81e2d7e"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.fbx",
+                             "length":  54819,
+                             "sha256":  "bff83ba3404a31adc36d6a46c15b80aa1366165a2798ece59020d6939233293b"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "e0d2e958b45ca14824e1411442fe0cbbe0314da4dcb54eed549a8e03c9fb1749"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.fbx",
+                             "length":  82666,
+                             "sha256":  "464580e726922b9bb973c2b94f363f228fc0d712b8a8d0d888695341149567f0"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "8b3adcd14b181bbe038f96411924974aae0342d753949e543d0db34e4782dc04"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.fbx",
+                             "length":  80328,
+                             "sha256":  "459e98ff25ee823320ab37506e1ce6f276c77e080a3f94f9b3e31fbc63485657"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "04c8dcf6d9db81e54499237991b0e5d48f76ade9a23ab750f5f8ab9904ee2922"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangRemainingFinalAssetArtBuilder.cs",
+                             "length":  15778,
+                             "sha256":  "507e7ea6574a59b6cf0278c9a3e91ca3d424bf893d1e455a5a0e22fb00054842"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangRemainingFinalAssetArtBuilder.cs.meta",
+                             "length":  243,
+                             "sha256":  "f0db684f59ba5cc3367396cf0c2967716de8625d821944e459bd2982c1ec85d8"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangRemainingFinalAssetFbxExporter.cs",
+                             "length":  12080,
+                             "sha256":  "c8a4712dd83f5d6233036d33a7bddb317677af8aac5fc0d288386ffd77e16816"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangRemainingFinalAssetFbxExporter.cs.meta",
+                             "length":  243,
+                             "sha256":  "a9a9b4ffc348ae5122b8a476236d91801f2d9063a1afc5d2a3ee86105e3ab0eb"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/Mandate.Editor.asmdef",
+                             "length":  465,
+                             "sha256":  "60e81cfbde755b9276d55155c5e7bb98ca3e69c43a1575eb4526a6045ec7a656"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/Mandate.Editor.asmdef.meta",
+                             "length":  166,
+                             "sha256":  "bd775c483ec1be8ee01c5f5575ad1518d7c3e427afc0a138ea6a465a21289b90"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT00_material_han_stone.mat",
+                             "length":  2208,
+                             "sha256":  "009cfff5948ac0a812f9fc6364ac2d80c1b54765478c16e0a50a40c20be42408"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT00_material_han_stone.mat.meta",
+                             "length":  188,
+                             "sha256":  "72600710590825c1cd1f7045cc814348f871ec2e0b2f5f2c97ed0e60e964b8c9"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT01_material_han_rammed_earth.mat",
+                             "length":  2215,
+                             "sha256":  "93ea6078a0d2611efd661dc7b8de50fddafb8bff68999d1373f74aa4cf40ddcb"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT01_material_han_rammed_earth.mat.meta",
+                             "length":  188,
+                             "sha256":  "9d7c516aa43a9174b2820552668a064fb0d6a07045c54cba4730fa7f46debd45"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT02_material_han_faded_vermilion.mat",
+                             "length":  2217,
+                             "sha256":  "142a11174c474cfb81f71995b649867a91b0014d92320b9db22284f7ec5c441e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT02_material_han_faded_vermilion.mat.meta",
+                             "length":  188,
+                             "sha256":  "f8b7c45cbe0126f52f15ac7aaef44db138f2e1cafa9b1fa110bcb6fcc26c10a1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT03_material_han_grey_green_tile.mat",
+                             "length":  2217,
+                             "sha256":  "37ca63b124a6870ced87b4d78d061a8579f771f89d2de92490e922e5c6eb5c19"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT03_material_han_grey_green_tile.mat.meta",
+                             "length":  188,
+                             "sha256":  "79f481ac6514d892d587ebbfb1f3f025c89f20349e3e5285cde2f15657e92e38"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT04_material_han_dark_timber.mat",
+                             "length":  2214,
+                             "sha256":  "28276e08e7402aea562b1edcd4c5b63266bcdfe09a22038a76267cbddc32daa6"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT04_material_han_dark_timber.mat.meta",
+                             "length":  188,
+                             "sha256":  "883c0a6cfc8bef5538f7069215dea796add36af2929c6efde691886485684a1d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT05_material_han_coverage_foliage.mat",
+                             "length":  2219,
+                             "sha256":  "e940af55378e056cb8d52ba6e6aacc36cb5002336d323f6c8c0be75dce60c0a1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT05_material_han_coverage_foliage.mat.meta",
+                             "length":  188,
+                             "sha256":  "1dc2d6bb01616d29f609e1a35ba40c818d1aeb0b0c4e15d171b3092281cd191b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT06_material_han_coverage_rammed_earth.mat",
+                             "length":  2224,
+                             "sha256":  "6dc0e1e0ef27989ccd9175913098f905e2318211f95c7ba66a9cbe3ad54558a2"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT06_material_han_coverage_rammed_earth.mat.meta",
+                             "length":  188,
+                             "sha256":  "45440328698294933b552cc2391a1897385621e0cd935a72ea0ac80d009bd86e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT07_material_han_coverage_faded_red.mat",
+                             "length":  2220,
+                             "sha256":  "ee6fd760cf228d0e63650a3558e4e63c68e65dcb2c1b77923ad29e7956f87d6b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT07_material_han_coverage_faded_red.mat.meta",
+                             "length":  188,
+                             "sha256":  "f546c197dc4c0e979874eb270383a4850b534623c52732c0be4cbb7d6a169e94"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT08_material_han_coverage_tile.mat",
+                             "length":  2215,
+                             "sha256":  "863153a84fd99764d943ee0d2d470bf17d6726f739f46bcced4fff2f7e2fe67d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT08_material_han_coverage_tile.mat.meta",
+                             "length":  188,
+                             "sha256":  "30911eef08096f64cc11273676d01bdea53c87f38cdf08f041c86d7e811b7b5d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT09_material_han_earth_yard.mat",
+                             "length":  2213,
+                             "sha256":  "b8d7af98e24a03ec155a0c448fbe35568d7140b1624edf7cdaaffa67f94ed912"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT09_material_han_earth_yard.mat.meta",
+                             "length":  188,
+                             "sha256":  "31ca1cfc26305b0b54e06baff24d04a287f89925b83788ea6fba89742d726d47"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT10_material_han_coverage_soil.mat",
+                             "length":  2216,
+                             "sha256":  "5803717a6206eeecaaf4d7cb6614c427423d5e7cfb9f9236f935b9be403f3e58"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT10_material_han_coverage_soil.mat.meta",
+                             "length":  188,
+                             "sha256":  "5ae54d7aa55182066113e369309591a317f12f7f2a1064704b5bf66cb2616ef8"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT11_material_han_coverage_crop.mat",
+                             "length":  2216,
+                             "sha256":  "6d357039026d1082cb26946c5eae51c906f4e4bfd3cda3219479f2f86457c6db"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT11_material_han_coverage_crop.mat.meta",
+                             "length":  188,
+                             "sha256":  "fe48b4461344ed631ac67cd5ae59ef4438157e61756e8f2f85d2a0bb2dfc45a6"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT12_material_han_coverage_stone.mat",
+                             "length":  2215,
+                             "sha256":  "79d340f3690d9e1aa493453a26b2a34a09d52574c4862f76b38aa7bc2db887fc"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT12_material_han_coverage_stone.mat.meta",
+                             "length":  188,
+                             "sha256":  "6df25970707a6b2adee9e96f26f7904ecc3417b8cd330c19813e42dd431ff736"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT13_material_han_thatch.mat",
+                             "length":  2209,
+                             "sha256":  "1bc8bc2f8a913c70170129752b0c5dc97069e4421918b14143a582211be70cc3"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT13_material_han_thatch.mat.meta",
+                             "length":  188,
+                             "sha256":  "58b3f3c76c5ea6557d543fad740e796123abf62146f89d5156febf3f59082a0b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT14_material_han_coverage_timber.mat",
+                             "length":  2218,
+                             "sha256":  "87a1d5447df624d5be0c2200df796bfcb3820925d7d4ced9cd38e245b97a1b24"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT14_material_han_coverage_timber.mat.meta",
+                             "length":  188,
+                             "sha256":  "af6914c94fd3c74fb9f27592f1a13036c2bd88669f23f98ee45ae2cd86142b03"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT15_material_han_grain.mat",
+                             "length":  2208,
+                             "sha256":  "666586dc83b364edee81b8022d280cd94e5cad7f82f170d92a5bde2d3b247ffc"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT15_material_han_grain.mat.meta",
+                             "length":  188,
+                             "sha256":  "f2a480dc40967adf6fae71d5d82da8af9ddc547cd810f36bb558de09eac523e8"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT16_material_han_coverage_thatch.mat",
+                             "length":  2217,
+                             "sha256":  "a48eef6603b8550d2227a49e4568f24b809630f5576d0c544137bb24dd1f5dad"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT16_material_han_coverage_thatch.mat.meta",
+                             "length":  188,
+                             "sha256":  "7342b049e4d74b41038967965d7460bdefe9204f446dedd2b6554d26a1aeda9f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT17_material_han_coverage_cloth.mat",
+                             "length":  2216,
+                             "sha256":  "ead1879ed8b0458512b5fd992d5e7e5531b47ef21337938328dd9d76f989fd46"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT17_material_han_coverage_cloth.mat.meta",
+                             "length":  188,
+                             "sha256":  "ee021c6996d39c805815aa8bae1d1e0e264791122bc4ef749cf3cad7bcd81dc1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT18_material_han_plain_cloth.mat",
+                             "length":  2214,
+                             "sha256":  "f92a17037be424c2dc66bc270db194701ca7cbebb184b4fc3efed5aeeed8e2d7"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT18_material_han_plain_cloth.mat.meta",
+                             "length":  188,
+                             "sha256":  "cff918f36a3f5fa5657ef423680b73205b42fd29b2f46250c4a8e8df46062c22"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT19_material_han_coverage_water.mat",
+                             "length":  2220,
+                             "sha256":  "5cfc3d46bc74c679b70bb3019e71c9fa5c110f86494128221a4d15f726af0189"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT19_material_han_coverage_water.mat.meta",
+                             "length":  188,
+                             "sha256":  "e6341b39eab5e9fec51361e48c632f277c63cfc01f69570385d0f7fd671674f8"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT20_material_han_coverage_metal.mat",
+                             "length":  2220,
+                             "sha256":  "d19e90d10f48c7442f92e9eaa034150c783f40e89627f065baf2e213ad26d665"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT20_material_han_coverage_metal.mat.meta",
+                             "length":  188,
+                             "sha256":  "331b36a9ef13290e383c15a72eb95cf93c591ac31bf28eb4bd4ee6cbeda60ef4"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT21_material_han_coverage_fire.mat",
+                             "length":  2215,
+                             "sha256":  "76084ba82541b419b2e381a17adb65d0bba000460f46543c5d862d9e1e29f136"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Materials/MAT21_material_han_coverage_fire.mat.meta",
+                             "length":  188,
+                             "sha256":  "a4e606f5627730a37c4e4004684f46db9af4377ec56825ec88275a1f9ea82966"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M00_Cube.asset",
+                             "length":  5959,
+                             "sha256":  "b33a98cdb0dfda9c6170456678f1f16e0988fc744e84ae3dd57ae020b9de76e2"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M00_Cube.asset.meta",
+                             "length":  188,
+                             "sha256":  "63c89f6d447b02fd18a1d7fb647c09af6b09b8b49c7312bdf37af8bfd171c6f0"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M01_HAN_PRODUCTION_han_rammed_block.asset",
+                             "length":  3796,
+                             "sha256":  "ac737eef5a5611cd8cfb7bbd748aeb30bef93a5f8c372255e7536e313d18b30e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M01_HAN_PRODUCTION_han_rammed_block.asset.meta",
+                             "length":  188,
+                             "sha256":  "d023eddf7c17e11c4bd9084c6a505e18b5936b659790146665b25de96d8e8025"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M02_HAN_PRODUCTION_han_hip_roof.asset",
+                             "length":  3792,
+                             "sha256":  "26dd89ac3a628d25caf10871043abda2a0c2b0d516d797119654dac4120545c2"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M02_HAN_PRODUCTION_han_hip_roof.asset.meta",
+                             "length":  188,
+                             "sha256":  "e6cac5fc022b8dd6a6518d88168ab3cd5a8bac9de13dfff2c37406647a09dfeb"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M03_HAN_PRODUCTION_han_foliage_cluster.asset",
+                             "length":  3977,
+                             "sha256":  "c1b4b11f95ea7cc8ade58a0c89f7429bb11bdd4704183eba408a5a4eb7642d94"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M03_HAN_PRODUCTION_han_foliage_cluster.asset.meta",
+                             "length":  188,
+                             "sha256":  "f868bc854d7d112d19e133d296032cdfba75fb98c90d0522c27e03daa68da965"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M04_Cylinder.asset",
+                             "length":  14040,
+                             "sha256":  "20ebf5021d8bef239158c14024f684ea7e0b8829510235df4f09222602b58f10"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M04_Cylinder.asset.meta",
+                             "length":  188,
+                             "sha256":  "586cc5ff2fe9b37afa178f59c5a129e475388aa7296dd7dba8a98c00f572a1c9"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M05_HAN_PRODUCTION_han_terrain_pad.asset",
+                             "length":  3795,
+                             "sha256":  "58ceec11714be9241954b8467c686d98297b01ee2bfa0a6005b562bbca1c2c92"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M05_HAN_PRODUCTION_han_terrain_pad.asset.meta",
+                             "length":  188,
+                             "sha256":  "50fc762095f3ce7a8b7679d6b2c9e7ffbae53600d25df4c4878ecfc553240a99"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M06_HAN_PRODUCTION_han_tile_slab.asset",
+                             "length":  4357,
+                             "sha256":  "c9039f3ebc3e1129c44b793240ae68718d7995cd36d2e30672933eaa5b48f890"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M06_HAN_PRODUCTION_han_tile_slab.asset.meta",
+                             "length":  188,
+                             "sha256":  "20b8f8111147cdbc04a0705963f658982b0c36855adb1ea2858dfa578fa0d32f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M07_HAN_PRODUCTION_han_timber_beam.asset",
+                             "length":  4501,
+                             "sha256":  "4c7458d1b9e1fc985163e2942e13b1e9e9c61d051d7dce42b94ff71e653f733c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M07_HAN_PRODUCTION_han_timber_beam.asset.meta",
+                             "length":  188,
+                             "sha256":  "3b8676b80a45c9b96caca41603ee93c42c51546f5c40141c08bbacd9fa37ea00"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M08_HAN_PRODUCTION_han_field_ridge.asset",
+                             "length":  4149,
+                             "sha256":  "806083d18e82267351d226d921cf35d6ada4fd83933b3f929622eef79742bbd0"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M08_HAN_PRODUCTION_han_field_ridge.asset.meta",
+                             "length":  188,
+                             "sha256":  "7f4c11566c9e0cefc45147c01d7d0ddcbe92f6c3d7722c2bc609982a177bdb83"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M09_HAN_PRODUCTION_han_road_crown.asset",
+                             "length":  4172,
+                             "sha256":  "1537efbd6e99c4eb3f93ddfd62e0269c59322aeebe0e1abaeeceb0820b3decff"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M09_HAN_PRODUCTION_han_road_crown.asset.meta",
+                             "length":  188,
+                             "sha256":  "62e49d3057a13a423b9bd27b5c0af43fdf8fc0e046f7c7b0308e4616e1eadabf"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M10_HAN_PRODUCTION_han_wall_coping.asset",
+                             "length":  3795,
+                             "sha256":  "bcafa6c8a06c8d3e8e282e3d3ee063a326fb3a8abf3bc0b9616b6acb6e880d41"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M10_HAN_PRODUCTION_han_wall_coping.asset.meta",
+                             "length":  188,
+                             "sha256":  "2045a104e035ebb86889e895ed029ac37745d720abef2f628db90c934c3e634e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M11_HAN_PRODUCTION_han_ritual_ring.asset",
+                             "length":  8777,
+                             "sha256":  "fd1af50e349dca9c2f36555aa594628df867330b0ad224bb06f8ce0e38ef95bf"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/Meshes/M11_HAN_PRODUCTION_han_ritual_ring.asset.meta",
+                             "length":  188,
+                             "sha256":  "86d8cc7f1e468227cc0dbed15fb3b236259b88042b12b2d8df65f49bd4bb112c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.prefab",
+                             "length":  47646,
+                             "sha256":  "e66c199f9e246432fb52a20bb3884a17c20d9a3191bc6e2af0f89fbfd4d1e991"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "e50d3b54179a6dd1b165ae75b55c319089d2f5525f668619e4123a33f7f46828"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.prefab",
+                             "length":  55144,
+                             "sha256":  "f7b21c093db856cec0b6d4280790aa3f3c9d891f9c9f30f48f89179e62ed8e92"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "be9e11751c66c57d484c8bcefd59746a2a71eefa0f96e7df17f4dbf47e3d3ec1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.prefab",
+                             "length":  55132,
+                             "sha256":  "6699127f2a73976a10c648c4ac8906046ed93290e19d5901c8b90f780f486839"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "b603702238ceee6b32d785b2e5dda46e012e3bd5e10c43c1d79791071fb834fa"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.prefab",
+                             "length":  65080,
+                             "sha256":  "bc44af91f4d6f358df1f1f7d084bce25cbeeb70a8ae1ce7b71c9e99ec7a536a7"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "998f7b0a212e69de4b834abbbf2845be9c7a2b168636beb09fd6c5ef682bced8"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.prefab",
+                             "length":  55119,
+                             "sha256":  "78a93f8518d357ff7d3033a179732a63ad6ac928de50374ad1a31175174e0734"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "658714d35d858935d89b05708a0684d5b1af296eae77be3b67d3165f78a77b54"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.prefab",
+                             "length":  50109,
+                             "sha256":  "2f044340a829112cefb915e2e8f8098525ca9ae2d1db24a3009d9d8eaa2beb07"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "9e33439cee46fe4c667969f965a3d4c0829e47262393e3e403eea9809794455f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.prefab",
+                             "length":  47679,
+                             "sha256":  "94cadda089953a0e618e455a8934e53c56fc6e77f877a2c76c124233c7248088"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "285d8d2eb4cf92e317fd5035ec596efe84fbd09231ba67a9aee9916678b0b7eb"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.prefab",
+                             "length":  55167,
+                             "sha256":  "851e40f9cbfce4b54829383aaf88440f7afe2cc699339f39107e87f54e2e785a"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "85ce0ae36b36d620b6724be50911a940dbd4e1d774be61e42334b2bf5ebb420f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.prefab",
+                             "length":  79377,
+                             "sha256":  "f6b0f65816c8d13faa7cc1b77543199f5b2358ec5101e68fc728367e5b16201c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "78be17efa96c381cf7d71d07c6da4e22f88ee61bc8ddd1e67f06594232be2baa"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.prefab",
+                             "length":  36763,
+                             "sha256":  "f660b983a8522c71c73b57f7603a947cb27d65b6ef5f201a83aa786c8f5f7f20"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "54783346d6a1584d996b44beaf0757fc640bd092b5fdf2fff36cab221866a465"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.prefab",
+                             "length":  29279,
+                             "sha256":  "9f4296b9999ed3094b46a05c1664bf705a23643528b113a810e02df4cc5255f4"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "7fb055a6df1aa6aa27e4cf3c715f9d62c6ee5c5751cf8956ca4cc7a94ec7bade"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.prefab",
+                             "length":  64430,
+                             "sha256":  "f6039948d758292e2442837c03c47e1788d5ba170172129142b736648adbb032"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "c5f072083e5943724780b908a6ec3af5e949a8bdcde14b6484edf77c52d39842"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.prefab",
+                             "length":  49303,
+                             "sha256":  "43033667995ae3d966f6fa77528c62eecf1233fdc858eb4cdc17960f321398cd"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "d940a9f18c79b2e760e363f24c25c21ad21a37e03d501eaf11ec05fc7e0bda4b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.prefab",
+                             "length":  66907,
+                             "sha256":  "2869310db86fa54a44ef51e4d79676a459c642df6914e369ff90d420ea29ab10"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "6c2695448e60f9c2d17cc66d068cc0a567a70fa13cb3eaf6fc3f16ccc34ae518"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.prefab",
+                             "length":  56789,
+                             "sha256":  "f98ba497c5c2949b064d58c67cd79b7a253eefd9abef00857c2ec10755474c30"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "d6cd7571e28b7a5cadf3cd2abc284bc24a52f83eca108afa084380d50e3ff67b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.prefab",
+                             "length":  39202,
+                             "sha256":  "88a6052d712a3ec3c37ba8d4cc8e851efb140187fd5a65afd264b02759dd1df1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "c6b34ebbb94d1488ccc7aa51ff0625e7ffc1a3d6ef5ce1df62f8e24504b2f187"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.prefab",
+                             "length":  44206,
+                             "sha256":  "c33ff1986030e32fc3d5c10c727efa444a1c44d133b27953609ad9e350cf2d59"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "f52113be9a9e70964f10201970e8bc9c9d027e4d94ceda0ffec4eef70544f4ea"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.prefab",
+                             "length":  49308,
+                             "sha256":  "26731b3c0679716bbf5aa41fad6aa0a0b6b45a7c9574f55a63379be1571446b7"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "9cb128203f925b78dcff110e178acd42a23df2ddc409297d95be0d0c93b6e338"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.prefab",
+                             "length":  64307,
+                             "sha256":  "c9301c6337ccaea90825bec13dd614e62634394d7063dcc17ce8f4ee284ef8f1"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "effb044032add6916820afc507d939721407d41c4af3526008a04ff29ba2ce86"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.prefab",
+                             "length":  74204,
+                             "sha256":  "87b5fe8d860cf39dcfece0e9e060b27fdcb39fd9561d2a77fc0a178d3f293d9b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "b6c30b86b9ce71864dbcf342f263c06928e2db7156200b0ba39df6acd9b702fc"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.prefab",
+                             "length":  74155,
+                             "sha256":  "1135dea37cabe3e92c456e1a574b4373fb056985c104b4f9acc6c4af265fbdf6"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "80b4b9fc0cf9b0ae7b7ded3a7c2dbaeaec236180487360102ae875a22be00c84"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.prefab",
+                             "length":  69209,
+                             "sha256":  "f0e50f7e308fa40c400521876e6dbdcd61d6f8f17d08fcfbb32b8559c29850ee"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "f55b4bc93dd1488f48ec44e8a13042fc16489d1a8a95f38fdf12861825b30072"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.prefab",
+                             "length":  81720,
+                             "sha256":  "ab10bbed163185bdd66097feb6631ba52e9a3f2312135ed79955d9ddd3615be0"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "d412af100bb33b69f6c5bfcf01f139c20ba8806adc01f4460ab44d627cd75db9"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.prefab",
+                             "length":  56137,
+                             "sha256":  "c55714ebd4719424f2bca344ff0efc4961e76c6333a7ce1973b3338b52b8a57a"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "17f15df4ca9a2f645cd056a0e6c6da7a6d8d16976b3a0fc34d89b610eeb9f793"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.prefab",
+                             "length":  62606,
+                             "sha256":  "1a4e3b03ca6d916d1450834cafb5be83546c52a4d91fcd8570d85a0429baf44c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "317d1884e688c49eda4e5f1e2a7784e2e901b5b02653a11a1fc6b57657c3875a"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.prefab",
+                             "length":  76936,
+                             "sha256":  "5be3314258dc7ac803ce1f470a798d3f7e09e91b51bef4dc7b2e3e77b3cfb62d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "71a3670e2d1ab9cbfdade86466cd7aada975dfa27650b460da0c6314bc3dde3d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.prefab",
+                             "length":  71763,
+                             "sha256":  "b027082ea178dd0abb9ec70e054d194a2be9146187ece931bb57e452f086208b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "e2c579e2e8a0c8f0e9c31eb812fd5f59d110fbfe3209c088169a80a683cc2a70"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.prefab",
+                             "length":  106622,
+                             "sha256":  "13cfd91ba3949c76ecbb5ce576889b776391ad0a2d63363492201a7864df2623"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "fa0a2fc264a9ec1e2f5bfd10658aef8a5dc10e2757b71887a05dfee053573e02"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.prefab",
+                             "length":  66595,
+                             "sha256":  "83835f74373224e06ea7c959d305e0031405b3abdcd09e716d51d2e7a0071ceb"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "8ba65d6a9d3da770dadb107b4bf819bc5fb66d689d21438268ae1e65f4759a9e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.prefab",
+                             "length":  66908,
+                             "sha256":  "28dc8360f7c792c385f31bfeae95347a5b967abaadcf79bdd508d943ba7de2d7"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "5c41e560e01a6c8575ad6776178f0b1d56134fed70c1f44093330b2a54d9859e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.prefab",
+                             "length":  64252,
+                             "sha256":  "fa5cefc32dae6e78dd5598351ef7d2bb8a4c9bb4c310d7fb4be68fa788b9e85d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "c872c963f638cdd747140f1f93ca31ea8d11747092fc5799fa8f729b02923202"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.prefab",
+                             "length":  71782,
+                             "sha256":  "9c35ad7f7b94e341094f065387987caa01f59137cffec3ae2932a77b011c4f3f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "8d43279123b218fc22c2d92f1a25c79ed360ad91a0d538ae6c7541234f40588e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.prefab",
+                             "length":  79369,
+                             "sha256":  "6bb9c5d5215467c272736c5d8b639dfd098e513d76b72952503641266f410a53"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "e467d4479122dae2e2ec50d27a5b17aba20ba235a0f2a1297382ecf6e8a7b46d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.prefab",
+                             "length":  66930,
+                             "sha256":  "83fb268190dcc54f1156075b5305d8a93d89a65b1aef5d53bfb54a94c373c73d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "67a38c77e8d7229dd81647a3bc3a08c76d5460c7490e19b87cb79d780cf044f2"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.prefab",
+                             "length":  71842,
+                             "sha256":  "514352ef7848fb81c8e2f04425ea08a252c7a55fdf06df265f7e3349349ee35c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "52f2400c8db89a403d29ef8bf335753bb3f66736a3e880278fc4aa00d0e2691b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.prefab",
+                             "length":  74185,
+                             "sha256":  "a859271d25957b16d4b750241c0feaf22f542771a6b000e5b181360fb703180a"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "0acc2e1343762a237a7feb7d015acb448393d6a6f24c255f3e480c1630d9d3cc"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.prefab",
+                             "length":  64293,
+                             "sha256":  "4f0f86f591de6706a6d1a3b08aeac61930d7dd7ac1bbb4309713b9084efd175e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "db6e4f26d774f3a2dadc7fcba3335878e68d58df62ed03fe0caacd5b2230e254"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.prefab",
+                             "length":  66718,
+                             "sha256":  "e10385bfb8b90e1de214eff56c1a374548f1ffede7d0cd7e54f0780768253817"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.prefab.meta",
+                             "length":  154,
+                             "sha256":  "378dddfdc2fbfef5b7913b42069d3251db635cc6671f347e7c2f9ab7c890b5fb"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Domain/LuoyangRemainingFinalAssetState.cs",
+                             "length":  13459,
+                             "sha256":  "0c6d72e4b9dead43df3b1446f3e0610f882c459e868ec42b9c5b1565a07ac050"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Domain/LuoyangRemainingFinalAssetState.cs.meta",
+                             "length":  243,
+                             "sha256":  "b3ac02b212c021c10f57224f08dcd513d0a175ecfaafc2d314bdf97e195aeac9"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Persistence/LuoyangRemainingFinalAssetSource.cs",
+                             "length":  1524,
+                             "sha256":  "56cb596e3643d5f31d5a443269e6ed6c94f3394781a96b0ee81b99a85896b882"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Persistence/LuoyangRemainingFinalAssetSource.cs.meta",
+                             "length":  243,
+                             "sha256":  "7d4beaa9e1659806269fc7133234baa2cb8e1556a7c380e9d593c50f5f7627a5"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs",
+                             "length":  121918,
+                             "sha256":  "6c5ed0858affad1ce7bbec42e8007379b10b2d79b27d1c268f811dc032e9b177"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs.meta",
+                             "length":  243,
+                             "sha256":  "3ac0df8dcb7f0750daa14ddf5b4ff19191a9cc2dc7241f95d5c1a10f21d2503d"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs",
+                             "length":  51124,
+                             "sha256":  "a599b0e27b47a259a8ea4d988106c606b9fd3e94a793e45d449e1196028fb8a5"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs.meta",
+                             "length":  243,
+                             "sha256":  "7c8ffdea430300b1b2aa23759d0b0f1661676d641633828a8762c1a1e0f7b8a0"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/LuoyangFinalAssetPrefabMetadata.cs",
+                             "length":  602,
+                             "sha256":  "3553a75fe92f6644cae202acf59f49aa2254f30f556f9076bc1ed2e0f0c9bc76"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/LuoyangFinalAssetPrefabMetadata.cs.meta",
+                             "length":  243,
+                             "sha256":  "3837672696304dd571a80d32195a7afa7ce2811575de163cf388e7b01e77f750"
+                         },
+                         {
+                             "path":  "Assets/StreamingAssets/WorldMap/LuoyangRemainingFinalAssetsV1/luoyang_remaining_final_assets_v1.json",
+                             "length":  67160,
+                             "sha256":  "088ed23719ccd4eb5f9e2257ca9c0463668b1f8473d4b28125097dc7eda6fec7"
+                         },
+                         {
+                             "path":  "Assets/StreamingAssets/WorldMap/LuoyangRemainingFinalAssetsV1/luoyang_remaining_final_assets_v1.json.meta",
+                             "length":  155,
+                             "sha256":  "a6336990d7eea5fac7c2c021a2e08d653ddcd2eba23b4e26752d7a591218eab9"
+                         },
+                         {
+                             "path":  "MapPipeline/scripts/build_luoyang_remaining_final_asset_catalog_v1.ps1",
+                             "length":  5099,
+                             "sha256":  "2acb273e685e42de881fafc75a52187496b7c56d7ebe40312232179a10099126"
+                         },
+                         {
+                             "path":  "MapPipeline/scripts/build_luoyang_remaining_final_asset_source_manifest_v1.ps1",
+                             "length":  10666,
+                             "sha256":  "d524ad526c01b32a36312f87cd9899a0015405650b6d4b5d676bb40d6ca3dfc4"
+                         }
+                     ],
+    "pieces":  [
+                   {
+                       "review_order":  15,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_PINGCHENGMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_PINGCHENGMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.pingchengmen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.pingchengmen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.pingchengmen",
+                       "representative_cell_id64":  "4144545",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.prefab",
+                       "prefab_length":  47646,
+                       "prefab_sha256":  "e66c199f9e246432fb52a20bb3884a17c20d9a3191bc6e2af0f89fbfd4d1e991",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R15_HAN_LUOYANG_GATE_PINGCHENGMEN_A.fbx",
+                       "fbx_length":  39327,
+                       "fbx_sha256":  "4701be5e8794b79393be43ea4f887f4f089f3229c6866c6b9f5f6230f89e22a7",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  16,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_SHANGDONGMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_SHANGDONGMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.shangdongmen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.shangdongmen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.shangdongmen",
+                       "representative_cell_id64":  "4098156",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.prefab",
+                       "prefab_length":  55144,
+                       "prefab_sha256":  "f7b21c093db856cec0b6d4280790aa3f3c9d891f9c9f30f48f89179e62ed8e92",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R16_HAN_LUOYANG_GATE_SHANGDONGMEN_A.fbx",
+                       "fbx_length":  41988,
+                       "fbx_sha256":  "3578d7b38e6f770bf0ebbf81bf337e477043676ad3c3391ab98ba64088a3db1b",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  17,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_SHANGXIMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_SHANGXIMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.shangximen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.shangximen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.shangximen",
+                       "representative_cell_id64":  "4098138",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.prefab",
+                       "prefab_length":  55132,
+                       "prefab_sha256":  "6699127f2a73976a10c648c4ac8906046ed93290e19d5901c8b90f780f486839",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R17_HAN_LUOYANG_GATE_SHANGXIMEN_A.fbx",
+                       "fbx_length":  42404,
+                       "fbx_sha256":  "7dea9b6a2b823bacc43b19ffc4c2b11a1d42b8a8ac564035bd131c63548860e9",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  18,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_XIAMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_XIAMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.xiamen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.xiamen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.xiamen",
+                       "representative_cell_id64":  "4084894",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.prefab",
+                       "prefab_length":  65080,
+                       "prefab_sha256":  "bc44af91f4d6f358df1f1f7d084bce25cbeeb70a8ae1ce7b71c9e99ec7a536a7",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R18_HAN_LUOYANG_GATE_XIAMEN_A.fbx",
+                       "fbx_length":  45765,
+                       "fbx_sha256":  "426d6681c91e316588bef366fceedc3e34655d33de4eb901a2e8c4cff70d5c25",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  19,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_XIAOYUANMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_XIAOYUANMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.xiaoyuanmen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.xiaoyuanmen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.xiaoyuanmen",
+                       "representative_cell_id64":  "4144541",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.prefab",
+                       "prefab_length":  55119,
+                       "prefab_sha256":  "78a93f8518d357ff7d3033a179732a63ad6ac928de50374ad1a31175174e0734",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R19_HAN_LUOYANG_GATE_XIAOYUANMEN_A.fbx",
+                       "fbx_length":  46771,
+                       "fbx_sha256":  "f329eb48cfee9830a604897c1a42bd7814fc6381b5eee037ed4a4550cd4d6939",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  20,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_YONGMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_YONGMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.yongmen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.yongmen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.yongmen",
+                       "representative_cell_id64":  "4114708",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.prefab",
+                       "prefab_length":  50109,
+                       "prefab_sha256":  "2f044340a829112cefb915e2e8f8098525ca9ae2d1db24a3009d9d8eaa2beb07",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R20_HAN_LUOYANG_GATE_YONGMEN_A.fbx",
+                       "fbx_length":  71252,
+                       "fbx_sha256":  "fc675153085e5aafb1b999be1e2b9a3ca1d829402ac36df979d46fa476b7dc7a",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  21,
+                       "asset_variant_id":  "HAN_LUOYANG_GATE_ZHONGDONGMEN_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_ZHONGDONGMEN_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.zhongdongmen.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.zhongdongmen.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.gate.zhongdongmen",
+                       "representative_cell_id64":  "4114726",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.prefab",
+                       "prefab_length":  47679,
+                       "prefab_sha256":  "94cadda089953a0e618e455a8934e53c56fc6e77f877a2c76c124233c7248088",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R21_HAN_LUOYANG_GATE_ZHONGDONGMEN_A.fbx",
+                       "fbx_length":  39551,
+                       "fbx_sha256":  "722ff476ac0e169ab0a3affd0463d95a23bb10b48b4a5c5024fad417c082b863",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  23,
+                       "asset_variant_id":  "HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A",
+                       "source_kit_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1",
+                       "source_profile_id":  "gate_identity.luoyang.south_palace_north_gate.v1",
+                       "historical_basis_id":  "LUOYANG_TWELVE_CITY_AND_PALACE_GATE_IDENTITY_V1:gate_identity.luoyang.south_palace_north_gate.v1",
+                       "priority_id":  "priority.p0.identity_critical",
+                       "facility_usage_count":  1,
+                       "representative_facility_id":  "facility.instance.luoyang.184.south_palace_gate.1242.2043",
+                       "representative_cell_id64":  "4118031",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.prefab",
+                       "prefab_length":  55167,
+                       "prefab_sha256":  "851e40f9cbfce4b54829383aaf88440f7afe2cc699339f39107e87f54e2e785a",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R23_HAN_LUOYANG_SOUTH_PALACE_NORTH_GATE_A.fbx",
+                       "fbx_length":  42055,
+                       "fbx_sha256":  "243abc0fbde770ca34635d2380127eeea71593af94c14abb09280fb81f1008f3",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  24,
+                       "asset_variant_id":  "HAN_RES_COMMON_SMALL_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_RES_COMMON_SMALL_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.residence.courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.residence.courtyard.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  552,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001498",
+                       "representative_cell_id64":  "4048437",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.prefab",
+                       "prefab_length":  79377,
+                       "prefab_sha256":  "f6b0f65816c8d13faa7cc1b77543199f5b2358ec5101e68fc728367e5b16201c",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R24_HAN_RES_COMMON_SMALL_PRODUCTION_A.fbx",
+                       "fbx_length":  62755,
+                       "fbx_sha256":  "7da16500925d050178fabd5dbea4c2d1da79c2971e0847c207482365127629a7",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  25,
+                       "asset_variant_id":  "HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.agriculture.dry_field.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.agriculture.dry_field.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  361,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001822",
+                       "representative_cell_id64":  "4018599",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.prefab",
+                       "prefab_length":  36763,
+                       "prefab_sha256":  "f660b983a8522c71c73b57f7603a947cb27d65b6ef5f201a83aa786c8f5f7f20",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R25_HAN_AGRICULTURE_DRY_FIELD_PRODUCTION_A.fbx",
+                       "fbx_length":  31883,
+                       "fbx_sha256":  "2cd522a0f2268e0282dbe8ad51e22c7fda9ca458d6b486769cb4edd416009e4a",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  26,
+                       "asset_variant_id":  "HAN_ROAD_SEGMENT_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_ROAD_SEGMENT_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.public.road_segment.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.public.road_segment.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  359,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001231",
+                       "representative_cell_id64":  "3992096",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.prefab",
+                       "prefab_length":  29279,
+                       "prefab_sha256":  "9f4296b9999ed3094b46a05c1664bf705a23643528b113a810e02df4cc5255f4",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R26_HAN_ROAD_SEGMENT_PRODUCTION_A.fbx",
+                       "fbx_length":  33343,
+                       "fbx_sha256":  "94bba6a94de2a5c776500f43ca9db7ecfeeaa0723c9ebc4c9c8ef6925bc5b79d",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  27,
+                       "asset_variant_id":  "HAN_PRODUCTION_WORKSHOP_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_PRODUCTION_WORKSHOP_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.workshop.courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.workshop.courtyard.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  94,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001997",
+                       "representative_cell_id64":  "4038496",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.prefab",
+                       "prefab_length":  64430,
+                       "prefab_sha256":  "f6039948d758292e2442837c03c47e1788d5ba170172129142b736648adbb032",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R27_HAN_PRODUCTION_WORKSHOP_PRODUCTION_A.fbx",
+                       "fbx_length":  89027,
+                       "fbx_sha256":  "0e650702e7a254f1821739f82937c97c5122a75e47d273524c54c52eb0b0e829",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  28,
+                       "asset_variant_id":  "HAN_AGRICULTURE_GARDEN_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_AGRICULTURE_GARDEN_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.agriculture.garden.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.agriculture.garden.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  92,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000147",
+                       "representative_cell_id64":  "4108093",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.prefab",
+                       "prefab_length":  49303,
+                       "prefab_sha256":  "43033667995ae3d966f6fa77528c62eecf1233fdc858eb4cdc17960f321398cd",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R28_HAN_AGRICULTURE_GARDEN_PRODUCTION_A.fbx",
+                       "fbx_length":  48136,
+                       "fbx_sha256":  "8e505fa8a02b43b31b3b7d44eb425b84555fe3688142120edc11e84fd274cf4e",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  29,
+                       "asset_variant_id":  "HAN_STORAGE_WAREHOUSE_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_STORAGE_WAREHOUSE_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.warehouse.courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.warehouse.courtyard.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  85,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002017",
+                       "representative_cell_id64":  "4041811",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.prefab",
+                       "prefab_length":  66907,
+                       "prefab_sha256":  "2869310db86fa54a44ef51e4d79676a459c642df6914e369ff90d420ea29ab10",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R29_HAN_STORAGE_WAREHOUSE_PRODUCTION_A.fbx",
+                       "fbx_length":  93720,
+                       "fbx_sha256":  "323c84e820d52e57e370cb4308a62183590f3c97f783284e5b1030c23fc431f0",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  30,
+                       "asset_variant_id":  "HAN_CITY_WALL_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_CITY_WALL_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.fortification.city_wall.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.fortification.city_wall.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  76,
+                       "representative_facility_id":  "facility.instance.luoyang.184.main_wall.1232.2034",
+                       "representative_cell_id64":  "4084882",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.prefab",
+                       "prefab_length":  56789,
+                       "prefab_sha256":  "f98ba497c5c2949b064d58c67cd79b7a253eefd9abef00857c2ec10755474c30",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R30_HAN_CITY_WALL_PRODUCTION_A.fbx",
+                       "fbx_length":  48189,
+                       "fbx_sha256":  "150cb36f245810ded1ca3b6dc28b9dd0dea0a97244bb22d86b82ad2a39c9bd48",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  31,
+                       "asset_variant_id":  "HAN_PALACE_WALL_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_PALACE_WALL_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.fortification.palace_wall.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.fortification.palace_wall.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  70,
+                       "representative_facility_id":  "facility.instance.luoyang.184.north_palace_wall.1234.2037",
+                       "representative_cell_id64":  "4091513",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.prefab",
+                       "prefab_length":  39202,
+                       "prefab_sha256":  "88a6052d712a3ec3c37ba8d4cc8e851efb140187fd5a65afd264b02759dd1df1",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R31_HAN_PALACE_WALL_PRODUCTION_A.fbx",
+                       "fbx_length":  37903,
+                       "fbx_sha256":  "105a4f56b2400b42c7a6f3d864f0c55cbab0df830bed17523438bc7ad53a0478",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  32,
+                       "asset_variant_id":  "HAN_INN_POST_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_INN_POST_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.service.inn_post.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.service.inn_post.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  60,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002027",
+                       "representative_cell_id64":  "4045126",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.prefab",
+                       "prefab_length":  44206,
+                       "prefab_sha256":  "c33ff1986030e32fc3d5c10c727efa444a1c44d133b27953609ad9e350cf2d59",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R32_HAN_INN_POST_PRODUCTION_A.fbx",
+                       "fbx_length":  46932,
+                       "fbx_sha256":  "2b98cceca3797f6c63847d196f45330e70837a5e357f05f9201ad000383d5e24",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  33,
+                       "asset_variant_id":  "HAN_AGRICULTURE_PASTURE_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_AGRICULTURE_PASTURE_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1",
+                       "source_profile_id":  "production_profile.han.luoyang.agriculture.pasture.v1",
+                       "historical_basis_id":  "LUOYANG_PRODUCTION_BUILDING_KIT_V1:production_profile.han.luoyang.agriculture.pasture.v1",
+                       "priority_id":  "priority.p1.high_exposure",
+                       "facility_usage_count":  51,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001932",
+                       "representative_cell_id64":  "4028544",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.prefab",
+                       "prefab_length":  49308,
+                       "prefab_sha256":  "26731b3c0679716bbf5aa41fad6aa0a0b6b45a7c9574f55a63379be1571446b7",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R33_HAN_AGRICULTURE_PASTURE_PRODUCTION_A.fbx",
+                       "fbx_length":  78348,
+                       "fbx_sha256":  "897994594edbe06d7b50191e07e39dbf8696974f281cc0e3a956acf321dbd71c",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  34,
+                       "asset_variant_id":  "HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A",
+                       "source_kit_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1",
+                       "source_profile_id":  "urban_fabric.luoyang.market_shopfront.v1",
+                       "historical_basis_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1:urban_fabric.luoyang.market_shopfront.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  48,
+                       "representative_facility_id":  "facility.instance.luoyang.184.jinshi",
+                       "representative_cell_id64":  "4114709",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.prefab",
+                       "prefab_length":  64307,
+                       "prefab_sha256":  "c9301c6337ccaea90825bec13dd614e62634394d7063dcc17ce8f4ee284ef8f1",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R34_HAN_LUOYANG_URBAN_MARKET_SHOPFRONT_A.fbx",
+                       "fbx_length":  92967,
+                       "fbx_sha256":  "a704e4a52bf8400f6b3bb037cdbaf0c1fd0922f25fd2c15ae93630eb58464093",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  35,
+                       "asset_variant_id":  "HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A",
+                       "source_kit_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1",
+                       "source_profile_id":  "urban_fabric.luoyang.caravan_courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1:urban_fabric.luoyang.caravan_courtyard.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  45,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.001957",
+                       "representative_cell_id64":  "4045121",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.prefab",
+                       "prefab_length":  74204,
+                       "prefab_sha256":  "87b5fe8d860cf39dcfece0e9e060b27fdcb39fd9561d2a77fc0a178d3f293d9b",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R35_HAN_LUOYANG_URBAN_CARAVAN_COURTYARD_A.fbx",
+                       "fbx_length":  88271,
+                       "fbx_sha256":  "17765874b94297cef1585e7b04f53c0f18654602e3150a4c17ec92cbdba9f03e",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  36,
+                       "asset_variant_id":  "HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A",
+                       "source_kit_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1",
+                       "source_profile_id":  "urban_fabric.luoyang.school_courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1:urban_fabric.luoyang.school_courtyard.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  39,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002051",
+                       "representative_cell_id64":  "4031867",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.prefab",
+                       "prefab_length":  74155,
+                       "prefab_sha256":  "1135dea37cabe3e92c456e1a574b4373fb056985c104b4f9acc6c4af265fbdf6",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R36_HAN_LUOYANG_URBAN_SCHOOL_COURTYARD_A.fbx",
+                       "fbx_length":  62158,
+                       "fbx_sha256":  "b94e246991d402c62df24971ca56b63fad3dac4fefda36bb882af343691d695a",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  37,
+                       "asset_variant_id":  "HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A",
+                       "source_kit_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1",
+                       "source_profile_id":  "urban_fabric.luoyang.local_office_axis.v1",
+                       "historical_basis_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1:urban_fabric.luoyang.local_office_axis.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  16,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002037",
+                       "representative_cell_id64":  "4048441",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.prefab",
+                       "prefab_length":  69209,
+                       "prefab_sha256":  "f0e50f7e308fa40c400521876e6dbdcd61d6f8f17d08fcfbb32b8559c29850ee",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R37_HAN_LUOYANG_URBAN_LOCAL_OFFICE_AXIS_A.fbx",
+                       "fbx_length":  55831,
+                       "fbx_sha256":  "1119a125bc8c103b7629bb5ef973b5808b4ff3435d6817326bf5068e053fa785",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  38,
+                       "asset_variant_id":  "HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A",
+                       "source_kit_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1",
+                       "source_profile_id":  "urban_fabric.luoyang.military_camp_compound.v1",
+                       "historical_basis_id":  "LUOYANG_MEDIUM_FREQUENCY_URBAN_FABRIC_V1:urban_fabric.luoyang.military_camp_compound.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  10,
+                       "representative_facility_id":  "facility.instance.luoyang.184.barracks.2035.-2",
+                       "representative_cell_id64":  "4108081",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.prefab",
+                       "prefab_length":  81720,
+                       "prefab_sha256":  "ab10bbed163185bdd66097feb6631ba52e9a3f2312135ed79955d9ddd3615be0",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R38_HAN_LUOYANG_URBAN_MILITARY_CAMP_COMPOUND_A.fbx",
+                       "fbx_length":  61659,
+                       "fbx_sha256":  "1d86bf087c7c8e152be0c0a974ea8f1a7da45997612322cb5de667f8c15a0f8b",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  39,
+                       "asset_variant_id":  "HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A",
+                       "source_kit_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1",
+                       "source_profile_id":  "infrastructure.luoyang.canal.stone_bank.v1",
+                       "historical_basis_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1:infrastructure.luoyang.canal.stone_bank.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  19,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000379",
+                       "representative_cell_id64":  "4157811",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.prefab",
+                       "prefab_length":  56137,
+                       "prefab_sha256":  "c55714ebd4719424f2bca344ff0efc4961e76c6333a7ce1973b3338b52b8a57a",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R39_HAN_LUOYANG_INFRASTRUCTURE_CANAL_STONE_BANK_A.fbx",
+                       "fbx_length":  45209,
+                       "fbx_sha256":  "b4b3d7537223c2e1b527cc937006d808680aca62c72fd8c05c48b2651860450c",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  40,
+                       "asset_variant_id":  "HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A",
+                       "source_kit_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1",
+                       "source_profile_id":  "infrastructure.luoyang.well.timber_canopy.v1",
+                       "historical_basis_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1:infrastructure.luoyang.well.timber_canopy.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  16,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002057",
+                       "representative_cell_id64":  "4015285",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.prefab",
+                       "prefab_length":  62606,
+                       "prefab_sha256":  "1a4e3b03ca6d916d1450834cafb5be83546c52a4d91fcd8570d85a0429baf44c",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R40_HAN_LUOYANG_INFRASTRUCTURE_WELL_TIMBER_CANOPY_A.fbx",
+                       "fbx_length":  106046,
+                       "fbx_sha256":  "eba6b4cfec97dc595545ac89d0cf6ea541ac55bc9ccd3479c5f17552ee49de33",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  41,
+                       "asset_variant_id":  "HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A",
+                       "source_kit_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1",
+                       "source_profile_id":  "infrastructure.luoyang.bridge.timber_stone.v1",
+                       "historical_basis_id":  "LUOYANG_CANAL_WELL_BRIDGE_INFRASTRUCTURE_PRODUCTION_V1:infrastructure.luoyang.bridge.timber_stone.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  2,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000377",
+                       "representative_cell_id64":  "4157809",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.prefab",
+                       "prefab_length":  76936,
+                       "prefab_sha256":  "5be3314258dc7ac803ce1f470a798d3f7e09e91b51bef4dc7b2e3e77b3cfb62d",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R41_HAN_LUOYANG_INFRASTRUCTURE_BRIDGE_TIMBER_STONE_A.fbx",
+                       "fbx_length":  61093,
+                       "fbx_sha256":  "f30d4fb988a92ce284fe508ceb338797bb27e2a2bd9a6586dad85b2399ac462c",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  42,
+                       "asset_variant_id":  "HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A",
+                       "source_kit_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1",
+                       "source_profile_id":  "defense.luoyang.generic_military_gate.v1",
+                       "historical_basis_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1:defense.luoyang.generic_military_gate.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  4,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.001038",
+                       "representative_cell_id64":  "4055056",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.prefab",
+                       "prefab_length":  71763,
+                       "prefab_sha256":  "b027082ea178dd0abb9ec70e054d194a2be9146187ece931bb57e452f086208b",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R42_HAN_LUOYANG_DEFENSE_GENERIC_MILITARY_GATE_A.fbx",
+                       "fbx_length":  59812,
+                       "fbx_sha256":  "f3e6fa2295fe5d5d6d1152f94b850a89fb6689acdbe739fa55a5bd5b1a2ae327",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  43,
+                       "asset_variant_id":  "HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A",
+                       "source_kit_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1",
+                       "source_profile_id":  "defense.luoyang.fortified_manor.v1",
+                       "historical_basis_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1:defense.luoyang.fortified_manor.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  7,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.001031",
+                       "representative_cell_id64":  "4055047",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.prefab",
+                       "prefab_length":  106622,
+                       "prefab_sha256":  "13cfd91ba3949c76ecbb5ce576889b776391ad0a2d63363492201a7864df2623",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R43_HAN_LUOYANG_DEFENSE_FORTIFIED_MANOR_A.fbx",
+                       "fbx_length":  62079,
+                       "fbx_sha256":  "49c37145978b1e501f1cfb1b3d7fdbe7a074f69b30907410718de6af787453d1",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  44,
+                       "asset_variant_id":  "HAN_LUOYANG_DEFENSE_BEACON_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_DEFENSE_BEACON_A",
+                       "source_kit_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1",
+                       "source_profile_id":  "defense.luoyang.beacon.v1",
+                       "historical_basis_id":  "LUOYANG_LOW_FREQUENCY_DEFENSE_PRODUCTION_V1:defense.luoyang.beacon.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  3,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.001024",
+                       "representative_cell_id64":  "4031888",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.prefab",
+                       "prefab_length":  66595,
+                       "prefab_sha256":  "83835f74373224e06ea7c959d305e0031405b3abdcd09e716d51d2e7a0071ceb",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R44_HAN_LUOYANG_DEFENSE_BEACON_A.fbx",
+                       "fbx_length":  84705,
+                       "fbx_sha256":  "809b145455b215a31c688a22122eb3ef1e4d92fb4c7fb24f3326286a3b649d7f",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  45,
+                       "asset_variant_id":  "HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A",
+                       "source_kit_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1",
+                       "source_profile_id":  "production.luoyang.final_civic.clinic_herbal_courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1:production.luoyang.final_civic.clinic_herbal_courtyard.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  9,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000451",
+                       "representative_cell_id64":  "4161115",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.prefab",
+                       "prefab_length":  66908,
+                       "prefab_sha256":  "28dc8360f7c792c385f31bfeae95347a5b967abaadcf79bdd508d943ba7de2d7",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R45_HAN_LUOYANG_CLINIC_HERBAL_COURTYARD_A.fbx",
+                       "fbx_length":  59856,
+                       "fbx_sha256":  "976ac4f957a506e53c6abc53f1896f4edc0e47a0a143d9b2eff7b1dbe74a4f50",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  46,
+                       "asset_variant_id":  "HAN_LUOYANG_GENERIC_RITUAL_HALL_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_GENERIC_RITUAL_HALL_A",
+                       "source_kit_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1",
+                       "source_profile_id":  "production.luoyang.final_civic.generic_ritual_hall.v1",
+                       "historical_basis_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1:production.luoyang.final_civic.generic_ritual_hall.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  6,
+                       "representative_facility_id":  "facility.instance.luoyang.184.metropolitan.002045",
+                       "representative_cell_id64":  "4190934",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.prefab",
+                       "prefab_length":  64252,
+                       "prefab_sha256":  "fa5cefc32dae6e78dd5598351ef7d2bb8a4c9bb4c310d7fb4be68fa788b9e85d",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R46_HAN_LUOYANG_GENERIC_RITUAL_HALL_A.fbx",
+                       "fbx_length":  51291,
+                       "fbx_sha256":  "35b9b5b18dd4878baa6dde240f50807955f4b7e1192c8c5574cb9c7648004c6e",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  47,
+                       "asset_variant_id":  "HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A",
+                       "source_kit_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1",
+                       "source_profile_id":  "production.luoyang.final_civic.central_office_axial.v1",
+                       "historical_basis_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1:production.luoyang.final_civic.central_office_axial.v1",
+                       "priority_id":  "priority.p2.system_readable",
+                       "facility_usage_count":  2,
+                       "representative_facility_id":  "facility.instance.luoyang.184.central_offices_east",
+                       "representative_cell_id64":  "4124662",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.prefab",
+                       "prefab_length":  71782,
+                       "prefab_sha256":  "9c35ad7f7b94e341094f065387987caa01f59137cffec3ae2932a77b011c4f3f",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R47_HAN_LUOYANG_CENTRAL_OFFICE_AXIAL_COURT_A.fbx",
+                       "fbx_length":  58048,
+                       "fbx_sha256":  "22f4b0f82c6ecda49c620f258f2ec6dcf9532f99f5cb7d3b1f9fbb196138eeee",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  48,
+                       "asset_variant_id":  "HAN_LUOYANG_FORESTRY_PRODUCTION_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_FORESTRY_PRODUCTION_A",
+                       "source_kit_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1",
+                       "source_profile_id":  "production.luoyang.forestry.managed_timber_yard.v1",
+                       "historical_basis_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1:production.luoyang.forestry.managed_timber_yard.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  9,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000617",
+                       "representative_cell_id64":  "4154481",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.prefab",
+                       "prefab_length":  79369,
+                       "prefab_sha256":  "6bb9c5d5215467c272736c5d8b639dfd098e513d76b72952503641266f410a53",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R48_HAN_LUOYANG_FORESTRY_PRODUCTION_A.fbx",
+                       "fbx_length":  83626,
+                       "fbx_sha256":  "6a3090f63baa9885ef3df5714ff2684814db2c4f94decfbd0641db2c459bfb85",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  49,
+                       "asset_variant_id":  "HAN_LUOYANG_QUARRY_TERRACE_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_QUARRY_TERRACE_A",
+                       "source_kit_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1",
+                       "source_profile_id":  "production.luoyang.quarry.open_terraces.v1",
+                       "historical_basis_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1:production.luoyang.quarry.open_terraces.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  6,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000631",
+                       "representative_cell_id64":  "4154495",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.prefab",
+                       "prefab_length":  66930,
+                       "prefab_sha256":  "83fb268190dcc54f1156075b5305d8a93d89a65b1aef5d53bfb54a94c373c73d",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R49_HAN_LUOYANG_QUARRY_TERRACE_A.fbx",
+                       "fbx_length":  53266,
+                       "fbx_sha256":  "7c717f71887214b2ee3f19630fc0edf25ed7d477cc5eb01faa11d4bd8a98c756",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  50,
+                       "asset_variant_id":  "HAN_LUOYANG_MINE_ADIT_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_MINE_ADIT_A",
+                       "source_kit_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1",
+                       "source_profile_id":  "production.luoyang.mine.shallow_adit.v1",
+                       "historical_basis_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1:production.luoyang.mine.shallow_adit.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  5,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000626",
+                       "representative_cell_id64":  "4154490",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.prefab",
+                       "prefab_length":  71842,
+                       "prefab_sha256":  "514352ef7848fb81c8e2f04425ea08a252c7a55fdf06df265f7e3349349ee35c",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R50_HAN_LUOYANG_MINE_ADIT_A.fbx",
+                       "fbx_length":  59214,
+                       "fbx_sha256":  "562eb106b94fa369c4116cdafbd26ca839c353838e7b0645b79bd19b12c529ee",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  51,
+                       "asset_variant_id":  "HAN_LUOYANG_RICE_PADDY_BUNDED_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_RICE_PADDY_BUNDED_A",
+                       "source_kit_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1",
+                       "source_profile_id":  "production.luoyang.rice_field.bunded_paddy.v1",
+                       "historical_basis_id":  "LUOYANG_RESOURCE_AGRICULTURE_PRODUCTION_V1:production.luoyang.rice_field.bunded_paddy.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  6,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000909",
+                       "representative_cell_id64":  "4164434",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.prefab",
+                       "prefab_length":  74185,
+                       "prefab_sha256":  "a859271d25957b16d4b750241c0feaf22f542771a6b000e5b181360fb703180a",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R51_HAN_LUOYANG_RICE_PADDY_BUNDED_A.fbx",
+                       "fbx_length":  54819,
+                       "fbx_sha256":  "bff83ba3404a31adc36d6a46c15b80aa1366165a2798ece59020d6939233293b",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  52,
+                       "asset_variant_id":  "HAN_LUOYANG_PUBLIC_COURTYARD_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_PUBLIC_COURTYARD_A",
+                       "source_kit_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1",
+                       "source_profile_id":  "production.luoyang.final_civic.public_courtyard.v1",
+                       "historical_basis_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1:production.luoyang.final_civic.public_courtyard.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  4,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000167",
+                       "representative_cell_id64":  "4098144",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.prefab",
+                       "prefab_length":  64293,
+                       "prefab_sha256":  "4f0f86f591de6706a6d1a3b08aeac61930d7dd7ac1bbb4309713b9084efd175e",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R52_HAN_LUOYANG_PUBLIC_COURTYARD_A.fbx",
+                       "fbx_length":  82666,
+                       "fbx_sha256":  "464580e726922b9bb973c2b94f363f228fc0d712b8a8d0d888695341149567f0",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  53,
+                       "asset_variant_id":  "HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A",
+                       "replacement_slot_id":  "HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A",
+                       "source_kit_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1",
+                       "source_profile_id":  "production.luoyang.final_civic.public_plaza.v1",
+                       "historical_basis_id":  "LUOYANG_FINAL_LOW_FREQUENCY_CIVIC_RITUAL_MEDICAL_PRODUCTION_CLOSURE_V1:production.luoyang.final_civic.public_plaza.v1",
+                       "priority_id":  "priority.p3.supporting_context",
+                       "facility_usage_count":  4,
+                       "representative_facility_id":  "facility.instance.luoyang.v1.recommended.000158",
+                       "representative_cell_id64":  "4127971",
+                       "user_review_decision":  "PREACCEPTED",
+                       "prefab_path":  "Assets/Resources/Art/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.prefab",
+                       "prefab_length":  66718,
+                       "prefab_sha256":  "e10385bfb8b90e1de214eff56c1a374548f1ffede7d0cd7e54f0780768253817",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/FinalRemaining/R53_HAN_LUOYANG_OPEN_PUBLIC_PLAZA_A.fbx",
+                       "fbx_length":  80328,
+                       "fbx_sha256":  "459e98ff25ee823320ab37506e1ce6f276c77e080a3f94f9b3e31fbc63485657",
+                       "prefab_source_status":  "PRESENT_UNITY_RELOAD_VALIDATED",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "lod_count":  3,
+                       "final_art_approved":  true
+                   }
+               ]
+}

@@ -89,6 +89,8 @@ namespace Mandate.Domain
         public int WorkerPersonCount;
         public int StudentPersonCount;
         public long StorageCapacity;
+        public int ConditionBasisPoints = 10_000;
+        public int RuntimeExpansionLevel;
         public List<string> ResidentPersonIds = new List<string>();
         public List<string> WorkerPersonIds = new List<string>();
         public List<string> ServicePersonIds = new List<string>();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Mandate.Domain
 {
@@ -59,6 +60,38 @@ namespace Mandate.Domain
         Critical
     }
 
+    public enum LuoyangSupplierMaterializationLevel : byte
+    {
+        FullPhysical,
+        CompactRuntime,
+        DeferredExternalTrade
+    }
+
+    public enum LuoyangSupplyOrderStatus : byte
+    {
+        Requested,
+        InTransit,
+        Delivered,
+        Failed
+    }
+
+    public enum LuoyangIntelligentAgentRole : byte
+    {
+        Household,
+        FamilyOrganization,
+        Merchant,
+        SettlementDevelopment,
+        Government,
+        FacilityManager
+    }
+
+    public enum LuoyangCompactConstructionKind : byte
+    {
+        NewBuild,
+        Repair,
+        Expansion
+    }
+
     [Serializable]
     public sealed class Luoyang184LivingFacilitySourceRecord
     {
@@ -92,11 +125,122 @@ namespace Mandate.Domain
         IReadOnlyList<Luoyang184LivingFacilitySourceRecord> Facilities { get; }
         IReadOnlyList<Luoyang184MetropolitanAgricultureRecord> Agriculture { get; }
         IReadOnlyList<Luoyang184MetropolitanSupplyChainRecord> SupplyChains { get; }
+        IReadOnlyList<Luoyang184T4SupplierSourceRecord> ExternalSuppliers { get; }
+        IReadOnlyList<Luoyang184FamilyOrganizationSourceRecord>
+            FamilyOrganizations { get; }
+        IReadOnlyList<ulong> DevelopableCellIds { get; }
         string GetPersonId(uint ordinal);
         string GetHouseholdId(uint ordinal);
         string GetFacilityId(uint facilityIndex);
         string GetActivityId(ushort activityIndex);
         string GetOccupationId(ushort occupationIndex);
+    }
+
+    [Serializable]
+    public sealed class Luoyang184FamilyOrganizationSourceRecord
+    {
+        public ushort Index;
+        public string Id;
+        public string HeadPersonId;
+        public long Funds;
+        public long AssetValue;
+        public List<string> FacilityIds = new List<string>();
+    }
+
+    [Serializable]
+    public sealed class Luoyang184T4SupplierSourceRecord
+    {
+        public string SupplierId;
+        public LuoyangSupplierMaterializationLevel Level;
+        public string CountyId;
+        public string SettlementId;
+        public string FacilityId;
+        public string InventoryId;
+        public string OrganizationId;
+        public string ManagerPersonId;
+        public string ManagerHouseholdId;
+        public string ProductId;
+        public long OpeningQuantityMilliunits;
+        public long StorageCapacityMilliunits;
+        public long DailyProductionMilliunits;
+        public string RouteId;
+        public int DistanceKilometers;
+        public int TravelDays;
+        public int NaturalLossBasisPoints;
+        public int RiskLossBasisPoints;
+        public string EvidenceGrade;
+        public string SourceReferenceId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangExternalSupplierRuntimeState
+    {
+        public string SupplierId;
+        public LuoyangSupplierMaterializationLevel Level;
+        public string CountyId;
+        public string SettlementId;
+        public string FacilityId;
+        public string InventoryId;
+        public string OrganizationId;
+        public string ManagerPersonId;
+        public string ManagerHouseholdId;
+        public string ProductId;
+        public long InventoryQuantityMilliunits;
+        public long StorageCapacityMilliunits;
+        public long DailyProductionMilliunits;
+        public string RouteId;
+        public int DistanceKilometers;
+        public int TravelDays;
+        public int NaturalLossBasisPoints;
+        public int RiskLossBasisPoints;
+        public long CumulativeProducedMilliunits;
+        public long CumulativeDispatchedMilliunits;
+        public long CashBalance;
+        public long CumulativeSalesRevenue;
+        public long CumulativeOperatingExpense;
+        public string EvidenceGrade;
+        public string SourceReferenceId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangSupplyOrderRuntimeState
+    {
+        public string Id;
+        public long RequestedDay;
+        public string ProductId;
+        public string SupplierId;
+        public string DestinationInventoryId;
+        public long RequestedQuantityMilliunits;
+        public long DispatchedQuantityMilliunits;
+        public long DeliveredQuantityMilliunits;
+        public long UnitPrice;
+        public long PurchaseCost;
+        public LuoyangSupplyOrderStatus Status;
+        public string ShipmentId;
+        public string RequestedByAgentId;
+        public string ReasonId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangShipmentRuntimeState
+    {
+        public string Id;
+        public string OrderId;
+        public string ProductId;
+        public string SupplierId;
+        public string SourceInventoryId;
+        public string DestinationInventoryId;
+        public string RouteId;
+        public string CarrierPersonId;
+        public long DispatchDay;
+        public long ArrivalDay;
+        public long ShippedQuantityMilliunits;
+        public long CarrierConsumptionMilliunits;
+        public long NaturalLossMilliunits;
+        public long RiskLossMilliunits;
+        public long DeliveredQuantityMilliunits;
+        public long PurchaseCost;
+        public bool Delivered;
     }
 
     [Serializable]
@@ -110,6 +254,11 @@ namespace Mandate.Domain
         public short Age;
         public LuoyangWorkforceStatus Status;
         public int EffectiveLaborBasisPoints;
+        public string SocialRoleId;
+        public string CurrentActivityId;
+        public string CurrentLocationId = "location.capital.luoyang";
+        public string TransitDestinationId;
+        public long TransitArrivalDay = -1;
         public long CumulativeFoodDemandMilliunits;
         public long CumulativeFoodConsumedMilliunits;
     }
@@ -121,6 +270,7 @@ namespace Mandate.Domain
         public string FacilityId;
         public string DefinitionId;
         public string OwnerId;
+        public ulong CellId64;
         public string RecipeId;
         public string InputProductId;
         public string OutputProductId;
@@ -137,6 +287,8 @@ namespace Mandate.Domain
         public LuoyangProductionRuntimeStatus Status;
         public string StopReasonId;
         public string AiResponseActionId;
+        public int ConditionBasisPoints = 10_000;
+        public int RuntimeExpansionLevel;
     }
 
     [Serializable]
@@ -174,11 +326,19 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class LuoyangHouseholdConsumptionState
     {
+        public string HouseholdId;
         public uint HouseholdOrdinal;
         public uint HeadPersonOrdinal;
         public uint MemberStartOrdinal;
         public ushort MemberCount;
+        public ushort FamilyOrganizationIndex = ushort.MaxValue;
+        public uint ResidenceFacilityIndex = uint.MaxValue;
         public long Wealth;
+        public long FoodReserveMilliunits;
+        public long CumulativeMoneySpent;
+        public long CumulativeMoneyTaxPaid;
+        public long CumulativeReliefReceivedMilliunits;
+        public long LastConsumptionSettlementDay;
         public long DailyFoodDemandMilliunits;
         public long CumulativeFoodDemandMilliunits;
         public long CumulativeFoodAcquiredMilliunits;
@@ -190,6 +350,155 @@ namespace Mandate.Domain
     }
 
     [Serializable]
+    public sealed class LuoyangIntelligentAgentRuntimeState
+    {
+        public string Id;
+        public string SubjectId;
+        public string RepresentativePersonId;
+        public int SubjectIndex = -1;
+        public WorldAgentKind AgentKind;
+        public LuoyangIntelligentAgentRole Role;
+        public string GoalId;
+        public int RiskPreferenceBasisPoints;
+        public int DiligenceBasisPoints;
+        public int AmbitionBasisPoints;
+        public int CompassionBasisPoints;
+        public long DecisionSequence;
+        public long LastDecisionDay = -1;
+        public long NextDecisionDay;
+        public string LastActionTypeId;
+        public long ExecutedActionCount;
+        public long RejectedActionCount;
+    }
+
+    [Serializable]
+    public sealed class LuoyangDecisionAuditState
+    {
+        public string Id;
+        public long Day;
+        public string AgentId;
+        public LuoyangIntelligentAgentRole Role;
+        public string SignalDigest;
+        public string CandidateDigest;
+        public string SelectedActionTypeId;
+        public string ValidationReasonId;
+        public bool Executed;
+        public string ResultEntityId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangDecisionScheduleBucketState
+    {
+        public int BucketIndex;
+        public List<int> AgentIndexes = new List<int>();
+    }
+
+    [Serializable]
+    public sealed class LuoyangFamilyOrganizationRuntimeState
+    {
+        public ushort Index;
+        public string Id;
+        public string HeadPersonId;
+        public long Funds;
+        public long AssetValue;
+        public int HouseholdCount;
+        public string FamilyCenterFacilityId;
+        public long MemberSupportPaid;
+        public long InvestmentPaid;
+        public string LastStrategyId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangCompactConstructionProjectState
+    {
+        public string Id;
+        public LuoyangCompactConstructionKind Kind;
+        public ulong CellId64;
+        public string TargetFacilityId;
+        public string ResultFacilityId;
+        public string FacilityDefinitionId;
+        public string OwnerId;
+        public string MaterialInventoryId;
+        public string MaterialProductId;
+        public long MaterialQuantityMilliunits;
+        public List<LuoyangCompactConstructionMaterialState> Materials =
+            new List<LuoyangCompactConstructionMaterialState>();
+        public long StartedDay;
+        public long CompletionDay;
+        public int RequiredLaborers;
+        public List<uint> LaborerPersonOrdinals = new List<uint>();
+        public long MoneyCost;
+        public bool Completed;
+        public bool Cancelled;
+        public bool LegacyImported;
+        public string MigrationNote;
+        public string RequestedByAgentId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangCompactConstructionMaterialState
+    {
+        public string InventoryId;
+        public string ProductId;
+        public long ConsumedMilliunits;
+    }
+
+    [Serializable]
+    public sealed class LuoyangCellPropertyRuntimeState
+    {
+        public ulong CellId64;
+        public string OwnerId;
+        public string AdministrativeControllerId;
+        public string BuildingRightHolderId;
+        public string FacilityId;
+        public long LastTransferDay;
+        public long LastTransferPrice;
+        public int Revision;
+    }
+
+    [Serializable]
+    public sealed class LuoyangCellPropertyTransferRuntimeState
+    {
+        public string Id;
+        public ulong CellId64;
+        public string FromOwnerId;
+        public string ToOwnerId;
+        public long Price;
+        public long Day;
+        public string AuthorizingPersonId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangGovernmentEconomyRuntimeState
+    {
+        public string OrganizationId = "organization.government.han.luoyang";
+        public string CurrentLocationId = "location.capital.luoyang";
+        public string GranaryInventoryId;
+        public long Treasury;
+        public long TaxRevenue;
+        public long PurchaseExpense;
+        public long ReliefExpense;
+        public long ConstructionExpense;
+        public string CurrentFoodPolicyId;
+        public string CurrentDevelopmentPolicyId;
+    }
+
+    [Serializable]
+    public sealed class LuoyangMarketTradeRuntimeState
+    {
+        public string Id;
+        public long Day;
+        public string ProductId;
+        public string BuyerId;
+        public string SellerId;
+        public string SourceInventoryId;
+        public long QuantityMilliunits;
+        public long UnitPrice;
+        public long MoneyTransferred;
+        public string TradeOrderId;
+    }
+
+    [Serializable]
     public sealed class LuoyangInventoryBalanceState
     {
         public string Id;
@@ -197,6 +506,9 @@ namespace Mandate.Domain
         public string OwnerId;
         public string FacilityId;
         public string ProductId;
+        public string CurrentLocationId = "location.capital.luoyang";
+        public string TransitDestinationId;
+        public long TransitArrivalDay = -1;
         public long CapacityMilliunits;
         public long QuantityMilliunits;
         public int QualityBasisPoints = 10_000;
@@ -229,6 +541,13 @@ namespace Mandate.Domain
         public long FailedDemandMilliunits;
         public int BasePrice;
         public int CurrentPriceBasisPoints = 10_000;
+        public long CashBalance = 100_000_000;
+        public long RecentTradeQuantityMilliunits;
+        public long RecentTradeValue;
+        public int TransportCostBasisPoints;
+        public int RiskBasisPoints;
+        public int SeasonBasisPoints = 10_000;
+        public int ShortageBasisPoints;
     }
 
     [Serializable]
@@ -276,18 +595,32 @@ namespace Mandate.Domain
         public long ConsumptionMilliseconds;
         public long ProductionMilliseconds;
         public long MarketMilliseconds;
+        public long DecisionMilliseconds;
+        public long DecisionIndexMilliseconds;
+        public long HouseholdDecisionMilliseconds;
+        public long FacilityDecisionMilliseconds;
+        public long OrganizationDecisionMilliseconds;
+        public long SupplyMilliseconds;
+        public long ShortageMilliseconds;
     }
 
     [Serializable]
     public sealed class Luoyang184LivingWorldRuntimeState
     {
-        public const int FormatVersion = 1;
+        public const int FormatVersion = 6;
 
         public int Version = FormatVersion;
+        public bool RequiresSourceRehydration;
+        public List<string> MigrationWarnings = new List<string>();
         public long AbsoluteDay;
         public ulong MasterSeed;
         public string SourcePackageId;
         public string ProtectedPackageDigest;
+        public long DailyFoodDemandMilliunits;
+        public int CurrentUnemployedCount;
+        public int CurrentLocalPopulation;
+        public int UnemployedSearchCursor;
+        public int FacilityVacancySearchCursor;
         public List<LuoyangWorkforceAssignmentState> Workforce =
             new List<LuoyangWorkforceAssignmentState>();
         public List<LuoyangFacilityProductionRuntimeState> Facilities =
@@ -300,8 +633,48 @@ namespace Mandate.Domain
             new List<LuoyangInventoryBalanceState>();
         public List<LuoyangInventoryFlowState> InventoryFlows =
             new List<LuoyangInventoryFlowState>();
+        public List<LuoyangExternalSupplierRuntimeState> ExternalSuppliers =
+            new List<LuoyangExternalSupplierRuntimeState>();
+        public List<LuoyangSupplyOrderRuntimeState> SupplyOrders =
+            new List<LuoyangSupplyOrderRuntimeState>();
+        public List<LuoyangShipmentRuntimeState> Shipments =
+            new List<LuoyangShipmentRuntimeState>();
         public List<LuoyangMarketRuntimeState> Markets =
             new List<LuoyangMarketRuntimeState>();
+        public List<LuoyangMarketTradeRuntimeState> MarketTrades =
+            new List<LuoyangMarketTradeRuntimeState>();
+        public List<LuoyangIntelligentAgentRuntimeState> IntelligentAgents =
+            new List<LuoyangIntelligentAgentRuntimeState>();
+        public List<LuoyangDecisionAuditState> DecisionAudits =
+            new List<LuoyangDecisionAuditState>();
+        public List<LuoyangDecisionScheduleBucketState> DecisionScheduleBuckets =
+            new List<LuoyangDecisionScheduleBucketState>();
+        public List<LuoyangFamilyOrganizationRuntimeState> FamilyOrganizations =
+            new List<LuoyangFamilyOrganizationRuntimeState>();
+        public List<LuoyangCompactConstructionProjectState> ConstructionProjects =
+            new List<LuoyangCompactConstructionProjectState>();
+        public List<LuoyangCellPropertyRuntimeState> CellProperties =
+            new List<LuoyangCellPropertyRuntimeState>();
+        public List<LuoyangCellPropertyTransferRuntimeState> CellPropertyTransfers =
+            new List<LuoyangCellPropertyTransferRuntimeState>();
+        public List<LuoyangFamilyAssetRuntimeState> FamilyAssets =
+            new List<LuoyangFamilyAssetRuntimeState>();
+        public List<LuoyangPersonDevelopmentRuntimeState> PersonDevelopment =
+            new List<LuoyangPersonDevelopmentRuntimeState>();
+        public List<LuoyangOfficeRuntimeState> Offices =
+            new List<LuoyangOfficeRuntimeState>();
+        public List<LuoyangTaxRuntimeState> Taxes =
+            new List<LuoyangTaxRuntimeState>();
+        public List<LuoyangMilitaryForceRuntimeState> Forces =
+            new List<LuoyangMilitaryForceRuntimeState>();
+        public List<LuoyangSocialPressureRuntimeState> SocialPressureHistory =
+            new List<LuoyangSocialPressureRuntimeState>();
+        public List<LuoyangHistoricalEventRuntimeState> HistoricalEvents =
+            new List<LuoyangHistoricalEventRuntimeState>();
+        public List<LuoyangPlayerCommandRuntimeState> PlayerCommands =
+            new List<LuoyangPlayerCommandRuntimeState>();
+        public LuoyangGovernmentEconomyRuntimeState GovernmentEconomy =
+            new LuoyangGovernmentEconomyRuntimeState();
         public List<LuoyangShortageResponseState> ShortageResponses =
             new List<LuoyangShortageResponseState>();
         public List<LuoyangLivingWorldDaySnapshotState> DaySnapshots =
@@ -393,13 +766,33 @@ namespace Mandate.Domain
                 runtime.Workforce == null || runtime.Facilities == null ||
                 runtime.Crops == null || runtime.Households == null ||
                 runtime.Inventories == null || runtime.InventoryFlows == null ||
-                runtime.Markets == null || runtime.ShortageResponses == null ||
+                runtime.ExternalSuppliers == null ||
+                runtime.SupplyOrders == null || runtime.Shipments == null ||
+                runtime.Markets == null || runtime.MarketTrades == null ||
+                runtime.IntelligentAgents == null ||
+                runtime.DecisionAudits == null ||
+                runtime.DecisionScheduleBuckets == null ||
+                runtime.FamilyOrganizations == null ||
+                runtime.ConstructionProjects == null ||
+                runtime.CellProperties == null ||
+                runtime.CellPropertyTransfers == null ||
+                runtime.FamilyAssets == null ||
+                runtime.PersonDevelopment == null ||
+                runtime.Offices == null || runtime.Taxes == null ||
+                runtime.Forces == null || runtime.SocialPressureHistory == null ||
+                runtime.HistoricalEvents == null || runtime.PlayerCommands == null ||
+                runtime.GovernmentEconomy == null ||
+                runtime.ShortageResponses == null ||
                 runtime.DaySnapshots == null || runtime.Performance == null)
                 throw new InvalidOperationException("Invalid Luoyang living-world runtime collections.");
             if (runtime.Workforce.Count != expectedPersons ||
                 runtime.Households.Count != expectedHouseholds ||
-                runtime.Facilities.Count != expectedFacilities)
+                runtime.Facilities.Count < expectedFacilities)
                 throw new InvalidOperationException("Luoyang living-world protected counts changed.");
+            if (runtime.CurrentLocalPopulation < 0 ||
+                runtime.CurrentLocalPopulation > runtime.Workforce.Count)
+                throw new InvalidOperationException(
+                    "Invalid Luoyang current-location population cache.");
 
             var activePersons = new HashSet<uint>();
             for (var i = 0; i < runtime.Workforce.Count; i++)
@@ -407,6 +800,10 @@ namespace Mandate.Domain
                 var assignment = runtime.Workforce[i] ??
                     throw new InvalidOperationException("A workforce assignment cannot be null.");
                 if (!activePersons.Add(assignment.PersonOrdinal) ||
+                    string.IsNullOrWhiteSpace(assignment.CurrentLocationId) ||
+                    (assignment.TransitArrivalDay >= 0 &&
+                     string.IsNullOrWhiteSpace(
+                         assignment.TransitDestinationId)) ||
                     assignment.EffectiveLaborBasisPoints < 0 ||
                     assignment.CumulativeFoodDemandMilliunits < 0 ||
                     assignment.CumulativeFoodConsumedMilliunits < 0 ||
@@ -419,10 +816,144 @@ namespace Mandate.Domain
             {
                 var inventory = runtime.Inventories[i];
                 if (inventory == null || string.IsNullOrWhiteSpace(inventory.Id) ||
+                    string.IsNullOrWhiteSpace(inventory.CurrentLocationId) ||
+                    (inventory.TransitArrivalDay >= 0 &&
+                     string.IsNullOrWhiteSpace(inventory.TransitDestinationId)) ||
                     inventory.QuantityMilliunits < 0 ||
                     inventory.CapacityMilliunits < 0 ||
                     inventory.QuantityMilliunits > inventory.CapacityMilliunits)
                     throw new InvalidOperationException("Invalid Luoyang inventory balance.");
+            }
+
+            var supplierIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var supplier in runtime.ExternalSuppliers)
+            {
+                if (supplier == null ||
+                    !supplierIds.Add(supplier.SupplierId) ||
+                    string.IsNullOrWhiteSpace(supplier.CountyId) ||
+                    string.IsNullOrWhiteSpace(supplier.FacilityId) ||
+                    string.IsNullOrWhiteSpace(supplier.InventoryId) ||
+                    string.IsNullOrWhiteSpace(supplier.ProductId) ||
+                    supplier.InventoryQuantityMilliunits < 0 ||
+                    supplier.StorageCapacityMilliunits <= 0 ||
+                    supplier.InventoryQuantityMilliunits >
+                        supplier.StorageCapacityMilliunits ||
+                    supplier.DailyProductionMilliunits < 0 ||
+                    supplier.CashBalance < 0 ||
+                    supplier.CumulativeOperatingExpense < 0 ||
+                    supplier.TravelDays <= 0 ||
+                    supplier.NaturalLossBasisPoints < 0 ||
+                    supplier.RiskLossBasisPoints < 0)
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang external supplier state.");
+            }
+            var orderIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var order in runtime.SupplyOrders)
+            {
+                if (order == null || !orderIds.Add(order.Id) ||
+                    !supplierIds.Contains(order.SupplierId) ||
+                    order.RequestedDay < 0 ||
+                    order.RequestedQuantityMilliunits <= 0 ||
+                    order.DispatchedQuantityMilliunits < 0 ||
+                    order.DeliveredQuantityMilliunits < 0 ||
+                    order.UnitPrice <= 0 || order.PurchaseCost < 0 ||
+                    order.DeliveredQuantityMilliunits >
+                        order.DispatchedQuantityMilliunits)
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang supply order state.");
+            }
+            var shipmentIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var shipment in runtime.Shipments)
+            {
+                if (shipment == null || !shipmentIds.Add(shipment.Id) ||
+                    !orderIds.Contains(shipment.OrderId) ||
+                    !supplierIds.Contains(shipment.SupplierId) ||
+                    shipment.ArrivalDay <= shipment.DispatchDay ||
+                    shipment.ShippedQuantityMilliunits <= 0 ||
+                    shipment.CarrierConsumptionMilliunits < 0 ||
+                    shipment.NaturalLossMilliunits < 0 ||
+                    shipment.RiskLossMilliunits < 0 ||
+                    shipment.DeliveredQuantityMilliunits < 0 ||
+                    shipment.PurchaseCost < 0 ||
+                    shipment.ShippedQuantityMilliunits != checked(
+                        shipment.CarrierConsumptionMilliunits +
+                        shipment.NaturalLossMilliunits +
+                        shipment.RiskLossMilliunits +
+                        shipment.DeliveredQuantityMilliunits))
+                    throw new InvalidOperationException(
+                        "Invalid or unconserved Luoyang shipment state.");
+            }
+            var tradeIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var trade in runtime.MarketTrades)
+            {
+                if (trade == null || string.IsNullOrWhiteSpace(trade.Id) ||
+                    !tradeIds.Add(trade.Id) || trade.Day < 0 ||
+                    string.IsNullOrWhiteSpace(trade.ProductId) ||
+                    string.IsNullOrWhiteSpace(trade.BuyerId) ||
+                    string.IsNullOrWhiteSpace(trade.SellerId) ||
+                    trade.QuantityMilliunits <= 0 || trade.UnitPrice <= 0 ||
+                    trade.MoneyTransferred <= 0)
+                    throw new InvalidOperationException("Invalid Luoyang market trade.");
+            }
+
+            var agentIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var agent in runtime.IntelligentAgents)
+            {
+                if (agent == null || string.IsNullOrWhiteSpace(agent.Id) ||
+                    !agentIds.Add(agent.Id) ||
+                    !Enum.IsDefined(typeof(LuoyangIntelligentAgentRole), agent.Role) ||
+                    agent.RiskPreferenceBasisPoints < 0 ||
+                    agent.RiskPreferenceBasisPoints > 10_000 ||
+                    agent.DiligenceBasisPoints < 0 || agent.DiligenceBasisPoints > 10_000 ||
+                    agent.AmbitionBasisPoints < 0 || agent.AmbitionBasisPoints > 10_000 ||
+                    agent.CompassionBasisPoints < 0 || agent.CompassionBasisPoints > 10_000 ||
+                    agent.DecisionSequence < 0 || agent.NextDecisionDay < 0)
+                    throw new InvalidOperationException("Invalid Luoyang intelligent Agent state.");
+            }
+            if (runtime.GovernmentEconomy.Treasury < 0 ||
+                runtime.Markets.Exists(item => item.CashBalance < 0))
+                throw new InvalidOperationException("Invalid Luoyang money balance.");
+            if (string.IsNullOrWhiteSpace(
+                    runtime.GovernmentEconomy.CurrentLocationId) ||
+                string.IsNullOrWhiteSpace(
+                    runtime.GovernmentEconomy.GranaryInventoryId) ||
+                !runtime.Inventories.Exists(item => item.Id ==
+                    runtime.GovernmentEconomy.GranaryInventoryId))
+                throw new InvalidOperationException(
+                    "Invalid Luoyang government location or granary contract.");
+            var propertyCells = new HashSet<ulong>();
+            foreach (var property in runtime.CellProperties)
+            {
+                if (property == null || property.CellId64 == 0 ||
+                    !propertyCells.Add(property.CellId64) ||
+                    string.IsNullOrWhiteSpace(property.OwnerId) ||
+                    string.IsNullOrWhiteSpace(property.AdministrativeControllerId) ||
+                    string.IsNullOrWhiteSpace(property.BuildingRightHolderId))
+                    throw new InvalidOperationException(
+                        "Invalid or duplicate Luoyang Cell property.");
+            }
+            foreach (var project in runtime.ConstructionProjects)
+            {
+                if (project == null ||
+                    (!runtime.RequiresSourceRehydration && project.CellId64 == 0) ||
+                    (!runtime.RequiresSourceRehydration &&
+                     string.IsNullOrWhiteSpace(project.OwnerId)) ||
+                    project.CompletionDay <= project.StartedDay ||
+                    project.RequiredLaborers <= 0 ||
+                    project.LaborerPersonOrdinals == null ||
+                    !project.LegacyImported &&
+                    project.LaborerPersonOrdinals.Count < project.RequiredLaborers ||
+                    project.LaborerPersonOrdinals.Any(item =>
+                        item >= runtime.Workforce.Count) ||
+                    project.Materials == null ||
+                    (!project.LegacyImported && project.Materials.Count < 2) ||
+                    project.Materials.Any(item => item.ConsumedMilliunits <= 0 ||
+                        !runtime.Inventories.Exists(inventory =>
+                            inventory.Id == item.InventoryId)) ||
+                    project.LegacyImported &&
+                    string.IsNullOrWhiteSpace(project.MigrationNote))
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang construction project backing facts.");
             }
         }
 

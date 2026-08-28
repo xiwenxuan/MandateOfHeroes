@@ -48,7 +48,10 @@ namespace Mandate.Domain
         MilitaryMedicalTransferMedicineReleased,
         MerchantMarketPurchased,
         MerchantCargoDamaged,
-        MerchantMarketSold
+        MerchantMarketSold,
+        FacilityConstructionMaterialReserved,
+        FacilityConstructionMaterialConsumed,
+        FacilityConstructionMaterialReleased
     }
 
     [Serializable]
@@ -152,6 +155,7 @@ namespace Mandate.Domain
         public string SourceMilitaryMedicalTransferId;
         public string SourceMilitaryFieldHospitalConstructionProjectId;
         public string SourceMilitaryFieldHospitalMaintenanceId;
+        public string SourceFacilityConstructionProjectId;
         public string HouseholdReliefRecipientPersonId;
         public long LegacyFamilyGrainDelta;
         public long LegacyFamilySeedGrainDelta;

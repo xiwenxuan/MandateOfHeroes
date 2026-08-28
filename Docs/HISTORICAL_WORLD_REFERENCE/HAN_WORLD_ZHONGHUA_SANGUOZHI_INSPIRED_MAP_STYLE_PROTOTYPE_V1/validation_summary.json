@@ -1,0 +1,56 @@
+{
+  "schema": "hanworld.zhonghua-sanguozhi-inspired-style-prototype.validation.v1",
+  "generated_at": "2026-08-16T17:40:00+08:00",
+  "source": {
+    "repository": "https://github.com/kpxp/ZhongHuaSanGuoZhi-New-Code",
+    "head_sha": "50f00168e005f7e5d8576e5adc215b1fbe2f8fa5",
+    "branches": 3,
+    "tags": 2,
+    "commits": 297,
+    "contributors": 2,
+    "recursive_tree_entries": 1914,
+    "recursive_tree_truncated": false,
+    "map_and_core_files": 1534,
+    "license_status": "UNRESOLVED",
+    "asset_license_status": "UNRESOLVED_SEPARATE",
+    "source_cloned": false,
+    "clone_blocker": "GITHUB_GIT_TRANSPORT_443_FAILURE_OR_CONNECTION_RESET",
+    "api_static_audit": "COMPLETE",
+    "status": "SOURCE_RESEARCH_V1_HARD_BLOCKED_FULL_GIT_CLONE"
+  },
+  "style_d": {
+    "profile_id": "art.han-world.zhonghua-sanguozhi-fusion.v1",
+    "world_sample": "READY",
+    "region_sample": "READY",
+    "mountain_sample": "READY",
+    "river_sample": "READY_WITH_ART_DEBT",
+    "forest_sample": "READY",
+    "plain_sample": "READY",
+    "screenshots": 10,
+    "workbooks": 14,
+    "status": "STYLE_D_ZHONGHUA_SANGUOZHI_FUSION_PROTOTYPE_READY"
+  },
+  "validation": {
+    "solution_compile": "PASSED",
+    "targeted_core_smoke": "PASSED_1_OF_1",
+    "complete_core_regression": "PASSED_709_OF_709_GROUPED",
+    "unified_core_regression_attempt": "TIMED_OUT_AND_NOT_CLAIMED",
+    "grouped_core_regression_run_id": "style-d-final-20260816",
+    "grouped_core_regression_groups": 12,
+    "grouped_core_regression_result": "tmp/core-test-groups/style-d-final-20260816/aggregate.json",
+    "unity_project_load": "PASSED",
+    "unity_editmode": "PASSED_2_OF_2",
+    "unity_playmode": "PASSED_1_OF_1",
+    "screenshot_content_assertions": "PASSED_10_OF_10",
+    "workbook_render_verification": "PASSED_14_OF_14"
+  },
+  "invariants": {
+    "historical_geography_changed": false,
+    "global_cell_changed": false,
+    "external_code_copied": false,
+    "external_assets_copied": false,
+    "nationwide_rollout": "BLOCKED_PENDING_USER_APPROVAL",
+    "henan_yin_high_detail": "BLOCKED_PENDING_USER_APPROVAL",
+    "luoyang_city": "BLOCKED_PENDING_USER_APPROVAL"
+  }
+}

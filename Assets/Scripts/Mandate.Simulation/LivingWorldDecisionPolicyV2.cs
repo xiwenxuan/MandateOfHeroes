@@ -710,6 +710,34 @@ namespace Mandate.Simulation
             {
                 return;
             }
+            var property = world.CellProperties.Find(item =>
+                item.LocationId == context.LocationId &&
+                !world.Facilities.Exists(facility =>
+                    facility.CellId64 == item.CellId64) &&
+                !world.FacilityConstructionProjects.Exists(project =>
+                    project.CellId64 == item.CellId64 &&
+                    project.Status != FacilityConstructionStatus.Cancelled));
+            if (property == null)
+            {
+                return;
+            }
+            var container = world.InventoryContainers.Find(item =>
+                item.LocationId == context.LocationId &&
+                (item.OwnerFamilyId == property.OwnerId ||
+                 item.OwnerOrganizationId == property.OwnerId));
+            var batch = container == null
+                ? null
+                : world.ProductBatches.Find(item =>
+                    item.InventoryContainerId == container.Id &&
+                    item.Quantity > item.ReservedQuantity);
+            var worker = world.People.Find(item => item.IsAlive &&
+                item.LocationId == context.LocationId &&
+                !world.Journeys.Exists(journey =>
+                    journey.PersonId == item.Id));
+            if (container == null || batch == null || worker == null)
+            {
+                return;
+            }
             var build = NewAction(
                 agent, context, WorldActionTypeIds.BuildFacility, "build_pressure");
             build.ExpectedBenefitBasisPoints =
@@ -717,7 +745,16 @@ namespace Mandate.Simulation
             build.CostBasisPoints = 6_000;
             AddArg(build, "facility_definition_id",
                 world.FacilityDefinitions[0].Id);
-            AddArg(build, "owner_id", agent.AgentId);
+            AddArg(build, "owner_id", property.OwnerId);
+            AddArg(build, "cell_id", property.CellId64.ToString());
+            AddArg(build, "material_container_id", container.Id);
+            AddArg(build, "material_product_id", batch.ProductDefinitionId);
+            AddArg(build, "material_quantity", Math.Min(
+                10L, batch.Quantity - batch.ReservedQuantity).ToString());
+            AddArg(build, "worker_person_id", worker.Id);
+            AddArg(build, "labor_minutes", "480");
+            AddArg(build, "construction_days", "90");
+            AddArg(build, "money_cost", "0");
             AddArg(build, "time_days", "90");
             candidates.Add(build);
         }
@@ -812,6 +849,12 @@ namespace Mandate.Simulation
                         return ExecuteSell(world, action, validation.ExecutableQuantity);
                     case WorldActionTypeIds.Invest:
                         return ExecuteFamilyInvestment(world, action);
+                    case WorldActionTypeIds.MigrateHousehold:
+                        return ExecuteHouseholdMigration(world, action);
+                    case WorldActionTypeIds.BuildFacility:
+                        return ExecuteConstruction(world, action);
+                    case WorldActionTypeIds.CreateGovernmentPurchase:
+                        return ExecuteGovernmentPurchase(world, action);
                     default:
                         return Result(
                             WorldActionValidationStatus.Deferred,
@@ -929,6 +972,98 @@ namespace Mandate.Simulation
                 WorldActionValidationStatus.Valid,
                 "family_organization_assets_invested",
                 null,
+                true);
+        }
+
+        private static WorldActionExecutionResult ExecuteHouseholdMigration(
+            WorldState world,
+            WorldActionIntent action)
+        {
+            var migration = new HouseholdMigrationSystem().Start(
+                world,
+                action.AgentId,
+                Arg(action, "target_location_id"),
+                Arg(action, "route_id"));
+            return Result(
+                WorldActionValidationStatus.Valid,
+                "household_migration_journeys_started",
+                migration.Id,
+                true);
+        }
+
+        private static WorldActionExecutionResult ExecuteConstruction(
+            WorldState world,
+            WorldActionIntent action)
+        {
+            var construction = new PropertyConstructionSystem();
+            var project = construction.StartProject(
+                world,
+                action.LocationId,
+                ulong.Parse(Arg(action, "cell_id")),
+                Arg(action, "facility_definition_id"),
+                Arg(action, "owner_id"),
+                Arg(action, "worker_person_id"),
+                Arg(action, "material_container_id"),
+                Arg(action, "material_product_id"),
+                ParseLong(action, "material_quantity"),
+                ParseInt(action, "labor_minutes"),
+                ParseInt(action, "construction_days"),
+                ParseLong(action, "money_cost"));
+            construction.ContributeLabor(
+                world,
+                project.Id,
+                Arg(action, "worker_person_id"),
+                ParseInt(action, "labor_minutes"));
+            return Result(
+                WorldActionValidationStatus.Valid,
+                "facility_construction_project_started",
+                project.Id,
+                true);
+        }
+
+        private WorldActionExecutionResult ExecuteGovernmentPurchase(
+            WorldState world,
+            WorldActionIntent action)
+        {
+            var governanceId = Arg(action, "county_governance_id");
+            var sourceEvent = WorldActionValidator
+                .FindLatestReliefShortfallEvent(world, governanceId) ??
+                throw new InvalidOperationException(
+                    "Committed relief shortfall event is missing.");
+            var scheduler = new PublicReliefProcurementCommandScheduler(
+                new PublicReliefProcurementSystem(_content));
+            var runtime = new WorldCommandRuntime();
+            runtime.RegisterHandler(scheduler.CreateCommandHandler());
+            var commandId = PublicReliefProcurementCommandScheduler.CommandId(
+                sourceEvent.Day, governanceId);
+            runtime.Enqueue(world, new WorldCommandEnvelope(
+                commandId,
+                PublicReliefProcurementCommandScheduler.CommandTypeId,
+                action.AgentId,
+                world.AbsoluteDay,
+                (DaySegment)world.Segment,
+                5,
+                new Dictionary<string, string>
+                {
+                    { PublicReliefProcurementCommandScheduler.ExpectedDayArgumentId,
+                        world.AbsoluteDay.ToString() },
+                    { PublicReliefProcurementCommandScheduler.GovernanceIdArgumentId,
+                        governanceId },
+                    { PublicReliefProcurementCommandScheduler.SourceEventIdArgumentId,
+                        sourceEvent.Id },
+                    { PublicReliefProcurementCommandScheduler.MaximumQuantityArgumentId,
+                        ParseLong(action, "quantity").ToString() },
+                    { PublicReliefProcurementCommandScheduler.MaximumBudgetArgumentId,
+                        checked(ParseLong(action, "quantity") *
+                            ParseLong(action, "maximum_unit_price")).ToString() },
+                    { PublicReliefProcurementCommandScheduler.MaximumUnitPriceArgumentId,
+                        ParseLong(action, "maximum_unit_price").ToString() }
+                }));
+            runtime.ProcessDue(world);
+            return Result(
+                WorldActionValidationStatus.Valid,
+                "government_purchase_command_executed",
+                commandId,
                 true);
         }
 

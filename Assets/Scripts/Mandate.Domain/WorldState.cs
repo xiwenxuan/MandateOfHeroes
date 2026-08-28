@@ -223,7 +223,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 72;
+        public const int CurrentSchemaVersion = 75;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -281,6 +281,18 @@ namespace Mandate.Domain
                 new List<HistoricalPersonFamilyIntegrationState>();
         public List<Luoyang184LivingWorldState> LuoyangLivingWorlds =
             new List<Luoyang184LivingWorldState>();
+        public List<LuoyangPassageTraversalWorldState>
+            LuoyangPassageTraversals =
+                new List<LuoyangPassageTraversalWorldState>();
+        public List<LuoyangPassageOperationalControlState>
+            LuoyangPassageOperationalControls =
+                new List<LuoyangPassageOperationalControlState>();
+        public List<LuoyangPassageDamageRecordState>
+            LuoyangPassageDamageRecords =
+                new List<LuoyangPassageDamageRecordState>();
+        public List<LuoyangPassageRepairOrderState>
+            LuoyangPassageRepairOrders =
+                new List<LuoyangPassageRepairOrderState>();
         public List<FacilityDefinitionState> FacilityDefinitions =
             new List<FacilityDefinitionState>();
         public List<FacilityState> Facilities = new List<FacilityState>();
@@ -460,6 +472,17 @@ namespace Mandate.Domain
         public long MilitaryMedicalContractActivationDay;
         public List<ConstructionProjectState> ConstructionProjects =
             new List<ConstructionProjectState>();
+        public List<WorldCellPropertyState> CellProperties =
+            new List<WorldCellPropertyState>();
+        public List<CellPropertyTransferState> CellPropertyTransfers =
+            new List<CellPropertyTransferState>();
+        public List<FacilityConstructionProjectState>
+            FacilityConstructionProjects =
+                new List<FacilityConstructionProjectState>();
+        public List<FacilityConstructionLaborState> FacilityConstructionLabor =
+            new List<FacilityConstructionLaborState>();
+        public List<HouseholdMigrationState> HouseholdMigrations =
+            new List<HouseholdMigrationState>();
         public bool PopulationLedgerInitialized;
         public long PopulationOpeningTotal;
         public List<PopulationCohortState> PopulationCohorts =
@@ -637,6 +660,9 @@ namespace Mandate.Domain
             HistoricalEventContractRules.ValidateWorld(this);
             HistoricalPersonFamilyIntegrationRules.ValidateWorld(this);
             Luoyang184LivingWorldRules.ValidateWorld(this);
+            PropertyConstructionRules.ValidateWorld(this);
+            LuoyangPassageTraversalWorldRules.ValidateWorld(this);
+            LuoyangPassageOperationalRules.ValidateWorld(this);
             ValidateUniqueIds(
                 PersistentWorldCommands,
                 item => item.Id,
@@ -676,6 +702,22 @@ namespace Mandate.Domain
                 StrategicDelegationCommandProposals,
                 item => item.Id,
                 "strategic delegation command proposal");
+            ValidateUniqueIds(
+                LuoyangPassageTraversals,
+                item => item.Id,
+                "Luoyang passage traversal world state");
+            ValidateUniqueIds(
+                LuoyangPassageOperationalControls,
+                item => item.Id,
+                "Luoyang passage operational control");
+            ValidateUniqueIds(
+                LuoyangPassageDamageRecords,
+                item => item.Id,
+                "Luoyang passage damage record");
+            ValidateUniqueIds(
+                LuoyangPassageRepairOrders,
+                item => item.Id,
+                "Luoyang passage repair order");
             ValidateUniqueIds(
                 CountyGovernances, item => item.Id, "county governance");
             ValidateUniqueIds(
@@ -7257,6 +7299,19 @@ namespace Mandate.Domain
                         transaction.SourceCivilianFreightId) &&
                     !civilianFreights.ContainsKey(
                         transaction.SourceCivilianFreightId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceFacilityConstructionProjectId) &&
+                    !FacilityConstructionProjects.Exists(project =>
+                        project != null && project.Id ==
+                            transaction.SourceFacilityConstructionProjectId) ||
+                    !string.IsNullOrEmpty(
+                        transaction.SourceFacilityConstructionProjectId) &&
+                    transaction.Type != InventoryTransactionType
+                        .FacilityConstructionMaterialReserved &&
+                    transaction.Type != InventoryTransactionType
+                        .FacilityConstructionMaterialConsumed &&
+                    transaction.Type != InventoryTransactionType
+                        .FacilityConstructionMaterialReleased ||
                     !string.IsNullOrEmpty(
                         transaction.HouseholdReliefRecipientPersonId) &&
                     (!personIds.Contains(

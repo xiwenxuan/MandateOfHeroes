@@ -1,0 +1,439 @@
+{
+    "schema_version":  1,
+    "contract_id":  "art_source.luoyang.p0-named-gate-fourth-batch.user-accepted-fbx-source-validated-final-activation.v1",
+    "task_id":  "LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTANCE_AND_FINAL_ACTIVATION_V1",
+    "status_id":  "LUOYANG_P0_NAMED_GATE_FOURTH_BATCH_USER_ACCEPTED_FBX_SOURCE_VALIDATED_FINAL_ART_ACTIVATED_V1",
+    "selection_policy_id":  "selection.lowest-review-order.remaining-p0.after-three-activated-batches.four.v1",
+    "review_decision_status_id":  "user_review.luoyang-p0-named-gate-fourth-batch.accepted.v1",
+    "user_review_decision_record_id":  "decision.luoyang-p0-named-gate-fourth-batch.accepted.2026-08-27.v1",
+    "user_review_decision_date":  "2026-08-27",
+    "final_art_approval_status_id":  "final_art.user_accepted.fbx_source_validated.approved.v1",
+    "source_archive_status_id":  "source_archive.unity_native_and_fbx_complete.v1",
+    "source_license_id":  "license.project-original.unity-native-and-fbx.v1",
+    "fbx_source_toolchain_id":  "toolchain.unity-fbx-exporter.4.2.1",
+    "fbx_toolchain_license_id":  "license.unity-companion.v1",
+    "fbx_anchor_name_mapping_id":  "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+    "user_review_decision":  "ACCEPTED_ALL_FOUR",
+    "source_file_count":  56,
+    "toolchain_file_count":  2,
+    "fbx_source_count":  4,
+    "fbx_missing_count":  0,
+    "user_review_ready":  true,
+    "final_art_activation_ready":  true,
+    "final_art_approved":  true,
+    "toolchain":  {
+                      "unity_editor_version":  "2022.3.62f3c1",
+                      "exporter_package":  "com.unity.formats.fbx@4.2.1",
+                      "fbx_sdk_package":  "com.autodesk.fbx@4.2.1",
+                      "license":  "Unity Companion License",
+                      "official_documentation":  "https://docs.unity3d.com/2022.3/Manual/com.unity.formats.fbx.html"
+                  },
+    "toolchain_files":  [
+                            {
+                                "path":  "Packages/manifest.json",
+                                "length":  1985,
+                                "sha256":  "f5995ec810ab94a3fe13c4698bada51a23681b971a3e994d6ccd7731a1655960"
+                            },
+                            {
+                                "path":  "Packages/packages-lock.json",
+                                "length":  11345,
+                                "sha256":  "2d24248b4e919dd05e50b902ad85bfb1013307a514ac4d1e79deac7df6a38cbf"
+                            }
+                        ],
+    "source_files":  [
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Gumen.fbx",
+                             "length":  73434,
+                             "sha256":  "3ba729b67829a3397d69f11666fd5aed4059382068904e79024dee2d8e932227"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Gumen.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "f55fe75ddc241f43b1ef6109be3d14ed3c44c4c65367e412fb794202bf222fb1"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Jinmen.fbx",
+                             "length":  74823,
+                             "sha256":  "6d77c5f7eeb214b3cf0f91b72527454e9410d82cd852c9591ac859e78a85b8da"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Jinmen.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "12a53e007b006bafccb80a11b330bccb9ab455ebfa6056ff39c6d8fe341cd2f7"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Kaiyangmen.fbx",
+                             "length":  45980,
+                             "sha256":  "1cf99e57a07629c63fa6c81e37f90bc0f25a25853a3986ee070548cfa939f8f6"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Kaiyangmen.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "8167a16d5990506767a553086ddd7442f70a7250a220eacc01227c5a9f12810c"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Maomen.fbx",
+                             "length":  72748,
+                             "sha256":  "76543ea1c97d149117508907941f34b762583be076f837ad6387e3310c73d7c0"
+                         },
+                         {
+                             "path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Maomen.fbx.meta",
+                             "length":  2830,
+                             "sha256":  "8408358a3efff4ffbddd093edf9a4a1761811f49501b1d931c7edca62b5b5cdc"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangP0NamedGateFourthBatchArtBuilder.cs",
+                             "length":  18479,
+                             "sha256":  "a23b3831360b175f0cc674b0fcc1ddea560d76a1cb4148dae494b6cf7ac254e8"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangP0NamedGateFourthBatchArtBuilder.cs.meta",
+                             "length":  243,
+                             "sha256":  "c29471716c2960a5fad6e3faabf8a776d94b4b438da0927ec86a3f0201038037"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangP0NamedGateFourthBatchFbxExporter.cs",
+                             "length":  10062,
+                             "sha256":  "2d38c619fa6a07d491d04709c11317408403345e7eae9c1222ab34ebbc771e5c"
+                         },
+                         {
+                             "path":  "Assets/Editor/Mandate.Editor/LuoyangP0NamedGateFourthBatchFbxExporter.cs.meta",
+                             "length":  243,
+                             "sha256":  "c4a1712ce8fdd31221179786aecd5e8928dd0d84f9f401109a7e49bf6441ff74"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat",
+                             "length":  2191,
+                             "sha256":  "21aff64491290768654429a7363b6126a8b137ba2acc5aadac8bdf53519b12e4"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat.meta",
+                             "length":  188,
+                             "sha256":  "0c2bfe6a0e0571206770961fd1c4164aa1e3912cd26624e84f9b646bb402c95d"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Gumen.prefab",
+                             "length":  61975,
+                             "sha256":  "f89cd18e7cc0532206653de208ed968dcd29984eb23cdcea222f6d60d8391570"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Gumen.prefab.meta",
+                             "length":  154,
+                             "sha256":  "dad1b7afe76b7b20e4275e258565a8e6b6fa3bb5fa6ba30ded84c11a66a0b5c3"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Jinmen.prefab",
+                             "length":  67036,
+                             "sha256":  "642ddc35eaca0251b69f39bbe61afc7705bd42948c7bd8b2e8e5a657ffb9f634"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Jinmen.prefab.meta",
+                             "length":  154,
+                             "sha256":  "941ee79ba443b4ac609de8fb3d41bbd1df5cdacec47171aaba84c668eefbe897"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Kaiyangmen.prefab",
+                             "length":  72003,
+                             "sha256":  "6b1fb1744bda29280b27417c80a5574fc89171ebf5bf37d9cbb77262a88c4ae8"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Kaiyangmen.prefab.meta",
+                             "length":  154,
+                             "sha256":  "a114c3864baa1cc707a8de72460d4848a30e450b1353e5e26bb5c8d423ab4f7f"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Maomen.prefab",
+                             "length":  59509,
+                             "sha256":  "ea8de1d04fd614d45dc8c6b5dfab277139c4db9b3abb6d782d0df41d277d6da5"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Batch4/Maomen.prefab.meta",
+                             "length":  154,
+                             "sha256":  "bb6b2e9cdfd0650a9d94ccfbb6fab91fee7f44d7ef3727d78f1783dc13efea9c"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat",
+                             "length":  2192,
+                             "sha256":  "55febebf346833aeb5dc634a0dab1dbb7c59e0c18f84f72665d80c57c5237a92"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat.meta",
+                             "length":  188,
+                             "sha256":  "b6eb7075b59557ba38dac2ef4126faf74df8fa42c72e8338dda3c88351eb1bc0"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat",
+                             "length":  2196,
+                             "sha256":  "e9d3c1fa86ab00664916272c8a47084fd003a07c62852400c71d6e7f99d38783"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat.meta",
+                             "length":  188,
+                             "sha256":  "b00859b22de7bcd74f3bb6b51621060b668b89a8a75c732293739e25d3e3121b"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat",
+                             "length":  2193,
+                             "sha256":  "8d8c7182672fc9d548403db8aaa90fd4f7f6126a5652891153f178847e26f4ca"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat.meta",
+                             "length":  188,
+                             "sha256":  "04b3771f7717aaca65cfe421a42cdf7f5de647a911f65199b0505a5252c47472"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat",
+                             "length":  2186,
+                             "sha256":  "ab5a5157461e29410d92c9a82e209199b7769b531df91d4b0e0a7e349ef6e3bd"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat.meta",
+                             "length":  188,
+                             "sha256":  "311d4d526b6f927bc11a1f23e078b98c8ecbefd75502e5f7efc4f6da66cd62b7"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat",
+                             "length":  2188,
+                             "sha256":  "de0b62cda7f54993966aeb3528339f08798142bb30c68bc9ce67e73bda28a334"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat.meta",
+                             "length":  188,
+                             "sha256":  "72c1e1e09fe1061c1b70c917b5e50ab5414378889230086a3098f1224cf83028"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat",
+                             "length":  2193,
+                             "sha256":  "16bbbd5e154f0a97bbad6ba6bf19f0b3583200f4d716b5ab456383cd9384e869"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat.meta",
+                             "length":  188,
+                             "sha256":  "685fb1cc24633454c91c1eab923709ca98a9e3f301b780ace85851f80f39f450"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset",
+                             "length":  5960,
+                             "sha256":  "da2e3d353d729814de2463fd546e877d9936aaa259377a8b8f4ff78273029355"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset.meta",
+                             "length":  188,
+                             "sha256":  "3c8ba2af91423a152225222dc12bdc55b65fdd2e2ea59ea32b9614fe1d1c49d6"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset",
+                             "length":  3512,
+                             "sha256":  "124fa480d45805e3557d2987785c5eec0da8a76097cd0595433d628030d02a1e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset.meta",
+                             "length":  188,
+                             "sha256":  "914f2e1f530be89b9edbf64a0b6d728734488c59e334c668d3df2cee7dcd8861"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset",
+                             "length":  14047,
+                             "sha256":  "6bfa444efae6362f97de88d2869c3cdc7124bc412f54cc7ccd24d35597e0f6ec"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset.meta",
+                             "length":  188,
+                             "sha256":  "9edd3e0175c1d42c0c1f887cb4ab50370a96c13f30394924cf4dafe7c56fb09e"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeRoadCrown.asset",
+                             "length":  3791,
+                             "sha256":  "fdebb96efbdbf4ac35b48a06f51c41d0a148f639de806e881b077dbf6a74a9a0"
+                         },
+                         {
+                             "path":  "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeRoadCrown.asset.meta",
+                             "length":  188,
+                             "sha256":  "606322c14744f8f50f3e3a02e01bde7be4154b01179dd90772b48cbb88fbe7f7"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Domain/LuoyangP0NamedGateFourthBatchState.cs",
+                             "length":  19665,
+                             "sha256":  "39704640076849b0e3ad3c692f58df9c17d5f5be22dbea2c9394c2054158fac3"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Domain/LuoyangP0NamedGateFourthBatchState.cs.meta",
+                             "length":  243,
+                             "sha256":  "4b721ab32fa1c4026d78807d841140f04aa479ebdc5bbd832be6e0edbb181cde"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Persistence/LuoyangP0NamedGateFourthBatchSource.cs",
+                             "length":  1711,
+                             "sha256":  "3a04dbcd615eeed09f4bd933dc26f09529229cf53611aecaf930f59ce256bd78"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Persistence/LuoyangP0NamedGateFourthBatchSource.cs.meta",
+                             "length":  243,
+                             "sha256":  "a37fbcc7bd9cef768d537106599809daaf0d173f4e15ce8f47cd7c95140eb04f"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/ExplicitStrategicCellMapV1.cs",
+                             "length":  51536,
+                             "sha256":  "8f09d398e1639c4c0ab3e66f3e2cd62aa87368569876d3c3e62b69e8dfd8d030"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/ExplicitStrategicCellMapV1.cs.meta",
+                             "length":  240,
+                             "sha256":  "18e1d837826351439f77bdcaf5721e60a67770cf722ddc3f2f56849f86c358a4"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs",
+                             "length":  112323,
+                             "sha256":  "01dd936d0c2292a058f9bacf423faa6907439e622863d127f57d689c8bf4c51a"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanBuildableFacilityModelInstance.cs.meta",
+                             "length":  243,
+                             "sha256":  "3ac0df8dcb7f0750daa14ddf5b4ff19191a9cc2dc7241f95d5c1a10f21d2503d"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs",
+                             "length":  50119,
+                             "sha256":  "aadf1b4a304dbd2e38d682b98e4e9f4972d1cf9da3f98f6a17c7620520b568a3"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.BuildableFacilities.cs.meta",
+                             "length":  243,
+                             "sha256":  "7c8ffdea430300b1b2aa23759d0b0f1661676d641633828a8762c1a1e0f7b8a0"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.cs",
+                             "length":  69525,
+                             "sha256":  "de005a12be65f2d66db5de56bd8b44aba4a430e9e321fe27111d0f1ca8be3a51"
+                         },
+                         {
+                             "path":  "Assets/Scripts/Mandate.Presentation/HanWorldNaturalMapController.cs.meta",
+                             "length":  243,
+                             "sha256":  "47b2d2a16253ad3e5a57c60c721f6dcc421f187ed9b1ed67c0fd77c6f782c4dd"
+                         },
+                         {
+                             "path":  "Assets/StreamingAssets/WorldMap/LuoyangP0NamedGateFourthBatchV1/luoyang_p0_named_gate_fourth_batch_v1.json",
+                             "length":  6357,
+                             "sha256":  "91996e0b2ad5bae9a798fdfcb2e59c55beff4d19fb12ce677ede713630d46d36"
+                         },
+                         {
+                             "path":  "Assets/StreamingAssets/WorldMap/LuoyangP0NamedGateFourthBatchV1/luoyang_p0_named_gate_fourth_batch_v1.json.meta",
+                             "length":  155,
+                             "sha256":  "6942b797c5ab98d88cee549321bb6cc31dc0db1410960604b4f5193a1f223776"
+                         }
+                     ],
+    "pieces":  [
+                   {
+                       "review_order":  11,
+                       "facility_id":  "facility.instance.luoyang.184.gate.gumen",
+                       "candidate_id":  "candidate.luoyang.p0.batch4.gumen.v1",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_GUMEN_A",
+                       "user_review_decision":  "ACCEPTED",
+                       "artist_prefab_resource_path":  "Art/Han/Luoyang/P0Batch4/Gumen",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Gumen.fbx",
+                       "fbx_length":  73434,
+                       "fbx_sha256":  "3ba729b67829a3397d69f11666fd5aed4059382068904e79024dee2d8e932227",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "anchor_name_mapping_id":  "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+                       "anchor_mappings":  [
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.gumen",
+                                                   "fbx_node_name":  "anchor_gate_gumen"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.gumen.outer",
+                                                   "fbx_node_name":  "anchor_gate_gumen_outer"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.gumen.inner",
+                                                   "fbx_node_name":  "anchor_gate_gumen_inner"
+                                               }
+                                           ],
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  12,
+                       "facility_id":  "facility.instance.luoyang.184.gate.jinmen",
+                       "candidate_id":  "candidate.luoyang.p0.batch4.jinmen.v1",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_JINMEN_A",
+                       "user_review_decision":  "ACCEPTED",
+                       "artist_prefab_resource_path":  "Art/Han/Luoyang/P0Batch4/Jinmen",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Jinmen.fbx",
+                       "fbx_length":  74823,
+                       "fbx_sha256":  "6d77c5f7eeb214b3cf0f91b72527454e9410d82cd852c9591ac859e78a85b8da",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "anchor_name_mapping_id":  "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+                       "anchor_mappings":  [
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.jinmen",
+                                                   "fbx_node_name":  "anchor_gate_jinmen"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.jinmen.outer",
+                                                   "fbx_node_name":  "anchor_gate_jinmen_outer"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.jinmen.inner",
+                                                   "fbx_node_name":  "anchor_gate_jinmen_inner"
+                                               }
+                                           ],
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  13,
+                       "facility_id":  "facility.instance.luoyang.184.gate.kaiyangmen",
+                       "candidate_id":  "candidate.luoyang.p0.batch4.kaiyangmen.v1",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_KAIYANGMEN_A",
+                       "user_review_decision":  "ACCEPTED",
+                       "artist_prefab_resource_path":  "Art/Han/Luoyang/P0Batch4/Kaiyangmen",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Kaiyangmen.fbx",
+                       "fbx_length":  45980,
+                       "fbx_sha256":  "1cf99e57a07629c63fa6c81e37f90bc0f25a25853a3986ee070548cfa939f8f6",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "anchor_name_mapping_id":  "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+                       "anchor_mappings":  [
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.kaiyangmen",
+                                                   "fbx_node_name":  "anchor_gate_kaiyangmen"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.kaiyangmen.outer",
+                                                   "fbx_node_name":  "anchor_gate_kaiyangmen_outer"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.kaiyangmen.inner",
+                                                   "fbx_node_name":  "anchor_gate_kaiyangmen_inner"
+                                               }
+                                           ],
+                       "final_art_approved":  true
+                   },
+                   {
+                       "review_order":  14,
+                       "facility_id":  "facility.instance.luoyang.184.gate.maomen",
+                       "candidate_id":  "candidate.luoyang.p0.batch4.maomen.v1",
+                       "replacement_slot_id":  "HAN_LUOYANG_GATE_MAOMEN_A",
+                       "user_review_decision":  "ACCEPTED",
+                       "artist_prefab_resource_path":  "Art/Han/Luoyang/P0Batch4/Maomen",
+                       "fbx_source_path":  "Assets/ArtSource/Han/Luoyang/P0Batch4/Maomen.fbx",
+                       "fbx_length":  72748,
+                       "fbx_sha256":  "76543ea1c97d149117508907941f34b762583be076f837ad6387e3310c73d7c0",
+                       "fbx_source_status":  "PRESENT_UNITY_REIMPORT_VALIDATED",
+                       "anchor_name_mapping_id":  "anchor_name.dot_to_underscore.unity_fbx_exporter.v1",
+                       "anchor_mappings":  [
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.maomen",
+                                                   "fbx_node_name":  "anchor_gate_maomen"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.maomen.outer",
+                                                   "fbx_node_name":  "anchor_gate_maomen_outer"
+                                               },
+                                               {
+                                                   "stable_anchor_id":  "anchor.gate.maomen.inner",
+                                                   "fbx_node_name":  "anchor_gate_maomen_inner"
+                                               }
+                                           ],
+                       "final_art_approved":  true
+                   }
+               ]
+}

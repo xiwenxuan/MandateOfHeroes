@@ -15,6 +15,13 @@ Use `scripts/verify-project.ps1` for compilation plus a targeted core and Unity 
 core and EditMode suites exceed a reliable single-process workflow, so complete regression evidence uses the
 grouped runners documented below rather than one unbounded unified invocation.
 
+On Windows, the unified verifier creates a case-insensitive child-process environment and collapses duplicate
+`Path`/`PATH` variants to the longest value before launching MSBuild or Roslyn. This is process-local: it does not
+change user or machine environment variables. The compile stage supports Visual Studio 2022 Build Tools and uses
+an installed complete dotnet SDK as the `Microsoft.NET.Sdk` fallback for Unity-generated project files. When the
+project-locked editor is installed, the targeted core runner uses that editor's Unity Mono runtime so Unity package
+assemblies are not incorrectly rejected by Windows CLR strong-name validation.
+
 ## Standard invocation
 
 ```powershell

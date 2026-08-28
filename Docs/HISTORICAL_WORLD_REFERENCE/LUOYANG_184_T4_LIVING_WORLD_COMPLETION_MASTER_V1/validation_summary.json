@@ -1,0 +1,59 @@
+{
+  "schema": "mandate.luoyang-184.t4-living-world-completion.validation.v1",
+  "status": "T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS",
+  "baseline": {
+    "persons": 400000,
+    "households": 80899,
+    "opening_facilities": 2084,
+    "developable_cells": 5740,
+    "vacant_runtime_property_cells": 64,
+    "world_schema": 73,
+    "checkpoint_version": 6,
+    "task_start_head": "191bca0bbe58f7f09eff91ef9254596953fb1ab6"
+  },
+  "data": "PASS",
+  "simulation": "PASS",
+  "economy": "PASS_REAL_INVENTORY_AND_MONEY",
+  "ai": "PASS_SEEDS_1_TO_20_ONE_YEAR",
+  "supply": "PASS_A_B_RUNTIME_C_DEFERRED_NO_MAGIC_DISPATCH",
+  "government": "PASS_REAL_TAX_TREASURY_GRANARY",
+  "military": "PASS_PERMANENT_PERSON_FORCE_AND_REAL_INVENTORY",
+  "historical_events": "PASS_189_190_OFFSCREEN_WITH_REAL_RELOCATION",
+  "player_gameplay": "PASS_WORK_STUDY_TRADE_PROPERTY_BUILD_OFFICE_MILITARY",
+  "ui": "PASS_2_PLAYMODE_SMOKES",
+  "save_load": "PASS_V6_ROUND_TRIP_AND_V5_SEQUENTIAL_MIGRATION",
+  "performance": {
+    "initialization_ms": 692,
+    "one_year_simulation_ms": 5151,
+    "six_year_last_segment_ms": 13288,
+    "peak_managed_memory_bytes": 259266280,
+    "person_count": 400000
+  },
+  "final_validation": {
+    "compile": "PASS_0_ERRORS_WITH_EXISTING_WARNINGS",
+    "core_regression": "PASS_657_LEGACY_PLUS_27_T4_TOTAL_684",
+    "unity_editmode": "PASS_18_FUNCTIONAL_PLUS_5_LONG_PERF_MIGRATION_PLUS_4X5_SEEDS",
+    "unity_playmode": "PASS_2_LUOYANG_SMOKES",
+    "diff_check": "PASS",
+    "unity_result_summaries": [
+      "tmp/unity-validation/unity-EditMode-20260812-172802-988.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-173141-850.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-180556-496.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-180806-682.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-181013-815.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-181223-590.summary.json",
+      "tmp/unity-validation/unity-PlayMode-20260812-180130-916.summary.json",
+      "tmp/unity-validation/unity-PlayMode-20260812-180215-496.summary.json"
+    ],
+    "superseded_blocked_runs": [
+      "tmp/unity-validation/unity-EditMode-20260812-173434-238.summary.json",
+      "tmp/unity-validation/unity-EditMode-20260812-174326-966.summary.json"
+    ],
+    "blocked_run_resolution": "The monolithic 20-seed test exceeded 300 seconds twice. It was split into four disjoint five-seed suites without reducing seed coverage."
+  },
+  "deferred_enhancements": [
+    "historically calibrated in-kind tax, exemption and remission parameters",
+    "per-shipment and per-movement gate-state route recalculation",
+    "complex inheritance, crime and full RPG interaction depth"
+  ]
+}

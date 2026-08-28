@@ -26,7 +26,7 @@ namespace Mandate.Presentation
         UnusedDevelopable
     }
 
-    public sealed class LuoyangWorldValidationController : MonoBehaviour
+    public sealed partial class LuoyangWorldValidationController : MonoBehaviour
     {
         private const int TextureWidth = 512;
         private const int TextureHeight = 320;
@@ -45,6 +45,8 @@ namespace Mandate.Presentation
         private Luoyang184LivingWorldRuntimeState _livingRuntime;
         private Luoyang184LivingWorldSystem _livingSystem;
         private string _livingDebugText = string.Empty;
+        private uint _selectedLivingPersonOrdinal;
+        private string _playerCommandMessage = string.Empty;
 
         public bool IsReady { get; private set; }
         public string LastError { get; private set; }
@@ -90,6 +92,7 @@ namespace Mandate.Presentation
                 _livingSystem.AdvanceTo(_livingRuntime, 1);
                 _livingSystem.AttachSummary(_integratedWorld, _livingRuntime);
                 SelectLivingPerson(0);
+                InitializePlayablePresentation();
                 SelectHistoricalPerson("P0038");
                 if (_worldReader.Manifest.GridSchemaVersion != _prototypeReader.World.GridSchemaVersion)
                     throw new InvalidDataException("HanWorld and Luoyang 184 GridSchemaVersion differ.");
@@ -218,12 +221,31 @@ namespace Mandate.Presentation
             if (_livingRuntime == null || ordinal >= _livingRuntime.Workforce.Count)
                 return false;
             var person = _livingRuntime.Workforce[(int)ordinal];
+            _selectedLivingPersonOrdinal = ordinal;
+            var household = _livingRuntime.Households[(int)person.HouseholdOrdinal];
+            var development = _livingRuntime.PersonDevelopment.FirstOrDefault(item =>
+                item.PersonOrdinal == ordinal);
+            var office = _livingRuntime.Offices.FirstOrDefault(item =>
+                item.HolderPersonOrdinal == ordinal);
             _livingDebugText =
                 $"Living Person #{person.PersonOrdinal + 1:N0}\n" +
                 $"Household #{person.HouseholdOrdinal + 1:N0}; facility index {person.FacilityIndex}\n" +
-                $"Work status {person.Status}; age {person.Age}; effective labor {person.EffectiveLaborBasisPoints}/10000\n" +
+                $"Role/activity {person.SocialRoleId}/{person.CurrentActivityId}; work {person.Status}; age {person.Age}\n" +
+                $"Residence {development?.ResidenceFacilityId ?? household.ResidenceFacilityIndex.ToString()}; money {household.Wealth:N0}; reserve {household.FoodReserveMilliunits:N0}\n" +
+                $"Office {office?.OfficeKindId ?? "none"}; knowledge/skill {development?.KnowledgeBasisPoints ?? 0}/{development?.SkillBasisPoints ?? 0}\n" +
                 $"Food demand/consumed {person.CumulativeFoodDemandMilliunits:N0}/{person.CumulativeFoodConsumedMilliunits:N0} milliunits";
             return true;
+        }
+
+        public bool ExecutePlayerCommand(string commandTypeId, string targetId = null)
+        {
+            if (_livingRuntime == null) return false;
+            var result = new Luoyang184PlayerCommandSystem().Execute(
+                _livingRuntime, _selectedLivingPersonOrdinal, commandTypeId,
+                targetId);
+            _playerCommandMessage = result.StatusId + ": " + result.ResultId;
+            SelectLivingPerson(_selectedLivingPersonOrdinal);
+            return result.StatusId == "completed";
         }
 
         public bool SelectLivingHousehold(uint ordinal)
@@ -276,6 +298,7 @@ namespace Mandate.Presentation
         {
             _worldReader?.Dispose();
             if (_mapTexture != null) Destroy(_mapTexture);
+            DisposePlayablePresentation();
         }
 
         private void OnGUI()
@@ -289,6 +312,12 @@ namespace Mandate.Presentation
             if (!IsReady)
             {
                 GUI.Label(new Rect(18, 45, Screen.width - 36, Screen.height - 60), LastError ?? "Loading...");
+                return;
+            }
+
+            if (_usePlayablePresentation)
+            {
+                DrawPlayablePresentation();
                 return;
             }
 
@@ -319,6 +348,29 @@ namespace Mandate.Presentation
             if (GUI.Button(new Rect(346, y, 74, 27), "Zoom -")) Zoom(1.33f);
             GUI.Label(new Rect(430, y + 3, 440, 24), $"Continuous scale: {_cellsPerPixel:F2} Cell/pixel; wheel/click enabled");
             DrawStressControls(18, y + 31);
+            DrawPlayerCommands(18, y + 59);
+        }
+
+        private void DrawPlayerCommands(float x, float y)
+        {
+            GUI.Label(new Rect(x, y, 150, 22),
+                $"Player Person #{_selectedLivingPersonOrdinal + 1:N0}");
+            var commands = new[]
+            {
+                new[] { "Find work", LuoyangPlayerCommandTypeIds.SeekWork },
+                new[] { "Study", LuoyangPlayerCommandTypeIds.Study },
+                new[] { "Market trade", LuoyangPlayerCommandTypeIds.Trade },
+                new[] { "Buy Cell", LuoyangPlayerCommandTypeIds.BuyProperty },
+                new[] { "Expand", LuoyangPlayerCommandTypeIds.ExpandIndustry },
+                new[] { "Build", LuoyangPlayerCommandTypeIds.BuildIndustry },
+                new[] { "Accept office", LuoyangPlayerCommandTypeIds.AcceptOffice },
+                new[] { "Enlist", LuoyangPlayerCommandTypeIds.Enlist }
+            };
+            for (var i = 0; i < commands.Length; i++)
+                if (GUI.Button(new Rect(x + 150 + i * 91, y, 87, 22), commands[i][0]))
+                    ExecutePlayerCommand(commands[i][1]);
+            GUI.Label(new Rect(x, y + 24, 900, 22),
+                "Command result: " + (_playerCommandMessage ?? string.Empty));
         }
 
         private void DrawStressControls(float x, float y)
@@ -411,9 +463,16 @@ namespace Mandate.Presentation
         {
             if (_livingRuntime == null) return "Living-world closure: unavailable";
             var summary = _livingSystem.BuildWorldSummary(_livingRuntime);
+            var pressure = _livingRuntime.SocialPressureHistory.LastOrDefault();
+            var force = _livingRuntime.Forces.FirstOrDefault();
             return $"Living-world day {summary.LastSimulatedDay}: Persons {summary.PermanentPersonCount:N0}; Households {summary.HouseholdCount:N0}; Facilities {summary.FacilityCount:N0}\n" +
                    $"Food stock/consumed/shortage {summary.FoodStockMilliunits:N0}/{summary.FoodConsumptionMilliunits:N0}/{summary.FoodShortageMilliunits:N0}\n" +
-                   $"Supply status {summary.SupplyStatusId}; dependency {summary.SupplyRegionDependency}";
+                   $"Supply {summary.SupplyStatusId}; Markets {_livingRuntime.Markets.Count}; Orders/Shipments {_livingRuntime.SupplyOrders.Count}/{_livingRuntime.Shipments.Count}\n" +
+                   $"Treasury {_livingRuntime.GovernmentEconomy.Treasury:N0}; tax {_livingRuntime.GovernmentEconomy.TaxRevenue:N0}; Offices {_livingRuntime.Offices.Count}\n" +
+                   $"Force {force?.PermanentPersonCount ?? 0}; defense {force?.DefenseBasisPoints ?? 0}; pressure {pressure?.CompositeBasisPoints ?? 0}\n" +
+                   $"Property/projects {_livingRuntime.CellProperties.Count}/{_livingRuntime.ConstructionProjects.Count}; events " +
+                   string.Join(",", _livingRuntime.HistoricalEvents.Select(item =>
+                       item.DefinitionId + "=" + item.StatusId));
         }
 
         private void HandleMapInput(Event current)

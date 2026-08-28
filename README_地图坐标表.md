@@ -135,3 +135,11 @@ python scripts/generate_map_anchor_template.py
 ## 当前版本
 
 `V0.1`：首次建立空白正式模板、系统参数、状态与下拉字典、坐标公式、连续性偏差、条件格式和校验汇总。
+
+## Global Spatial Foundation V1 补充
+
+本模板不得自行定义世界宽高、地图原点、Region 原点或 Cell 编号。正式值以
+`Docs/HISTORICAL_WORLD_REFERENCE/WORLD_GLOBAL_ORIGIN_CELL_GRID_AND_SPATIAL_CONTINUITY_V1/GLOBAL_SPATIAL_FOUNDATION_CONTRACT_V1.md`
+为准：唯一 CRS、固定 Global Origin、3314×2176 个 2000m Cell、0基 row-major Cell ID，以及
+16×16 技术 Spatial / Simulation Aggregation Block。Region/技术块/Unity 坐标必须可逆回 Global；
+Region成员只由完整 Global Cell ID 决定，Terrain/Streaming尺寸待实测，视觉锚点不是 SubCell。

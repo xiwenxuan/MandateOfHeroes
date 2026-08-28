@@ -1,0 +1,54 @@
+{
+  "contract_id": "mandate.luoyang.authored-road-connectors-dynamic-passage.v1",
+  "task_id": "LUOYANG_AUTHORED_ROAD_CONNECTORS_AND_DYNAMIC_PASSAGE_TRAVERSAL_V1",
+  "navigation_node_count": 379,
+  "strict_road_edge_count": 334,
+  "modeled_connector_count": 28,
+  "passage_count": 20,
+  "passage_approach_edge_count": 40,
+  "refined_navigation_edge_count": 402,
+  "dense_city_selection_trigger_count": 549,
+  "connector_evidence_class_id": "historical_evidence.gameplay_reconstruction",
+  "connector_spatial_precision_id": "cell",
+  "connector_route_authoring_profile_id": "navigation.connector.route.minimum-obstruction-cardinal.v1",
+  "claims_historical_exactness": false,
+  "changes_save_schema": false,
+  "persists_across_save": false,
+  "screenshot": {
+    "path": "Screenshots/01_DENSE_CITY_MODELED_CONNECTORS_AND_CLOSED_GATE.png",
+    "width": 1600,
+    "height": 1000,
+    "file_size_bytes": 1383112,
+    "sha256": "2CA45D053D6637CE5E95A3D57F99E9C8E9851D81DE214B1B8795EB6411BE335C",
+    "pixel_variance_gate": "passed"
+  },
+  "target_editmode": {
+    "passed": 3,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-EditMode-20260828-102637-648.summary.json"
+  },
+  "target_graphical_playmode": {
+    "passed": 1,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-PlayMode-20260828-102420-857.summary.json"
+  },
+  "final_unified_verification": {
+    "compile": "passed",
+    "core_tests": "1/1 passed",
+    "editmode": "3/3 passed",
+    "diff_check": "passed",
+    "compile_log": "tmp/skill-verification/compile-20260828-102620-772.out.log",
+    "core_log": "tmp/skill-verification/core-tests-20260828-102634-930.out.log",
+    "editmode_summary": "tmp/unity-validation/unity-EditMode-20260828-102637-648.summary.json"
+  },
+  "previous_interaction_graphical_regression": {
+    "passed": 1,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-PlayMode-20260828-101237-466.summary.json"
+  },
+  "whole_city_graphical_regression": {
+    "passed": 1,
+    "failed": 0,
+    "summary": "tmp/unity-validation/unity-PlayMode-20260828-101354-901.summary.json"
+  }
+}

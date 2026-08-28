@@ -1,0 +1,151 @@
+{
+    "schema_version":  1,
+    "contract_id":  "presentation.luoyang.p0-four-piece.review-decision-board.v1",
+    "status":  "P0_FOUR_PIECE_REVIEW_DECISION_BOARDS_V1_READY_FOR_USER_DECISION_FINAL_APPROVAL_PENDING",
+    "source_contract_id":  "presentation.luoyang.p0-four-piece.multi-angle-review.v1",
+    "source_count":  12,
+    "board_count":  4,
+    "source_edit_policy":  "NO_CROP_NO_COLOR_CHANGE_LAYOUT_ONLY",
+    "pieces":  [
+                   {
+                       "piece_id":  "luoyang.p0.south-palace",
+                       "display_name":  "SOUTH PALACE / NANGONG",
+                       "decision":  "PENDING",
+                       "final_art_approved":  false,
+                       "sources":  [
+                                       {
+                                           "angle":  "front_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_south_palace_front_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "25ddc6133efbd714074f7299f148ff4d55a52cdf7268a42767394066a0d715fe"
+                                       },
+                                       {
+                                           "angle":  "rear_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_south_palace_rear_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "10ea4a7443362774d570de6acd86cf0f3b87e687c8636ae25214f8f43a6e58f9"
+                                       },
+                                       {
+                                           "angle":  "low_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_south_palace_low_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "75dbacd6f7181ac28dbf1a8b399412a02f8a0ee4f889f072c1fb2e5a91681543"
+                                       }
+                                   ],
+                       "board":  {
+                                     "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1/Boards/luoyang_p0_south_palace_review_decision_board_v1.png",
+                                     "width":  3000,
+                                     "height":  900,
+                                     "sha256":  "ae4eacc0ede49131bdc60e421b914e342a22e24e0efd91a5d7e854baf42a83a7"
+                                 }
+                   },
+                   {
+                       "piece_id":  "luoyang.p0.mingtang",
+                       "display_name":  "MINGTANG",
+                       "decision":  "PENDING",
+                       "final_art_approved":  false,
+                       "sources":  [
+                                       {
+                                           "angle":  "front_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_mingtang_front_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "f1a9f42c7ad604309be10c99d597de430f0c7c369df12d1518dfe6e860deba5d"
+                                       },
+                                       {
+                                           "angle":  "rear_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_mingtang_rear_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "37db10f5b2f2956a168f8dfc64d5acd852e94a556cb968e188264379c93c7577"
+                                       },
+                                       {
+                                           "angle":  "low_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_mingtang_low_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "3dc37bfd6fd72c2ce6f056eb4293122cb4f712d8bb3652821dec3f0515eaa47a"
+                                       }
+                                   ],
+                       "board":  {
+                                     "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1/Boards/luoyang_p0_mingtang_review_decision_board_v1.png",
+                                     "width":  3000,
+                                     "height":  900,
+                                     "sha256":  "d42c0d871de6dddccf6b6b3209331cbc3e9afb20ff3cc9c9cb1460878b219a42"
+                                 }
+                   },
+                   {
+                       "piece_id":  "luoyang.p0.guangyangmen",
+                       "display_name":  "GUANGYANGMEN",
+                       "decision":  "PENDING",
+                       "final_art_approved":  false,
+                       "sources":  [
+                                       {
+                                           "angle":  "front_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_guangyangmen_front_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "8f17a7a4471e26f3d436cd57364f0b229b2a78d3caeb8d4368d40ebfa1a0f3a7"
+                                       },
+                                       {
+                                           "angle":  "rear_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_guangyangmen_rear_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "18d72cf81741bea3001f3e18aedcd0129e8651e1bb83b86a4ffbb5fcf1a9498a"
+                                       },
+                                       {
+                                           "angle":  "low_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_guangyangmen_low_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "90f9ac62f0806d32ac427533e15f8a07651aa39bdbd17d1d2f220c3ba82772db"
+                                       }
+                                   ],
+                       "board":  {
+                                     "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1/Boards/luoyang_p0_guangyangmen_review_decision_board_v1.png",
+                                     "width":  3000,
+                                     "height":  900,
+                                     "sha256":  "d8ccff8a251bcaacc2921ed783b3b70741b1e54d1de75816df13b156be150b94"
+                                 }
+                   },
+                   {
+                       "piece_id":  "luoyang.p0.north-palace-south-gate",
+                       "display_name":  "NORTH PALACE SOUTH GATE",
+                       "decision":  "PENDING",
+                       "final_art_approved":  false,
+                       "sources":  [
+                                       {
+                                           "angle":  "front_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_north_palace_south_gate_front_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "86ef74754dc43888bb41be5de2ce3c0f82b162b3c8dfe2e70392504421232b7c"
+                                       },
+                                       {
+                                           "angle":  "rear_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_north_palace_south_gate_rear_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "113dfa906ec8df050631d6ba7b0eefb1ba674eb99b30873be459529159996881"
+                                       },
+                                       {
+                                           "angle":  "low_oblique",
+                                           "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_MULTI_ANGLE_TURNTABLE_REVIEW_PACK_V1/Screenshots/luoyang_p0_north_palace_south_gate_low_oblique_v1.png",
+                                           "width":  1600,
+                                           "height":  1000,
+                                           "sha256":  "8ab4224f4ba25665514f33bf89324ede984aa40d1b7b76870ef1754a8f493df1"
+                                       }
+                                   ],
+                       "board":  {
+                                     "path":  "Docs/HISTORICAL_WORLD_REFERENCE/LUOYANG_P0_FOUR_PIECE_REVIEW_DECISION_BOARD_V1/Boards/luoyang_p0_north_palace_south_gate_review_decision_board_v1.png",
+                                     "width":  3000,
+                                     "height":  900,
+                                     "sha256":  "81a591590b5b1b3552777525a595f9a038f38746e30b40e9297dd81558dd2320"
+                                 }
+                   }
+               ]
+}
