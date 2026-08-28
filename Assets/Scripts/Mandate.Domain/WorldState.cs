@@ -63,6 +63,7 @@ namespace Mandate.Domain
         public long BirthDay;
         public bool IsAlive = true;
         public int HealthBasisPoints = 10_000;
+        public int StaminaBasisPoints = 10_000;
         public long Wealth;
         public int Provisions = 10;
         public int CargoCapacity = 50;
@@ -94,6 +95,64 @@ namespace Mandate.Domain
         public LifeGoalKind LifeGoal = LifeGoalKind.Unknown;
         public PersonalityState Personality = new PersonalityState();
         public NeedState Needs = new NeedState();
+        public ulong CurrentCellId64;
+        public string CurrentFacilityId = string.Empty;
+    }
+
+    public sealed class PlayerSession
+    {
+        private readonly WorldState _world;
+
+        public PlayerSession(WorldState world)
+        {
+            _world = world ?? throw new ArgumentNullException(nameof(world));
+        }
+
+        public string ControlledPersonId
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_world.PlayerPersonId))
+                    throw new InvalidOperationException(
+                        "The player session has no controlled Person.");
+                return new StableId(_world.PlayerPersonId).Value;
+            }
+        }
+
+        public PersonState ControlledPerson
+        {
+            get
+            {
+                var personId = ControlledPersonId;
+                for (var i = 0; i < _world.People.Count; i++)
+                    if (_world.People[i] != null && string.Equals(
+                            _world.People[i].Id, personId,
+                            StringComparison.Ordinal))
+                        return _world.People[i];
+                throw new InvalidOperationException(
+                    $"The controlled Person '{personId}' does not exist.");
+            }
+        }
+
+        public bool CanAct
+        {
+            get
+            {
+                var person = ControlledPerson;
+                if (!person.IsAlive || person.HealthBasisPoints <= 0)
+                    return false;
+                for (var i = 0;
+                     i < _world.LuoyangFormalPlayerMovements.Count;
+                     i++)
+                    if (_world.LuoyangFormalPlayerMovements[i] != null &&
+                        _world.LuoyangFormalPlayerMovements[i].PersonId ==
+                        person.Id &&
+                        _world.LuoyangFormalPlayerMovements[i].Status ==
+                        LuoyangFormalMovementStatus.Active)
+                        return false;
+                return true;
+            }
+        }
     }
 
     [Serializable]
@@ -223,7 +282,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 75;
+        public const int CurrentSchemaVersion = 76;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -293,6 +352,15 @@ namespace Mandate.Domain
         public List<LuoyangPassageRepairOrderState>
             LuoyangPassageRepairOrders =
                 new List<LuoyangPassageRepairOrderState>();
+        public List<LuoyangLocalNavigationLocationState>
+            LuoyangLocalNavigationLocations =
+                new List<LuoyangLocalNavigationLocationState>();
+        public List<LuoyangRoadOperationalSegmentState>
+            LuoyangRoadOperationalSegments =
+                new List<LuoyangRoadOperationalSegmentState>();
+        public List<LuoyangFormalPlayerMovementState>
+            LuoyangFormalPlayerMovements =
+                new List<LuoyangFormalPlayerMovementState>();
         public List<FacilityDefinitionState> FacilityDefinitions =
             new List<FacilityDefinitionState>();
         public List<FacilityState> Facilities = new List<FacilityState>();
@@ -663,6 +731,7 @@ namespace Mandate.Domain
             PropertyConstructionRules.ValidateWorld(this);
             LuoyangPassageTraversalWorldRules.ValidateWorld(this);
             LuoyangPassageOperationalRules.ValidateWorld(this);
+            LuoyangFormalPlayerMovementRules.ValidateWorld(this);
             ValidateUniqueIds(
                 PersistentWorldCommands,
                 item => item.Id,
@@ -710,6 +779,18 @@ namespace Mandate.Domain
                 LuoyangPassageOperationalControls,
                 item => item.Id,
                 "Luoyang passage operational control");
+            ValidateUniqueIds(
+                LuoyangLocalNavigationLocations,
+                item => item.Id,
+                "Luoyang local navigation location");
+            ValidateUniqueIds(
+                LuoyangRoadOperationalSegments,
+                item => item.Id,
+                "Luoyang road operational segment");
+            ValidateUniqueIds(
+                LuoyangFormalPlayerMovements,
+                item => item.Id,
+                "Luoyang formal player movement");
             ValidateUniqueIds(
                 LuoyangPassageDamageRecords,
                 item => item.Id,
@@ -1002,6 +1083,13 @@ namespace Mandate.Domain
                 if (person.HealthBasisPoints < 0 || person.HealthBasisPoints > 10_000)
                 {
                     throw new InvalidOperationException($"Invalid health for {person.Id}.");
+                }
+
+                if (person.StaminaBasisPoints < 0 ||
+                    person.StaminaBasisPoints > 10_000)
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid stamina for {person.Id}.");
                 }
 
                 if (person.CargoCapacity < 0)

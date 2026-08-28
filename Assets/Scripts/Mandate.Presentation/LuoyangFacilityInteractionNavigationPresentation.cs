@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mandate.Domain;
+using Mandate.Simulation;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -449,6 +450,8 @@ namespace Mandate.Presentation
         private Material _pedestrianTargetMaterial;
         private float _horizontalMetresPerUnit;
         private LuoyangPedestrianWalkPlan _lastPedestrianWalkPlan;
+        private WorldState _formalMovementWorld;
+        private LuoyangFormalPlayerMovementService _formalMovementService;
 
         private LuoyangFacilityInteractionNavigationRuntime(GameObject root,
             LuoyangRoadTraversalRefinementPlan refinementPlan,
@@ -532,6 +535,8 @@ namespace Mandate.Presentation
             _pedestrianInstance;
         public IReadOnlyList<string> PedestrianRouteFacilityIds =>
             _pedestrianInstance?.RouteFacilityIds ?? Array.Empty<string>();
+        public bool UsesFormalPlayerMovement =>
+            _formalMovementWorld != null && _formalMovementService != null;
 
         public static LuoyangFacilityInteractionNavigationRuntime Build(
             LuoyangFacilityInteractionNavigationPlan plan,
@@ -819,6 +824,16 @@ namespace Mandate.Presentation
                 string.IsNullOrWhiteSpace(facilityId) ||
                 !_pedestrianNodePositions.TryGetValue(facilityId,
                     out var position)) return false;
+            if (UsesFormalPlayerMovement)
+            {
+                var controlled = new PlayerSession(_formalMovementWorld)
+                    .ControlledPerson;
+                if (!string.Equals(controlled.CurrentFacilityId, facilityId,
+                        StringComparison.Ordinal) ||
+                    !string.IsNullOrWhiteSpace(actorId) && !string.Equals(
+                        actorId, controlled.Id, StringComparison.Ordinal))
+                    return false;
+            }
             if (!string.IsNullOrWhiteSpace(actorId) && !string.Equals(
                     actorId, _pedestrianInstance.ActorId,
                     StringComparison.Ordinal))
@@ -837,6 +852,8 @@ namespace Mandate.Presentation
         {
             if (_pedestrianInstance == null || _passageSession == null ||
                 string.IsNullOrWhiteSpace(facilityId)) return false;
+            if (UsesFormalPlayerMovement)
+                return TrySetFormalPedestrianDestination(facilityId);
             var plan = LuoyangClickToWalkPedestrianRules.CreatePlan(
                 _refinementPlan, _passageSession,
                 _pedestrianInstance.ActorId,
@@ -890,6 +907,83 @@ namespace Mandate.Presentation
             const float reviewSpeedUnitsPerSecond = 0.32f;
             return _pedestrianInstance.Step(deltaSeconds,
                 reviewSpeedUnitsPerSecond);
+        }
+
+        public void BindFormalMovement(WorldState world,
+            LuoyangFormalPlayerMovementService movementService)
+        {
+            _formalMovementWorld = world ?? throw new ArgumentNullException(
+                nameof(world));
+            _formalMovementService = movementService ??
+                throw new ArgumentNullException(nameof(movementService));
+            if (_pedestrianInstance == null) return;
+            var controlled = new PlayerSession(world).ControlledPerson;
+            if (!_pedestrianNodePositions.TryGetValue(
+                    controlled.CurrentFacilityId, out var position))
+                throw new InvalidOperationException(
+                    "The controlled Person is outside the active Luoyang " +
+                    "resident presentation window.");
+            if (_pedestrianInstance.IsWalking)
+                throw new InvalidOperationException(
+                    "Formal movement cannot bind while preview playback runs.");
+            _pedestrianInstance.BindActor(controlled.Id);
+            _pedestrianInstance.PlaceAt(controlled.CurrentFacilityId, position);
+            _lastPedestrianWalkPlan = null;
+            ClearPedestrianRouteVisual();
+        }
+
+        public void UnbindFormalMovement()
+        {
+            _formalMovementWorld = null;
+            _formalMovementService = null;
+        }
+
+        private bool TrySetFormalPedestrianDestination(string facilityId)
+        {
+            if (_pedestrianInstance.IsWalking) return false;
+            if (!_formalMovementService.TryRequest(_formalMovementWorld,
+                    facilityId, out var movement, out var plan,
+                    out var failureReasonId))
+            {
+                _pedestrianInstance.Stop(string.IsNullOrWhiteSpace(
+                        failureReasonId)
+                        ? LuoyangClickToWalkPedestrianIds.NoRouteReasonId
+                        : failureReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            _formalMovementService.Complete(_formalMovementWorld, movement.Id);
+            if (movement.Status != LuoyangFormalMovementStatus.Completed)
+            {
+                var controlled = new PlayerSession(_formalMovementWorld)
+                    .ControlledPerson;
+                if (_pedestrianNodePositions.TryGetValue(
+                        controlled.CurrentFacilityId, out var position))
+                    _pedestrianInstance.PlaceAt(
+                        controlled.CurrentFacilityId, position);
+                _pedestrianInstance.Stop(movement.FailureReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            _lastPedestrianWalkPlan = plan;
+            if (plan.FacilityIds.Any(item =>
+                    !_pedestrianNodePositions.ContainsKey(item)))
+            {
+                _pedestrianInstance.PlaceAt(plan.TargetFacilityId,
+                    _pedestrianNodePositions[plan.TargetFacilityId]);
+                _pedestrianInstance.Stop(
+                    LuoyangClickToWalkPedestrianIds
+                        .OutsideResidentWindowReasonId, false);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            var routePoints = BuildPedestrianRoutePoints(plan);
+            _pedestrianInstance.BeginRoute(plan, routePoints);
+            SetPedestrianRouteVisual(routePoints);
+            _pedestrianTarget.transform.position = routePoints[
+                routePoints.Count - 1] + Vector3.up * 0.006f;
+            _pedestrianTarget.SetActive(true);
+            return true;
         }
 
         private IReadOnlyList<Vector3> BuildPedestrianRoutePoints(
@@ -976,7 +1070,7 @@ namespace Mandate.Presentation
             ActiveRepairScaffoldCount =
                 _passagePresentationInstancesByFacilityId.Values.Count(item =>
                     item.IsRepairing);
-            if (_pedestrianInstance != null &&
+            if (!UsesFormalPlayerMovement && _pedestrianInstance != null &&
                 _pedestrianInstance.IsWalking &&
                 _pedestrianInstance.RemainingFacilityIds().Any(item =>
                     passageSession.TryGet(item, out var passage) &&

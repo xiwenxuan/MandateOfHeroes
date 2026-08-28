@@ -84,6 +84,11 @@ namespace Mandate.Presentation
         private WorldCommandRuntime _luoyangPassageWorldCommandRuntime;
         private LuoyangPassageWorldCommandSystem
             _luoyangPassageWorldCommandSystem;
+        private LuoyangFormalPlayerMovementSystem
+            _luoyangFormalPlayerMovementSystem;
+        private LuoyangFormalPlayerMovementService
+            _luoyangFormalPlayerMovementService;
+        private WorldSimulator _luoyangFormalMovementSimulator;
         private LuoyangFacilityInteractionNavigationRuntime
             _luoyangFacilityInteractionNavigationRuntime;
         private string _selectedLuoyangFacilityId;
@@ -988,6 +993,11 @@ namespace Mandate.Presentation
                         BuildingPerformanceCellPosition,
                         (float)HorizontalMetresPerUnit,
                         (float)VerticalMetresPerUnit);
+                if (_luoyangPassageWorld != null &&
+                    _luoyangFormalPlayerMovementService != null)
+                    _luoyangFacilityInteractionNavigationRuntime
+                        .BindFormalMovement(_luoyangPassageWorld,
+                            _luoyangFormalPlayerMovementService);
                 return;
             }
             var grid = GlobalSpatialFoundationV1.CreateCellGrid();
@@ -1253,7 +1263,34 @@ namespace Mandate.Presentation
             _luoyangPassageWorld = world;
             _luoyangPassageWorldCommandRuntime = commandRuntime;
             _luoyangPassageWorldCommandSystem = commandSystem;
+            if (!string.IsNullOrWhiteSpace(world.PlayerPersonId))
+            {
+                _luoyangFormalPlayerMovementSystem =
+                    new LuoyangFormalPlayerMovementSystem(
+                        _luoyangRoadTraversalRefinementPlan);
+                _luoyangFormalPlayerMovementSystem.RegisterHandlers(
+                    commandRuntime);
+                var initialFacilityId =
+                    SelectInitialFormalPlayerFacilityId(world);
+                if (_luoyangFormalPlayerMovementSystem.EnsureInitialized(
+                        world, commandRuntime, initialFacilityId))
+                {
+                    commandRuntime.ProcessDue(world);
+                    commandRuntime.DispatchPublishedEvents(world);
+                }
+                _luoyangFormalMovementSimulator = new WorldSimulator(
+                    world.MasterSeed, null,
+                    new WorldStatePersonRepository(world), commandRuntime);
+                _luoyangFormalPlayerMovementService =
+                    new LuoyangFormalPlayerMovementService(
+                        _luoyangFormalPlayerMovementSystem, commandRuntime,
+                        _luoyangFormalMovementSimulator);
+            }
             RefreshPersistedLuoyangPassageProjection();
+            if (_luoyangFormalPlayerMovementService != null)
+                _luoyangFacilityInteractionNavigationRuntime?
+                    .BindFormalMovement(world,
+                        _luoyangFormalPlayerMovementService);
             return report;
         }
 
@@ -1262,6 +1299,11 @@ namespace Mandate.Presentation
             _luoyangPassageWorld = null;
             _luoyangPassageWorldCommandRuntime = null;
             _luoyangPassageWorldCommandSystem = null;
+            _luoyangFormalPlayerMovementSystem = null;
+            _luoyangFormalPlayerMovementService = null;
+            _luoyangFormalMovementSimulator = null;
+            _luoyangFacilityInteractionNavigationRuntime?
+                .UnbindFormalMovement();
             if (_luoyangRoadTraversalRefinementPlan == null)
             {
                 _luoyangPassageTraversalSession = null;
@@ -1346,6 +1388,27 @@ namespace Mandate.Presentation
             _luoyangFacilityInteractionNavigationRuntime?
                 .RefreshTraversalState(_luoyangPassageTraversalSession,
                     _luoyangPassageWorld);
+        }
+
+        private string SelectInitialFormalPlayerFacilityId(WorldState world)
+        {
+            var controlled = new PlayerSession(world).ControlledPerson;
+            if (!string.IsNullOrWhiteSpace(controlled.CurrentFacilityId) &&
+                _luoyangRoadTraversalRefinementPlan
+                    .NavigationNodesByFacilityId.ContainsKey(
+                        controlled.CurrentFacilityId))
+                return controlled.CurrentFacilityId;
+            var residentWindow = LuoyangBuildingPerformanceRules
+                .SelectDensestResidentWindow(_luoyangBuildingPerformancePlan);
+            var visible = new HashSet<string>(residentWindow.Facilities.Select(
+                item => item.FacilityId), StringComparer.Ordinal);
+            return _luoyangRoadTraversalRefinementPlan.NavigationNodes
+                .Where(item => visible.Contains(item.FacilityId) &&
+                    string.Equals(item.FacilityDefinitionId,
+                        "facility.public.road", StringComparison.Ordinal))
+                .OrderBy(item => item.CellId64)
+                .ThenBy(item => item.FacilityId, StringComparer.Ordinal)
+                .First().FacilityId;
         }
 
         public IReadOnlyList<string> FindLuoyangFacilityPath(

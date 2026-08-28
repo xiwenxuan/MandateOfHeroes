@@ -582,6 +582,16 @@ namespace Mandate.Domain
             LuoyangPassageTraversalSession passageSession,
             string actorId, string startFacilityId, string targetFacilityId)
         {
+            return CreatePlan(refinementPlan, passageSession, actorId,
+                startFacilityId, targetFacilityId, null);
+        }
+
+        public static LuoyangPedestrianWalkPlan CreatePlan(
+            LuoyangRoadTraversalRefinementPlan refinementPlan,
+            LuoyangPassageTraversalSession passageSession,
+            string actorId, string startFacilityId, string targetFacilityId,
+            Func<string, bool> canTraverseEdge)
+        {
             if (refinementPlan == null)
                 throw new ArgumentNullException(nameof(refinementPlan));
             if (passageSession == null)
@@ -598,7 +608,7 @@ namespace Mandate.Domain
 
             var facilityPath = LuoyangRoadConnectorPassageTraversalRules
                 .FindFacilityPath(refinementPlan, passageSession,
-                    startFacilityId, targetFacilityId);
+                    startFacilityId, targetFacilityId, canTraverseEdge);
             if (facilityPath.Count == 0)
             {
                 var blocked = IsBlockedPassage(passageSession,
@@ -786,6 +796,403 @@ namespace Mandate.Domain
                 }
                 return (hash & 1) == 0 ? -1f : 1f;
             }
+        }
+    }
+
+    public static class LuoyangFormalPlayerMovementIds
+    {
+        public const string ContractId =
+            "mandate.luoyang.formal-player-movement-world-settlement.v1";
+        public const string PolicyId =
+            "movement.policy.luoyang-pedestrian-world-settlement.v1";
+        public const string InitializeCommandTypeId =
+            "mandate.command.luoyang-player-movement.initialize.v1";
+        public const string MoveCommandTypeId =
+            "mandate.command.luoyang-player-movement.request.v1";
+        public const string AdvanceSegmentCommandTypeId =
+            "mandate.command.luoyang-player-movement.advance-segment.v1";
+        public const string RoadTransitionCommandTypeId =
+            "mandate.command.luoyang-road-segment.transition.v1";
+        public const string SystemIssuerId =
+            "mandate.issuer.luoyang-player-movement-system.v1";
+        public const string PresentationIssuerId =
+            "mandate.issuer.luoyang-player-input.v1";
+        public const string InitializedEventTypeId =
+            "mandate.event.luoyang-player-movement.initialized.v1";
+        public const string MovementStartedEventTypeId =
+            "mandate.event.person-movement.started.v1";
+        public const string MovementProgressedEventTypeId =
+            "mandate.event.person-movement.progressed.v1";
+        public const string MovementCompletedEventTypeId =
+            "mandate.event.person-movement.completed.v1";
+        public const string LocationChangedEventTypeId =
+            "mandate.event.person-location.changed.v1";
+        public const string MovementInterruptedEventTypeId =
+            "mandate.event.person-movement.interrupted.v1";
+        public const string RouteInvalidatedEventTypeId =
+            "mandate.event.person-movement.route-invalidated.v1";
+        public const string RoadTransitionedEventTypeId =
+            "mandate.event.luoyang-road-segment.transitioned.v1";
+        public const string OpenRoadStatusId =
+            "road.segment.status.open.v1";
+        public const string BlockedRoadStatusId =
+            "road.segment.status.blocked.v1";
+        public const string DestroyedRoadStatusId =
+            "road.segment.status.destroyed.v1";
+        public const string FootMovementModeId = "movement.mode.foot.v1";
+        public const string InvalidRouteReasonId =
+            "movement.interruption.route-invalidated.v1";
+        public const string InsufficientStaminaReasonId =
+            "movement.rejection.insufficient-stamina.v1";
+        public const string InsufficientFoodReasonId =
+            "movement.rejection.insufficient-food.v1";
+        public const int WorldSegmentMinutes = 360;
+    }
+
+    public enum LuoyangFormalMovementStatus : byte
+    {
+        Active,
+        Completed,
+        Interrupted
+    }
+
+    [Serializable]
+    public sealed class LuoyangLocalNavigationLocationState
+    {
+        public string Id;
+        public string FacilityId;
+        public string FacilityDefinitionId;
+        public string SettlementLocationId;
+        public ulong CellId64;
+        public int GridColumn;
+        public int GridRow;
+    }
+
+    [Serializable]
+    public sealed class LuoyangRoadOperationalSegmentState
+    {
+        public string Id;
+        public string EdgeId;
+        public string FromFacilityId;
+        public string ToFacilityId;
+        public string StatusId;
+        public long Revision;
+        public long LastChangedDay;
+        public byte LastChangedSegment;
+        public string LastReasonId;
+        public string LastCommandId;
+        public string LastEventId;
+
+        public bool CanTraverse => string.Equals(StatusId,
+            LuoyangFormalPlayerMovementIds.OpenRoadStatusId,
+            StringComparison.Ordinal);
+    }
+
+    [Serializable]
+    public sealed class LuoyangFormalMovementSegmentState
+    {
+        public int Sequence;
+        public string EdgeId;
+        public string FromFacilityId;
+        public string ToFacilityId;
+        public string PassageFacilityId;
+        public int DistanceMetres;
+        public int WeightedDistanceMetres;
+        public int DurationMinutes;
+        public int StaminaCostBasisPoints;
+        public int FoodCost;
+    }
+
+    [Serializable]
+    public sealed class LuoyangFormalPlayerMovementState
+    {
+        public string Id;
+        public string RequestCommandId;
+        public string PersonId;
+        public string PolicyId;
+        public string MovementModeId;
+        public string OriginSettlementLocationId;
+        public string OriginFacilityId;
+        public ulong OriginCellId64;
+        public string TargetFacilityId;
+        public ulong TargetCellId64;
+        public long IssuedDay;
+        public byte IssuedSegment;
+        public int ExpectedDurationMinutes;
+        public int ExpectedWorldSegments;
+        public int ExpectedStaminaCostBasisPoints;
+        public int ExpectedFoodCost;
+        public int CurrentSegmentIndex;
+        public int ElapsedDurationMinutes;
+        public int UnsettledDurationMinutes;
+        public int ConsumedStaminaBasisPoints;
+        public int ConsumedFood;
+        public LuoyangFormalMovementStatus Status;
+        public string FailureReasonId;
+        public long CompletedDay = -1;
+        public byte CompletedSegment;
+        public string LastProgressCommandId;
+        public string StartedEventId;
+        public string CompletionEventId;
+        public List<LuoyangFormalMovementSegmentState> Segments =
+            new List<LuoyangFormalMovementSegmentState>();
+    }
+
+    public sealed class LuoyangMovementCostPolicy
+    {
+        public LuoyangMovementCostPolicy(
+            int walkingMetresPerMinute = 80,
+            int metresPerStaminaBasisPoint = 20,
+            int feedingIntervalMinutes = 360)
+        {
+            if (walkingMetresPerMinute <= 0 ||
+                metresPerStaminaBasisPoint <= 0 ||
+                feedingIntervalMinutes <= 0)
+                throw new ArgumentOutOfRangeException(nameof(
+                    walkingMetresPerMinute));
+            WalkingMetresPerMinute = walkingMetresPerMinute;
+            MetresPerStaminaBasisPoint = metresPerStaminaBasisPoint;
+            FeedingIntervalMinutes = feedingIntervalMinutes;
+        }
+
+        public string Id => LuoyangFormalPlayerMovementIds.PolicyId;
+        public int WalkingMetresPerMinute { get; }
+        public int MetresPerStaminaBasisPoint { get; }
+        public int FeedingIntervalMinutes { get; }
+    }
+
+    public sealed class LuoyangMovementSegmentCost
+    {
+        public int DistanceMetres { get; internal set; }
+        public int WeightedDistanceMetres { get; internal set; }
+        public int DurationMinutes { get; internal set; }
+        public int StaminaCostBasisPoints { get; internal set; }
+    }
+
+    public sealed class LuoyangMovementCostCalculator
+    {
+        private readonly LuoyangMovementCostPolicy _policy;
+
+        public LuoyangMovementCostCalculator(
+            LuoyangMovementCostPolicy policy = null)
+        {
+            _policy = policy ?? new LuoyangMovementCostPolicy();
+        }
+
+        public LuoyangMovementCostPolicy Policy => _policy;
+
+        public LuoyangMovementSegmentCost CalculateSegment(
+            double distanceMetres,
+            double weightedDistanceMetres,
+            int loadBasisPoints = 0)
+        {
+            if (distanceMetres <= 0d || weightedDistanceMetres <= 0d ||
+                weightedDistanceMetres + 0.0001d < distanceMetres ||
+                loadBasisPoints < 0 || loadBasisPoints > 10_000)
+                throw new ArgumentOutOfRangeException(nameof(distanceMetres));
+            var distance = Math.Max(1, checked((int)Math.Ceiling(
+                distanceMetres)));
+            var weighted = Math.Max(distance, checked((int)Math.Ceiling(
+                weightedDistanceMetres)));
+            var loadAdjusted = checked(weighted +
+                weighted * loadBasisPoints / 20_000);
+            return new LuoyangMovementSegmentCost
+            {
+                DistanceMetres = distance,
+                WeightedDistanceMetres = loadAdjusted,
+                DurationMinutes = CeilingDivide(loadAdjusted,
+                    _policy.WalkingMetresPerMinute),
+                StaminaCostBasisPoints = CeilingDivide(loadAdjusted,
+                    _policy.MetresPerStaminaBasisPoint)
+            };
+        }
+
+        public int CalculateFoodCost(int durationMinutes)
+        {
+            if (durationMinutes < 0)
+                throw new ArgumentOutOfRangeException(nameof(durationMinutes));
+            return durationMinutes / _policy.FeedingIntervalMinutes;
+        }
+
+        public int CalculateWorldSegments(int durationMinutes)
+        {
+            if (durationMinutes < 0)
+                throw new ArgumentOutOfRangeException(nameof(durationMinutes));
+            return durationMinutes == 0 ? 0 : CeilingDivide(durationMinutes,
+                LuoyangFormalPlayerMovementIds.WorldSegmentMinutes);
+        }
+
+        private static int CeilingDivide(int value, int divisor) => checked(
+            (value + divisor - 1) / divisor);
+    }
+
+    public static class LuoyangFormalPlayerMovementRules
+    {
+        public static void ValidateWorld(WorldState world)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (world.LuoyangLocalNavigationLocations == null ||
+                world.LuoyangRoadOperationalSegments == null ||
+                world.LuoyangFormalPlayerMovements == null)
+                throw new InvalidOperationException(
+                    "Luoyang formal movement collections cannot be null.");
+
+            var locations = new Dictionary<string,
+                LuoyangLocalNavigationLocationState>(StringComparer.Ordinal);
+            foreach (var location in world.LuoyangLocalNavigationLocations)
+            {
+                if (location == null)
+                    throw new InvalidOperationException(
+                        "A Luoyang local navigation location cannot be null.");
+                _ = new StableId(location.Id);
+                _ = new StableId(location.FacilityId);
+                _ = new StableId(location.FacilityDefinitionId);
+                _ = new StableId(location.SettlementLocationId);
+                if (location.CellId64 == 0 ||
+                    !locations.TryAdd(location.FacilityId, location))
+                    throw new InvalidOperationException(
+                        "Invalid or duplicate Luoyang local location.");
+            }
+
+            var roads = new Dictionary<string,
+                LuoyangRoadOperationalSegmentState>(StringComparer.Ordinal);
+            foreach (var road in world.LuoyangRoadOperationalSegments)
+            {
+                if (road == null || !IsRoadStatus(road.StatusId) ||
+                    road.Revision < 0 || road.LastChangedDay < 0 ||
+                    road.LastChangedDay > world.AbsoluteDay ||
+                    !locations.ContainsKey(road.FromFacilityId) ||
+                    !locations.ContainsKey(road.ToFacilityId))
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang road operational segment.");
+                _ = new StableId(road.Id);
+                _ = new StableId(road.EdgeId);
+                if (!roads.TryAdd(road.EdgeId, road))
+                    throw new InvalidOperationException(
+                        "Duplicate Luoyang road operational edge.");
+            }
+
+            foreach (var person in world.People)
+            {
+                if (person == null || string.IsNullOrEmpty(
+                        person.CurrentFacilityId)) continue;
+                if (!locations.TryGetValue(person.CurrentFacilityId,
+                        out var local) || local.CellId64 !=
+                    person.CurrentCellId64 || !string.Equals(
+                        local.SettlementLocationId, person.LocationId,
+                        StringComparison.Ordinal))
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has an invalid local location.");
+            }
+
+            var activePeople = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var movement in world.LuoyangFormalPlayerMovements)
+            {
+                ValidateMovement(world, movement, locations, roads);
+                if (movement.Status == LuoyangFormalMovementStatus.Active &&
+                    !activePeople.Add(movement.PersonId))
+                    throw new InvalidOperationException(
+                        "A Person cannot have two active Luoyang movements.");
+            }
+        }
+
+        public static bool IsRoadStatus(string statusId) => string.Equals(
+                statusId, LuoyangFormalPlayerMovementIds.OpenRoadStatusId,
+                StringComparison.Ordinal) || string.Equals(statusId,
+                LuoyangFormalPlayerMovementIds.BlockedRoadStatusId,
+                StringComparison.Ordinal) || string.Equals(statusId,
+                LuoyangFormalPlayerMovementIds.DestroyedRoadStatusId,
+                StringComparison.Ordinal);
+
+        private static void ValidateMovement(WorldState world,
+            LuoyangFormalPlayerMovementState movement,
+            IReadOnlyDictionary<string, LuoyangLocalNavigationLocationState>
+                locations,
+            IReadOnlyDictionary<string, LuoyangRoadOperationalSegmentState>
+                roads)
+        {
+            if (movement == null || !Enum.IsDefined(
+                    typeof(LuoyangFormalMovementStatus), movement.Status) ||
+                !string.Equals(movement.PolicyId,
+                    LuoyangFormalPlayerMovementIds.PolicyId,
+                    StringComparison.Ordinal) ||
+                !string.Equals(movement.MovementModeId,
+                    LuoyangFormalPlayerMovementIds.FootMovementModeId,
+                    StringComparison.Ordinal) || movement.Segments == null ||
+                movement.Segments.Count == 0 ||
+                movement.CurrentSegmentIndex < 0 ||
+                movement.CurrentSegmentIndex > movement.Segments.Count ||
+                movement.ExpectedDurationMinutes <= 0 ||
+                movement.ExpectedWorldSegments <= 0 ||
+                movement.ExpectedStaminaCostBasisPoints <= 0 ||
+                movement.ExpectedFoodCost < 0 ||
+                movement.ElapsedDurationMinutes < 0 ||
+                movement.UnsettledDurationMinutes < 0 ||
+                movement.UnsettledDurationMinutes >=
+                    LuoyangFormalPlayerMovementIds.WorldSegmentMinutes ||
+                movement.ConsumedStaminaBasisPoints < 0 ||
+                movement.ConsumedFood < 0 ||
+                !locations.ContainsKey(movement.OriginFacilityId) ||
+                !locations.ContainsKey(movement.TargetFacilityId) ||
+                !world.People.Any(item => item != null && string.Equals(
+                    item.Id, movement.PersonId, StringComparison.Ordinal)))
+                throw new InvalidOperationException(
+                    "Invalid Luoyang formal player movement.");
+            _ = new StableId(movement.Id);
+            _ = new StableId(movement.RequestCommandId);
+            _ = new StableId(movement.PersonId);
+            var duration = 0;
+            var stamina = 0;
+            var food = 0;
+            var expectedFrom = movement.OriginFacilityId;
+            for (var i = 0; i < movement.Segments.Count; i++)
+            {
+                var segment = movement.Segments[i];
+                if (segment == null || segment.Sequence != i ||
+                    !roads.ContainsKey(segment.EdgeId) ||
+                    !string.Equals(segment.FromFacilityId, expectedFrom,
+                        StringComparison.Ordinal) ||
+                    !locations.ContainsKey(segment.ToFacilityId) ||
+                    segment.DistanceMetres <= 0 ||
+                    segment.WeightedDistanceMetres < segment.DistanceMetres ||
+                    segment.DurationMinutes <= 0 ||
+                    segment.StaminaCostBasisPoints <= 0 ||
+                    segment.FoodCost < 0)
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang movement route snapshot.");
+                duration = checked(duration + segment.DurationMinutes);
+                stamina = checked(stamina +
+                    segment.StaminaCostBasisPoints);
+                food = checked(food + segment.FoodCost);
+                expectedFrom = segment.ToFacilityId;
+            }
+            if (!string.Equals(expectedFrom, movement.TargetFacilityId,
+                    StringComparison.Ordinal) ||
+                duration != movement.ExpectedDurationMinutes ||
+                stamina != movement.ExpectedStaminaCostBasisPoints ||
+                food != movement.ExpectedFoodCost ||
+                movement.ConsumedStaminaBasisPoints > stamina ||
+                movement.ConsumedFood > food ||
+                movement.ElapsedDurationMinutes > duration)
+                throw new InvalidOperationException(
+                    "Luoyang movement totals do not match its route snapshot.");
+            if (movement.Status == LuoyangFormalMovementStatus.Active)
+            {
+                if (movement.CurrentSegmentIndex >= movement.Segments.Count ||
+                    movement.CompletedDay != -1 ||
+                    !string.IsNullOrEmpty(movement.CompletionEventId) ||
+                    !string.IsNullOrEmpty(movement.FailureReasonId))
+                    throw new InvalidOperationException(
+                        "Invalid active Luoyang movement lifecycle.");
+            }
+            else if (movement.CompletedDay < movement.IssuedDay ||
+                     string.IsNullOrEmpty(movement.CompletionEventId) ||
+                     movement.Status == LuoyangFormalMovementStatus.Completed &&
+                     movement.CurrentSegmentIndex != movement.Segments.Count ||
+                     movement.Status == LuoyangFormalMovementStatus.Interrupted &&
+                     string.IsNullOrEmpty(movement.FailureReasonId))
+                throw new InvalidOperationException(
+                    "Invalid terminal Luoyang movement lifecycle.");
         }
     }
 
@@ -1212,6 +1619,16 @@ namespace Mandate.Domain
             LuoyangPassageTraversalSession session,
             string fromFacilityId, string toFacilityId)
         {
+            return FindFacilityPath(plan, session, fromFacilityId,
+                toFacilityId, null);
+        }
+
+        public static IReadOnlyList<string> FindFacilityPath(
+            LuoyangRoadTraversalRefinementPlan plan,
+            LuoyangPassageTraversalSession session,
+            string fromFacilityId, string toFacilityId,
+            Func<string, bool> canTraverseEdge)
+        {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             if (session == null) throw new ArgumentNullException(nameof(session));
             if (!plan.NavigationNodesByFacilityId.TryGetValue(fromFacilityId,
@@ -1229,6 +1646,8 @@ namespace Mandate.Domain
                 StringComparer.Ordinal);
             foreach (var edge in plan.NavigationEdges)
             {
+                if (canTraverseEdge != null &&
+                    !canTraverseEdge(edge.EdgeId)) continue;
                 var edgeCost = Math.Max(1d, edge.TraversalCostMetres);
                 adjacency[edge.FromNodeId].Add(new WeightedNeighbor(
                     edge.ToNodeId, edgeCost));

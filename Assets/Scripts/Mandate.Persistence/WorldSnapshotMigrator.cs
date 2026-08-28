@@ -251,6 +251,9 @@ namespace Mandate.Persistence
                     case 74:
                         MigrateVersionSeventyFourToSeventyFive(world);
                         break;
+                    case 75:
+                        MigrateVersionSeventyFiveToSeventySix(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -2288,6 +2291,29 @@ namespace Mandate.Persistence
                 }
             }
             world.SchemaVersion = 75;
+        }
+
+        private static void MigrateVersionSeventyFiveToSeventySix(
+            WorldState world)
+        {
+            world.LuoyangLocalNavigationLocations ??=
+                new List<LuoyangLocalNavigationLocationState>();
+            world.LuoyangRoadOperationalSegments ??=
+                new List<LuoyangRoadOperationalSegmentState>();
+            world.LuoyangFormalPlayerMovements ??=
+                new List<LuoyangFormalPlayerMovementState>();
+            if (world.People != null)
+            {
+                foreach (var person in world.People)
+                {
+                    if (person == null) continue;
+                    person.CurrentFacilityId ??= string.Empty;
+                    if (person.StaminaBasisPoints < 0 ||
+                        person.StaminaBasisPoints > 10_000)
+                        person.StaminaBasisPoints = 10_000;
+                }
+            }
+            world.SchemaVersion = 76;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(
