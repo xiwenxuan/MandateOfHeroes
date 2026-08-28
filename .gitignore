@@ -13,6 +13,12 @@
 tmp/
 outputs/
 
+# Unity Test Framework bootstrap scenes left behind by interrupted test runs.
+# Keep them out of version control, and move them out of Assets with
+# Tools/Quarantine-UnityGeneratedTestScenes.ps1 so Unity does not import them.
+Assets/InitTestScene*.unity
+Assets/InitTestScene*.unity.meta
+
 # Reproducible local evidence, previews and Python/Node caches
 **/__pycache__/
 *.py[cod]

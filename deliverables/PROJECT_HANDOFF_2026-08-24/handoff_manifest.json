@@ -1,0 +1,45 @@
+{
+  "schema": "mandate-of-heroes.development-handoff.v1",
+  "created_at": "2026-08-24T12:01:21+08:00",
+  "project": {
+    "name": "MandateOfHeroes",
+    "title_zh": "群雄志：仕途",
+    "current_path": "J:\\project\\MandateOfHeroes",
+    "relative_path_from_handoff": "..\\MandateOfHeroes",
+    "unity_version": "2022.3.62f3c1"
+  },
+  "git": {
+    "remote": "https://github.com/xiwenxuan/MandateOfHeroes.git",
+    "branch": "codex/m23-p4-quality-artisan-growth",
+    "head": "191bca0bbe58f7f09eff91ef9254596953fb1ab6",
+    "tracking_ahead": 3,
+    "tracking_behind": 0,
+    "status_total": 342,
+    "tracked_modified_unstaged": 32,
+    "staged": 0,
+    "untracked": 310
+  },
+  "transfer": {
+    "included_file_count": 12480,
+    "included_bytes": 1328114676,
+    "remaining_files": 0,
+    "failed_files": 0,
+    "source_target_git_state_match": true,
+    "target_git_connectivity_passed": true,
+    "excluded_regenerable_roots": [
+      "Library",
+      "Temp",
+      "Logs",
+      "obj",
+      "bin",
+      "tmp",
+      "outputs",
+      ".codex-docx-qa"
+    ]
+  },
+  "current_gate": {
+    "id": "STYLE_D_STRATEGIC_LANDSCAPE_V2_READY_FOR_USER_REVIEW",
+    "final_golden": false,
+    "requires_user_visual_approval": true
+  }
+}

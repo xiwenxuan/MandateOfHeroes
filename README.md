@@ -8,9 +8,20 @@
 
 ## 项目位置
 
-`<repo-root>`
+Unity Hub 必须选择**同时包含 `Assets`、`Packages`、`ProjectSettings` 的仓库根目录**，
+不要选择 `Assets`、`Builds` 或上一级目录。当前工程锁定
+`Unity 2022.3.62f3c1`，不要用 Unity 6000.x 升级打开。
 
-后续 Unity 工程请创建或打开此目录，不再使用上一级已有的 Godot 工程。
+在 Windows 上可先检查并用锁定版本直接打开：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools\Inspect-UnityProjectWorkspace.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File Tools\Open-UnityProject.ps1
+```
+
+完整目录说明、缓存保留策略和故障恢复见
+[项目文件夹整理与 Unity 打开指南](Docs/PROJECT_FOLDER_ORGANIZATION_AND_UNITY_OPENING.md)。
+后续 Unity 工程只打开此仓库根目录，不再使用上一级已有的 Godot 工程。
 
 ## 当前阶段
 
