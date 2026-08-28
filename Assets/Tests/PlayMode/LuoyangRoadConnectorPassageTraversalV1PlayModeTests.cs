@@ -274,6 +274,98 @@ namespace Mandate.Tests
         }
 
         [UnityTest]
+        public IEnumerator FormalPlayer_ClickCreatesCommandSettlesWorldAndOnlyThenPlays()
+        {
+            yield return SceneManager.LoadSceneAsync("HanWorldArtDirectionLab",
+                LoadSceneMode.Single);
+            yield return null;
+            var controller = Object.FindObjectOfType<
+                HanWorldNaturalMapController>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(controller.IsReady || controller.TryInitialize(),
+                Is.True, controller.LastError);
+
+            var world = WorldState.Create(184);
+            const string locationId = "location.luoyang.formal-playmode";
+            const string personId = "person.m26.formal-playmode";
+            world.Locations.Add(new LocationState
+            {
+                Id = locationId,
+                DisplayName = "洛阳",
+                Kind = LocationKind.RegionalSeat,
+                Terrain = TerrainKind.Plains,
+                Features = LocationFeature.Government |
+                    LocationFeature.Market,
+                Population = 1
+            });
+            world.People.Add(new PersonState
+            {
+                Id = personId,
+                DisplayName = "M26 正式玩家",
+                LocationId = locationId,
+                BirthLocationId = locationId,
+                StaminaBasisPoints = 10_000,
+                Provisions = 100
+            });
+            world.PlayerPersonId = personId;
+            world.PopulationStorage.SynchronizeInlineCounts(world.People);
+            var runtime = new WorldCommandRuntime();
+            controller.BindLuoyangPassageWorld(world, runtime);
+            controller.SetPresentationUiVisible(false);
+            controller.ApplyStrategicCellCamera(
+                StrategicCellCameraRig.LuoyangBuildingPerformanceReview);
+            yield return null;
+            yield return null;
+
+            var actor = controller.GetLuoyangClickWalkPedestrian();
+            Assert.That(actor.ActorId, Is.EqualTo(personId));
+            var person = new PlayerSession(world).ControlledPerson;
+            Assert.That(actor.CurrentFacilityId,
+                Is.EqualTo(person.CurrentFacilityId));
+            const string gateId =
+                LuoyangGateIdentityKitIds.NorthPalaceSouthGate;
+            var candidates = controller.GetLuoyangPassageApproachFacilityIds(
+                gateId);
+            var target = candidates.First(item => item !=
+                person.CurrentFacilityId);
+            var openingStamina = person.StaminaBasisPoints;
+            var openingTick = world.AbsoluteDay * 4L + world.Segment;
+
+            Assert.That(controller.SetLuoyangPedestrianDestination(target),
+                Is.True);
+            var movement = world.LuoyangFormalPlayerMovements.Last();
+            Assert.That(movement.Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Completed));
+            Assert.That(person.CurrentFacilityId, Is.EqualTo(target));
+            Assert.That(person.StaminaBasisPoints,
+                Is.LessThan(openingStamina));
+            Assert.That(world.AbsoluteDay * 4L + world.Segment,
+                Is.GreaterThan(openingTick));
+            Assert.That(world.PersistentWorldCommands.Any(item =>
+                item.CommandTypeId ==
+                LuoyangFormalPlayerMovementIds.MoveCommandTypeId), Is.True);
+            Assert.That(actor.IsWalking, Is.True,
+                "Unity should now be replaying the committed world fact.");
+            var playbackGuard = actor.RoutePointCount + 1;
+            while (actor.IsWalking && playbackGuard-- > 0)
+                Assert.That(controller.StepLuoyangPedestrian(1000f), Is.True);
+            Assert.That(playbackGuard, Is.GreaterThanOrEqualTo(0));
+            Assert.That(actor.CurrentFacilityId, Is.EqualTo(target));
+            Assert.That(actor.MovementStateId, Is.EqualTo(
+                LuoyangClickToWalkPedestrianIds.ArrivedStateId));
+
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                WorldSnapshotSerializer.Serialize(world));
+            Assert.That(loaded.PlayerPersonId, Is.EqualTo(personId));
+            Assert.That(loaded.People.Single(item => item.Id == personId)
+                .CurrentFacilityId, Is.EqualTo(target));
+            Assert.That(loaded.LuoyangFormalPlayerMovements.Last().Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Completed));
+            controller.UnbindLuoyangPassageWorld();
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator DenseCityWindow_ClickWalkActorUsesRouteAndStopsForClosedGate()
         {
             yield return SceneManager.LoadSceneAsync("HanWorldArtDirectionLab",

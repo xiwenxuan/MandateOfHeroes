@@ -613,6 +613,412 @@ namespace Mandate.Tests
                 Is.EqualTo(serializedBefore));
         }
 
+        [Test]
+        public void MovePersonCommandTests_FormalSessionCreatesPersistentAction()
+        {
+            var fixture = CreateFormalMovementFixture();
+            var target = FindFarReachableTarget(fixture);
+            Assert.That(fixture.Service.TryRequest(fixture.World, target,
+                out var movement, out var plan, out var failure), Is.True,
+                failure);
+            Assert.That(new PlayerSession(fixture.World).ControlledPersonId,
+                Is.EqualTo(FormalPlayerPersonId));
+            Assert.That(movement.PersonId, Is.EqualTo(FormalPlayerPersonId));
+            Assert.That(movement.Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Active));
+            Assert.That(movement.Segments, Has.Count.EqualTo(
+                plan.Segments.Count));
+            Assert.That(fixture.World.PersistentWorldCommands.Single(item =>
+                    item.Id == movement.RequestCommandId).CommandTypeId,
+                Is.EqualTo(LuoyangFormalPlayerMovementIds.MoveCommandTypeId));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void MovementValidationTests_RejectMissingInvalidAndStaleOrigins()
+        {
+            var fixture = CreateFormalMovementFixture();
+            Assert.That(fixture.System.TryCreatePlan(fixture.World,
+                    "facility.missing.target", out _, out var invalidTarget),
+                Is.False);
+            Assert.That(invalidTarget, Is.Not.Empty);
+            fixture.World.People.Single(item => item.Id ==
+                FormalPlayerPersonId).IsAlive = false;
+            Assert.That(fixture.System.TryCreatePlan(fixture.World,
+                    FindAnyOtherFacility(fixture), out _, out var deadReason),
+                Is.False);
+            Assert.That(deadReason, Is.EqualTo(
+                "movement.rejection.person-cannot-act.v1"));
+
+            var stale = CreateFormalMovementFixture();
+            var commandId = stale.System.EnqueueMove(stale.World,
+                stale.Runtime, FindFarReachableTarget(stale));
+            var command = stale.World.PersistentWorldCommands.Single(item =>
+                item.Id == commandId);
+            command.Arguments.Single(item => item.Key ==
+                "origin_facility_id").Value = FindAnyOtherFacility(stale);
+            Assert.Throws<System.InvalidOperationException>(() =>
+                stale.Runtime.ProcessDue(stale.World));
+            Assert.That(stale.World.WorldCommandBatchResults.Last().Outcome,
+                Is.EqualTo(WorldCommandBatchOutcome.Rejected));
+        }
+
+        [Test]
+        public void MovementValidationTests_RejectsInsufficientStaminaAndFood()
+        {
+            var stamina = CreateFormalMovementFixture();
+            var target = FindFarReachableTarget(stamina);
+            new PlayerSession(stamina.World).ControlledPerson
+                .StaminaBasisPoints = 0;
+            Assert.That(stamina.System.TryCreatePlan(stamina.World, target,
+                    out _, out var staminaReason), Is.False);
+            Assert.That(staminaReason, Is.EqualTo(
+                LuoyangFormalPlayerMovementIds.InsufficientStaminaReasonId));
+
+            var food = CreateFormalMovementFixture();
+            var foodTarget = FindFoodCostTarget(food);
+            new PlayerSession(food.World).ControlledPerson.Provisions = 0;
+            Assert.That(food.System.TryCreatePlan(food.World, foodTarget,
+                    out _, out var foodReason), Is.False);
+            Assert.That(foodReason, Is.EqualTo(
+                LuoyangFormalPlayerMovementIds.InsufficientFoodReasonId));
+        }
+
+        [Test]
+        public void MovementCostCalculatorTests_FixedInputsAreExactAndDataDriven()
+        {
+            var calculator = new LuoyangMovementCostCalculator(
+                new LuoyangMovementCostPolicy(80, 20, 360));
+            var cost = calculator.CalculateSegment(2_000d, 3_600d, 2_000);
+            Assert.That(cost.DistanceMetres, Is.EqualTo(2_000));
+            Assert.That(cost.WeightedDistanceMetres, Is.EqualTo(3_960));
+            Assert.That(cost.DurationMinutes, Is.EqualTo(50));
+            Assert.That(cost.StaminaCostBasisPoints, Is.EqualTo(198));
+            Assert.That(calculator.CalculateFoodCost(359), Is.Zero);
+            Assert.That(calculator.CalculateFoodCost(360), Is.EqualTo(1));
+            Assert.That(calculator.CalculateWorldSegments(361), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void PersonLocationUpdateTests_SettlesTimeStaminaFoodAndLocation()
+        {
+            var fixture = CreateFormalMovementFixture();
+            var person = new PlayerSession(fixture.World).ControlledPerson;
+            var openingDay = fixture.World.AbsoluteDay;
+            var openingSegment = fixture.World.Segment;
+            var openingStamina = person.StaminaBasisPoints;
+            var openingFood = person.Provisions;
+            var target = FindFarReachableTarget(fixture);
+            fixture.Service.TryRequest(fixture.World, target,
+                out var movement, out _, out _);
+            fixture.Service.Complete(fixture.World, movement.Id);
+            Assert.That(movement.Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Completed));
+            Assert.That(person.CurrentFacilityId, Is.EqualTo(target));
+            Assert.That(person.CurrentCellId64,
+                Is.EqualTo(movement.TargetCellId64));
+            Assert.That(openingStamina - person.StaminaBasisPoints,
+                Is.EqualTo(movement.ExpectedStaminaCostBasisPoints));
+            Assert.That(openingFood - person.Provisions,
+                Is.EqualTo(movement.ExpectedFoodCost));
+            Assert.That(fixture.World.AbsoluteDay > openingDay ||
+                        fixture.World.Segment > openingSegment, Is.True);
+            Assert.That(fixture.World.WorldEventOutbox.Any(item =>
+                item.EventTypeId == LuoyangFormalPlayerMovementIds
+                    .MovementCompletedEventTypeId), Is.True);
+            Assert.That(fixture.World.WorldEventOutbox.Any(item =>
+                item.EventTypeId == LuoyangFormalPlayerMovementIds
+                    .LocationChangedEventTypeId), Is.True);
+        }
+
+        [Test]
+        public void RoutePassabilityTests_RoadBlockDestroyAndRepairAreAuthoritative()
+        {
+            var fixture = CreateFormalMovementFixture();
+            var start = new PlayerSession(fixture.World).ControlledPerson
+                .CurrentFacilityId;
+            var road = fixture.World.LuoyangRoadOperationalSegments.First(item =>
+                item.FromFacilityId == start || item.ToFacilityId == start);
+            var target = road.FromFacilityId == start
+                ? road.ToFacilityId
+                : road.FromFacilityId;
+            fixture.System.EnqueueRoadTransition(fixture.World,
+                fixture.Runtime, road.EdgeId,
+                LuoyangFormalPlayerMovementIds.DestroyedRoadStatusId,
+                "road.reason.test-destroyed.v1");
+            fixture.Runtime.ProcessDue(fixture.World);
+            fixture.Runtime.DispatchPublishedEvents(fixture.World);
+            Assert.That(fixture.System.TryCreatePlan(fixture.World, target,
+                out _, out _), Is.False);
+            fixture.System.EnqueueRoadTransition(fixture.World,
+                fixture.Runtime, road.EdgeId,
+                LuoyangFormalPlayerMovementIds.OpenRoadStatusId,
+                "road.reason.test-repaired.v1");
+            fixture.Runtime.ProcessDue(fixture.World);
+            fixture.Runtime.DispatchPublishedEvents(fixture.World);
+            Assert.That(fixture.System.TryCreatePlan(fixture.World, target,
+                out var reopened, out _), Is.True);
+            Assert.That(reopened.CanWalk, Is.True);
+        }
+
+        [Test]
+        public void GateBridgePassabilityTests_ReadsPersistedPassageState()
+        {
+            foreach (var bridge in new[] { false, true })
+            {
+                var open = CreatePassageMovementFixture(bridge);
+                Assert.That(open.Service.TryRequest(open.World,
+                    open.TargetFacilityId, out var movement, out _, out _),
+                    Is.True);
+                open.Service.Complete(open.World, movement.Id);
+                Assert.That(movement.Status,
+                    Is.EqualTo(LuoyangFormalMovementStatus.Completed));
+                var blocked = CreatePassageMovementFixture(bridge);
+                blocked.PassageSystem.EnqueueTransition(blocked.World,
+                    blocked.Runtime, blocked.PassageFacilityId,
+                    LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                    "passage.reason.movement-test-destroyed.v1",
+                    FormalPlayerPersonId);
+                blocked.Runtime.ProcessDue(blocked.World);
+                blocked.Runtime.DispatchPublishedEvents(blocked.World);
+                Assert.That(blocked.System.TryCreatePlan(blocked.World,
+                    blocked.PassageFacilityId, out _, out _), Is.False);
+            }
+        }
+
+        [Test]
+        public void RouteInvalidationTests_StopsAtBoundaryWhenGateCloses()
+        {
+            var fixture = CreatePassageMovementFixture(false);
+            Assert.That(fixture.Service.TryRequest(fixture.World,
+                fixture.TargetFacilityId, out var movement, out _, out _),
+                Is.True);
+            fixture.PassageSystem.EnqueueTransition(fixture.World,
+                fixture.Runtime, fixture.PassageFacilityId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.movement-test-closed.v1",
+                FormalPlayerPersonId);
+            fixture.Runtime.ProcessDue(fixture.World);
+            fixture.Runtime.DispatchPublishedEvents(fixture.World);
+            fixture.Service.AdvanceNextSegment(fixture.World, movement.Id);
+            Assert.That(movement.Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Interrupted));
+            Assert.That(movement.FailureReasonId, Is.EqualTo(
+                LuoyangFormalPlayerMovementIds.InvalidRouteReasonId));
+            Assert.That(fixture.World.WorldEventOutbox.Any(item =>
+                item.EventTypeId == LuoyangFormalPlayerMovementIds
+                    .RouteInvalidatedEventTypeId), Is.True);
+        }
+
+        [Test]
+        public void MovementSaveLoadTests_ActiveSegmentBoundaryResumesExactly()
+        {
+            var fixture = CreateFormalMovementFixture();
+            var target = FindFarReachableTarget(fixture);
+            fixture.Service.TryRequest(fixture.World, target,
+                out var movement, out _, out _);
+            Assert.That(movement.Segments.Count, Is.GreaterThan(1));
+            fixture.Service.AdvanceNextSegment(fixture.World, movement.Id);
+            var boundarySnapshot = WorldSnapshotSerializer.Serialize(
+                fixture.World);
+            fixture.Service.Complete(fixture.World, movement.Id);
+            var continuousHash = MovementStateHash(fixture.World);
+            var loaded = WorldSnapshotSerializer.Deserialize(boundarySnapshot);
+            var resumed = CreateFormalMovementRuntime(loaded, fixture.Plan);
+            resumed.Service.Complete(loaded, movement.Id);
+            Assert.That(MovementStateHash(loaded), Is.EqualTo(continuousHash));
+            Assert.That(loaded.LuoyangFormalPlayerMovements.Single(item =>
+                    item.Id == movement.Id).Status,
+                Is.EqualTo(LuoyangFormalMovementStatus.Completed));
+        }
+
+        [Test]
+        public void MovementSaveLoadTests_V75MigratesWithoutInventingLocalFacts()
+        {
+            var legacy = WorldState.Create(184);
+            legacy.SchemaVersion = 75;
+            legacy.LuoyangLocalNavigationLocations = null;
+            legacy.LuoyangRoadOperationalSegments = null;
+            legacy.LuoyangFormalPlayerMovements = null;
+            var migrated = WorldSnapshotMigrator.MigrateToCurrent(legacy);
+            Assert.That(migrated.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(migrated.LuoyangLocalNavigationLocations, Is.Empty);
+            Assert.That(migrated.LuoyangRoadOperationalSegments, Is.Empty);
+            Assert.That(migrated.LuoyangFormalPlayerMovements, Is.Empty);
+            migrated.Validate();
+        }
+
+        [Test]
+        public void MovementReplayTests_ThreeRunsProduceIdenticalStateHash()
+        {
+            var hashes = new string[3];
+            for (var run = 0; run < hashes.Length; run++)
+            {
+                var fixture = CreateFormalMovementFixture();
+                var target = FindFarReachableTarget(fixture);
+                fixture.Service.TryRequest(fixture.World, target,
+                    out var movement, out _, out _);
+                fixture.Service.Complete(fixture.World, movement.Id);
+                hashes[run] = MovementStateHash(fixture.World);
+                System.Console.WriteLine("REPLAY_RUN_" + (run + 1) +
+                    "_HASH=" + hashes[run]);
+            }
+            Assert.That(hashes[1], Is.EqualTo(hashes[0]));
+            Assert.That(hashes[2], Is.EqualTo(hashes[0]));
+        }
+
+        private const string FormalPlayerPersonId =
+            "person.m26.formal-player";
+
+        private static FormalMovementFixture CreateFormalMovementFixture(
+            string initialFacilityId = null)
+        {
+            var plan = BuildLuoyangPassagePlan();
+            var roadNodes = plan.NavigationNodes.Where(item =>
+                    item.FacilityDefinitionId == "facility.public.road")
+                .OrderBy(item => item.CellId64)
+                .ThenBy(item => item.FacilityId,
+                    System.StringComparer.Ordinal).ToArray();
+            initialFacilityId ??= roadNodes[0].FacilityId;
+            var world = WorldState.Create(184);
+            const string locationId = "location.luoyang.formal-movement";
+            world.Locations.Add(new LocationState
+            {
+                Id = locationId,
+                DisplayName = "洛阳",
+                Kind = LocationKind.RegionalSeat,
+                Terrain = TerrainKind.Plains,
+                Features = LocationFeature.Government |
+                    LocationFeature.Market,
+                Population = 1
+            });
+            world.People.Add(new PersonState
+            {
+                Id = FormalPlayerPersonId,
+                DisplayName = "M26 正式玩家",
+                LocationId = locationId,
+                BirthLocationId = locationId,
+                StaminaBasisPoints = 10_000,
+                Provisions = 100
+            });
+            world.PlayerPersonId = FormalPlayerPersonId;
+            world.PopulationStorage.SynchronizeInlineCounts(world.People);
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(plan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(world, runtime);
+            runtime.ProcessDue(world);
+            runtime.DispatchPublishedEvents(world);
+            var system = new LuoyangFormalPlayerMovementSystem(plan);
+            system.RegisterHandlers(runtime);
+            system.EnsureInitialized(world, runtime, initialFacilityId);
+            runtime.ProcessDue(world);
+            runtime.DispatchPublishedEvents(world);
+            var fixture = CreateFormalMovementRuntime(world, plan, runtime,
+                passageSystem, system);
+            world.Validate();
+            return fixture;
+        }
+
+        private static FormalMovementFixture CreateFormalMovementRuntime(
+            WorldState world, LuoyangRoadTraversalRefinementPlan plan,
+            WorldCommandRuntime runtime = null,
+            LuoyangPassageWorldCommandSystem passageSystem = null,
+            LuoyangFormalPlayerMovementSystem system = null)
+        {
+            runtime ??= new WorldCommandRuntime();
+            passageSystem ??= new LuoyangPassageWorldCommandSystem(plan);
+            passageSystem.RegisterHandlers(runtime);
+            system ??= new LuoyangFormalPlayerMovementSystem(plan);
+            system.RegisterHandlers(runtime);
+            var simulator = new WorldSimulator(world.MasterSeed, null,
+                new WorldStatePersonRepository(world), runtime);
+            var service = new LuoyangFormalPlayerMovementService(system,
+                runtime, simulator);
+            return new FormalMovementFixture(world, plan, runtime,
+                passageSystem, system, service);
+        }
+
+        private static PassageMovementFixture CreatePassageMovementFixture(
+            bool bridge)
+        {
+            var plan = BuildLuoyangPassagePlan();
+            var passage = plan.PassageFacilityIds.Select(item =>
+                    plan.NavigationNodesByFacilityId[item])
+                .First(item => (item.FacilityDefinitionId ==
+                    "facility.public.bridge") == bridge);
+            var nodeById = plan.NavigationNodes.ToDictionary(item =>
+                item.NodeId, System.StringComparer.Ordinal);
+            var approaches = plan.NavigationEdges.Where(item =>
+                    item.EdgeProfileId ==
+                    LuoyangRoadConnectorPassageTraversalIds
+                        .PassageApproachEdgeProfileId &&
+                    (item.FromNodeId == passage.NodeId ||
+                     item.ToNodeId == passage.NodeId))
+                .Select(item => nodeById[item.FromNodeId == passage.NodeId
+                    ? item.ToNodeId
+                    : item.FromNodeId].FacilityId)
+                .OrderBy(item => item, System.StringComparer.Ordinal).ToArray();
+            var fixture = CreateFormalMovementFixture(approaches[0]);
+            return new PassageMovementFixture(fixture,
+                passage.FacilityId, approaches[1]);
+        }
+
+        private static string FindFarReachableTarget(
+            FormalMovementFixture fixture)
+        {
+            var start = new PlayerSession(fixture.World).ControlledPerson
+                .CurrentFacilityId;
+            foreach (var node in fixture.Plan.NavigationNodes.Where(item =>
+                         item.FacilityDefinitionId == "facility.public.road" &&
+                         item.FacilityId != start).OrderByDescending(item =>
+                         item.CellId64).ThenByDescending(item => item.FacilityId,
+                         System.StringComparer.Ordinal))
+                if (fixture.System.TryCreatePlan(fixture.World,
+                        node.FacilityId, out var plan, out _) &&
+                    plan.Segments.Count > 1)
+                    return node.FacilityId;
+            throw new System.InvalidOperationException(
+                "No multi-segment movement target exists.");
+        }
+
+        private static string FindAnyOtherFacility(
+            FormalMovementFixture fixture) => fixture.Plan.NavigationNodes
+            .First(item => item.FacilityId != new PlayerSession(fixture.World)
+                .ControlledPerson.CurrentFacilityId).FacilityId;
+
+        private static string FindFoodCostTarget(FormalMovementFixture fixture)
+        {
+            var calculator = new LuoyangMovementCostCalculator();
+            var start = new PlayerSession(fixture.World).ControlledPerson
+                .CurrentFacilityId;
+            foreach (var node in fixture.Plan.NavigationNodes.Where(item =>
+                         item.FacilityId != start).OrderByDescending(item =>
+                         item.CellId64))
+                if (fixture.System.TryCreatePlan(fixture.World,
+                        node.FacilityId, out var plan, out _))
+                {
+                    var minutes = plan.Segments.Sum(item => calculator
+                        .CalculateSegment(item.DistanceMetres,
+                            item.WeightedDistanceMetres).DurationMinutes);
+                    if (calculator.CalculateFoodCost(minutes) > 0)
+                        return node.FacilityId;
+                }
+            throw new System.InvalidOperationException(
+                "No route reaches the feeding interval.");
+        }
+
+        private static string MovementStateHash(WorldState world)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(
+                WorldSnapshotSerializer.Serialize(world));
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            return string.Concat(sha.ComputeHash(bytes).Select(item =>
+                item.ToString("x2",
+                    System.Globalization.CultureInfo.InvariantCulture)));
+        }
+
         private static LuoyangRoadTraversalRefinementPlan
             BuildLuoyangPassagePlan()
         {
@@ -909,6 +1315,46 @@ namespace Mandate.Tests
                     }
                 }
             });
+        }
+
+        private class FormalMovementFixture
+        {
+            public FormalMovementFixture(WorldState world,
+                LuoyangRoadTraversalRefinementPlan plan,
+                WorldCommandRuntime runtime,
+                LuoyangPassageWorldCommandSystem passageSystem,
+                LuoyangFormalPlayerMovementSystem system,
+                LuoyangFormalPlayerMovementService service)
+            {
+                World = world;
+                Plan = plan;
+                Runtime = runtime;
+                PassageSystem = passageSystem;
+                System = system;
+                Service = service;
+            }
+
+            public WorldState World { get; }
+            public LuoyangRoadTraversalRefinementPlan Plan { get; }
+            public WorldCommandRuntime Runtime { get; }
+            public LuoyangPassageWorldCommandSystem PassageSystem { get; }
+            public LuoyangFormalPlayerMovementSystem System { get; }
+            public LuoyangFormalPlayerMovementService Service { get; }
+        }
+
+        private sealed class PassageMovementFixture : FormalMovementFixture
+        {
+            public PassageMovementFixture(FormalMovementFixture source,
+                string passageFacilityId, string targetFacilityId)
+                : base(source.World, source.Plan, source.Runtime,
+                    source.PassageSystem, source.System, source.Service)
+            {
+                PassageFacilityId = passageFacilityId;
+                TargetFacilityId = targetFacilityId;
+            }
+
+            public string PassageFacilityId { get; }
+            public string TargetFacilityId { get; }
         }
 
         private sealed class LuoyangPassageOperationsFixture
