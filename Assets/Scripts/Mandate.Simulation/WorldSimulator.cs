@@ -3057,6 +3057,9 @@ namespace Mandate.Simulation
         private const string ExpectedRevisionArgumentId = "expected_revision";
         private const string TargetStatusArgumentId = "target_status_id";
         private const string ReasonArgumentId = "reason_id";
+        private const string LocalMapVersionArgumentId =
+            "local_map_version_id";
+        private const string LocalMapHashArgumentId = "local_map_hash";
 
         private readonly LuoyangRoadTraversalRefinementPlan _plan;
         private readonly LuoyangMovementCostCalculator _costCalculator;
@@ -3065,10 +3068,14 @@ namespace Mandate.Simulation
         private readonly Dictionary<string, LuoyangRoadNavigationNode>
             _nodesByFacilityId;
         private readonly HashSet<string> _passageFacilityIds;
+        private readonly LuoyangHumanScaleLocalMapPlan _localMap;
+        private readonly LuoyangHumanScaleLocalRoutePlanner
+            _localRoutePlanner;
 
         public LuoyangFormalPlayerMovementSystem(
             LuoyangRoadTraversalRefinementPlan plan,
-            LuoyangMovementCostCalculator costCalculator = null)
+            LuoyangMovementCostCalculator costCalculator = null,
+            LuoyangHumanScaleLocalMapPlan localMap = null)
         {
             _plan = plan ?? throw new ArgumentNullException(nameof(plan));
             LuoyangRoadConnectorPassageTraversalRules.Validate(plan);
@@ -3080,6 +3087,10 @@ namespace Mandate.Simulation
                 item.FacilityId, StringComparer.Ordinal);
             _passageFacilityIds = new HashSet<string>(
                 plan.PassageFacilityIds, StringComparer.Ordinal);
+            _localMap = localMap;
+            _localRoutePlanner = localMap == null
+                ? null
+                : new LuoyangHumanScaleLocalRoutePlanner(localMap);
         }
 
         public void RegisterHandlers(WorldCommandRuntime runtime)
@@ -3093,7 +3104,12 @@ namespace Mandate.Simulation
                 .AdvanceSegmentCommandTypeId, new AdvanceHandler(this));
             Register(runtime, LuoyangFormalPlayerMovementIds
                 .RoadTransitionCommandTypeId, new RoadTransitionHandler(this));
+            Register(runtime, LuoyangFormalPlayerMovementIds
+                .UpgradeLocalLocationsCommandTypeId,
+                new UpgradeLocalLocationsHandler(this));
         }
+
+        public bool UsesHumanScaleLocalMap => _localMap != null;
 
         public bool EnsureInitialized(WorldState world,
             WorldCommandRuntime runtime, string initialFacilityId)
@@ -3106,10 +3122,35 @@ namespace Mandate.Simulation
             if (world.LuoyangLocalNavigationLocations.Count != 0 ||
                 world.LuoyangRoadOperationalSegments.Count != 0)
             {
+                if (_localMap != null &&
+                    HasStrategicLocationInitialization(world))
+                {
+                    var upgradeCommandId = "luoyang.player-movement." +
+                        "upgrade-local-locations." + _localMap.MapVersionId;
+                    runtime.Enqueue(world, new WorldCommandEnvelope(
+                        upgradeCommandId,
+                        LuoyangFormalPlayerMovementIds
+                            .UpgradeLocalLocationsCommandTypeId,
+                        LuoyangFormalPlayerMovementIds.SystemIssuerId,
+                        world.AbsoluteDay, (DaySegment)world.Segment,
+                        CommandPriority,
+                        new Dictionary<string, string>(
+                            StringComparer.Ordinal)
+                        {
+                            [LocalMapVersionArgumentId] =
+                                _localMap.MapVersionId,
+                            [LocalMapHashArgumentId] = _localMap.AssetHash
+                        }));
+                    return true;
+                }
                 ValidateInitializedPlan(world);
                 return false;
             }
-            if (!_nodesByFacilityId.ContainsKey(initialFacilityId))
+            if (_localMap == null &&
+                    !_nodesByFacilityId.ContainsKey(initialFacilityId) ||
+                _localMap != null &&
+                    !_localMap.NavigationNodesByFacilityId.ContainsKey(
+                        initialFacilityId))
                 throw new InvalidOperationException(
                     "The initial player Facility is not a navigation node.");
             var commandId = "luoyang.player-movement.initialize." + person.Id;
@@ -3123,6 +3164,21 @@ namespace Mandate.Simulation
                     [InitialFacilityArgumentId] = initialFacilityId
                 }));
             return true;
+        }
+
+        private bool HasStrategicLocationInitialization(WorldState world)
+        {
+            if (world.LuoyangLocalNavigationLocations.Count !=
+                    _plan.NavigationNodes.Count ||
+                world.LuoyangRoadOperationalSegments.Count !=
+                    _plan.NavigationEdges.Count)
+                return false;
+            var locations = world.LuoyangLocalNavigationLocations.ToDictionary(
+                item => item.FacilityId, StringComparer.Ordinal);
+            return _plan.NavigationNodes.All(item =>
+                locations.TryGetValue(item.FacilityId, out var state) &&
+                state.CellId64 == item.CellId64 &&
+                state.FacilityDefinitionId == item.FacilityDefinitionId);
         }
 
         public bool TryCreatePlan(WorldState world, string targetFacilityId,
@@ -3174,6 +3230,57 @@ namespace Mandate.Simulation
             {
                 failureReasonId = LuoyangFormalPlayerMovementIds
                     .InsufficientFoodReasonId;
+                return false;
+            }
+            failureReasonId = string.Empty;
+            return true;
+        }
+
+        public bool TryCreateLocalPlan(WorldState world,
+            string targetFacilityId,
+            out LuoyangHumanScaleLocalRoute plan,
+            out string failureReasonId)
+        {
+            if (_localRoutePlanner == null)
+                throw new InvalidOperationException(
+                    "This movement system has no human-scale map.");
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            world.Validate();
+            ValidateInitializedPlan(world);
+            var session = new PlayerSession(world);
+            var person = session.ControlledPerson;
+            if (!session.CanAct)
+            {
+                plan = null;
+                failureReasonId = "movement.rejection.person-cannot-act.v1";
+                return false;
+            }
+            if (world.Journeys.Any(item => item != null &&
+                    item.PersonId == person.Id))
+            {
+                plan = null;
+                failureReasonId = "movement.rejection.person-traveling.v1";
+                return false;
+            }
+            if (!_localRoutePlanner.TryFindRoute(world,
+                    person.CurrentFacilityId, targetFacilityId,
+                    out plan, out failureReasonId))
+                return false;
+            var snapshot = BuildLocalMovementState(world, person, plan,
+                "movement.preview");
+            if (person.StaminaBasisPoints <
+                snapshot.ExpectedStaminaCostBasisPoints)
+            {
+                failureReasonId = LuoyangFormalPlayerMovementIds
+                    .InsufficientStaminaReasonId;
+                plan = null;
+                return false;
+            }
+            if (person.Provisions < snapshot.ExpectedFoodCost)
+            {
+                failureReasonId = LuoyangFormalPlayerMovementIds
+                    .InsufficientFoodReasonId;
+                plan = null;
                 return false;
             }
             failureReasonId = string.Empty;
@@ -3276,20 +3383,39 @@ namespace Mandate.Simulation
 
         public void ValidateInitializedPlan(WorldState world)
         {
+            var expectedLocationCount = _localMap == null
+                ? _plan.NavigationNodes.Count
+                : _localMap.FacilityCapabilities.Count;
             if (world.LuoyangLocalNavigationLocations.Count !=
-                    _plan.NavigationNodes.Count ||
+                    expectedLocationCount ||
                 world.LuoyangRoadOperationalSegments.Count !=
                     _plan.NavigationEdges.Count)
                 throw new InvalidOperationException(
                     "The persisted Luoyang movement graph is incomplete.");
             var local = world.LuoyangLocalNavigationLocations.ToDictionary(
                 item => item.FacilityId, StringComparer.Ordinal);
-            foreach (var node in _plan.NavigationNodes)
-                if (!local.TryGetValue(node.FacilityId, out var persisted) ||
-                    persisted.CellId64 != node.CellId64 ||
-                    persisted.FacilityDefinitionId != node.FacilityDefinitionId)
-                    throw new InvalidOperationException(
-                        "The persisted Luoyang local-location graph drifted.");
+            if (_localMap == null)
+            {
+                foreach (var node in _plan.NavigationNodes)
+                    if (!local.TryGetValue(node.FacilityId,
+                            out var persisted) ||
+                        persisted.CellId64 != node.CellId64 ||
+                        persisted.FacilityDefinitionId !=
+                            node.FacilityDefinitionId)
+                        throw new InvalidOperationException(
+                            "The persisted Luoyang local-location graph drifted.");
+            }
+            else
+            {
+                foreach (var capability in _localMap.FacilityCapabilities)
+                    if (!local.TryGetValue(capability.FacilityId,
+                            out var persisted) ||
+                        persisted.CellId64 != capability.CellId64 ||
+                        persisted.FacilityDefinitionId !=
+                            capability.FacilityDefinitionId)
+                        throw new InvalidOperationException(
+                            "The persisted human-scale location graph drifted.");
+            }
             var roads = world.LuoyangRoadOperationalSegments.ToDictionary(
                 item => item.EdgeId, StringComparer.Ordinal);
             foreach (var edge in _plan.NavigationEdges)
@@ -3373,9 +3499,141 @@ namespace Mandate.Simulation
             return movement;
         }
 
+        private LuoyangFormalPlayerMovementState BuildLocalMovementState(
+            WorldState world, PersonState person,
+            LuoyangHumanScaleLocalRoute plan, string commandId)
+        {
+            var totalCost = _costCalculator.CalculateSegment(
+                plan.DistanceCentimetres / 100d,
+                plan.WeightedDistanceCentimetres / 100d);
+            var movement = new LuoyangFormalPlayerMovementState
+            {
+                Id = "luoyang.player-movement." + person.Id + "." +
+                     world.LuoyangFormalPlayerMovements.Count.ToString("D8",
+                         System.Globalization.CultureInfo.InvariantCulture),
+                RequestCommandId = commandId,
+                PersonId = person.Id,
+                PolicyId = _costCalculator.Policy.Id,
+                MovementModeId = LuoyangFormalPlayerMovementIds
+                    .FootMovementModeId,
+                OriginSettlementLocationId = person.LocationId,
+                OriginFacilityId = plan.StartFacilityId,
+                OriginCellId64 = _localMap.NavigationNodesByFacilityId[
+                    plan.StartFacilityId].CellId64,
+                TargetFacilityId = plan.TargetFacilityId,
+                TargetCellId64 = _localMap.NavigationNodesByFacilityId[
+                    plan.TargetFacilityId].CellId64,
+                IssuedDay = world.AbsoluteDay,
+                IssuedSegment = world.Segment,
+                Status = LuoyangFormalMovementStatus.Active,
+                FailureReasonId = string.Empty,
+                LastProgressCommandId = string.Empty,
+                StartedEventId = string.Empty,
+                CompletionEventId = string.Empty,
+                IsLocalHumanScale = true,
+                LocalMapVersionId = _localMap.MapVersionId,
+                LocalMapAssetHash = _localMap.AssetHash,
+                ExpectedDurationMinutes = totalCost.DurationMinutes,
+                ExpectedWorldSegments = _costCalculator
+                    .CalculateWorldSegments(totalCost.DurationMinutes),
+                ExpectedStaminaCostBasisPoints = totalCost
+                    .StaminaCostBasisPoints,
+                ExpectedFoodCost = _costCalculator.CalculateFoodCost(
+                    totalCost.DurationMinutes)
+            };
+            long accumulatedWeight = 0;
+            var allocatedDuration = 0;
+            var allocatedStamina = 0;
+            var allocatedFood = 0;
+            for (var index = 0; index < plan.Edges.Count; index++)
+            {
+                var edge = plan.Edges[index];
+                var fromNode = _localMap.NodesById[plan.NodeIds[index]];
+                var toNode = _localMap.NodesById[plan.NodeIds[index + 1]];
+                accumulatedWeight = checked(accumulatedWeight +
+                    (long)edge.DistanceCentimetres *
+                    edge.TraversalCostPermille / 1000L);
+                var durationAtEnd = Allocate(totalCost.DurationMinutes,
+                    accumulatedWeight, plan.WeightedDistanceCentimetres);
+                var staminaAtEnd = Allocate(
+                    totalCost.StaminaCostBasisPoints, accumulatedWeight,
+                    plan.WeightedDistanceCentimetres);
+                var foodAtEnd = _costCalculator.CalculateFoodCost(
+                    durationAtEnd);
+                movement.Segments.Add(
+                    new LuoyangFormalMovementSegmentState
+                    {
+                        Sequence = index,
+                        EdgeId = edge.Id,
+                        FromFacilityId = index == 0
+                            ? plan.StartFacilityId : string.Empty,
+                        ToFacilityId = index + 1 == plan.Edges.Count
+                            ? plan.TargetFacilityId : string.Empty,
+                        PassageFacilityId = edge.PassageFacilityId,
+                        DistanceMetres = Math.Max(1,
+                            (edge.DistanceCentimetres + 99) / 100),
+                        WeightedDistanceMetres = Math.Max(1, checked((int)
+                            Math.Ceiling((double)edge.DistanceCentimetres *
+                                edge.TraversalCostPermille / 100_000d))),
+                        DurationMinutes = durationAtEnd - allocatedDuration,
+                        StaminaCostBasisPoints = staminaAtEnd -
+                            allocatedStamina,
+                        FoodCost = foodAtEnd - allocatedFood,
+                        IsLocalHumanScale = true,
+                        FormalWorldObjectId = edge.FormalWorldObjectId,
+                        TraversalConditionId = edge.TraversalConditionId,
+                        FromLocalNodeId = fromNode.Id,
+                        ToLocalNodeId = toNode.Id,
+                        FromLocalSpaceId = fromNode.LocalSpaceId,
+                        ToLocalSpaceId = toNode.LocalSpaceId,
+                        FromCellId64 = fromNode.CellId64,
+                        ToCellId64 = toNode.CellId64,
+                        FromEastCentimetres = Centimetres(
+                            fromNode.LocalEastMetres),
+                        FromNorthCentimetres = Centimetres(
+                            fromNode.LocalNorthMetres),
+                        FromElevationCentimetres = Centimetres(
+                            fromNode.ElevationMetres),
+                        ToEastCentimetres = Centimetres(
+                            toNode.LocalEastMetres),
+                        ToNorthCentimetres = Centimetres(
+                            toNode.LocalNorthMetres),
+                        ToElevationCentimetres = Centimetres(
+                            toNode.ElevationMetres)
+                    });
+                allocatedDuration = durationAtEnd;
+                allocatedStamina = staminaAtEnd;
+                allocatedFood = foodAtEnd;
+            }
+            return movement;
+        }
+
+        private static int Allocate(int total, long accumulated,
+            long denominator) => denominator <= 0 ? total : checked((int)
+            Math.Min(total, (total * accumulated + denominator - 1L) /
+                denominator));
+
+        private static int Centimetres(double metres) => checked(
+            (int)Math.Round(metres * 100d,
+                MidpointRounding.AwayFromZero));
+
         private bool CanTraverse(WorldState world,
             LuoyangFormalMovementSegmentState segment)
         {
+            if (segment.IsLocalHumanScale)
+            {
+                if (_localMap == null || !_localMap.EdgesById.TryGetValue(
+                        segment.EdgeId, out var localEdge) ||
+                    !string.Equals(localEdge.TraversalConditionId,
+                        segment.TraversalConditionId,
+                        StringComparison.Ordinal) ||
+                    !string.Equals(localEdge.FormalWorldObjectId,
+                        segment.FormalWorldObjectId,
+                        StringComparison.Ordinal))
+                    return false;
+                return LuoyangHumanScaleWorldTraversalRules
+                    .CanTraverseLocalEdge(world, localEdge);
+            }
             var road = world.LuoyangRoadOperationalSegments.FirstOrDefault(
                 item => item.EdgeId == segment.EdgeId);
             if (road == null || !road.CanTraverse) return false;
@@ -3456,6 +3714,105 @@ namespace Mandate.Simulation
                 new RoadTransitionTransaction(_owner, command));
         }
 
+        private sealed class UpgradeLocalLocationsHandler :
+            IWorldCommandHandler
+        {
+            private readonly LuoyangFormalPlayerMovementSystem _owner;
+            public UpgradeLocalLocationsHandler(
+                LuoyangFormalPlayerMovementSystem owner) => _owner = owner;
+            public string CommandTypeId => LuoyangFormalPlayerMovementIds
+                .UpgradeLocalLocationsCommandTypeId;
+            public void Plan(WorldCommandEnvelope command,
+                WorldTransactionBuffer transactions) => transactions.Add(
+                new UpgradeLocalLocationsTransaction(_owner, command));
+        }
+
+        private sealed class UpgradeLocalLocationsTransaction :
+            IWorldTransaction
+        {
+            private readonly LuoyangFormalPlayerMovementSystem _owner;
+            private readonly WorldCommandEnvelope _command;
+            public UpgradeLocalLocationsTransaction(
+                LuoyangFormalPlayerMovementSystem owner,
+                WorldCommandEnvelope command)
+            {
+                _owner = owner;
+                _command = command;
+            }
+            public string Id =>
+                "luoyang.player-movement.transaction.upgrade-local-locations";
+            public string KindId =>
+                "mandate.transaction.person-movement.upgrade-local-locations.v1";
+            public int Priority => CommandPriority;
+            public void Validate(WorldState world,
+                WorldTransactionValidationContext validation)
+            {
+                if (_owner._localMap == null ||
+                    !_owner.HasStrategicLocationInitialization(world) ||
+                    Argument(_command, LocalMapVersionArgumentId) !=
+                        _owner._localMap.MapVersionId ||
+                    Argument(_command, LocalMapHashArgumentId) !=
+                        _owner._localMap.AssetHash ||
+                    world.LuoyangFormalPlayerMovements.Any(item =>
+                        item != null && item.Status ==
+                        LuoyangFormalMovementStatus.Active))
+                    throw new InvalidOperationException(
+                        "The human-scale location upgrade is stale or unsafe.");
+            }
+            public void Apply(WorldState world, WorldEventBuffer events)
+            {
+                var person = new PlayerSession(world).ControlledPerson;
+                world.LuoyangLocalNavigationLocations.Clear();
+                foreach (var capability in _owner._localMap
+                             .FacilityCapabilities.OrderBy(
+                                 item => item.FacilityId,
+                                 StringComparer.Ordinal))
+                {
+                    var space = _owner._localMap.LocalSpacesByCellId[
+                        capability.CellId64];
+                    world.LuoyangLocalNavigationLocations.Add(
+                        new LuoyangLocalNavigationLocationState
+                        {
+                            Id = "luoyang.local-location." +
+                                 capability.FacilityId,
+                            FacilityId = capability.FacilityId,
+                            FacilityDefinitionId =
+                                capability.FacilityDefinitionId,
+                            SettlementLocationId = person.LocationId,
+                            CellId64 = capability.CellId64,
+                            GridColumn = space.GridColumn,
+                            GridRow = space.GridRow
+                        });
+                }
+                if (!string.IsNullOrEmpty(person.CurrentFacilityId) &&
+                    _owner._localMap.NavigationNodesByFacilityId.TryGetValue(
+                        person.CurrentFacilityId, out var node))
+                {
+                    person.CurrentCellId64 = node.CellId64;
+                    person.CurrentLocalSpaceId = node.LocalSpaceId;
+                    person.CurrentLocalAnchorId = node.Id;
+                    person.CurrentLocalEastCentimetres = Centimetres(
+                        node.LocalEastMetres);
+                    person.CurrentLocalNorthCentimetres = Centimetres(
+                        node.LocalNorthMetres);
+                    person.CurrentLocalElevationCentimetres = Centimetres(
+                        node.ElevationMetres);
+                    person.LocationPrecisionId = _owner._localMap
+                        .EntrancesByFacilityId.ContainsKey(
+                            person.CurrentFacilityId)
+                        ? LuoyangHumanScaleLocalMapIds
+                            .FacilityEntranceLocationTypeId
+                        : LuoyangHumanScaleLocalMapIds.GroundLocationTypeId;
+                }
+                events.Add(new WorldRuntimeEvent(
+                    "luoyang.player-movement.event.upgraded-local-locations." +
+                    _owner._localMap.MapVersionId,
+                    "mandate.event.person-movement." +
+                    "upgraded-local-locations.v1", Id,
+                    world.AbsoluteDay, (DaySegment)world.Segment));
+            }
+        }
+
         private sealed class InitializeTransaction : IWorldTransaction
         {
             private readonly LuoyangFormalPlayerMovementSystem _owner;
@@ -3480,9 +3837,13 @@ namespace Mandate.Simulation
                         "The Luoyang movement graph is already initialized.");
                 var personId = Argument(_command, PersonArgumentId);
                 var session = new PlayerSession(world);
-                if (session.ControlledPersonId != personId ||
-                    !_owner._nodesByFacilityId.ContainsKey(Argument(_command,
-                        InitialFacilityArgumentId)))
+                var initialFacilityId = Argument(_command,
+                    InitialFacilityArgumentId);
+                var initialExists = _owner._localMap == null
+                    ? _owner._nodesByFacilityId.ContainsKey(initialFacilityId)
+                    : _owner._localMap.NavigationNodesByFacilityId.ContainsKey(
+                        initialFacilityId);
+                if (session.ControlledPersonId != personId || !initialExists)
                     throw new InvalidOperationException(
                         "The movement initialization Person or Facility is invalid.");
                 if (world.LuoyangPassageTraversals.Count !=
@@ -3495,19 +3856,49 @@ namespace Mandate.Simulation
                 var person = new PlayerSession(world).ControlledPerson;
                 var initialFacilityId = Argument(_command,
                     InitialFacilityArgumentId);
-                foreach (var node in _owner._plan.NavigationNodes.OrderBy(
-                             item => item.FacilityId, StringComparer.Ordinal))
-                    world.LuoyangLocalNavigationLocations.Add(
-                        new LuoyangLocalNavigationLocationState
-                        {
-                            Id = "luoyang.local-location." + node.FacilityId,
-                            FacilityId = node.FacilityId,
-                            FacilityDefinitionId = node.FacilityDefinitionId,
-                            SettlementLocationId = person.LocationId,
-                            CellId64 = node.CellId64,
-                            GridColumn = node.GridColumn,
-                            GridRow = node.GridRow
-                        });
+                if (_owner._localMap == null)
+                {
+                    foreach (var node in _owner._plan.NavigationNodes.OrderBy(
+                                 item => item.FacilityId,
+                                 StringComparer.Ordinal))
+                        world.LuoyangLocalNavigationLocations.Add(
+                            new LuoyangLocalNavigationLocationState
+                            {
+                                Id = "luoyang.local-location." +
+                                     node.FacilityId,
+                                FacilityId = node.FacilityId,
+                                FacilityDefinitionId =
+                                    node.FacilityDefinitionId,
+                                SettlementLocationId = person.LocationId,
+                                CellId64 = node.CellId64,
+                                GridColumn = node.GridColumn,
+                                GridRow = node.GridRow
+                            });
+                }
+                else
+                {
+                    foreach (var capability in _owner._localMap
+                                 .FacilityCapabilities.OrderBy(
+                                     item => item.FacilityId,
+                                     StringComparer.Ordinal))
+                    {
+                        var space = _owner._localMap.LocalSpacesByCellId[
+                            capability.CellId64];
+                        world.LuoyangLocalNavigationLocations.Add(
+                            new LuoyangLocalNavigationLocationState
+                            {
+                                Id = "luoyang.local-location." +
+                                     capability.FacilityId,
+                                FacilityId = capability.FacilityId,
+                                FacilityDefinitionId =
+                                    capability.FacilityDefinitionId,
+                                SettlementLocationId = person.LocationId,
+                                CellId64 = capability.CellId64,
+                                GridColumn = space.GridColumn,
+                                GridRow = space.GridRow
+                            });
+                    }
+                }
                 foreach (var edge in _owner._plan.NavigationEdges.OrderBy(
                              item => item.EdgeId, StringComparer.Ordinal))
                     world.LuoyangRoadOperationalSegments.Add(
@@ -3528,14 +3919,47 @@ namespace Mandate.Simulation
                             LastCommandId = _command.Id,
                             LastEventId = "luoyang.player-movement.event.initialized"
                         });
-                var initial = _owner._nodesByFacilityId[initialFacilityId];
-                person.CurrentFacilityId = initial.FacilityId;
-                person.CurrentCellId64 = initial.CellId64;
+                if (_owner._localMap == null)
+                {
+                    var initial = _owner._nodesByFacilityId[
+                        initialFacilityId];
+                    person.CurrentFacilityId = initial.FacilityId;
+                    person.CurrentCellId64 = initial.CellId64;
+                    person.LocationPrecisionId =
+                        LuoyangHumanScaleLocalMapIds.StrategicLocationTypeId;
+                    person.CurrentLocalSpaceId = string.Empty;
+                    person.CurrentLocalAnchorId = string.Empty;
+                }
+                else
+                {
+                    var entrance = _owner._localMap
+                        .NavigationNodesByFacilityId[initialFacilityId];
+                    person.CurrentFacilityId = initialFacilityId;
+                    person.CurrentCellId64 = entrance.CellId64;
+                    person.LocationPrecisionId = _owner._localMap
+                        .EntrancesByFacilityId.ContainsKey(initialFacilityId)
+                            ? LuoyangHumanScaleLocalMapIds
+                                .FacilityEntranceLocationTypeId
+                            : LuoyangHumanScaleLocalMapIds
+                                .GroundLocationTypeId;
+                    person.CurrentLocalSpaceId = entrance.LocalSpaceId;
+                    person.CurrentLocalAnchorId = entrance.Id;
+                    person.CurrentLocalEastCentimetres = Centimetres(
+                        entrance.LocalEastMetres);
+                    person.CurrentLocalNorthCentimetres = Centimetres(
+                        entrance.LocalNorthMetres);
+                    person.CurrentLocalElevationCentimetres = Centimetres(
+                        entrance.ElevationMetres);
+                }
                 events.Add(new WorldRuntimeEvent(
                     "luoyang.player-movement.event.initialized",
                     LuoyangFormalPlayerMovementIds.InitializedEventTypeId,
                     Id, world.AbsoluteDay, (DaySegment)world.Segment));
             }
+
+            private static int Centimetres(double metres) => checked(
+                (int)Math.Round(metres * 100d,
+                    MidpointRounding.AwayFromZero));
         }
 
         private sealed class MoveTransaction : IWorldTransaction
@@ -3569,11 +3993,22 @@ namespace Mandate.Simulation
                 if (origin != person.CurrentFacilityId)
                     throw new InvalidOperationException(
                         "Movement origin does not match the Person location.");
-                if (!_owner.TryCreatePlan(world, target, out var plan,
-                        out var failure))
-                    throw new InvalidOperationException(failure);
-                _movement = _owner.BuildMovementState(world, person, plan,
-                    _command.Id);
+                if (_owner._localMap == null)
+                {
+                    if (!_owner.TryCreatePlan(world, target, out var plan,
+                            out var failure))
+                        throw new InvalidOperationException(failure);
+                    _movement = _owner.BuildMovementState(world, person, plan,
+                        _command.Id);
+                }
+                else
+                {
+                    if (!_owner.TryCreateLocalPlan(world, target,
+                            out var plan, out var failure))
+                        throw new InvalidOperationException(failure);
+                    _movement = _owner.BuildLocalMovementState(world, person,
+                        plan, _command.Id);
+                }
             }
             public void Apply(WorldState world, WorldEventBuffer events)
             {
@@ -3678,10 +4113,40 @@ namespace Mandate.Simulation
                 _movement.UnsettledDurationMinutes = accumulated %
                     LuoyangFormalPlayerMovementIds.WorldSegmentMinutes;
                 _movement.CurrentSegmentIndex++;
-                var local = world.LuoyangLocalNavigationLocations.Single(
-                    item => item.FacilityId == _segment.ToFacilityId);
-                _person.CurrentFacilityId = local.FacilityId;
-                _person.CurrentCellId64 = local.CellId64;
+                if (_segment.IsLocalHumanScale)
+                {
+                    _person.CurrentCellId64 = _segment.ToCellId64;
+                    _person.CurrentLocalSpaceId =
+                        _segment.ToLocalSpaceId;
+                    _person.CurrentLocalAnchorId =
+                        _segment.ToLocalNodeId;
+                    _person.CurrentLocalEastCentimetres =
+                        _segment.ToEastCentimetres;
+                    _person.CurrentLocalNorthCentimetres =
+                        _segment.ToNorthCentimetres;
+                    _person.CurrentLocalElevationCentimetres =
+                        _segment.ToElevationCentimetres;
+                    var finalLocalSegment =
+                        _movement.CurrentSegmentIndex ==
+                        _movement.Segments.Count;
+                    _person.CurrentFacilityId = finalLocalSegment
+                        ? _movement.TargetFacilityId
+                        : string.Empty;
+                    _person.LocationPrecisionId = finalLocalSegment
+                        ? LuoyangHumanScaleLocalMapIds
+                            .FacilityEntranceLocationTypeId
+                        : LuoyangHumanScaleLocalMapIds
+                            .GroundLocationTypeId;
+                }
+                else
+                {
+                    var local = world.LuoyangLocalNavigationLocations.Single(
+                        item => item.FacilityId == _segment.ToFacilityId);
+                    _person.CurrentFacilityId = local.FacilityId;
+                    _person.CurrentCellId64 = local.CellId64;
+                    _person.LocationPrecisionId =
+                        LuoyangHumanScaleLocalMapIds.StrategicLocationTypeId;
+                }
                 var suffix = _movement.CurrentSegmentIndex.ToString("D4",
                     System.Globalization.CultureInfo.InvariantCulture);
                 events.Add(new WorldRuntimeEvent(
@@ -3789,6 +4254,26 @@ namespace Mandate.Simulation
             out string failureReasonId)
         {
             if (!_movementSystem.TryCreatePlan(world, targetFacilityId,
+                    out presentationPlan, out failureReasonId))
+            {
+                movement = null;
+                return false;
+            }
+            var commandId = _movementSystem.EnqueueMove(world,
+                _commandRuntime, targetFacilityId);
+            _commandRuntime.ProcessDue(world);
+            _commandRuntime.DispatchPublishedEvents(world);
+            movement = world.LuoyangFormalPlayerMovements.Single(item =>
+                item.RequestCommandId == commandId);
+            return true;
+        }
+
+        public bool TryRequestLocal(WorldState world, string targetFacilityId,
+            out LuoyangFormalPlayerMovementState movement,
+            out LuoyangHumanScaleLocalRoute presentationPlan,
+            out string failureReasonId)
+        {
+            if (!_movementSystem.TryCreateLocalPlan(world, targetFacilityId,
                     out presentationPlan, out failureReasonId))
             {
                 movement = null;

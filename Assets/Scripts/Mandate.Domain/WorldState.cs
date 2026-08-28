@@ -97,6 +97,12 @@ namespace Mandate.Domain
         public NeedState Needs = new NeedState();
         public ulong CurrentCellId64;
         public string CurrentFacilityId = string.Empty;
+        public string LocationPrecisionId = string.Empty;
+        public string CurrentLocalSpaceId = string.Empty;
+        public string CurrentLocalAnchorId = string.Empty;
+        public int CurrentLocalEastCentimetres;
+        public int CurrentLocalNorthCentimetres;
+        public int CurrentLocalElevationCentimetres;
     }
 
     public sealed class PlayerSession
@@ -282,7 +288,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 76;
+        public const int CurrentSchemaVersion = 77;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;

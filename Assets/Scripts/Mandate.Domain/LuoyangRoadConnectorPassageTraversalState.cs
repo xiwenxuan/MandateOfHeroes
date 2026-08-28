@@ -813,6 +813,8 @@ namespace Mandate.Domain
             "mandate.command.luoyang-player-movement.advance-segment.v1";
         public const string RoadTransitionCommandTypeId =
             "mandate.command.luoyang-road-segment.transition.v1";
+        public const string UpgradeLocalLocationsCommandTypeId =
+            "mandate.command.luoyang-player-movement.upgrade-local-locations.v1";
         public const string SystemIssuerId =
             "mandate.issuer.luoyang-player-movement-system.v1";
         public const string PresentationIssuerId =
@@ -901,6 +903,21 @@ namespace Mandate.Domain
         public int DurationMinutes;
         public int StaminaCostBasisPoints;
         public int FoodCost;
+        public bool IsLocalHumanScale;
+        public string FormalWorldObjectId = string.Empty;
+        public string TraversalConditionId = string.Empty;
+        public string FromLocalNodeId = string.Empty;
+        public string ToLocalNodeId = string.Empty;
+        public string FromLocalSpaceId = string.Empty;
+        public string ToLocalSpaceId = string.Empty;
+        public ulong FromCellId64;
+        public ulong ToCellId64;
+        public int FromEastCentimetres;
+        public int FromNorthCentimetres;
+        public int FromElevationCentimetres;
+        public int ToEastCentimetres;
+        public int ToNorthCentimetres;
+        public int ToElevationCentimetres;
     }
 
     [Serializable]
@@ -934,6 +951,9 @@ namespace Mandate.Domain
         public string LastProgressCommandId;
         public string StartedEventId;
         public string CompletionEventId;
+        public bool IsLocalHumanScale;
+        public string LocalMapVersionId = string.Empty;
+        public string LocalMapAssetHash = string.Empty;
         public List<LuoyangFormalMovementSegmentState> Segments =
             new List<LuoyangFormalMovementSegmentState>();
     }
@@ -1074,6 +1094,7 @@ namespace Mandate.Domain
 
             foreach (var person in world.People)
             {
+                ValidatePersonLocalLocation(person);
                 if (person == null || string.IsNullOrEmpty(
                         person.CurrentFacilityId)) continue;
                 if (!locations.TryGetValue(person.CurrentFacilityId,
@@ -1149,25 +1170,33 @@ namespace Mandate.Domain
             {
                 var segment = movement.Segments[i];
                 if (segment == null || segment.Sequence != i ||
-                    !roads.ContainsKey(segment.EdgeId) ||
-                    !string.Equals(segment.FromFacilityId, expectedFrom,
-                        StringComparison.Ordinal) ||
-                    !locations.ContainsKey(segment.ToFacilityId) ||
                     segment.DistanceMetres <= 0 ||
                     segment.WeightedDistanceMetres < segment.DistanceMetres ||
-                    segment.DurationMinutes <= 0 ||
-                    segment.StaminaCostBasisPoints <= 0 ||
-                    segment.FoodCost < 0)
+                    segment.DurationMinutes < 0 ||
+                    segment.StaminaCostBasisPoints < 0 ||
+                    segment.FoodCost < 0 ||
+                    (movement.IsLocalHumanScale
+                        ? !ValidateLocalSegment(segment)
+                        : !ValidateStrategicSegment(segment, roads,
+                            locations, expectedFrom)))
                     throw new InvalidOperationException(
                         "Invalid Luoyang movement route snapshot.");
                 duration = checked(duration + segment.DurationMinutes);
                 stamina = checked(stamina +
                     segment.StaminaCostBasisPoints);
                 food = checked(food + segment.FoodCost);
-                expectedFrom = segment.ToFacilityId;
+                if (!movement.IsLocalHumanScale)
+                    expectedFrom = segment.ToFacilityId;
             }
-            if (!string.Equals(expectedFrom, movement.TargetFacilityId,
+            if ((!movement.IsLocalHumanScale && !string.Equals(expectedFrom,
+                    movement.TargetFacilityId,
                     StringComparison.Ordinal) ||
+                movement.IsLocalHumanScale &&
+                    (string.IsNullOrEmpty(movement.LocalMapVersionId) ||
+                     string.IsNullOrEmpty(movement.LocalMapAssetHash) ||
+                     movement.LocalMapAssetHash.Length != 64 ||
+                     !locations.ContainsKey(movement.OriginFacilityId) ||
+                     !locations.ContainsKey(movement.TargetFacilityId))) ||
                 duration != movement.ExpectedDurationMinutes ||
                 stamina != movement.ExpectedStaminaCostBasisPoints ||
                 food != movement.ExpectedFoodCost ||
@@ -1193,6 +1222,81 @@ namespace Mandate.Domain
                      string.IsNullOrEmpty(movement.FailureReasonId))
                 throw new InvalidOperationException(
                     "Invalid terminal Luoyang movement lifecycle.");
+        }
+
+        private static bool ValidateStrategicSegment(
+            LuoyangFormalMovementSegmentState segment,
+            IReadOnlyDictionary<string, LuoyangRoadOperationalSegmentState>
+                roads,
+            IReadOnlyDictionary<string, LuoyangLocalNavigationLocationState>
+                locations,
+            string expectedFrom) =>
+            !segment.IsLocalHumanScale && roads.ContainsKey(segment.EdgeId) &&
+            string.Equals(segment.FromFacilityId, expectedFrom,
+                StringComparison.Ordinal) &&
+            locations.ContainsKey(segment.ToFacilityId) &&
+            segment.DurationMinutes > 0 &&
+            segment.StaminaCostBasisPoints > 0;
+
+        private static bool ValidateLocalSegment(
+            LuoyangFormalMovementSegmentState segment)
+        {
+            if (!segment.IsLocalHumanScale ||
+                string.IsNullOrEmpty(segment.FromLocalNodeId) ||
+                string.IsNullOrEmpty(segment.ToLocalNodeId) ||
+                string.IsNullOrEmpty(segment.FromLocalSpaceId) ||
+                string.IsNullOrEmpty(segment.ToLocalSpaceId) ||
+                string.IsNullOrEmpty(segment.TraversalConditionId) ||
+                segment.FromCellId64 == 0 || segment.ToCellId64 == 0 ||
+                segment.FromEastCentimetres < 0 ||
+                segment.FromEastCentimetres > 200_000 ||
+                segment.FromNorthCentimetres < 0 ||
+                segment.FromNorthCentimetres > 200_000 ||
+                segment.ToEastCentimetres < 0 ||
+                segment.ToEastCentimetres > 200_000 ||
+                segment.ToNorthCentimetres < 0 ||
+                segment.ToNorthCentimetres > 200_000)
+                return false;
+            if (string.Equals(segment.TraversalConditionId,
+                    LocalTraversalConditionIds.StaticWalkable,
+                    StringComparison.Ordinal))
+                return string.IsNullOrEmpty(segment.FormalWorldObjectId);
+            if (string.Equals(segment.TraversalConditionId,
+                    LocalTraversalConditionIds.FormalRoadOpen,
+                    StringComparison.Ordinal) ||
+                string.Equals(segment.TraversalConditionId,
+                    LocalTraversalConditionIds.FormalPassageAvailable,
+                    StringComparison.Ordinal))
+                return !string.IsNullOrEmpty(segment.FormalWorldObjectId);
+            return false;
+        }
+
+        private static void ValidatePersonLocalLocation(PersonState person)
+        {
+            if (person == null) return;
+            person.LocationPrecisionId ??= string.Empty;
+            person.CurrentLocalSpaceId ??= string.Empty;
+            person.CurrentLocalAnchorId ??= string.Empty;
+            if (string.IsNullOrEmpty(person.CurrentLocalSpaceId))
+            {
+                if (!string.IsNullOrEmpty(person.CurrentLocalAnchorId) ||
+                    person.CurrentLocalEastCentimetres != 0 ||
+                    person.CurrentLocalNorthCentimetres != 0 ||
+                    person.CurrentLocalElevationCentimetres != 0)
+                    throw new InvalidOperationException(
+                        $"Person {person.Id} has incomplete local position.");
+                return;
+            }
+            _ = new StableId(person.CurrentLocalSpaceId);
+            if (!string.IsNullOrEmpty(person.CurrentLocalAnchorId))
+                _ = new StableId(person.CurrentLocalAnchorId);
+            if (person.CurrentCellId64 == 0 ||
+                person.CurrentLocalEastCentimetres < 0 ||
+                person.CurrentLocalEastCentimetres > 200_000 ||
+                person.CurrentLocalNorthCentimetres < 0 ||
+                person.CurrentLocalNorthCentimetres > 200_000)
+                throw new InvalidOperationException(
+                    $"Person {person.Id} has an invalid local position.");
         }
     }
 

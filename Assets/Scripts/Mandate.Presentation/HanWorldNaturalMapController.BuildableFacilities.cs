@@ -78,6 +78,8 @@ namespace Mandate.Presentation
             _luoyangFacilityInteractionNavigationPlan;
         private LuoyangRoadTraversalRefinementPlan
             _luoyangRoadTraversalRefinementPlan;
+        private LuoyangHumanScaleLocalMapPlan
+            _luoyangHumanScaleLocalMapPlan;
         private LuoyangPassageTraversalSession
             _luoyangPassageTraversalSession;
         private WorldState _luoyangPassageWorld;
@@ -91,6 +93,10 @@ namespace Mandate.Presentation
         private WorldSimulator _luoyangFormalMovementSimulator;
         private LuoyangFacilityInteractionNavigationRuntime
             _luoyangFacilityInteractionNavigationRuntime;
+        private LuoyangHumanScaleStreamingRuntime
+            _luoyangHumanScaleStreamingRuntime;
+        private GlobalProjectedCoordinate _luoyangHumanScaleFloatingOrigin;
+        private bool _hasLuoyangHumanScaleFloatingOrigin;
         private string _selectedLuoyangFacilityId;
         private LuoyangBuildingPerformanceBatchRenderer
             _luoyangBuildingPerformanceBatchRenderer;
@@ -221,6 +227,18 @@ namespace Mandate.Presentation
             _luoyangFacilityInteractionNavigationPlan?.NavigationEdges.Count ?? 0;
         public int LuoyangRefinedRoadNavigationEdgeCount =>
             _luoyangRoadTraversalRefinementPlan?.NavigationEdges.Count ?? 0;
+        public int LuoyangHumanScaleLocalSpaceCount =>
+            _luoyangHumanScaleLocalMapPlan?.LocalSpaces.Count ?? 0;
+        public int LuoyangHumanScaleNavigationNodeCount =>
+            _luoyangHumanScaleLocalMapPlan?.Nodes.Count ?? 0;
+        public int LuoyangHumanScaleNavigationEdgeCount =>
+            _luoyangHumanScaleLocalMapPlan?.Edges.Count ?? 0;
+        public int LuoyangHumanScaleTransitionCount =>
+            _luoyangHumanScaleLocalMapPlan?.Transitions.Count ?? 0;
+        public string LuoyangHumanScaleLocalMapStatus =>
+            _luoyangHumanScaleLocalMapPlan == null
+                ? "NOT_READY"
+                : _luoyangHumanScaleLocalMapPlan.StatusId;
         public int LuoyangModeledRoadConnectorCount =>
             _luoyangRoadTraversalRefinementPlan?.ModeledConnectors.Count ?? 0;
         public int LuoyangPassageTraversalCount =>
@@ -253,6 +271,18 @@ namespace Mandate.Presentation
         public int RuntimeLuoyangActiveRepairScaffoldCount =>
             _luoyangFacilityInteractionNavigationRuntime?
                 .ActiveRepairScaffoldCount ?? 0;
+        public int RuntimeLuoyangHumanScaleResidentCellCount =>
+            _luoyangHumanScaleStreamingRuntime?.ResidentCellCount ?? 0;
+        public int RuntimeLuoyangHumanScaleGameObjectCount =>
+            _luoyangHumanScaleStreamingRuntime?.ResidentGameObjectCount ?? 0;
+        public int RuntimeLuoyangHumanScaleMeshCount =>
+            _luoyangHumanScaleStreamingRuntime?.ResidentMeshCount ?? 0;
+        public int RuntimeLuoyangHumanScaleColliderCount =>
+            _luoyangHumanScaleStreamingRuntime?.ResidentColliderCount ?? 0;
+        public long RuntimeLuoyangHumanScaleLoadMilliseconds =>
+            _luoyangHumanScaleStreamingRuntime?.LastLoadMilliseconds ?? 0L;
+        public long RuntimeLuoyangHumanScaleUnloadMilliseconds =>
+            _luoyangHumanScaleStreamingRuntime?.LastUnloadMilliseconds ?? 0L;
         public int LuoyangRoadComponentCountBeforeConnectors =>
             _luoyangFacilityInteractionNavigationPlan?
                 .RoadComponentCountBeforeConnectors ?? 0;
@@ -876,6 +906,11 @@ namespace Mandate.Presentation
             _luoyangRoadTraversalRefinementPlan =
                 LuoyangRoadConnectorPassageTraversalRules.CreatePlan(
                     _luoyangFacilityInteractionNavigationPlan);
+            _luoyangHumanScaleLocalMapPlan =
+                LuoyangHumanScaleLocalMapRules.CreatePlan(
+                    _luoyangBuildingPerformancePlan,
+                    _luoyangWholeCityCompositionPlan,
+                    _luoyangRoadTraversalRefinementPlan);
             if (_luoyangPassageWorld != null)
             {
                 _luoyangPassageWorldCommandSystem =
@@ -958,6 +993,8 @@ namespace Mandate.Presentation
             if (_buildableFacilityRoot == null) return;
             _luoyangFacilityInteractionNavigationRuntime?.Dispose();
             _luoyangFacilityInteractionNavigationRuntime = null;
+            _luoyangHumanScaleStreamingRuntime?.Dispose();
+            _luoyangHumanScaleStreamingRuntime = null;
             _selectedLuoyangFacilityId = null;
             _luoyangBuildingPerformanceBatchRenderer?.Dispose();
             _luoyangBuildingPerformanceBatchRenderer = null;
@@ -995,9 +1032,34 @@ namespace Mandate.Presentation
                         (float)VerticalMetresPerUnit);
                 if (_luoyangPassageWorld != null &&
                     _luoyangFormalPlayerMovementService != null)
+                {
+                    if (_luoyangFormalPlayerMovementSystem
+                            .UsesHumanScaleLocalMap)
+                        SetHumanScaleFloatingOrigin(new PlayerSession(
+                            _luoyangPassageWorld).ControlledPerson
+                            .CurrentCellId64);
                     _luoyangFacilityInteractionNavigationRuntime
                         .BindFormalMovement(_luoyangPassageWorld,
-                            _luoyangFormalPlayerMovementService);
+                            _luoyangFormalPlayerMovementService,
+                            _luoyangFormalPlayerMovementSystem
+                                .UsesHumanScaleLocalMap
+                                ? _luoyangHumanScaleLocalMapPlan : null,
+                            _luoyangFormalPlayerMovementSystem
+                                .UsesHumanScaleLocalMap
+                                ? HumanScaleLocalWorldPosition : null);
+                    if (_luoyangFormalPlayerMovementSystem
+                            .UsesHumanScaleLocalMap)
+                    {
+                        var person = new PlayerSession(_luoyangPassageWorld)
+                            .ControlledPerson;
+                        _luoyangHumanScaleStreamingRuntime =
+                            LuoyangHumanScaleStreamingRuntime.Build(
+                                _luoyangHumanScaleLocalMapPlan,
+                                HumanScaleLocalWorldPosition,
+                                person.CurrentCellId64,
+                                _buildableFacilityRoot.transform);
+                    }
+                }
                 return;
             }
             var grid = GlobalSpatialFoundationV1.CreateCellGrid();
@@ -1052,6 +1114,9 @@ namespace Mandate.Presentation
         {
             _luoyangFacilityInteractionNavigationRuntime?.Dispose();
             _luoyangFacilityInteractionNavigationRuntime = null;
+            _luoyangHumanScaleStreamingRuntime?.Dispose();
+            _luoyangHumanScaleStreamingRuntime = null;
+            _hasLuoyangHumanScaleFloatingOrigin = false;
             _selectedLuoyangFacilityId = null;
             _luoyangBuildingPerformanceBatchRenderer?.Dispose();
             _luoyangBuildingPerformanceBatchRenderer = null;
@@ -1093,6 +1158,7 @@ namespace Mandate.Presentation
             _luoyangWholeCityCompositionPlan = null;
             _luoyangFacilityInteractionNavigationPlan = null;
             _luoyangRoadTraversalRefinementPlan = null;
+            _luoyangHumanScaleLocalMapPlan = null;
             _luoyangPassageTraversalSession = null;
             _p0FinalAssetVerticalSliceCatalog = null;
             _luoyangP0FinalAssetVerticalSlicePlan = null;
@@ -1174,17 +1240,36 @@ namespace Mandate.Presentation
                 .OrderBy(item => item.distance)
                 .FirstOrDefault();
             if (hit.collider != null)
+            {
+                if (_luoyangHumanScaleStreamingRuntime != null &&
+                    _luoyangHumanScaleStreamingRuntime.TryResolveProxy(
+                        hit.collider, out var localTarget))
+                    return SetLuoyangPedestrianDestination(
+                        localTarget.FacilityId);
+                if (_luoyangHumanScaleStreamingRuntime != null)
+                    return TryResolveHumanScaleGroundTarget(hit.point,
+                               out localTarget) &&
+                           SetLuoyangPedestrianDestination(
+                               localTarget.FacilityId);
                 return _luoyangFacilityInteractionNavigationRuntime
                     .TrySetPedestrianDestination(hit.point);
+            }
             var ground = new Plane(Vector3.up, Vector3.zero);
             return ground.Raycast(ray, out var distance) &&
                    _luoyangFacilityInteractionNavigationRuntime
                        .TrySetPedestrianDestination(ray.GetPoint(distance));
         }
 
-        public bool StepLuoyangPedestrian(float deltaSeconds) =>
-            _luoyangFacilityInteractionNavigationRuntime?
+        public bool StepLuoyangPedestrian(float deltaSeconds)
+        {
+            if (_luoyangPassageWorld != null &&
+                _luoyangHumanScaleStreamingRuntime != null)
+                _luoyangHumanScaleStreamingRuntime.MoveWindow(
+                    new PlayerSession(_luoyangPassageWorld)
+                        .ControlledPerson.CurrentCellId64);
+            return _luoyangFacilityInteractionNavigationRuntime?
                 .StepPedestrian(deltaSeconds) ?? false;
+        }
 
         public IReadOnlyList<string> GetLuoyangPassageApproachFacilityIds(
             string facilityId)
@@ -1267,7 +1352,10 @@ namespace Mandate.Presentation
             {
                 _luoyangFormalPlayerMovementSystem =
                     new LuoyangFormalPlayerMovementSystem(
-                        _luoyangRoadTraversalRefinementPlan);
+                        _luoyangRoadTraversalRefinementPlan, null,
+                        HasCompleteHumanScaleFacilityWorld(world)
+                            ? _luoyangHumanScaleLocalMapPlan
+                            : null);
                 _luoyangFormalPlayerMovementSystem.RegisterHandlers(
                     commandRuntime);
                 var initialFacilityId =
@@ -1288,9 +1376,34 @@ namespace Mandate.Presentation
             }
             RefreshPersistedLuoyangPassageProjection();
             if (_luoyangFormalPlayerMovementService != null)
+            {
+                if (_luoyangFormalPlayerMovementSystem
+                        .UsesHumanScaleLocalMap)
+                    SetHumanScaleFloatingOrigin(new PlayerSession(world)
+                        .ControlledPerson.CurrentCellId64);
                 _luoyangFacilityInteractionNavigationRuntime?
                     .BindFormalMovement(world,
-                        _luoyangFormalPlayerMovementService);
+                        _luoyangFormalPlayerMovementService,
+                        _luoyangFormalPlayerMovementSystem
+                            .UsesHumanScaleLocalMap
+                            ? _luoyangHumanScaleLocalMapPlan : null,
+                        _luoyangFormalPlayerMovementSystem
+                            .UsesHumanScaleLocalMap
+                            ? HumanScaleLocalWorldPosition : null);
+                if (_luoyangFacilityInteractionNavigationRuntime != null &&
+                    _luoyangFormalPlayerMovementSystem
+                        .UsesHumanScaleLocalMap)
+                {
+                    var person = new PlayerSession(world).ControlledPerson;
+                    _luoyangHumanScaleStreamingRuntime?.Dispose();
+                    _luoyangHumanScaleStreamingRuntime =
+                        LuoyangHumanScaleStreamingRuntime.Build(
+                            _luoyangHumanScaleLocalMapPlan,
+                            HumanScaleLocalWorldPosition,
+                            person.CurrentCellId64,
+                            _buildableFacilityRoot?.transform);
+                }
+            }
             return report;
         }
 
@@ -1302,6 +1415,9 @@ namespace Mandate.Presentation
             _luoyangFormalPlayerMovementSystem = null;
             _luoyangFormalPlayerMovementService = null;
             _luoyangFormalMovementSimulator = null;
+            _luoyangHumanScaleStreamingRuntime?.Dispose();
+            _luoyangHumanScaleStreamingRuntime = null;
+            _hasLuoyangHumanScaleFloatingOrigin = false;
             _luoyangFacilityInteractionNavigationRuntime?
                 .UnbindFormalMovement();
             if (_luoyangRoadTraversalRefinementPlan == null)
@@ -1411,6 +1527,16 @@ namespace Mandate.Presentation
                 .First().FacilityId;
         }
 
+        private bool HasCompleteHumanScaleFacilityWorld(WorldState world)
+        {
+            if (_luoyangHumanScaleLocalMapPlan == null) return false;
+            var formalIds = new HashSet<string>(world.Facilities.Where(item =>
+                    item != null).Select(item => item.Id),
+                StringComparer.Ordinal);
+            return _luoyangHumanScaleLocalMapPlan.FacilityCapabilities.All(
+                item => formalIds.Contains(item.FacilityId));
+        }
+
         public IReadOnlyList<string> FindLuoyangFacilityPath(
             string fromFacilityId, string toFacilityId)
         {
@@ -1441,6 +1567,52 @@ namespace Mandate.Presentation
                 0.02f,
                 (float)((northing - _floatingOrigin.NorthingMetres) /
                         HorizontalMetresPerUnit));
+        }
+
+        private Vector3 HumanScaleLocalWorldPosition(double easting,
+            double northing)
+        {
+            if (!_hasLuoyangHumanScaleFloatingOrigin)
+                throw new InvalidOperationException(
+                    "The Luoyang human-scale floating origin is not set.");
+            var position = _luoyangHumanScaleLocalMapPlan.WorldScale
+                .WorldToUnity(new GlobalProjectedCoordinate(easting,
+                    northing), 0d, _luoyangHumanScaleFloatingOrigin);
+            return new Vector3((float)position.XMetres, 0.02f,
+                (float)position.ZMetres);
+        }
+
+        private void SetHumanScaleFloatingOrigin(ulong cellId64)
+        {
+            var space = _luoyangHumanScaleLocalMapPlan.LocalSpacesByCellId[
+                cellId64];
+            _luoyangHumanScaleFloatingOrigin = new GlobalProjectedCoordinate(
+                space.OriginEastingMetres + space.WidthMetres * 0.5d,
+                space.OriginNorthingMetres + space.HeightMetres * 0.5d);
+            _hasLuoyangHumanScaleFloatingOrigin = true;
+        }
+
+        private bool TryResolveHumanScaleGroundTarget(Vector3 unityPosition,
+            out LuoyangResolvedLocalTarget target)
+        {
+            target = null;
+            if (_luoyangHumanScaleLocalMapPlan == null ||
+                !_hasLuoyangHumanScaleFloatingOrigin)
+                return false;
+            var world = _luoyangHumanScaleLocalMapPlan.WorldScale.UnityToWorld(
+                new UnityLocalPosition(unityPosition.x, unityPosition.y,
+                    unityPosition.z), _luoyangHumanScaleFloatingOrigin);
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            if (!grid.TryFromProjected(world.EastingMetres,
+                    world.NorthingMetres, out var cellId) ||
+                !_luoyangHumanScaleLocalMapPlan.LocalSpacesByCellId
+                    .TryGetValue(cellId.Value, out var space))
+                return false;
+            target = new LuoyangLocalTargetResolver(
+                _luoyangHumanScaleLocalMapPlan).ResolveGround(cellId.Value,
+                world.EastingMetres - space.OriginEastingMetres,
+                world.NorthingMetres - space.OriginNorthingMetres);
+            return target.IsValid;
         }
 
         private Vector3 BuildingPerformanceCellPosition(int row, int column)

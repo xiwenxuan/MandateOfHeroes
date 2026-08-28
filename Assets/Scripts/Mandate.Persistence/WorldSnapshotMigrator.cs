@@ -254,6 +254,9 @@ namespace Mandate.Persistence
                     case 75:
                         MigrateVersionSeventyFiveToSeventySix(world);
                         break;
+                    case 76:
+                        MigrateVersionSeventySixToSeventySeven(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -2314,6 +2317,47 @@ namespace Mandate.Persistence
                 }
             }
             world.SchemaVersion = 76;
+        }
+
+        private static void MigrateVersionSeventySixToSeventySeven(
+            WorldState world)
+        {
+            if (world.People != null)
+            {
+                foreach (var person in world.People)
+                {
+                    if (person == null) continue;
+                    person.LocationPrecisionId ??=
+                        LuoyangHumanScaleLocalMapIds.StrategicLocationTypeId;
+                    if (person.LocationPrecisionId.Length == 0)
+                        person.LocationPrecisionId =
+                            LuoyangHumanScaleLocalMapIds
+                                .StrategicLocationTypeId;
+                    person.CurrentLocalSpaceId ??= string.Empty;
+                    person.CurrentLocalAnchorId ??= string.Empty;
+                }
+            }
+            if (world.LuoyangFormalPlayerMovements != null)
+            {
+                foreach (var movement in world.LuoyangFormalPlayerMovements)
+                {
+                    if (movement == null) continue;
+                    movement.LocalMapVersionId ??= string.Empty;
+                    movement.LocalMapAssetHash ??= string.Empty;
+                    if (movement.Segments == null) continue;
+                    foreach (var segment in movement.Segments)
+                    {
+                        if (segment == null) continue;
+                        segment.FormalWorldObjectId ??= string.Empty;
+                        segment.TraversalConditionId ??= string.Empty;
+                        segment.FromLocalNodeId ??= string.Empty;
+                        segment.ToLocalNodeId ??= string.Empty;
+                        segment.FromLocalSpaceId ??= string.Empty;
+                        segment.ToLocalSpaceId ??= string.Empty;
+                    }
+                }
+            }
+            world.SchemaVersion = 77;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(

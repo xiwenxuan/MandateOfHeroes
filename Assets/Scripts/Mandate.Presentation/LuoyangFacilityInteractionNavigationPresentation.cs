@@ -219,6 +219,7 @@ namespace Mandate.Presentation
         private const float BodyRadius = 0.025f;
         private IReadOnlyList<Vector3> _routePoints = Array.Empty<Vector3>();
         private LuoyangPedestrianWalkPlan _routePlan;
+        private LuoyangHumanScaleLocalRoute _localRoutePlan;
         private int _nextPointIndex;
 
         public string ActorId { get; private set; }
@@ -232,7 +233,13 @@ namespace Mandate.Presentation
         public int RoutePointCount => _routePoints.Count;
         public CapsuleCollider CollisionProxy { get; private set; }
         public IReadOnlyList<string> RouteFacilityIds =>
-            _routePlan?.FacilityIds ?? Array.Empty<string>();
+            _routePlan?.FacilityIds ?? (_localRoutePlan == null
+                ? Array.Empty<string>()
+                : new[]
+                {
+                    _localRoutePlan.StartFacilityId,
+                    _localRoutePlan.TargetFacilityId
+                });
 
         public void Initialize(string actorId, string facilityId,
             Vector3 position, Mesh unitCubeMesh, Material bodyMaterial,
@@ -283,6 +290,7 @@ namespace Mandate.Presentation
             LastStopReasonId = string.Empty;
             MovementStateId = LuoyangClickToWalkPedestrianIds.ReadyStateId;
             _routePlan = null;
+            _localRoutePlan = null;
             _routePoints = Array.Empty<Vector3>();
             _nextPointIndex = 0;
             transform.position = position;
@@ -305,6 +313,7 @@ namespace Mandate.Presentation
                 throw new InvalidOperationException(
                     "A runtime pedestrian route requires a valid Domain plan.");
             _routePlan = plan;
+            _localRoutePlan = null;
             _routePoints = routePoints;
             CurrentFacilityId = plan.StartFacilityId;
             TargetFacilityId = plan.TargetFacilityId;
@@ -314,6 +323,25 @@ namespace Mandate.Presentation
             MovementStateId = routePoints.Count > 1
                 ? LuoyangClickToWalkPedestrianIds.WalkingStateId
                 : LuoyangClickToWalkPedestrianIds.ArrivedStateId;
+        }
+
+        public void BeginLocalRoute(LuoyangHumanScaleLocalRoute plan,
+            IReadOnlyList<Vector3> routePoints)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            if (routePoints == null || routePoints.Count < 2)
+                throw new InvalidOperationException(
+                    "A local pedestrian route requires Domain route points.");
+            _routePlan = null;
+            _localRoutePlan = plan;
+            _routePoints = routePoints;
+            CurrentFacilityId = plan.StartFacilityId;
+            TargetFacilityId = plan.TargetFacilityId;
+            LastStopReasonId = string.Empty;
+            transform.position = routePoints[0];
+            _nextPointIndex = 1;
+            MovementStateId =
+                LuoyangClickToWalkPedestrianIds.WalkingStateId;
         }
 
         public void Stop(string reasonId, bool blocked)
@@ -359,17 +387,26 @@ namespace Mandate.Presentation
             }
             if ((transform.position - target).sqrMagnitude > 0.000001f)
                 return true;
-            CurrentFacilityId = _routePlan.FacilityIds[_nextPointIndex];
+            if (_localRoutePlan == null)
+                CurrentFacilityId = _routePlan.FacilityIds[_nextPointIndex];
             _nextPointIndex++;
             if (_nextPointIndex < _routePoints.Count) return true;
             transform.position = _routePoints[_routePoints.Count - 1];
-            CurrentFacilityId = _routePlan.TargetFacilityId;
+            CurrentFacilityId = _localRoutePlan == null
+                ? _routePlan.TargetFacilityId
+                : _localRoutePlan.TargetFacilityId;
             MovementStateId = LuoyangClickToWalkPedestrianIds.ArrivedStateId;
             return true;
         }
 
         public IReadOnlyList<string> RemainingFacilityIds()
         {
+            if (_localRoutePlan != null && IsWalking)
+                return new[]
+                {
+                    CurrentFacilityId,
+                    _localRoutePlan.TargetFacilityId
+                };
             if (_routePlan == null || !IsWalking) return Array.Empty<string>();
             return _routePlan.FacilityIds.Skip(Math.Max(0,
                 _nextPointIndex - 1)).ToArray();
@@ -450,8 +487,11 @@ namespace Mandate.Presentation
         private Material _pedestrianTargetMaterial;
         private float _horizontalMetresPerUnit;
         private LuoyangPedestrianWalkPlan _lastPedestrianWalkPlan;
+        private LuoyangHumanScaleLocalRoute _lastHumanScaleRoute;
         private WorldState _formalMovementWorld;
         private LuoyangFormalPlayerMovementService _formalMovementService;
+        private LuoyangHumanScaleLocalMapPlan _humanScaleLocalMap;
+        private Func<double, double, Vector3> _localWorldPositionResolver;
 
         private LuoyangFacilityInteractionNavigationRuntime(GameObject root,
             LuoyangRoadTraversalRefinementPlan refinementPlan,
@@ -528,7 +568,9 @@ namespace Mandate.Presentation
         public int PedestrianRouteNodeCount =>
             _pedestrianInstance?.RouteFacilityIds.Count ?? 0;
         public float PedestrianRouteDistanceMetres =>
-            _lastPedestrianWalkPlan?.TotalDistanceMetres ?? 0f;
+            _lastHumanScaleRoute != null
+                ? (float)(_lastHumanScaleRoute.DistanceCentimetres / 100d)
+                : _lastPedestrianWalkPlan?.TotalDistanceMetres ?? 0f;
         public float PedestrianEstimatedDurationSeconds =>
             _lastPedestrianWalkPlan?.EstimatedDurationSeconds ?? 0f;
         public LuoyangClickWalkPedestrianInstance PedestrianInstance =>
@@ -537,6 +579,9 @@ namespace Mandate.Presentation
             _pedestrianInstance?.RouteFacilityIds ?? Array.Empty<string>();
         public bool UsesFormalPlayerMovement =>
             _formalMovementWorld != null && _formalMovementService != null;
+        public bool UsesHumanScaleFormalMovement =>
+            UsesFormalPlayerMovement && _humanScaleLocalMap != null &&
+            _localWorldPositionResolver != null;
 
         public static LuoyangFacilityInteractionNavigationRuntime Build(
             LuoyangFacilityInteractionNavigationPlan plan,
@@ -844,6 +889,7 @@ namespace Mandate.Presentation
             }
             _pedestrianInstance.PlaceAt(facilityId, position);
             _lastPedestrianWalkPlan = null;
+            _lastHumanScaleRoute = null;
             ClearPedestrianRouteVisual();
             return true;
         }
@@ -910,16 +956,39 @@ namespace Mandate.Presentation
         }
 
         public void BindFormalMovement(WorldState world,
-            LuoyangFormalPlayerMovementService movementService)
+            LuoyangFormalPlayerMovementService movementService,
+            LuoyangHumanScaleLocalMapPlan humanScaleLocalMap = null,
+            Func<double, double, Vector3> localWorldPositionResolver = null)
         {
             _formalMovementWorld = world ?? throw new ArgumentNullException(
                 nameof(world));
             _formalMovementService = movementService ??
                 throw new ArgumentNullException(nameof(movementService));
+            if ((humanScaleLocalMap == null) !=
+                (localWorldPositionResolver == null))
+                throw new InvalidOperationException(
+                    "Human-scale map and coordinate resolver must bind together.");
+            _humanScaleLocalMap = humanScaleLocalMap;
+            _localWorldPositionResolver = localWorldPositionResolver;
             if (_pedestrianInstance == null) return;
             var controlled = new PlayerSession(world).ControlledPerson;
-            if (!_pedestrianNodePositions.TryGetValue(
-                    controlled.CurrentFacilityId, out var position))
+            Vector3 position;
+            if (humanScaleLocalMap != null)
+            {
+                if (!humanScaleLocalMap.NavigationNodesByFacilityId
+                        .TryGetValue(controlled.CurrentFacilityId,
+                            out var localNode))
+                    throw new InvalidOperationException(
+                        "The controlled Person has no local navigation anchor.");
+                var space = humanScaleLocalMap.LocalSpacesByCellId[
+                    localNode.CellId64];
+                position = localWorldPositionResolver(
+                    space.OriginEastingMetres + localNode.LocalEastMetres,
+                    space.OriginNorthingMetres +
+                    localNode.LocalNorthMetres);
+            }
+            else if (!_pedestrianNodePositions.TryGetValue(
+                         controlled.CurrentFacilityId, out position))
                 throw new InvalidOperationException(
                     "The controlled Person is outside the active Luoyang " +
                     "resident presentation window.");
@@ -929,6 +998,7 @@ namespace Mandate.Presentation
             _pedestrianInstance.BindActor(controlled.Id);
             _pedestrianInstance.PlaceAt(controlled.CurrentFacilityId, position);
             _lastPedestrianWalkPlan = null;
+            _lastHumanScaleRoute = null;
             ClearPedestrianRouteVisual();
         }
 
@@ -936,11 +1006,17 @@ namespace Mandate.Presentation
         {
             _formalMovementWorld = null;
             _formalMovementService = null;
+            _humanScaleLocalMap = null;
+            _localWorldPositionResolver = null;
+            _lastHumanScaleRoute = null;
         }
 
         private bool TrySetFormalPedestrianDestination(string facilityId)
         {
             if (_pedestrianInstance.IsWalking) return false;
+            if (UsesHumanScaleFormalMovement)
+                return TrySetHumanScaleFormalPedestrianDestination(
+                    facilityId);
             if (!_formalMovementService.TryRequest(_formalMovementWorld,
                     facilityId, out var movement, out var plan,
                     out var failureReasonId))
@@ -982,6 +1058,47 @@ namespace Mandate.Presentation
             SetPedestrianRouteVisual(routePoints);
             _pedestrianTarget.transform.position = routePoints[
                 routePoints.Count - 1] + Vector3.up * 0.006f;
+            _pedestrianTarget.SetActive(true);
+            return true;
+        }
+
+        private bool TrySetHumanScaleFormalPedestrianDestination(
+            string facilityId)
+        {
+            if (!_formalMovementService.TryRequestLocal(_formalMovementWorld,
+                    facilityId, out var movement, out var plan,
+                    out var failureReasonId))
+            {
+                _pedestrianInstance.Stop(string.IsNullOrWhiteSpace(
+                        failureReasonId)
+                        ? LuoyangClickToWalkPedestrianIds.NoRouteReasonId
+                        : failureReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            _formalMovementService.Complete(_formalMovementWorld, movement.Id);
+            if (movement.Status != LuoyangFormalMovementStatus.Completed)
+            {
+                _pedestrianInstance.Stop(movement.FailureReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            var routePoints = plan.Points.Select(item =>
+                _localWorldPositionResolver(item.GlobalEastingMetres,
+                    item.GlobalNorthingMetres)).ToArray();
+            if (routePoints.Length < 2)
+            {
+                _pedestrianInstance.Stop(
+                    LuoyangClickToWalkPedestrianIds.NoRouteReasonId, true);
+                ClearPedestrianRouteVisual();
+                return false;
+            }
+            _lastPedestrianWalkPlan = null;
+            _lastHumanScaleRoute = plan;
+            _pedestrianInstance.BeginLocalRoute(plan, routePoints);
+            SetPedestrianRouteVisual(routePoints);
+            _pedestrianTarget.transform.position = routePoints[
+                routePoints.Length - 1] + Vector3.up * 0.006f;
             _pedestrianTarget.SetActive(true);
             return true;
         }
