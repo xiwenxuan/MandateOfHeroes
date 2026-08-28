@@ -1,0 +1,19 @@
+Luoyang Formal Player Movement and World Settlement V1
+Controlled Unity evidence frozen 2026-08-28
+
+Unity editor: 2022.3.62f3c1 (1623fc0bbb97)
+
+ProjectLoadSmoke: PASS
+Duration: 10.226 seconds
+Summary: tmp/unity-validation/unity-ProjectLoadSmoke-20260828-222312-445.summary.json
+
+EditMode targeted formal movement tests: 11 passed, 0 failed
+Duration: 72.494 seconds
+Summary: tmp/unity-validation/unity-EditMode-20260828-222343-406.summary.json
+
+Graphical PlayMode formal movement class: 4 passed, 0 failed
+Duration: 96.624 seconds
+Summary: tmp/unity-validation/unity-PlayMode-20260828-222519-263.summary.json
+
+All Unity gates retained the standard 300-second ceiling.
+Only Tools/Run-UnityTestsSafe.ps1 was used for Unity tests.

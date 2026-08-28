@@ -1,0 +1,21 @@
+Luoyang Formal Player Movement and World Settlement V1
+Scope and revision evidence frozen 2026-08-28
+
+Phase 0 workspace commits:
+- f125526 chore: organize Unity project workspace
+- e8d4ca8 feat: close Luoyang pedestrian prototype baseline
+
+Formal implementation commit:
+- 07e24fdeda6e feat: add formal Luoyang player movement settlement
+
+Tests and classified-timeout tooling commit:
+- 2b5f82b01224 test: cover Luoyang movement and classify slow regressions
+
+Documentation and acceptance evidence:
+- contained by the commit that adds this evidence file
+
+Final scope checks:
+- git diff --check: PASS
+- required temporary Unity-generated BillingMode metadata rewrite: restored, not retained
+- tmp/, Library/, Logs/ and ignored outputs/: excluded from commits
+- existing user programs: not closed during final validation

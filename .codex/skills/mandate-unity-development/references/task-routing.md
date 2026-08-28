@@ -681,6 +681,28 @@ closing or being destroyed cancels the remaining route in the same refresh. The 
 PermanentPerson, and no per-frame position or route enters V75. This targeted slice is not a whole-city NavMesh,
 indoor navigation, crowd/RVO simulation, final character animation or a replacement for formal M26 travel commands.
 
+### Current Luoyang formal player movement and world settlement V1 route
+
+For work that changes formal `PlayerSession` resolution, V76 local Facility/Cell person facts, persistent movement
+commands/events, road operational state, passage-aware formal route snapshots, movement time/stamina/food settlement,
+segment-boundary resume, deterministic replay or committed-route Unity playback, read
+`Docs/TASK_LUOYANG_FORMAL_PLAYER_MOVEMENT_WORLD_SETTLEMENT_V1.md` and
+`Docs/LUOYANG_FORMAL_PLAYER_MOVEMENT_V1_ACCEPTANCE_REPORT.md` together with the preceding click-to-walk route,
+the V75 passage route, M12 permanent-population contract, M25-P7 persistent execution contract and deterministic
+save specification.
+
+`WorldState.PlayerPersonId` remains the only persisted controlled-person reference; `PlayerSession` is a Domain
+wrapper and does not create a second player. Settlement reuses `PersonState.LocationId`, food reuses `Provisions`,
+and world time advances only through the existing simulator. V75-to-V76 initializes empty movement collections and
+never infers formal facts from the preview actor. Presentation may play a committed route but must not write Person,
+time, resources, roads or passages. The current status is
+`LUOYANG_FORMAL_PLAYER_MOVEMENT_WORLD_SETTLEMENT_V1_ACCEPTED`. Compilation, targeted core 11/11, frozen complete
+core 747/747, controlled ProjectLoad, EditMode 11/11, graphical PlayMode 4/4, three identical replay hashes and diff
+review passed. Only the exact multi-year food and save/resume determinism tests use the classified 900-second ceiling
+(about 503 and 502 seconds); every other core and Unity test retains 300 seconds. A separate opt-in living-evidence
+refresh exposed an existing food-conservation mismatch and remains outside this movement task. The next route is
+Luoyang character-scale close map and local navigation V1, not automatic movement expansion.
+
 ### Current family-organization center and historical-family reference contract
 
 For work that changes Clan/Branch/Household/FamilyOrganization separation, family-organization assets, Primary or

@@ -1,0 +1,26 @@
+Luoyang Formal Player Movement and World Settlement V1
+Core and compilation evidence frozen 2026-08-28
+
+Compilation: PASS
+Targeted movement core tests: 11 passed, 0 failed
+Targeted log: tmp/skill-verification/core-tests-20260828-214418-806.out.log
+
+Frozen complete grouped core regression: 747 passed, 0 failed
+Aggregate: tmp/core-test-groups/luoyang-movement-v1-final/aggregate.json
+Source fingerprint: CF640144C8062024947FBCF3501E65973B07EBAD4A3479E6EE92D7B03699DBBB
+
+Timeout classification:
+- slow-determinism / 900 seconds / FoodRuntime_FormalWorldIsDeterministicForOneYear
+  PASS, about 503 seconds
+- slow-determinism / 900 seconds / Simulation_SaveResumeMatchesContinuousRun
+  PASS, about 502 seconds
+- regular / 300 seconds / every other core test (745 tests)
+- Unity gates retain 300 seconds
+
+Required-gate existing failures: 0
+Failures introduced by this task: 0
+
+Separate opt-in diagnostic (not a required gate):
+LuoyangLiving_EvidenceExports365DayClosureAndCheckpoint exposed an existing food-conservation mismatch.
+Left 475173375; right 487898292; delta 12724917.
+Ignored output was not committed and the economy subsystem was not changed in this movement task.

@@ -2215,3 +2215,26 @@ CITY 当前驻留窗口建立一名低多边形人物、非 Trigger CapsuleColli
 V75，也不保存逐帧坐标或路线。它只证明单关注角色的点击步行、稳定侧移与动态门桥停止，不代表全城
 NavMesh、室内、多人物 RVO/拥堵、最终角色 FBX/动画或 M26 正式旅行命令已经完成。全局推荐顺序仍由
 0E 节决定，本连续洛阳任务不自动改写 M26 玩家玩法主线。
+
+## 44. 洛阳正式玩家人物移动与世界结算 V1（2026-08-28）
+
+正式入口为
+[`TASK_LUOYANG_FORMAL_PLAYER_MOVEMENT_WORLD_SETTLEMENT_V1.md`](TASK_LUOYANG_FORMAL_PLAYER_MOVEMENT_WORLD_SETTLEMENT_V1.md)，
+最终门禁见
+[`LUOYANG_FORMAL_PLAYER_MOVEMENT_V1_ACCEPTANCE_REPORT.md`](LUOYANG_FORMAL_PLAYER_MOVEMENT_V1_ACCEPTANCE_REPORT.md)。
+本阶段把第43节只读演示步行升级为 V76 正式世界行动：`WorldState.PlayerPersonId` 继续作为唯一受控人物
+引用，`PlayerSession` 只读解析现有 PermanentPerson；人物的 Settlement、Global Cell、Facility、
+体力和既有 `Provisions`，402条道路状态、门桥状态、固定路线快照及Segment边界进度共同进入世界账。
+
+点击现在先生成持久 Movement Command；Simulation 使用当前人物、起点、道路和门桥事实重新规划并
+计算时间、体力与口粮，然后通过既有 `WorldSimulator` 推进共享世界时间并提交人物位置。Unity 仅播放
+已经成功提交的路线，未绑定正式世界的旧人物仍只作为审图测试工具。道路、城门或桥梁在下一Segment前
+失效会产生 RouteInvalidated 和 MovementInterrupted；V75→V76 不从旧演示坐标虚构正式位置。
+
+当前状态为
+`LUOYANG_FORMAL_PLAYER_MOVEMENT_WORLD_SETTLEMENT_V1_ACCEPTED`。全工程编译、目标核心 11/11、冻结完整
+核心 747/747、Unity ProjectLoad、目标 EditMode 11/11、图形 PlayMode 4/4、三次相同重放哈希及
+`git diff --check` 均通过。两个多年确定性用例经明确分类后使用 900 秒专属上限，分别约 503 秒与 502 秒
+通过；其余核心和 Unity 继续使用 300 秒上限。一次可选生活证据刷新另行暴露既有食品守恒差额，未由本次
+移动引入且未在本任务越权修复。固定下一阶段是“洛阳人物尺度近景地图与局部导航 V1”，而不是继续
+扩充移动功能、建筑资产、NPC 群体寻路或外围供应区。

@@ -1,0 +1,9 @@
+Luoyang Formal Player Movement and World Settlement V1
+Deterministic replay evidence frozen 2026-08-28
+
+Run 1: 10d273927467e01e167e1aa97e9e0ec99b12cc738c8c53de81ea6cc0792e1b27
+Run 2: 10d273927467e01e167e1aa97e9e0ec99b12cc738c8c53de81ea6cc0792e1b27
+Run 3: 10d273927467e01e167e1aa97e9e0ec99b12cc738c8c53de81ea6cc0792e1b27
+
+Result: PASS
+All three final world-state hashes are identical.
