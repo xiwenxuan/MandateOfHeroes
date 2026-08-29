@@ -23,6 +23,8 @@ namespace Mandate.Simulation
         private const int PersonBatchSize = 12_500;
         private const int HouseholdBatchSize = 10_000;
         private readonly ILuoyang184LivingWorldSource source;
+        private readonly LuoyangNormalSupplyCalibrationProfileState
+            calibrationProfile;
 
         private static readonly HashSet<string> FoodProducts =
             new HashSet<string>(StringComparer.Ordinal)
@@ -39,9 +41,20 @@ namespace Mandate.Simulation
                 CoreProductionContent.OffalProductId
             };
 
-        public Luoyang184LivingWorldSystem(ILuoyang184LivingWorldSource source)
+        public Luoyang184LivingWorldSystem(
+            ILuoyang184LivingWorldSource source,
+            LuoyangNormalSupplyCalibrationProfileState calibrationProfile = null)
         {
             this.source = source ?? throw new ArgumentNullException(nameof(source));
+            // The repaired 700k scenario is normal-supply by default. Smaller
+            // historical fixtures retain their old balance while still using the
+            // same formal authority, so unrelated milestone tests are not silently
+            // rebalanced.
+            this.calibrationProfile = calibrationProfile ??
+                (source.PersonCount >= 700_000
+                    ? new LuoyangNormalSupplyCalibrationProfileState()
+                    : LuoyangNormalSupplyCalibrationProfileState
+                        .CreateAuthorityOnly());
         }
 
         public Luoyang184LivingWorldRuntimeState CreateRuntime(
@@ -74,6 +87,12 @@ namespace Mandate.Simulation
             BuildMarkets(runtime);
             BuildIntelligentAgents(runtime);
             new Luoyang184T4IntegratedRuntimeSystem().Initialize(runtime);
+            var formalEconomy = new LuoyangFormalEconomySystem();
+            formalEconomy.ApplyCapacityCalibrationBeforeActivation(
+                runtime, calibrationProfile);
+            formalEconomy.ActivateFromBootstrap(runtime);
+            formalEconomy.ApplyNormalSupplyOpeningReserve(
+                runtime, calibrationProfile);
             runtime.Performance.InitializationMilliseconds = timer.ElapsedMilliseconds;
             runtime.Performance.PeakManagedMemoryBytes = GC.GetTotalMemory(false);
             Luoyang184LivingWorldRules.ValidateRuntime(runtime,
@@ -103,6 +122,8 @@ namespace Mandate.Simulation
                 runtime.AbsoluteDay++;
                 var supplyTimer = Stopwatch.StartNew();
                 ResolveExternalSupply(runtime);
+                new Luoyang184T4IntegratedRuntimeSystem()
+                    .ProcureMilitaryFood(runtime);
                 runtime.Performance.SupplyMilliseconds +=
                     supplyTimer.ElapsedMilliseconds;
                 var decisionTimer = Stopwatch.StartNew();
@@ -115,6 +136,7 @@ namespace Mandate.Simulation
                     productionTimer.ElapsedMilliseconds;
 
                 var marketTimer = Stopwatch.StartNew();
+                BalanceFoodMarketAccess(runtime);
                 UpdateMarkets(runtime);
                 runtime.Performance.MarketMilliseconds += marketTimer.ElapsedMilliseconds;
 
@@ -142,6 +164,7 @@ namespace Mandate.Simulation
                 runtime.Performance.ThreeHundredSixtyFiveDayMilliseconds = elapsed;
             runtime.Performance.PeakManagedMemoryBytes = Math.Max(
                 runtime.Performance.PeakManagedMemoryBytes, GC.GetTotalMemory(false));
+            new LuoyangFormalEconomySystem().RebuildProjection(runtime);
             Luoyang184LivingWorldRules.ValidateRuntime(runtime,
                 source.PersonCount, source.HouseholdCount, source.FacilityCount);
         }
@@ -671,8 +694,13 @@ namespace Mandate.Simulation
                 if (supplier.Level ==
                     LuoyangSupplierMaterializationLevel.DeferredExternalTrade)
                     continue;
+                var productionScale = LuoyangFormalEconomySystem.IsFood(
+                    supplier.ProductId)
+                    ? calibrationProfile.ExternalProductionScale
+                    : 1;
                 var produced = Math.Min(
-                    supplier.DailyProductionMilliunits,
+                    checked(supplier.DailyProductionMilliunits *
+                            productionScale),
                     supplier.StorageCapacityMilliunits -
                     supplier.InventoryQuantityMilliunits);
                 var operatingCost = Math.Min(supplier.CashBalance,
@@ -685,7 +713,14 @@ namespace Mandate.Simulation
                         item.HouseholdId == supplier.ManagerHouseholdId);
                     if (household != null) household.Wealth += operatingCost;
                 }
-                supplier.InventoryQuantityMilliunits += produced;
+                if (LuoyangFormalEconomySystem.IsFood(supplier.ProductId))
+                    produced = new LuoyangFormalEconomySystem().Produce(runtime,
+                        supplier.InventoryId, supplier.ProductId, produced,
+                        InventoryTransactionType.RecipeSettled,
+                        "external.production." + runtime.AbsoluteDay + "." +
+                        supplier.SupplierId);
+                else
+                    supplier.InventoryQuantityMilliunits += produced;
                 supplier.CumulativeProducedMilliunits += produced;
             }
 
@@ -703,7 +738,12 @@ namespace Mandate.Simulation
                     shipment.DeliveredQuantityMilliunits,
                     destination.CapacityMilliunits -
                     destination.QuantityMilliunits);
-                destination.QuantityMilliunits += stored;
+                if (LuoyangFormalEconomySystem.IsFood(shipment.ProductId))
+                    stored = new LuoyangFormalEconomySystem().ReceiveFreight(
+                        runtime, shipment.Id, destination.Id,
+                        shipment.ProductId, stored);
+                else
+                    destination.QuantityMilliunits += stored;
                 shipment.Delivered = true;
                 var order = runtime.SupplyOrders.Find(item =>
                     item.Id == shipment.OrderId);
@@ -856,9 +896,6 @@ namespace Mandate.Simulation
             shipped = Math.Min(shipped, payerCash * 1_000 / unitPrice);
             if (shipped <= 0) return;
             var purchaseCost = checked((shipped * unitPrice + 999) / 1_000);
-            if (market != null) market.CashBalance -= purchaseCost;
-            supplier.CashBalance += purchaseCost;
-            supplier.CumulativeSalesRevenue += purchaseCost;
             var carrierConsumption = Math.Min(shipped,
                 checked((long)Math.Max(1, supplier.TravelDays) *
                     2_000L));
@@ -879,12 +916,22 @@ namespace Mandate.Simulation
                 : 0;
             var delivered = shipped - carrierConsumption - naturalLoss - riskLoss;
             if (delivered <= 0) return;
-            supplier.InventoryQuantityMilliunits -= shipped;
-            supplier.CumulativeDispatchedMilliunits += shipped;
             var orderId = "supply_order." + runtime.AbsoluteDay + "." +
                           runtime.SupplyOrders.Count.ToString("D6");
             var shipmentId = "shipment." + runtime.AbsoluteDay + "." +
                              runtime.Shipments.Count.ToString("D6");
+            if (LuoyangFormalEconomySystem.IsFood(supplier.ProductId))
+                new LuoyangFormalEconomySystem().DispatchFreight(runtime,
+                    supplier.InventoryId, shipmentId, supplier.ProductId,
+                    shipped,
+                    checked(carrierConsumption + naturalLoss + riskLoss),
+                    supplier.ManagerPersonId);
+            else
+                supplier.InventoryQuantityMilliunits -= shipped;
+            if (market != null) market.CashBalance -= purchaseCost;
+            supplier.CashBalance += purchaseCost;
+            supplier.CumulativeSalesRevenue += purchaseCost;
+            supplier.CumulativeDispatchedMilliunits += shipped;
             runtime.SupplyOrders.Add(new LuoyangSupplyOrderRuntimeState
             {
                 Id = orderId,
@@ -937,6 +984,19 @@ namespace Mandate.Simulation
             for (var i = 0; i < source.Agriculture.Count; i++)
             {
                 var field = source.Agriculture[i];
+                var initialOffset = calibrationProfile
+                    .AgricultureInitialStageWindowDays <= 0
+                    ? 0
+                    : i * calibrationProfile.AgricultureInitialStageWindowDays /
+                      Math.Max(1, source.Agriculture.Count);
+                var plantedDay = field.PlantedDay - initialOffset;
+                // The accepted outer-agriculture contract samples every field
+                // three times during the opening 30 days.  Initial-stage
+                // staggering may move fields earlier inside their real crop
+                // cycle, but it must not silently turn those opening samples
+                // into accelerated harvests.
+                var maturityDay = Math.Max(runtime.AbsoluteDay + 31,
+                    field.MaturityDay - initialOffset);
                 var destination = granaries[i % granaries.Count];
                 var storage = GetOrCreateInventory(runtime,
                     destination.FacilityId, field.ProductDefinitionId,
@@ -953,16 +1013,17 @@ namespace Mandate.Simulation
                     CropProductId = field.ProductDefinitionId,
                     StorageInventoryId = storage.Id,
                     SeedInventoryId = seed.Id,
-                    PlantingDay = field.PlantedDay,
-                    FullMaturityDay = field.MaturityDay,
+                    PlantingDay = plantedDay,
+                    FullMaturityDay = maturityDay,
                     CycleDurationDays = field.MaturityDay - field.PlantedDay,
                     EarlyHarvestMinimumBasisPoints =
                         field.EarlyHarvestMinimumBasisPoints,
                     MaturityBasisPoints = Luoyang184LivingWorldRules
                         .CalculateMaturityBasisPoints(runtime.AbsoluteDay,
-                            field.PlantedDay, field.MaturityDay),
+                            plantedDay, maturityDay),
                     FullYieldMilliunits = checked(
-                        field.FullYieldUnits * MilliunitsPerUnit),
+                        field.FullYieldUnits * MilliunitsPerUnit *
+                        calibrationProfile.AgricultureYieldUnitScale),
                     AssignedWorkers = field.WorkerPersonOrdinals.Count,
                     Phase = LuoyangCropPhase.Growing
                 });
@@ -1070,8 +1131,25 @@ namespace Mandate.Simulation
                     facility.AiResponseActionId = "facility.seek_input";
                     continue;
                 }
-                input.QuantityMilliunits -= facility.InputQuantity;
-                output.QuantityMilliunits += facility.OutputQuantity;
+                if (LuoyangFormalEconomySystem.IsFood(input.ProductId))
+                    new LuoyangFormalEconomySystem().ConsumeInventory(runtime,
+                        input.Id, input.ProductId, facility.InputQuantity,
+                        InventoryTransactionType.RecipeSettled,
+                        "production.input." + runtime.AbsoluteDay + "." +
+                        facility.FacilityIndex);
+                else
+                    input.QuantityMilliunits -= facility.InputQuantity;
+                if (LuoyangFormalEconomySystem.IsFood(output.ProductId))
+                    new LuoyangFormalEconomySystem().Produce(runtime,
+                        output.Id, output.ProductId, facility.OutputQuantity,
+                        InventoryTransactionType.RecipeSettled,
+                        "production.output." + runtime.AbsoluteDay + "." +
+                        facility.FacilityIndex,
+                        "workorder.compact.production." +
+                        facility.FacilityIndex + "." +
+                        facility.CycleStartedDay);
+                else
+                    output.QuantityMilliunits += facility.OutputQuantity;
                 runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
                 {
                     Id = "flow.production." + runtime.AbsoluteDay + "." +
@@ -1144,7 +1222,44 @@ namespace Mandate.Simulation
             available -= seed;
             var stored = Math.Min(yield - seed, available);
             var lost = yield - seed - stored;
-            inventory.QuantityMilliunits += stored;
+            stored = new LuoyangFormalEconomySystem().Produce(runtime,
+                inventory.Id, crop.CropProductId, stored,
+                InventoryTransactionType.FoodHarvested,
+                "harvest." + runtime.AbsoluteDay + "." + crop.FieldId +
+                "." + crop.CycleNumber,
+                "workorder.luoyang.harvest." + crop.FieldId + ".cycle." +
+                crop.CycleNumber);
+            var marketInventory = runtime.Inventories.Where(item =>
+                    item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                    item.ProductId == crop.CropProductId &&
+                    item.Id != inventory.Id)
+                .OrderBy(item => item.Id, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (marketInventory != null &&
+                calibrationProfile.HarvestMarketReleaseBasisPoints > 0)
+            {
+                var marketRelease = checked(stored * calibrationProfile
+                    .HarvestMarketReleaseBasisPoints / 10_000);
+                var released = new LuoyangFormalEconomySystem().Transfer(
+                    runtime, inventory.Id, marketInventory.Id,
+                    crop.CropProductId, marketRelease,
+                    InventoryTransactionType.FoodMarketTransferred,
+                    "harvest.market_release." + runtime.AbsoluteDay + "." +
+                    crop.FieldId + "." + crop.CycleNumber);
+                if (released > 0)
+                    runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
+                    {
+                        Id = "flow.harvest.market_release." +
+                             runtime.AbsoluteDay + "." + crop.FieldId,
+                        Day = runtime.AbsoluteDay,
+                        OperationId = "market.harvest_release",
+                        ProductId = crop.CropProductId,
+                        SourceInventoryId = inventory.Id,
+                        DestinationInventoryId = marketInventory.Id,
+                        QuantityMilliunits = released,
+                        FacilityId = crop.FacilityId
+                    });
+            }
             crop.ActualYieldMilliunits = yield;
             crop.StoredYieldMilliunits = stored;
             crop.SeedRecoveredMilliunits = seed;
@@ -1230,30 +1345,45 @@ namespace Mandate.Simulation
         private void UpdateMarkets(Luoyang184LivingWorldRuntimeState runtime)
         {
             var dailyDemand = runtime.DailyFoodDemandMilliunits;
+            var foodMarkets = runtime.Markets.Where(item =>
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                .OrderBy(item => item.ProductId, StringComparer.Ordinal)
+                .ToArray();
+            var foodMarketOrdinals = foodMarkets.Select((item, index) =>
+                    new { item.ProductId, Index = index })
+                .ToDictionary(item => item.ProductId, item => item.Index,
+                    StringComparer.Ordinal);
             foreach (var market in runtime.Markets)
             {
+                var productDemand = 0L;
+                if (foodMarketOrdinals.TryGetValue(market.ProductId,
+                        out var foodMarketIndex))
+                    productDemand = AllocatedFoodMarketDemand(dailyDemand,
+                        foodMarkets.Length, foodMarketIndex);
                 var stock = runtime.Inventories.Where(item =>
                     item.ProductId == market.ProductId &&
                     item.OwnerKind == LuoyangInventoryOwnerKind.Market)
                     .Sum(item => item.QuantityMilliunits);
                 market.SupplyMilliunits = stock;
-                market.DemandMilliunits = dailyDemand;
+                market.DemandMilliunits = productDemand;
                 market.TransferredMilliunits = 0;
-                market.FailedDemandMilliunits = Math.Max(0, dailyDemand - stock);
+                market.FailedDemandMilliunits = Math.Max(0,
+                    productDemand - stock);
                 market.TransportCostBasisPoints = AverageTransportCost(runtime,
                     market.ProductId);
                 market.RiskBasisPoints = AverageSupplyRisk(runtime,
                     market.ProductId);
                 market.SeasonBasisPoints = SeasonalBasisPoints(
                     runtime.AbsoluteDay);
-                market.ShortageBasisPoints = dailyDemand <= 0 ? 0 :
+                market.ShortageBasisPoints = productDemand <= 0 ? 0 :
                     (int)Math.Min(10_000,
-                        market.FailedDemandMilliunits * 10_000 / dailyDemand);
+                        market.FailedDemandMilliunits * 10_000 /
+                        productDemand);
                 var recentTrade = market.RecentTradeQuantityMilliunits <= 0
                     ? 0
                     : (int)Math.Min(2_000,
                         market.RecentTradeQuantityMilliunits * 2_000 /
-                        Math.Max(1L, dailyDemand));
+                        Math.Max(1L, productDemand));
                 market.CurrentPriceBasisPoints = Math.Max(2_000,
                     Math.Min(40_000, 10_000 +
                         market.ShortageBasisPoints * 2 +
@@ -1266,62 +1396,101 @@ namespace Mandate.Simulation
             }
         }
 
+        private void BalanceFoodMarketAccess(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            if (calibrationProfile.MarketTargetStockDays <= 0) return;
+            var foodMarkets = runtime.Markets.Where(item =>
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                .OrderBy(item => item.ProductId, StringComparer.Ordinal)
+                .ToArray();
+            var formal = new LuoyangFormalEconomySystem();
+            for (var index = 0; index < foodMarkets.Length; index++)
+            {
+                var market = foodMarkets[index];
+                var destination = runtime.Inventories.Where(item =>
+                        item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                        item.ProductId == market.ProductId)
+                    .OrderBy(item => item.Id, StringComparer.Ordinal)
+                    .FirstOrDefault();
+                if (destination == null) continue;
+                var daily = AllocatedFoodMarketDemand(
+                    runtime.DailyFoodDemandMilliunits, foodMarkets.Length,
+                    index);
+                var target = checked(daily *
+                    calibrationProfile.MarketTargetStockDays);
+                var shortage = Math.Max(0, target -
+                    LuoyangFormalEconomySystem.GetAvailableQuantity(runtime,
+                        destination.Id, destination.ProductId));
+                if (shortage <= 0) continue;
+                foreach (var source in runtime.Inventories.Where(item =>
+                             item.Id != destination.Id &&
+                             item.ProductId == market.ProductId &&
+                             item.OwnerKind != LuoyangInventoryOwnerKind.Market &&
+                             item.OwnerKind !=
+                                 LuoyangInventoryOwnerKind.Military)
+                             .OrderBy(item => item.OwnerKind ==
+                                 LuoyangInventoryOwnerKind.Government ? 1 : 0)
+                             .ThenBy(item => item.Id, StringComparer.Ordinal))
+                {
+                    if (shortage <= 0) break;
+                    var available = LuoyangFormalEconomySystem
+                        .GetAvailableQuantity(runtime, source.Id,
+                            source.ProductId);
+                    if (available <= 0) continue;
+                    var moved = formal.Transfer(runtime, source.Id,
+                        destination.Id, source.ProductId,
+                        Math.Min(shortage, available),
+                        InventoryTransactionType.FoodMarketTransferred,
+                        "market.stock_access." + runtime.AbsoluteDay + "." +
+                        source.Id + "." + destination.Id);
+                    if (moved <= 0) continue;
+                    shortage -= moved;
+                    runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
+                    {
+                        Id = "flow.market.stock_access." +
+                             runtime.AbsoluteDay + "." +
+                             runtime.InventoryFlows.Count,
+                        Day = runtime.AbsoluteDay,
+                        OperationId = "market.stock_access",
+                        ProductId = source.ProductId,
+                        SourceInventoryId = source.Id,
+                        DestinationInventoryId = destination.Id,
+                        QuantityMilliunits = moved,
+                        FacilityId = destination.FacilityId
+                    });
+                }
+            }
+        }
+
+        private static long AllocatedFoodMarketDemand(
+            long dailyDemand, int marketCount, int marketIndex)
+        {
+            if (marketCount <= 0 || marketIndex < 0 ||
+                marketIndex >= marketCount) return 0;
+            var share = dailyDemand / marketCount;
+            return marketIndex == marketCount - 1
+                ? dailyDemand - share * (marketCount - 1)
+                : share;
+        }
+
         private void ResolveHouseholdConsumption(
             Luoyang184LivingWorldRuntimeState runtime)
         {
-            long consumedTotal = 0;
-            long shortageTotal = 0;
-            var bucket = (int)(runtime.AbsoluteDay % 30);
-            for (var index = bucket; index < runtime.Households.Count;
-                 index += 30)
-            {
-                SettleHouseholdConsumption(runtime.Households[index],
-                    runtime.AbsoluteDay, ref consumedTotal, ref shortageTotal);
-            }
+            var formalEconomy = new LuoyangFormalEconomySystem();
+            formalEconomy.SupplyHouseholdBucketFromMarkets(runtime,
+                calibrationProfile.HouseholdMarketBufferDays);
+            formalEconomy.SettleHouseholdConsumption(
+                runtime, false, out var consumedTotal, out var shortageTotal);
             RecordHouseholdConsumptionFlow(runtime, consumedTotal,
                 shortageTotal);
-        }
-
-        private static void SettleHouseholdConsumption(
-            LuoyangHouseholdConsumptionState household,
-            long targetDay,
-            ref long consumedTotal,
-            ref long shortageTotal)
-        {
-            var elapsedDays = targetDay - household.LastConsumptionSettlementDay;
-            if (elapsedDays <= 0) return;
-            var demand = checked(household.DailyFoodDemandMilliunits *
-                elapsedDays);
-                var consumed = Math.Min(demand,
-                    household.FoodReserveMilliunits);
-                household.FoodReserveMilliunits -= consumed;
-                var remaining = demand - consumed;
-                consumedTotal += consumed;
-                shortageTotal += remaining;
-                household.CumulativeFoodDemandMilliunits += demand;
-                household.CumulativeFoodConsumedMilliunits += consumed;
-                household.CumulativeFoodShortageMilliunits += remaining;
-                household.FoodSecurityBasisPoints = demand <= 0
-                    ? 10_000
-                    : (int)Math.Min(10_000, consumed * 10_000 / demand);
-                household.LastAcquisitionSourceId = consumed > 0
-                    ? "household.reserve" : "acquisition.required";
-                household.AiResponseActionId = remaining <= 0
-                    ? "household.consume_and_monitor"
-                    : household.CumulativeFoodShortageMilliunits > demand * 7
-                        ? "household.seek_relief_or_migration"
-                        : "household.seek_market_or_relief";
-            household.LastConsumptionSettlementDay = targetDay;
         }
 
         private static void SettleAllHouseholdConsumption(
             Luoyang184LivingWorldRuntimeState runtime)
         {
-            long consumed = 0;
-            long shortage = 0;
-            foreach (var household in runtime.Households)
-                SettleHouseholdConsumption(household, runtime.AbsoluteDay,
-                    ref consumed, ref shortage);
+            new LuoyangFormalEconomySystem().SettleHouseholdConsumption(
+                runtime, true, out var consumed, out var shortage);
             RecordHouseholdConsumptionFlow(runtime, consumed, shortage);
         }
 
@@ -1556,12 +1725,14 @@ namespace Mandate.Simulation
         {
             var sourceFacility = source.Facilities.FirstOrDefault(item =>
                 item.FacilityId == facilityId);
+            var calibrationScale = calibrationProfile
+                .FoodStorageCapacityUnitScale;
             var capacity = sourceFacility == null
                 ? Math.Max(1_000_000L, runtime.Inventories.Where(item =>
                     item.FacilityId == facilityId).Sum(item =>
                     item.CapacityMilliunits))
                 : checked(Math.Max(0, sourceFacility.StorageCapacity) *
-                    MilliunitsPerUnit);
+                    MilliunitsPerUnit * calibrationScale);
             var used = runtime.Inventories.Where(item =>
                 item.FacilityId == facilityId).Sum(item => item.QuantityMilliunits);
             return Math.Max(0, capacity - used);

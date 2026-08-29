@@ -1,0 +1,20 @@
+{
+  "schema": "mandate.luoyang.opening-stock-audit.v1",
+  "calibration_profile_id": "calibration.luoyang.normal_supply.v1",
+  "daily_food_demand_milliunits": 634226370,
+  "configured_reserve_days": 210,
+  "formal_opening_food_milliunits": 133187537700,
+  "opening_days_of_supply": 210,
+  "measured_household_claim_milliunits": 130273689184,
+  "measured_non_household_opening_milliunits": 2913848516,
+  "configured_distribution_basis_points": {
+    "household": 9850,
+    "market": 100,
+    "public": 50
+  },
+  "authority_transaction": "OpeningBalance",
+  "authority_note": "Opening stock is one formal physical balance. Compact household and inventory values are projections only.",
+  "control_without_calibration_milliunits": 930970000,
+  "control_days_of_supply": 1,
+  "status": "PASS"
+}

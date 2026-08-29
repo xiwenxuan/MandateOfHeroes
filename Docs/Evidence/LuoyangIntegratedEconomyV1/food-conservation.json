@@ -1,0 +1,12 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_dispatch_loss_receipt_consumption",
+  "acceptance_status": "PARTIAL",
+  "scope": "separate_formal_and_compact_auditors",
+  "formal_consumed_quantity": 1,
+  "formal_difference": 0,
+  "compact_30d_difference_milliunits": 0,
+  "unified_authority_audited": false,
+  "blocking_reason": "Both ledgers balance independently; no audit proves one shared inventory authority across the actual Luoyang economy.",
+  "test": "IntegratedFoodConservationTests_DispatchLossReceiptAndConsumptionBalance"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_player_dispatch_replay",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "identical_runs": 3,
+  "total_runs": 3,
+  "actual_700k_joint_replay": false,
+  "blocking_reason": "The formal vertical slice is deterministic 3/3, but no unified actual Luoyang economy replay exists.",
+  "test": "IntegratedSupplyReplayTests_ThreeFormalRunsAreByteIdentical"
+}

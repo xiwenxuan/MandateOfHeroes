@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang.compact-projection-consistency.v1",
+  "authority": "authority.luoyang.formal_product_batch.v1",
+  "direction": "FormalToCompactOnly",
+  "checkpoints_days": [0, 1, 7, 15, 30, 365],
+  "maximum_projection_difference_milliunits": 0,
+  "household_claim_difference_milliunits": 0,
+  "unknown_physical_delta_count": 0,
+  "compact_physical_mutation_count": 0,
+  "reverse_projection_write_count": 0,
+  "rebuild_preserves_authority_hash": true,
+  "status": "PASS"
+}

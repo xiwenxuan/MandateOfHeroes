@@ -1,0 +1,12 @@
+{
+  "schema": "mandate.luoyang.freight-capacity-audit.v1",
+  "supplier_storage_capacity_scale": 24,
+  "external_production_scale": 24,
+  "one_year_dispatched_milliunits": 26000000,
+  "one_year_delivered_milliunits": 25048643,
+  "one_year_transport_loss_milliunits": 458822,
+  "one_year_in_transit_milliunits": 492535,
+  "conservation_equation": "26000000 = 25048643 + 458822 + 492535",
+  "mobile_authority": "Undelivered cargo remains in a formal freight InventoryContainer and ProductBatch; compact shipment cargo is projection only.",
+  "status": "PASS"
+}

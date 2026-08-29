@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_road_block_reroute",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "movement_capability": "pack_animal",
+  "route_revision": 1,
+  "remaining_cargo_after_reroute": 12,
+  "food_conservation_difference": 0,
+  "multi_gate_network_choice_proven": false,
+  "bridge_shock_proven": false,
+  "blocking_reason": "Road reroute conserves cargo, while network-level multi-Gate choice and Bridge shock remain outside the demonstrated fixture.",
+  "test": "RoadBlockSupplyTests_PackAnimalReroutesWithoutDuplicatingCargo"
+}

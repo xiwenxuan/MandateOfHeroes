@@ -38,6 +38,9 @@ namespace Mandate.Persistence
                     nameof(generationDirectory));
             var root = Path.GetFullPath(generationDirectory);
             Directory.CreateDirectory(root);
+            if (runtime.FormalEconomy != null &&
+                runtime.FormalEconomy.IsPhysicalAuthority)
+                LuoyangFormalEconomyDomain.RebuildProjection(runtime);
             var checkpoint = Path.Combine(root, CheckpointFileName);
             var temporary = checkpoint + ".tmp";
             if (File.Exists(temporary)) File.Delete(temporary);
@@ -62,7 +65,7 @@ namespace Mandate.Persistence
                 ComputeDeterministicStateSha256(runtime);
             var manifest = new
             {
-                schema = "mandate.luoyang-184.living-world-checkpoint.v6",
+                schema = "mandate.luoyang-184.living-world-checkpoint.v7",
                 format_version = runtime.Version,
                 source_package_id = runtime.SourcePackageId,
                 protected_package_digest = runtime.ProtectedPackageDigest,
@@ -288,6 +291,32 @@ namespace Mandate.Persistence
                 runtime.CurrentLocalPopulation = runtime.Workforce.Count;
                 runtime.Version = 6;
             }
+            if (runtime.Version == 6)
+            {
+                LuoyangFormalEconomyDomain.ActivateFromCompact(runtime,
+                    "v6-to-v7 explicit compact closing-balance " +
+                    "formalization; compact food fields are projections after " +
+                    "this transaction.");
+                runtime.Version = 7;
+            }
+            if (runtime.Version == 7)
+            {
+                if (runtime.FormalEconomy == null ||
+                    !runtime.FormalEconomy.IsPhysicalAuthority)
+                    throw new InvalidDataException(
+                        "V7 checkpoint has no formal economy authority.");
+                var householdHash =
+                    LuoyangFormalEconomyDomain.ComputeHouseholdOrderHash(
+                        runtime);
+                if (!string.IsNullOrWhiteSpace(
+                        runtime.FormalEconomy.HouseholdOrderHash) &&
+                    runtime.FormalEconomy.HouseholdOrderHash != householdHash)
+                    throw new InvalidDataException(
+                        "V7 formal household claim order does not match the " +
+                        "checkpoint household order.");
+                runtime.FormalEconomy.HouseholdOrderHash = householdHash;
+                LuoyangFormalEconomyDomain.RebuildProjection(runtime);
+            }
             return runtime;
         }
 
@@ -344,6 +373,15 @@ namespace Mandate.Persistence
                         typeof(Luoyang184LivingWorldRuntimeState) &&
                     member.Name == nameof(
                         Luoyang184LivingWorldRuntimeState.Performance))
+                    property.Ignored = true;
+                if (member.DeclaringType ==
+                        typeof(LuoyangFormalEconomyRuntimeState) &&
+                    (member.Name == nameof(LuoyangFormalEconomyRuntimeState
+                         .ProjectionRebuildCount) ||
+                     member.Name == nameof(LuoyangFormalEconomyRuntimeState
+                         .ProjectionRebuildMilliseconds) ||
+                     member.Name == nameof(LuoyangFormalEconomyRuntimeState
+                         .PeakManagedMemoryBytes)))
                     property.Ignored = true;
                 return property;
             }

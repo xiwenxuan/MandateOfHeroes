@@ -1,0 +1,30 @@
+{
+  "schema": "mandate.luoyang.economy-authority-unit-tests.v1",
+  "generated_at": "2026-08-30T03:13:00+08:00",
+  "source_fingerprint": "3FC748C4BB63B88D8A0BB3F48F38C8D9C29A62FED7536689253277607D350BCD",
+  "required_families": 14,
+  "status": "PASS",
+  "ordinary_timeout_seconds": 300,
+  "classified_one_year_timeout_seconds": 900,
+  "tests": [
+    "EconomyAuthorityMatrixTests",
+    "CompactFormalDoubleWriteTests",
+    "CompactFormalDoubleConsumptionTests",
+    "FormalHarvestAuthorityTests",
+    "FormalConsumptionAuthorityTests",
+    "FormalMarketAuthorityTests",
+    "FormalFreightAuthorityTests",
+    "CompactProjectionConsistencyTests",
+    "CompactProjectionRebuildTests",
+    "FormalEconomySaveLoadAuthorityTests",
+    "FormalEconomyReplayTests",
+    "Luoyang700kNormalSupplyBaselineTests",
+    "Luoyang700kOneYearEconomyTests",
+    "LuoyangEconomyAuthorityPerformanceTests"
+  ],
+  "evidence": {
+    "full_aggregate": "tmp/core-test-groups/luoyang-authority-v1-final5/aggregate.json",
+    "one_year": "tmp/core-test-groups/luoyang-authority-v1-final5/group-12/core-tests-group-12-chunk-9-20260830-025320-578.out.log",
+    "full_manifest": "tmp/core-test-groups/luoyang-authority-v1-final5/manifest.json"
+  }
+}

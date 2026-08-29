@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_supply_projection_round_trip",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "incoming_before": 20,
+  "incoming_after": 20,
+  "active_freights_before": 1,
+  "active_freights_after": 1,
+  "price_digest_equal": true,
+  "continuous_vs_resume_joint_hash_equal": false,
+  "blocking_reason": "Formal projection/freight round-trip passes, but the requested full joint continuous-versus-resume world comparison is absent.",
+  "test": "IntegratedSupplySaveLoadTests_ProjectionAndFreightRoundTrip"
+}

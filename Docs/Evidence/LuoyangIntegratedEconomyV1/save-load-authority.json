@@ -1,0 +1,11 @@
+{
+  "schema": "mandate.luoyang.formal-economy-save-load-authority.v1",
+  "derived_runtime_format_before": 6,
+  "derived_runtime_format_after": 7,
+  "migration": "V6 compact food is formalized once into OpeningBalance ProductBatch and InventoryTransaction records; V7 loads formal authority and rebuilds projections.",
+  "stale_projection_is_overwritten_on_save_load": true,
+  "authority_hash_round_trip_equal": true,
+  "deterministic_hash_excludes_performance_telemetry": true,
+  "projection_difference_milliunits": 0,
+  "status": "PASS"
+}

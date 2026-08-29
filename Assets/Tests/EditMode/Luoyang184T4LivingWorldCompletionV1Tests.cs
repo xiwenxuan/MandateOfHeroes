@@ -362,9 +362,26 @@ namespace Mandate.Tests
             Assert.That(runtime.ExternalSuppliers.Any(item =>
                 item.CumulativeSalesRevenue > 0), Is.True,
                 "merchant revenue");
+            var governmentDiagnostic = "purchase=" +
+                runtime.GovernmentEconomy.PurchaseExpense + ";relief=" +
+                runtime.GovernmentEconomy.ReliefExpense + ";treasury=" +
+                runtime.GovernmentEconomy.Treasury + ";tax=" +
+                runtime.GovernmentEconomy.TaxRevenue + ";market_food=" +
+                runtime.Inventories.Where(item =>
+                        item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                        LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                    .Sum(item => item.QuantityMilliunits) + ";military_food=" +
+                runtime.Inventories.Where(item =>
+                        item.OwnerKind == LuoyangInventoryOwnerKind.Military &&
+                        LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                    .Sum(item => item.QuantityMilliunits) +
+                ";household_wealth=" + runtime.Households.Sum(item =>
+                    item.Wealth);
+            Console.WriteLine("T4_GOVERNMENT_EXPENDITURE " +
+                governmentDiagnostic);
             Assert.That(runtime.GovernmentEconomy.PurchaseExpense > 0 ||
                 runtime.GovernmentEconomy.ReliefExpense > 0, Is.True,
-                "government expenditure");
+                "government expenditure; " + governmentDiagnostic);
             Assert.That(runtime.ConstructionProjects, Is.Not.Empty,
                 "settlement construction project");
             Assert.That(runtime.ConstructionProjects.All(item =>
@@ -598,9 +615,25 @@ namespace Mandate.Tests
                 Is.GreaterThan(0));
 
             LuoyangLivingWorldTestFixture.System.AdvanceTo(runtime, 30);
+            var playerTradeMarket = runtime.Inventories.Where(item =>
+                    item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                .OrderBy(item => item.Id, StringComparer.Ordinal).First();
+            var seededPlayerTradeStock = new LuoyangFormalEconomySystem()
+                .Produce(runtime, playerTradeMarket.Id,
+                    playerTradeMarket.ProductId, 1_000,
+                    InventoryTransactionType.OpeningBalance,
+                    "test.player_trade.formal_opening_lot");
+            Assert.That(seededPlayerTradeStock, Is.EqualTo(1_000));
             var trade = service.Execute(runtime, unemployed.PersonOrdinal,
                 LuoyangPlayerCommandTypeIds.Trade);
-            Assert.That(trade.StatusId, Is.EqualTo("completed"));
+            Assert.That(trade.StatusId, Is.EqualTo("completed"),
+                trade.ResultId + ";wealth=" + runtime.Households[
+                    (int)unemployed.HouseholdOrdinal].Wealth +
+                ";market_food=" + runtime.Inventories.Where(item =>
+                        item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                        LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                    .Sum(item => item.QuantityMilliunits));
             Assert.That(runtime.MarketTrades.Any(item =>
                 item.Id == trade.ResultId), Is.True);
 
@@ -682,7 +715,7 @@ namespace Mandate.Tests
         }
 
         [Test]
-        public void LuoyangT4_V5CheckpointMigratesLocationAndTransitContractToV6()
+        public void LuoyangT4_V5CheckpointMigratesLocationAndTransitContractToCurrentVersion()
         {
             var runtime = LuoyangLivingWorldTestFixture.NewRuntime();
             runtime.Version = 5;
@@ -700,7 +733,8 @@ namespace Mandate.Tests
                 var store = new Luoyang184LivingWorldCheckpointStore();
                 var saved = store.Save(runtime, directory);
                 var loaded = store.Load(saved.CheckpointPath);
-                Assert.That(loaded.Version, Is.EqualTo(6));
+                Assert.That(loaded.Version, Is.EqualTo(
+                    Luoyang184LivingWorldRuntimeState.FormatVersion));
                 Assert.That(loaded.Workforce.Take(2).All(item =>
                     item.CurrentLocationId == "location.capital.luoyang"), Is.True);
                 Assert.That(loaded.GovernmentEconomy.CurrentLocationId,

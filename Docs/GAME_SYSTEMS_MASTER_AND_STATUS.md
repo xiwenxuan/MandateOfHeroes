@@ -2345,3 +2345,29 @@ Save/Load、3次Replay和食品守恒均通过。70万人真实家庭日需求�
 6.698ms；性能结论为`ACCEPTABLE FOR V1`。因此当前正式状态更新为
 `TASK_LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_ACCEPTED`。全局下一任务固定为
 “洛阳城市供给—市场—家庭消费联合压力与可玩性验收V1”；该下一任务尚未实现。
+
+## 49. 70万人经济权威统一、正式库存接管与正常供应标定 V1（2026-08-30）
+
+当前报告见
+[`LUOYANG_700K_ECONOMY_AUTHORITY_UNIFICATION_AND_NORMAL_SUPPLY_CALIBRATION_V1_ACCEPTANCE_REPORT.md`](LUOYANG_700K_ECONOMY_AUTHORITY_UNIFICATION_AND_NORMAL_SUPPLY_CALIBRATION_V1_ACCEPTANCE_REPORT.md)。
+世界Save保持V78，洛阳派生Checkpoint由v6顺序迁移为v7。70万人食品物理权威已经统一为正式
+`ProductBatchState + InventoryTransactionState`；开局、收获、家庭消费、税粮、市场、军粮采购、
+民运、损耗和短缺均由同一批次账结算。紧凑食品字段降级为Formal→Compact单向Projection/Cache/
+Index，可确定性重建且不得反向创造或销毁食品；批次按产品/容器/来源窗口聚合，没有逐人逐餐对象爆炸。
+
+版本化正常供应参数按Authority、需求、开局储备、农业周期、仓储、运力和市场可达性顺序标定，失败
+候选完整保留。700,000人、142,980户的30日基线需求19,026,791,100 milliunits，消费全额满足、
+短缺0、期末120,819,691,306（190日供给）；开局30日不加速收获。365日农业正式贡献
+129,170,460,000，消费228,870,983,496，累计短缺2,621,641,554，期末56,456,320,382（89日
+供给），正式食品差额0；市场与民运持续运行。
+
+冻结源码指纹完整Core为836/836、失败0；上一22项联合场景与受影响AI 5项均通过。30日模拟4,677ms，
+1年55,511ms，峰值托管内存220,594,960 bytes，年末6,184批次/7,222事务，性能为
+`ACCEPTABLE FOR V1`。唯一Unity EditMode环境探针在60秒内没有生成启动日志，安全脚本仅终止本次
+PID且未重试；按任务书作为环境缺口，不否定Domain/Simulation/Persistence业务门禁。
+
+当前正式状态为
+`TASK_LUOYANG_700K_ECONOMY_AUTHORITY_UNIFICATION_AND_NORMAL_SUPPLY_CALIBRATION_V1_ACCEPTED`。
+上一“洛阳城市供给—市场—家庭消费联合压力与可玩性验收V1”报告继续保持`NOT ACCEPTED`。下一任务
+固定回到该联合任务做Final Remediation / Re-acceptance，补Gate/Road/Production/Carrier/Storage、
+政府采购与赈济、玩家Supply Card和商旅介入、Save/Load、Replay及Unity证据，不再重建经济底层。

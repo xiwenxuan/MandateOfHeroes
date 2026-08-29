@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_destination_storage_bottleneck",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "dispatched_quantity": 1000,
+  "delivered_quantity": 994,
+  "natural_loss_quantity": 6,
+  "remaining_quantity_after_capacity_recovery": 0,
+  "food_conservation_difference": 0,
+  "blocking_reason": "Capacity wait and idempotent receipt are proven, but not at actual Luoyang scale.",
+  "test": "StorageBottleneckSupplyTests_WaitsThenReceivesRemainingCargoOnce"
+}

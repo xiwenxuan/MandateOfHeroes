@@ -544,13 +544,16 @@ namespace Mandate.Simulation
             {
                 return;
             }
-            var governance = world.CountyGovernances.Find(item =>
-                item.CountyLocationId == family.LocationId);
+            var governance = FindGovernanceForLocation(
+                world, family.LocationId);
             var storage = world.Facilities.Find(item =>
                 item.SettlementId == family.LocationId &&
                 (item.OwnerId == family.Id || item.ControllerId == family.Id));
             if (governance != null && storage != null && family.Wealth > 0)
             {
+                var productId = CoreProductionContent.WheatGrainProductId;
+                var quote = FormalCountyMarketSystem.BuildQuote(
+                    world, governance.Id, productId);
                 var quantity = Math.Max(1L, Math.Min(30L, family.Wealth / 100L));
                 var buy = NewAction(
                     agent, context, WorldActionTypeIds.CreateMarketBuyOrder,
@@ -560,9 +563,10 @@ namespace Mandate.Simulation
                 buy.CostBasisPoints = 2_000;
                 AddArg(buy, "county_governance_id", governance.Id);
                 AddArg(buy, "storage_facility_id", storage.Id);
-                AddArg(buy, "product_definition_id", "product.wheat_grain");
+                AddArg(buy, "product_definition_id", productId);
                 AddArg(buy, "quantity", quantity.ToString());
-                AddArg(buy, "maximum_unit_price", "100");
+                AddArg(buy, "maximum_unit_price",
+                    quote.SuggestedBuyMaximumUnitPrice.ToString());
                 AddArg(buy, "minimum_quality_basis_points", "0");
                 AddArg(buy, "time_days", "1");
                 candidates.Add(buy);
@@ -666,7 +670,10 @@ namespace Mandate.Simulation
                 AddArg(sale, "storage_facility_id", batches[i].StorageFacilityId);
                 AddArg(sale, "product_definition_id", batches[i].ProductDefinitionId);
                 AddArg(sale, "quantity", quantity.ToString());
-                AddArg(sale, "minimum_unit_price", "100");
+                var quote = FormalCountyMarketSystem.BuildQuote(
+                    world, governance.Id, batches[i].ProductDefinitionId);
+                AddArg(sale, "minimum_unit_price",
+                    quote.SuggestedSellMinimumUnitPrice.ToString());
                 AddArg(sale, "minimum_quality_basis_points", "0");
                 AddArg(sale, "time_days", "1");
                 candidates.Add(sale);
@@ -693,8 +700,12 @@ namespace Mandate.Simulation
             purchase.CostBasisPoints = 4_000;
             AddArg(purchase, "county_governance_id", governance.Id);
             AddArg(purchase, "quantity", "100");
-            AddArg(purchase, "maximum_unit_price", "100");
-            AddArg(purchase, "product_definition_id", "product.wheat_grain");
+            var productId = CoreProductionContent.WheatGrainProductId;
+            var quote = FormalCountyMarketSystem.BuildQuote(
+                world, governance.Id, productId);
+            AddArg(purchase, "maximum_unit_price",
+                quote.SuggestedBuyMaximumUnitPrice.ToString());
+            AddArg(purchase, "product_definition_id", productId);
             AddArg(purchase, "time_days", "1");
             candidates.Add(purchase);
         }
@@ -757,6 +768,20 @@ namespace Mandate.Simulation
             AddArg(build, "money_cost", "0");
             AddArg(build, "time_days", "90");
             candidates.Add(build);
+        }
+
+        private static CountyGovernanceState FindGovernanceForLocation(
+            WorldState world,
+            string locationId)
+        {
+            var direct = world.CountyGovernances.Find(item =>
+                item.CountyLocationId == locationId);
+            if (direct != null) return direct;
+            var location = world.Locations.Find(item => item.Id == locationId);
+            return location == null
+                ? null
+                : world.CountyGovernances.Find(item =>
+                    item.CountyLocationId == location.ParentLocationId);
         }
 
         private static WorldActionIntent NewAction(

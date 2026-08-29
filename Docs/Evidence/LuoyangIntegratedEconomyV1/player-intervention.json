@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_player_carrier_dispatch",
+  "acceptance_status": "FAIL",
+  "scope": "service_level_small_formal_fixture",
+  "player_person_id": "person.freight_carrier",
+  "freight_id": "civilian_freight.0.000000",
+  "quantity": 20,
+  "unit_price": 2,
+  "freight_fee": 100,
+  "internal_cash_net": 0,
+  "food_conservation_difference": 0,
+  "ordinary_player_ui_present": false,
+  "actual_700k_world_changed": false,
+  "blocking_reason": "The thin service uses the formal player Person and freight chain, but no ordinary Luoyang UI invokes it and it does not change the compact 700k economy.",
+  "test": "PlayerMerchantWorldImpactTests_PlayerDispatchUsesFormalMarketAndFreight"
+}

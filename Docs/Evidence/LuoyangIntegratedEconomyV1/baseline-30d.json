@@ -1,0 +1,19 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "normal_supply_30d",
+  "acceptance_status": "FAIL",
+  "scope": "700k_compact_runtime_plus_separate_formal_freight_fixture",
+  "world_days": 30,
+  "permanent_persons": 700000,
+  "households": 142980,
+  "closing_food_stock_milliunits": 13721,
+  "cumulative_food_consumed_milliunits": 2867299,
+  "cumulative_food_shortage_milliunits": 19023923801,
+  "shortfall_households": 142980,
+  "compact_food_conservation_difference_milliunits": 0,
+  "separate_formal_fixture_difference": 0,
+  "daily_required_series_present": false,
+  "blocking_reason": "The 700k runtime and formal ProductBatch/Market/Freight world are separate authorities, every household is short at day 30, and the required daily joint series is absent.",
+  "test": "LuoyangIntegratedSupplyBaselineTests_ThirtyDayScaleAndFormalChainRemainConservative",
+  "source_log": "tmp/skill-verification/core-tests-20260829-194056-635.out.log"
+}

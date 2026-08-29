@@ -15,6 +15,9 @@ namespace Mandate.Simulation
         public const int DaysPerYear = 360;
         public const long Year189Day = 5 * DaysPerYear;
         public const long Year190Day = 6 * DaysPerYear;
+        private const long MarketTradingLotReserveMilliunits = 1_000;
+        private static readonly LuoyangFormalEconomySystem FormalEconomy =
+            new LuoyangFormalEconomySystem();
 
         public void Initialize(Luoyang184LivingWorldRuntimeState runtime)
         {
@@ -397,19 +400,10 @@ namespace Mandate.Simulation
             var granary = runtime.Inventories.Find(item =>
                 item.Id == runtime.GovernmentEconomy.GranaryInventoryId);
             if (granary == null) return;
-            long total = 0;
-            foreach (var household in runtime.Households)
-            {
-                var due = Math.Min(household.FoodReserveMilliunits,
-                    Math.Max(0L, (household.FoodReserveMilliunits + 99) / 100));
-                var capacity = granary.CapacityMilliunits -
-                    granary.QuantityMilliunits;
-                var paid = Math.Min(due, capacity);
-                if (paid <= 0) continue;
-                household.FoodReserveMilliunits -= paid;
-                granary.QuantityMilliunits += paid;
-                total += paid;
-            }
+            long total = FormalEconomy.CollectHouseholdTax(runtime, granary.Id,
+                Math.Max(0L, granary.CapacityMilliunits -
+                             granary.QuantityMilliunits),
+                "government.tax.inkind.household_to_granary." + taxDay);
             if (granary.QuantityMilliunits < granary.CapacityMilliunits)
             {
                 foreach (var source in runtime.Inventories.Where(item =>
@@ -424,9 +418,12 @@ namespace Mandate.Simulation
                     var paid = Math.Min(due,
                         granary.CapacityMilliunits - granary.QuantityMilliunits);
                     if (paid <= 0) continue;
-                    source.QuantityMilliunits -= paid;
-                    granary.QuantityMilliunits += paid;
-                    total += paid;
+                    var transferred = FormalEconomy.Transfer(runtime, source.Id,
+                        granary.Id, source.ProductId, paid,
+                        InventoryTransactionType.FoodTaxTransferred,
+                        "government.tax.inkind.market_to_granary." + taxDay +
+                        "." + source.Id);
+                    total += transferred;
                     if (granary.QuantityMilliunits >= granary.CapacityMilliunits)
                         break;
                 }
@@ -455,7 +452,15 @@ namespace Mandate.Simulation
             });
         }
 
-        private static void SettleMilitary(Luoyang184LivingWorldRuntimeState runtime)
+        public void ProcureMilitaryFood(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            ProcureMilitaryFood(runtime, true);
+        }
+
+        private void ProcureMilitaryFood(
+            Luoyang184LivingWorldRuntimeState runtime,
+            bool dailyCadence)
         {
             foreach (var force in runtime.Forces)
             {
@@ -463,18 +468,36 @@ namespace Mandate.Simulation
                     force.InventoryIds.Contains(item.Id) &&
                     item.ProductId == "product.food.dry_ration");
                 var demand = force.PermanentPersonCount * 30L;
-                var needed = Math.Max(0, demand - (food?.QuantityMilliunits ?? 0));
+                var foodAvailable = food == null ? 0 :
+                    LuoyangFormalEconomySystem.GetAvailableQuantity(runtime,
+                        food.Id);
+                var needed = Math.Max(0, demand - foodAvailable);
                 if (needed > 0 && food != null)
                 {
                     var market = runtime.Inventories.Where(item =>
                             item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
                             (item.ProductId.IndexOf("food", StringComparison.Ordinal) >= 0 ||
                              item.ProductId.IndexOf("grain", StringComparison.Ordinal) >= 0) &&
-                            item.QuantityMilliunits > 0)
+                            item.QuantityMilliunits >
+                            MarketTradingLotReserveMilliunits)
                         .OrderBy(item => item.Id, StringComparer.Ordinal).FirstOrDefault();
                     if (market != null)
                     {
-                        var moved = Math.Min(needed, market.QuantityMilliunits);
+                        var purchasable = Math.Max(0,
+                            LuoyangFormalEconomySystem.GetAvailableQuantity(
+                                runtime, market.Id, market.ProductId) -
+                            MarketTradingLotReserveMilliunits);
+                        var moved = Math.Min(needed, purchasable);
+                        if (dailyCadence)
+                        {
+                            // Daily procurement smooths government demand without
+                            // letting the garrison pre-empt an entire month's
+                            // market stock before households and player trades can
+                            // settle.  The month-end settlement below may buy the
+                            // remaining formal requirement before consumption.
+                            var dailyDemand = checked((demand + 29) / 30);
+                            moved = Math.Min(moved, dailyDemand);
+                        }
                         var marketState = runtime.Markets.Find(item =>
                             item.ProductId == market.ProductId);
                         var unitPrice = Math.Max(1L,
@@ -483,9 +506,13 @@ namespace Mandate.Simulation
                             10_000L);
                         moved = Math.Min(moved,
                             runtime.GovernmentEconomy.Treasury * 1_000 / unitPrice);
+                        moved = FormalEconomy.Transfer(runtime, market.Id,
+                            food.Id, market.ProductId, moved,
+                            InventoryTransactionType.FoodMarketTransferred,
+                            "military.procurement.local_batch." +
+                            runtime.AbsoluteDay + "." + force.Id);
+                        if (moved <= 0) continue;
                         var cost = checked((moved * unitPrice + 999) / 1_000);
-                        market.QuantityMilliunits -= moved;
-                        food.QuantityMilliunits += moved;
                         runtime.GovernmentEconomy.Treasury -= cost;
                         runtime.GovernmentEconomy.PurchaseExpense += cost;
                         if (marketState != null) marketState.CashBalance += cost;
@@ -501,8 +528,24 @@ namespace Mandate.Simulation
                         });
                     }
                 }
-                var consumed = Math.Min(food?.QuantityMilliunits ?? 0, demand);
-                if (food != null) food.QuantityMilliunits -= consumed;
+            }
+        }
+
+        private void SettleMilitary(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            ProcureMilitaryFood(runtime, false);
+            foreach (var force in runtime.Forces)
+            {
+                var food = runtime.Inventories.Find(item =>
+                    force.InventoryIds.Contains(item.Id) &&
+                    item.ProductId == "product.food.dry_ration");
+                var demand = force.PermanentPersonCount * 30L;
+                var consumed = food == null ? 0 :
+                    FormalEconomy.ConsumeInventory(runtime, food.Id, null,
+                        demand, InventoryTransactionType.FoodConsumed,
+                        "military.food_consumption." + runtime.AbsoluteDay +
+                        "." + force.Id);
                 force.FoodConsumedMilliunits += consumed;
                 force.DefenseBasisPoints = consumed < demand ?
                     Math.Max(0, force.DefenseBasisPoints - 100) :

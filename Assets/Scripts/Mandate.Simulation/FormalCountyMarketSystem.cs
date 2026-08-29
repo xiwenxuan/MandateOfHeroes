@@ -4,6 +4,26 @@ using Mandate.Domain;
 
 namespace Mandate.Simulation
 {
+    public sealed class FormalMarketQuote
+    {
+        public string CountyGovernanceId;
+        public string ProductDefinitionId;
+        public long EquilibriumUnitPrice;
+        public long LastTradeUnitPrice;
+        public long ReferenceUnitPrice;
+        public long SuggestedSellMinimumUnitPrice;
+        public long SuggestedBuyMaximumUnitPrice;
+        public long AvailableUnreservedStock;
+        public long ActiveSellSupply;
+        public long ActiveBuyDemand;
+        public long IncomingFreightQuantity;
+        public int BlockedInboundFreightCount;
+        public int HouseholdShortfallCount;
+        public long RecentTradeQuantity;
+        public int PressureBasisPoints;
+        public List<string> ExplanationFactorIds = new List<string>();
+    }
+
     public sealed class FormalCountyMarketSystem
     {
         private readonly ProductionContentRegistry _content;
@@ -332,6 +352,172 @@ namespace Mandate.Simulation
             return equilibrium == 0
                 ? 10_000
                 : (int)Math.Min(40_000L, current * 10_000L / equilibrium);
+        }
+
+        /// <summary>
+        /// Builds a read-only quote from the formal order book, physical
+        /// ProductBatch stock, household shortfalls, recent trades and inbound
+        /// freight. The quote never changes a market price; only a committed
+        /// formal trade may update FormalMarketPriceState.
+        /// </summary>
+        public static FormalMarketQuote BuildQuote(
+            WorldState world,
+            string countyGovernanceId,
+            string productDefinitionId)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            _ = new StableId(countyGovernanceId);
+            _ = new StableId(productDefinitionId);
+            var governance = world.CountyGovernances.Find(item =>
+                item.Id == countyGovernanceId) ??
+                throw new InvalidOperationException(
+                    "The market quote county governance does not exist.");
+            var location = world.Locations.Find(item => item.Id ==
+                governance.CountyLocationId) ??
+                throw new InvalidOperationException(
+                    "The market quote county location does not exist.");
+            var price = world.FormalMarketPrices.Find(item =>
+                item.CountyGovernanceId == countyGovernanceId &&
+                item.ProductDefinitionId == productDefinitionId);
+            var equilibrium = Math.Max(
+                1L, price?.EquilibriumUnitPrice ?? location.GrainPrice);
+            var lastTrade = Math.Max(
+                1L, price?.LastTradeUnitPrice ?? equilibrium);
+            var result = new FormalMarketQuote
+            {
+                CountyGovernanceId = countyGovernanceId,
+                ProductDefinitionId = productDefinitionId,
+                EquilibriumUnitPrice = equilibrium,
+                LastTradeUnitPrice = lastTrade
+            };
+
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch == null || batch.ProductDefinitionId !=
+                        productDefinitionId || batch.Quantity <=
+                        batch.ReservedQuantity ||
+                    string.IsNullOrEmpty(batch.OwnerFamilyId)) continue;
+                var family = world.Families.Find(item => item.Id ==
+                    batch.OwnerFamilyId);
+                if (family != null && FamilyBelongsToCounty(
+                        world, family, governance.CountyLocationId))
+                    result.AvailableUnreservedStock = checked(
+                        result.AvailableUnreservedStock + batch.Quantity -
+                        batch.ReservedQuantity);
+            }
+            for (var i = 0; i < world.FormalMarketOrders.Count; i++)
+            {
+                var order = world.FormalMarketOrders[i];
+                if (order == null || order.CountyGovernanceId !=
+                        countyGovernanceId ||
+                    order.ProductDefinitionId != productDefinitionId ||
+                    order.Status != FormalMarketOrderStatus.Active) continue;
+                if (order.Side == FormalMarketOrderSide.Buy)
+                    result.ActiveBuyDemand = checked(
+                        result.ActiveBuyDemand + order.RemainingQuantity);
+                else
+                    result.ActiveSellSupply = checked(
+                        result.ActiveSellSupply + order.RemainingQuantity);
+            }
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                if (freight == null || freight.Status ==
+                        CivilianFreightStatus.Completed ||
+                    freight.DestinationCountyGovernanceId !=
+                        countyGovernanceId ||
+                    freight.ProductDefinitionId != productDefinitionId)
+                    continue;
+                result.IncomingFreightQuantity = checked(
+                    result.IncomingFreightQuantity +
+                    freight.RemainingCargoQuantity);
+                if (freight.CellRouteWaiting)
+                    result.BlockedInboundFreightCount++;
+            }
+            for (var i = 0; i < world.Families.Count; i++)
+            {
+                var family = world.Families[i];
+                if (family != null && family.FoodSecurityBasisPoints <
+                        10_000 && FamilyBelongsToCounty(
+                            world, family, governance.CountyLocationId))
+                    result.HouseholdShortfallCount++;
+            }
+            for (var i = 0; i < world.FormalMarketTrades.Count; i++)
+            {
+                var trade = world.FormalMarketTrades[i];
+                if (trade != null && trade.CountyGovernanceId ==
+                        countyGovernanceId &&
+                    trade.ProductDefinitionId == productDefinitionId &&
+                    trade.Day >= world.AbsoluteDay - 30)
+                    result.RecentTradeQuantity = checked(
+                        result.RecentTradeQuantity + trade.Quantity);
+            }
+
+            var demand = checked(result.ActiveBuyDemand +
+                (long)result.HouseholdShortfallCount * 3L);
+            var outstandingSupply = checked(
+                result.AvailableUnreservedStock +
+                result.ActiveSellSupply + result.IncomingFreightQuantity);
+            var shortage = Math.Max(0L, demand - outstandingSupply);
+            var shortagePressure = shortage == 0
+                ? 0
+                : outstandingSupply == 0
+                    ? 10_000
+                    : RatioBasisPoints(shortage, outstandingSupply, 10_000);
+            var householdPressure = Math.Min(
+                5_000, result.HouseholdShortfallCount * 250);
+            var transportPressure = Math.Min(
+                5_000, result.BlockedInboundFreightCount * 500);
+            result.PressureBasisPoints = Math.Min(
+                30_000,
+                checked(10_000 + shortagePressure + householdPressure +
+                    transportPressure));
+            var anchor = checked((long)Math.Max(
+                1m,
+                ((decimal)equilibrium * 3m + lastTrade) / 4m));
+            result.ReferenceUnitPrice = checked((long)Math.Max(
+                1m,
+                (decimal)anchor * result.PressureBasisPoints / 10_000m));
+            result.SuggestedSellMinimumUnitPrice =
+                result.ReferenceUnitPrice;
+            result.SuggestedBuyMaximumUnitPrice = checked((long)Math.Max(
+                result.ReferenceUnitPrice,
+                (decimal)result.ReferenceUnitPrice * 10_500m / 10_000m));
+            result.ExplanationFactorIds.Add("formal.available-stock");
+            result.ExplanationFactorIds.Add("formal.active-order-demand");
+            result.ExplanationFactorIds.Add("formal.incoming-freight");
+            result.ExplanationFactorIds.Add("formal.recent-trades");
+            if (result.HouseholdShortfallCount > 0)
+                result.ExplanationFactorIds.Add(
+                    "formal.household-shortfall");
+            if (result.BlockedInboundFreightCount > 0)
+                result.ExplanationFactorIds.Add(
+                    "formal.transport-disruption");
+            return result;
+        }
+
+        private static int RatioBasisPoints(
+            long numerator,
+            long denominator,
+            int maximum)
+        {
+            if (numerator <= 0 || denominator <= 0) return 0;
+            return checked((int)Math.Min(
+                maximum,
+                (decimal)numerator * 10_000m / denominator));
+        }
+
+        private static bool FamilyBelongsToCounty(
+            WorldState world,
+            FamilyState family,
+            string countyLocationId)
+        {
+            if (family.LocationId == countyLocationId) return true;
+            var familyLocation = world.Locations.Find(item => item.Id ==
+                family.LocationId);
+            return familyLocation != null &&
+                familyLocation.ParentLocationId == countyLocationId;
         }
 
         private FormalMarketTradeState SettleTrade(

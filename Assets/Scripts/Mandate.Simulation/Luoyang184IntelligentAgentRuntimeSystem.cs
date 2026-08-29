@@ -542,11 +542,16 @@ namespace Mandate.Simulation
             var quantity = Math.Min(inventory.QuantityMilliunits,
                 Math.Min(affordable, desired));
             if (quantity <= 0) return false;
+            quantity = new LuoyangFormalEconomySystem().TransferToHousehold(
+                runtime, inventory.Id, agent.SubjectIndex,
+                inventory.ProductId, quantity,
+                InventoryTransactionType.FoodMarketTransferred,
+                "market.household." + runtime.AbsoluteDay + "." +
+                agent.SubjectIndex + "." + inventory.ProductId);
+            if (quantity <= 0) return false;
             var cost = checked((quantity * unitPrice + 999) / 1_000);
             household.Wealth -= cost;
             household.CumulativeMoneySpent += cost;
-            household.FoodReserveMilliunits += quantity;
-            inventory.QuantityMilliunits -= quantity;
             if (market != null)
             {
                 market.CashBalance += cost;
@@ -749,15 +754,21 @@ namespace Mandate.Simulation
                 supplier.RiskLossBasisPoints / 20_000;
             var delivered = shipped - carrier - natural - risk;
             if (delivered <= 0) return false;
-            market.CashBalance -= cost;
-            supplier.CashBalance += cost;
-            supplier.CumulativeSalesRevenue += cost;
-            supplier.InventoryQuantityMilliunits -= shipped;
-            supplier.CumulativeDispatchedMilliunits += shipped;
             var orderId = "trade_supply_order." + runtime.AbsoluteDay + "." +
                 runtime.SupplyOrders.Count.ToString("D6");
             var shipmentId = "trade_shipment." + runtime.AbsoluteDay + "." +
                 runtime.Shipments.Count.ToString("D6");
+            if (LuoyangFormalEconomySystem.IsFood(supplier.ProductId))
+                new LuoyangFormalEconomySystem().DispatchFreight(runtime,
+                    supplier.InventoryId, shipmentId, supplier.ProductId,
+                    shipped, checked(carrier + natural + risk),
+                    supplier.ManagerPersonId);
+            else
+                supplier.InventoryQuantityMilliunits -= shipped;
+            market.CashBalance -= cost;
+            supplier.CashBalance += cost;
+            supplier.CumulativeSalesRevenue += cost;
+            supplier.CumulativeDispatchedMilliunits += shipped;
             runtime.SupplyOrders.Add(new LuoyangSupplyOrderRuntimeState
             {
                 Id = orderId,
@@ -838,13 +849,19 @@ namespace Mandate.Simulation
                 governmentInventory.QuantityMilliunits);
             if (quantity <= 0) return false;
             cost = checked((quantity * unitPrice + 999) / 1_000);
+            quantity = new LuoyangFormalEconomySystem().Transfer(runtime,
+                marketInventory.Id, governmentInventory.Id,
+                marketInventory.ProductId, quantity,
+                InventoryTransactionType.FoodMarketTransferred,
+                "market.government." + runtime.AbsoluteDay + "." +
+                agent.DecisionSequence);
+            if (quantity <= 0) return false;
+            cost = checked((quantity * unitPrice + 999) / 1_000);
             runtime.GovernmentEconomy.Treasury -= cost;
             runtime.GovernmentEconomy.PurchaseExpense += cost;
             runtime.GovernmentEconomy.CurrentFoodPolicyId =
                 "government.food.procurement";
             if (market != null) market.CashBalance += cost;
-            marketInventory.QuantityMilliunits -= quantity;
-            governmentInventory.QuantityMilliunits += quantity;
             var trade = new LuoyangMarketTradeRuntimeState
             {
                 Id = "market_trade.government." + runtime.AbsoluteDay + "." +
@@ -880,8 +897,14 @@ namespace Mandate.Simulation
             if (inventory == null || household == null) return false;
             var quantity = Math.Min(inventory.QuantityMilliunits,
                 Math.Max(1_000L, household.DailyFoodDemandMilliunits * 3));
-            inventory.QuantityMilliunits -= quantity;
-            household.FoodReserveMilliunits += quantity;
+            var householdIndex = runtime.Households.IndexOf(household);
+            quantity = new LuoyangFormalEconomySystem().TransferToHousehold(
+                runtime, inventory.Id, householdIndex, inventory.ProductId,
+                quantity,
+                InventoryTransactionType.FoodCountyReliefTransferred,
+                "relief." + household.HouseholdId + "." +
+                runtime.AbsoluteDay);
+            if (quantity <= 0) return false;
             household.CumulativeReliefReceivedMilliunits += quantity;
             runtime.GovernmentEconomy.ReliefExpense += quantity / 1_000;
             runtime.GovernmentEconomy.CurrentFoodPolicyId = "government.food.relief";

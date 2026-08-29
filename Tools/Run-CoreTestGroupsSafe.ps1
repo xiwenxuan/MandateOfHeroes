@@ -23,7 +23,11 @@ $ErrorActionPreference = "Stop"
 # timeout even when the slow-test allowance is raised.
 $slowDeterminismTests = @(
     "FoodRuntime_FormalWorldIsDeterministicForOneYear",
-    "Simulation_SaveResumeMatchesContinuousRun"
+    "Simulation_SaveResumeMatchesContinuousRun",
+    # Full 700k-person, 365-day integrated economy simulation. It was measured
+    # above the ordinary 300-second gate and is therefore isolated exactly like
+    # the existing long deterministic simulations.
+    "Luoyang700kOneYearEconomyTests_AgricultureMarketFreightConsumptionAndConservationContinue"
 )
 
 # Windows PowerShell Start-Process fails when the host exposes both Path and

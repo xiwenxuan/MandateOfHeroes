@@ -1,0 +1,18 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_public_procurement_and_relief",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_household_fixture",
+  "procurement_quantity": 5,
+  "procurement_money": 10,
+  "internal_cash_net": 0,
+  "relief_delivered_quantity": 2,
+  "relief_consumed_quantity": 2,
+  "food_conservation_difference": 0,
+  "private_ownership_bypass": false,
+  "blocking_reason": "Real budget, seller batch, public stock, pickup, and consumption are proven separately from the 700k runtime.",
+  "tests": [
+    "PublicProcurementIntegratedTests_UsesBudgetSellerBatchAndFormalTrade",
+    "ReliefIntegratedTests_TransfersAndConsumesTraceablePublicFood"
+  ]
+}

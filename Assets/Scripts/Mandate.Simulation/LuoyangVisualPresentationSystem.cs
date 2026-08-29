@@ -238,13 +238,14 @@ namespace Mandate.Simulation
                     item.ProductId == requirement.ProductId);
                 var unitPrice = Math.Max(1L, market?.BasePrice ?? 1);
                 var purchaseCost = checked((shipped * unitPrice + 999) / 1_000);
+                var orderId = "supply_order.construction." + runtime.AbsoluteDay +
+                              "." + runtime.SupplyOrders.Count.ToString("D6");
+                var shipmentId = "shipment.construction." + runtime.AbsoluteDay +
+                                 "." + runtime.Shipments.Count.ToString("D6");
                 DebitMaterialBuyer(runtime, ownerId, purchaseCost);
                 supplier.CashBalance = checked(supplier.CashBalance + purchaseCost);
                 supplier.CumulativeSalesRevenue = checked(
                     supplier.CumulativeSalesRevenue + purchaseCost);
-                supplier.InventoryQuantityMilliunits -= shipped;
-                supplier.CumulativeDispatchedMilliunits = checked(
-                    supplier.CumulativeDispatchedMilliunits + shipped);
 
                 var carrierConsumption = Math.Min(shipped,
                     checked((long)Math.Max(1, supplier.TravelDays) * 2_000L));
@@ -257,10 +258,15 @@ namespace Mandate.Simulation
                 if (delivered < missing)
                     throw new InvalidOperationException(
                         "Construction shipment does not cover its real losses.");
-                var orderId = "supply_order.construction." + runtime.AbsoluteDay +
-                              "." + runtime.SupplyOrders.Count.ToString("D6");
-                var shipmentId = "shipment.construction." + runtime.AbsoluteDay +
-                                 "." + runtime.Shipments.Count.ToString("D6");
+                if (LuoyangFormalEconomySystem.IsFood(requirement.ProductId))
+                    new LuoyangFormalEconomySystem().DispatchFreight(runtime,
+                        supplier.InventoryId, shipmentId,
+                        requirement.ProductId, shipped, shipped - delivered,
+                        supplier.ManagerPersonId);
+                else
+                    supplier.InventoryQuantityMilliunits -= shipped;
+                supplier.CumulativeDispatchedMilliunits = checked(
+                    supplier.CumulativeDispatchedMilliunits + shipped);
                 var arrivalDay = checked(runtime.AbsoluteDay +
                     Math.Max(1, supplier.TravelDays));
                 runtime.SupplyOrders.Add(new LuoyangSupplyOrderRuntimeState

@@ -2537,16 +2537,98 @@ namespace Mandate.Simulation
 
     public sealed class LuoyangCitySupplyProjection
     {
+        public long ProjectionDay;
+        public long SourceWorldRevision;
         public long CurrentUsableFoodStock;
         public long CurrentUsableNutritionBasisUnits;
         public long DailyFoodDemandNutritionBasisUnits;
         public double DaysOfSupply;
+        public long PrivateFoodStock;
+        public long HouseholdStoredFood;
+        public long GovernmentFoodStock;
+        public long OtherCivilianFoodStock;
         public long IncomingFreightQuantity;
+        public long BlockedFreightQuantity;
+        public long DelayedFreightQuantity;
         public int DelayedFreightCount;
         public int BlockedFreightCount;
         public int HouseholdShortfallCount;
+        public int FoodShortfallPersonCount;
         public long PublicGranaryStock;
         public long MarketAvailableSupply;
+        public long PrivateMarketAvailableFood;
+        public int ActiveProcurementCount;
+        public int ActiveCarrierCount;
+        public int ActiveFreightCount;
+        public int SupplySourceCount;
+        public int MainFoodPriceIndexBasisPoints;
+        public List<LuoyangFoodPriceProjection> ProductPrices =
+            new List<LuoyangFoodPriceProjection>();
+    }
+
+    public sealed class LuoyangFoodPriceProjection
+    {
+        public string ProductDefinitionId;
+        public long EquilibriumUnitPrice;
+        public long LastTradeUnitPrice;
+        public long LastTradeDay;
+        public long ActiveBuyDemand;
+        public long ActiveSellSupply;
+        public long RecentTradeQuantity;
+        public int HouseholdShortfallCount;
+        public int BlockedInboundFreightCount;
+        public List<string> ExplanationFactorIds = new List<string>();
+    }
+
+    public sealed class LuoyangPlayerSupplyInterventionResult
+    {
+        public string PlayerPersonId;
+        public string PlayerFamilyId;
+        public string CivilianFreightId;
+        public string ProductDefinitionId;
+        public long Quantity;
+        public long UnitPrice;
+        public long FreightFee;
+        public long DispatchDay;
+    }
+
+    /// <summary>
+    /// Thin player-action adapter over the formal market freight service. It
+    /// owns no inventory, price, route, command or receipt state.
+    /// </summary>
+    public sealed class LuoyangPlayerSupplyInterventionService
+    {
+        public LuoyangPlayerSupplyInterventionResult DispatchMarketFreight(
+            WorldState world,
+            CivilianFreightSystem freightSystem,
+            CivilianFreightDispatchRequest request)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (freightSystem == null) throw new ArgumentNullException(
+                nameof(freightSystem));
+            if (request == null) throw new ArgumentNullException(
+                nameof(request));
+            if (string.IsNullOrEmpty(world.PlayerPersonId) ||
+                request.CarrierPersonId != world.PlayerPersonId)
+                throw new InvalidOperationException(
+                    "The formal supply intervention carrier must be the current player Person.");
+            var player = world.People.Find(item => item != null &&
+                item.Id == world.PlayerPersonId) ??
+                throw new InvalidOperationException(
+                    "The current player Person is unavailable.");
+            var freight = freightSystem.Dispatch(world, request);
+            return new LuoyangPlayerSupplyInterventionResult
+            {
+                PlayerPersonId = player.Id,
+                PlayerFamilyId = player.FamilyId,
+                CivilianFreightId = freight.Id,
+                ProductDefinitionId = freight.ProductDefinitionId,
+                Quantity = freight.DispatchedQuantity,
+                UnitPrice = freight.GoodsUnitPrice,
+                FreightFee = freight.FreightFee,
+                DispatchDay = freight.DispatchedDay
+            };
+        }
     }
 
     public sealed class LuoyangSupplyProjectionSystem
@@ -2554,12 +2636,17 @@ namespace Mandate.Simulation
         private const int DaysPerYear = 360;
         private const int DaysPerHouseholdSettlement = 30;
         private readonly ProductionContentRegistry _content;
+        private readonly IPersonRepository _people;
+        private IPersonRepository _fallbackPeople;
+        private WorldState _fallbackPeopleWorld;
 
         public LuoyangSupplyProjectionSystem(
-            ProductionContentRegistry content)
+            ProductionContentRegistry content,
+            IPersonRepository people = null)
         {
             _content = content ?? throw new ArgumentNullException(
                 nameof(content));
+            _people = people;
         }
 
         public LuoyangSupplyCatchmentAudit AuditCatchment(
@@ -2638,7 +2725,16 @@ namespace Mandate.Simulation
             selection.Normalize();
             var cityLocations = new HashSet<string>(
                 selection.CityLocationIds, StringComparer.Ordinal);
-            var result = new LuoyangCitySupplyProjection();
+            var cityFamilies = world.Families.Where(item => item != null &&
+                    cityLocations.Contains(item.LocationId))
+                .OrderBy(item => item.Id, StringComparer.Ordinal).ToArray();
+            var cityFamilyIds = new HashSet<string>(
+                cityFamilies.Select(item => item.Id), StringComparer.Ordinal);
+            var result = new LuoyangCitySupplyProjection
+            {
+                ProjectionDay = world.AbsoluteDay,
+                SourceWorldRevision = world.Revision
+            };
             for (var i = 0; i < world.ProductBatches.Count; i++)
             {
                 var batch = world.ProductBatches[i];
@@ -2656,19 +2752,48 @@ namespace Mandate.Simulation
                     result.CurrentUsableNutritionBasisUnits +
                     usable * food.NutritionBasisPoints);
                 if (IsGovernmentOwned(world, batch))
+                {
                     result.PublicGranaryStock = checked(
                         result.PublicGranaryStock + usable);
+                    result.GovernmentFoodStock = checked(
+                        result.GovernmentFoodStock + usable);
+                }
+                else if (!string.IsNullOrEmpty(batch.OwnerFamilyId))
+                {
+                    result.PrivateFoodStock = checked(
+                        result.PrivateFoodStock + usable);
+                    result.HouseholdStoredFood = checked(
+                        result.HouseholdStoredFood + usable);
+                }
+                else
+                {
+                    result.OtherCivilianFoodStock = checked(
+                        result.OtherCivilianFoodStock + usable);
+                }
             }
             long monthlyDemand = 0;
-            for (var i = 0; i < world.People.Count; i++)
+            var people = PeopleFor(world);
+            for (var familyIndex = 0;
+                 familyIndex < cityFamilies.Length;
+                 familyIndex++)
             {
-                var person = world.People[i];
-                if (person == null || !person.IsAlive ||
-                    !cityLocations.Contains(person.LocationId)) continue;
-                var age = Math.Max(
-                    0L, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
-                monthlyDemand = checked(monthlyDemand +
-                    (age < 15 || age > 60 ? 2L : 3L) * 10_000L);
+                var family = cityFamilies[familyIndex];
+                var shortfall = family.FoodSecurityBasisPoints < 10_000;
+                if (shortfall) result.HouseholdShortfallCount++;
+                for (var memberIndex = 0;
+                     memberIndex < family.MemberIds.Count;
+                     memberIndex++)
+                {
+                    var person = people.GetRequired(
+                        family.MemberIds[memberIndex]);
+                    if (!person.IsAlive) continue;
+                    var age = Math.Max(
+                        0L, (world.AbsoluteDay - person.BirthDay) /
+                            DaysPerYear);
+                    monthlyDemand = checked(monthlyDemand +
+                        (age < 15 || age > 60 ? 2L : 3L) * 10_000L);
+                    if (shortfall) result.FoodShortfallPersonCount++;
+                }
             }
             result.DailyFoodDemandNutritionBasisUnits =
                 (monthlyDemand + DaysPerHouseholdSettlement - 1) /
@@ -2688,15 +2813,27 @@ namespace Mandate.Simulation
                 result.IncomingFreightQuantity = checked(
                     result.IncomingFreightQuantity +
                     freight.RemainingCargoQuantity);
+                result.ActiveFreightCount++;
                 if (freight.CellRouteWaiting)
                 {
                     result.DelayedFreightCount++;
                     result.BlockedFreightCount++;
+                    result.DelayedFreightQuantity = checked(
+                        result.DelayedFreightQuantity +
+                        freight.RemainingCargoQuantity);
+                    result.BlockedFreightQuantity = checked(
+                        result.BlockedFreightQuantity +
+                        freight.RemainingCargoQuantity);
+                }
+                else if (freight.Status ==
+                    CivilianFreightStatus.AwaitingReceipt)
+                {
+                    result.DelayedFreightCount++;
+                    result.DelayedFreightQuantity = checked(
+                        result.DelayedFreightQuantity +
+                        freight.RemainingCargoQuantity);
                 }
             }
-            result.HouseholdShortfallCount = world.Families.Count(item =>
-                item != null && cityLocations.Contains(item.LocationId) &&
-                item.FoodSecurityBasisPoints < 10_000);
             for (var i = 0; i < world.FormalMarketOrders.Count; i++)
             {
                 var order = world.FormalMarketOrders[i];
@@ -2708,7 +2845,173 @@ namespace Mandate.Simulation
                 result.MarketAvailableSupply = checked(
                     result.MarketAvailableSupply + order.RemainingQuantity);
             }
+            result.PrivateMarketAvailableFood =
+                result.MarketAvailableSupply;
+            result.ActiveCarrierCount = world.CivilianCarrierRegistrations
+                .Count(item => item != null && item.Active);
+            result.ActiveProcurementCount =
+                CountActiveProcurement(world);
+            result.SupplySourceCount = CountSupplySources(
+                world, selection);
+            BuildPriceProjection(
+                world, cityLocations, cityFamilyIds, result);
             return result;
+        }
+
+        private void BuildPriceProjection(
+            WorldState world,
+            HashSet<string> cityLocations,
+            HashSet<string> cityFamilyIds,
+            LuoyangCitySupplyProjection result)
+        {
+            var governanceIds = new HashSet<string>(
+                world.CountyGovernances.Where(governance =>
+                        cityLocations.Contains(governance.CountyLocationId) ||
+                        world.Locations.Any(location =>
+                            cityLocations.Contains(location.Id) &&
+                            location.ParentLocationId ==
+                                governance.CountyLocationId))
+                    .Select(governance => governance.Id),
+                StringComparer.Ordinal);
+            long indexTotal = 0;
+            var indexCount = 0;
+            var prices = world.FormalMarketPrices.Where(price =>
+                    price != null && governanceIds.Contains(
+                        price.CountyGovernanceId) &&
+                    _content.TryGetFood(
+                        price.ProductDefinitionId, out _))
+                .OrderBy(price => price.ProductDefinitionId,
+                    StringComparer.Ordinal)
+                .ThenBy(price => price.CountyGovernanceId,
+                    StringComparer.Ordinal);
+            foreach (var price in prices)
+            {
+                var item = new LuoyangFoodPriceProjection
+                {
+                    ProductDefinitionId = price.ProductDefinitionId,
+                    EquilibriumUnitPrice = price.EquilibriumUnitPrice,
+                    LastTradeUnitPrice = price.LastTradeUnitPrice,
+                    LastTradeDay = price.LastTradeDay,
+                    HouseholdShortfallCount =
+                        result.HouseholdShortfallCount,
+                    BlockedInboundFreightCount =
+                        result.BlockedFreightCount
+                };
+                for (var orderIndex = 0;
+                     orderIndex < world.FormalMarketOrders.Count;
+                     orderIndex++)
+                {
+                    var order = world.FormalMarketOrders[orderIndex];
+                    if (order == null || order.Status !=
+                            FormalMarketOrderStatus.Active ||
+                        order.ProductDefinitionId !=
+                            price.ProductDefinitionId ||
+                        (!governanceIds.Contains(order.CountyGovernanceId) &&
+                         !cityFamilyIds.Contains(order.OwnerFamilyId)))
+                        continue;
+                    if (order.Side == FormalMarketOrderSide.Buy)
+                        item.ActiveBuyDemand = checked(
+                            item.ActiveBuyDemand + order.RemainingQuantity);
+                    else
+                        item.ActiveSellSupply = checked(
+                            item.ActiveSellSupply + order.RemainingQuantity);
+                }
+                for (var tradeIndex = 0;
+                     tradeIndex < world.FormalMarketTrades.Count;
+                     tradeIndex++)
+                {
+                    var trade = world.FormalMarketTrades[tradeIndex];
+                    if (trade != null && trade.ProductDefinitionId ==
+                            price.ProductDefinitionId &&
+                        governanceIds.Contains(trade.CountyGovernanceId) &&
+                        trade.Day >= world.AbsoluteDay - 30)
+                        item.RecentTradeQuantity = checked(
+                            item.RecentTradeQuantity + trade.Quantity);
+                }
+                item.ExplanationFactorIds.Add(
+                    "formal.available-stock");
+                item.ExplanationFactorIds.Add(
+                    "formal.active-order-demand");
+                item.ExplanationFactorIds.Add(
+                    "formal.recent-trades");
+                if (item.HouseholdShortfallCount > 0)
+                    item.ExplanationFactorIds.Add(
+                        "formal.household-shortfall");
+                if (item.BlockedInboundFreightCount > 0)
+                    item.ExplanationFactorIds.Add(
+                        "formal.transport-disruption");
+                result.ProductPrices.Add(item);
+                if (price.EquilibriumUnitPrice > 0 &&
+                    price.LastTradeUnitPrice >= 0)
+                {
+                    indexTotal = checked(indexTotal + Math.Min(
+                        100_000L,
+                        price.LastTradeUnitPrice * 10_000L /
+                        price.EquilibriumUnitPrice));
+                    indexCount++;
+                }
+            }
+            result.MainFoodPriceIndexBasisPoints = indexCount == 0
+                ? 0
+                : checked((int)(indexTotal / indexCount));
+        }
+
+        private static int CountActiveProcurement(WorldState world)
+        {
+            var pendingCommands = world.PersistentWorldCommands.Count(
+                command => command != null && command.Status ==
+                    PersistentWorldCommandStatus.Pending &&
+                    (command.CommandTypeId ==
+                         PublicReliefProcurementContractIds.CommandTypeId ||
+                     command.CommandTypeId ==
+                         PublicReliefProcurementContractIds
+                             .ExternalProcurementCommandTypeId));
+            return checked(pendingCommands +
+                world.PublicReliefRecoveries.Count(recovery =>
+                    recovery != null &&
+                    (recovery.Status ==
+                         PublicReliefRecoveryStatus.SupplementalInTransit ||
+                     recovery.Status ==
+                         PublicReliefRecoveryStatus.DistributionBlocked)));
+        }
+
+        private int CountSupplySources(
+            WorldState world,
+            LuoyangSupplyCatchmentSelection selection)
+        {
+            var supplyLocations = new HashSet<string>(
+                selection.SupplyLocationIds, StringComparer.Ordinal);
+            var sources = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch == null || batch.Quantity <= 0 ||
+                    !_content.TryGetFood(
+                        batch.ProductDefinitionId, out _)) continue;
+                var location = BatchLocation(world, batch);
+                if (supplyLocations.Contains(location)) sources.Add(location);
+            }
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                if (freight != null && freight.Status !=
+                        CivilianFreightStatus.Completed &&
+                    _content.TryGetFood(
+                        freight.ProductDefinitionId, out _))
+                    sources.Add(freight.OriginLocationId);
+            }
+            return sources.Count;
+        }
+
+        private IPersonRepository PeopleFor(WorldState world)
+        {
+            if (_people != null) return _people;
+            if (!ReferenceEquals(_fallbackPeopleWorld, world))
+            {
+                _fallbackPeopleWorld = world;
+                _fallbackPeople = new WorldStatePersonRepository(world);
+            }
+            return _fallbackPeople;
         }
 
         private static string ResourceOrderLocation(

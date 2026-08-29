@@ -1,0 +1,35 @@
+{
+  "schema": "mandate.luoyang.normal-supply-calibration-candidates.v1",
+  "selection_order": [
+    "authority_only_control",
+    "capacity_and_market_bucket",
+    "demand_accounting_and_bounded_market_access"
+  ],
+  "predeclared_gate": "A normal run must complete, conserve food exactly, operate agriculture/market/freight over one year, and must not produce technical universal household shortage on day 30.",
+  "candidates": [
+    {
+      "id": "calibration.luoyang.authority_only.v1",
+      "result": "FAIL",
+      "reason": "Authority unification alone exposed the old 1.47-day opening reserve and reproduced universal technical shortage.",
+      "parameters": {"opening_reserve_days": 0, "yield_scale": 1, "external_scale": 1, "market_target_days": 0},
+      "thirty_day": {"opening": 930970000, "demand": 19026791100, "consumed": 2731986, "shortage": 19024059114, "shortfall_households": 142980, "closing": 1205566720, "difference": 0}
+    },
+    {
+      "id": "calibration.luoyang.normal_supply.market_bucket.v2",
+      "result": "FAIL",
+      "reason": "Capacity and market release worked, but duplicated food demand rows and incomplete household access still made shortage too broad.",
+      "parameters": {"opening_reserve_days": 210, "yield_scale": 200, "external_scale": 24, "harvest_market_release_bp": 8500},
+      "one_year": {"consumed": 215940341781, "shortage": 15552283269, "shortfall_households": 131302, "difference": 0}
+    },
+    {
+      "id": "calibration.luoyang.normal_supply.v1",
+      "result": "PASS",
+      "reason": "One city demand is allocated exactly across food products and bounded market access uses only real formal stock and real household wealth.",
+      "parameters": {"opening_reserve_days": 210, "yield_scale": 200, "external_scale": 24, "stage_window_days": 110, "harvest_market_release_bp": 8500, "household_market_buffer_days": 14, "market_target_stock_days": 30},
+      "thirty_day": {"consumed": 19026791100, "shortage": 0, "shortfall_households": 0, "closing": 120819691306, "difference": 0},
+      "one_year": {"consumed": 228870983496, "shortage": 2621641554, "shortfall_households": 76256, "closing": 56456320382, "difference": 0}
+    }
+  ],
+  "selected_candidate": "calibration.luoyang.normal_supply.v1",
+  "selected_candidate_source_fingerprint": "3FC748C4BB63B88D8A0BB3F48F38C8D9C29A62FED7536689253277607D350BCD"
+}

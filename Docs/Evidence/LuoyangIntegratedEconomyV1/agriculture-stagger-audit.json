@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang.agriculture-stagger-audit.v1",
+  "field_count": 135,
+  "deterministic_window_days": 110,
+  "ordering": "stable agriculture source index",
+  "offset_formula": "field_index * 110 / field_count",
+  "opening_schedule_compatibility": "No initial-stage offset may accelerate a harvest into days 0-30; every accepted field retains at least three ten-day opening schedule samples.",
+  "opening_30_day_dispatch_floor": 405,
+  "opening_30_day_local_harvest_milliunits": 0,
+  "one_year_local_harvest_milliunits": 129170460000,
+  "randomness": "none",
+  "status": "PASS"
+}

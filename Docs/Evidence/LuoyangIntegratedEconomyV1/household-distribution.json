@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_household_distribution",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_household_fixture",
+  "households_with_pickups": 39,
+  "distinct_requested_nutrition_values": 4,
+  "affected_persons": 195,
+  "equal_share_shortcut": false,
+  "actual_700k_day30_shortfall_households": 142980,
+  "blocking_reason": "Household variation is preserved in the formal fixture, while the compact normal baseline leaves every actual household short and uses another inventory authority.",
+  "test": "HouseholdSupplyDistributionTests_PreservesHouseholdLevelVariation"
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_early_harvest_shock",
+  "acceptance_status": "PARTIAL",
+  "scope": "formal_200_person_agriculture_fixture",
+  "maturity_basis_points": 8000,
+  "early_harvest_quantity": 1,
+  "normal_harvest_quantity": 2,
+  "formal_batch_provenance_present": true,
+  "direct_stock_deletion": false,
+  "blocking_reason": "Formal reduced yield is proven, but its effect on actual Luoyang freight, prices, and 700k households is not joined.",
+  "test": "ProductionShockSupplyTests_EarlyHarvestReducesFormalBatchYield"
+}

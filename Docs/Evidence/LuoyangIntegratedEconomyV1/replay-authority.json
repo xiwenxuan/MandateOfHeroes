@@ -1,0 +1,11 @@
+{
+  "schema": "mandate.luoyang.formal-economy-replay.v1",
+  "seed": 71010,
+  "runs": 3,
+  "days": 30,
+  "authority_hashes_identical": true,
+  "projection_hashes_identical": true,
+  "legacy_outer_agriculture_replay_identical": true,
+  "performance_telemetry_is_world_fact": false,
+  "status": "PASS"
+}

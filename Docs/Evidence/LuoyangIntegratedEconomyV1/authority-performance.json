@@ -1,0 +1,29 @@
+{
+  "schema": "mandate.luoyang.economy-authority-performance.v1",
+  "source_fingerprint": "3FC748C4BB63B88D8A0BB3F48F38C8D9C29A62FED7536689253277607D350BCD",
+  "population": 700000,
+  "households": 142980,
+  "formal_object_granularity": "storage/product/source-window batches and aggregate transactions; no heavyweight object is created per meal or per person",
+  "thirty_day": {
+    "simulation_runtime_milliseconds": 4677,
+    "bounded_probe_elapsed_milliseconds": 8893,
+    "peak_managed_bytes": 217155136,
+    "batch_count": 79,
+    "transaction_count": 142,
+    "projection_rebuild_milliseconds": 209
+  },
+  "one_year": {
+    "simulation_runtime_milliseconds": 55511,
+    "peak_managed_bytes": 220594960,
+    "batch_count": 6184,
+    "transaction_count": 7222
+  },
+  "declared_bounds": {
+    "thirty_day_runtime_milliseconds_less_than": 300000,
+    "thirty_day_batch_count_less_than": 20000,
+    "thirty_day_transaction_count_less_than": 20000
+  },
+  "oom": false,
+  "catastrophic_hotspot": false,
+  "result": "ACCEPTABLE FOR V1"
+}

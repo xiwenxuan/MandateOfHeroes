@@ -1,0 +1,15 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "split_runtime_performance_probe",
+  "acceptance_status": "FAIL",
+  "scope": "700k_compact_runtime_and_separate_small_formal_projection",
+  "compact_initialization_plus_one_day_ms": 2671,
+  "compact_initialization_ms": 2207,
+  "compact_one_day_ms": 211,
+  "compact_peak_managed_memory_bytes": 194331072,
+  "formal_fixture_projection_100_iterations_ms": 6,
+  "unity_frame_metrics_present": false,
+  "joint_market_consumption_freight_route_metrics_present": false,
+  "blocking_reason": "Each side is bounded independently, but no unified 700k formal economy performance or Unity frame evidence exists.",
+  "test": "IntegratedSupplyPerformanceTests_ActualPopulationRuntimeAndProjectionAreBounded"
+}

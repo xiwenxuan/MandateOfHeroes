@@ -1,0 +1,20 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_gate_close_reopen",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "gate_id": "facility.instance.luoyang.184.gate.guangyangmen",
+  "blocked_freight_count": 1,
+  "blocked_quantity": 12,
+  "incoming_quantity_while_blocked": 12,
+  "recovery_dispatched": 12,
+  "recovery_delivered": 12,
+  "recovery_natural_loss": 0,
+  "delivered_ledger_entries": 1,
+  "food_conservation_difference": 0,
+  "blocking_reason": "Formal Gate/CellRoute behavior is proven, but not against the 700k economy authority or a joint price/household time series.",
+  "tests": [
+    "GateIntegratedSupplyShockTests_FormalGateBlocksFreightAndProjection",
+    "GateRecoveryMarketTests_ReopenResumesSameFreightOnce"
+  ]
+}

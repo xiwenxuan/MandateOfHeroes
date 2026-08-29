@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.luoyang.market-access-audit.v1",
+  "harvest_market_release_basis_points": 8500,
+  "household_market_buffer_days": 14,
+  "market_target_stock_days": 30,
+  "household_purchase_rule": "A bounded aggregate formal transfer acquires product stock from real markets; permanent household claims and real family wealth are then settled in stable household order.",
+  "thirty_day_market_volume_milliunits": 662302839,
+  "one_year_market_volume_milliunits": 214712943317,
+  "military_procurement_rule": "Daily procurement is capped to one day of monthly demand and both daily/month-end procurement preserve one 1000-milliunit real market trading lot; all purchases remain formal transfers with treasury and market cash entries.",
+  "one_year_price_basis_points": {
+    "minimum": 10000,
+    "maximum": 32000
+  },
+  "food_market_daily_demand_matches_city_demand": true,
+  "non_food_rows_have_food_demand": false,
+  "status": "PASS"
+}

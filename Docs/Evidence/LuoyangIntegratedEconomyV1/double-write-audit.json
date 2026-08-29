@@ -1,0 +1,41 @@
+{
+  "schema": "mandate.luoyang-economy-double-write-audit.v1",
+  "baseline_head": "4343237b5f15e8da1ab1e137f1bc73fa95e0cd77",
+  "finding": "parallel_authorities_not_same_call_double_write",
+  "harvest": {
+    "compact_writer": "Luoyang184LivingWorldSystem.Harvest",
+    "formal_writer": "AgricultureProductionSystem/ProductInventorySystem",
+    "same_operation_writes_both": false,
+    "joint_interpretation_risk": "DOUBLE_AUTHORITY"
+  },
+  "consumption": {
+    "compact_writer": "Luoyang184LivingWorldSystem.SettleHouseholdConsumption",
+    "formal_writer": "FoodInventorySystem/formal household food monthly command",
+    "same_operation_debits_both": false,
+    "joint_interpretation_risk": "DOUBLE_AUTHORITY"
+  },
+  "market": {
+    "compact_source": "LuoyangInventoryOwnerKind.Market QuantityMilliunits",
+    "formal_source": "ProductBatchState ReservedQuantity/formal sell reservation",
+    "joint_interpretation_risk": "DOUBLE_AUTHORITY"
+  },
+  "freight": {
+    "compact_source": "LuoyangExternalSupplierRuntimeState.InventoryQuantityMilliunits",
+    "formal_source": "ProductBatchState in mobile InventoryContainerState",
+    "joint_interpretation_risk": "DOUBLE_AUTHORITY"
+  },
+  "tax_and_relief": {
+    "compact_source": "household reserve and compact inventory direct mutation",
+    "formal_source": "paired InventoryTransactionState batch transfers",
+    "joint_interpretation_risk": "DOUBLE_AUTHORITY"
+  },
+  "unknown_paths": 0,
+  "required_after_state": {
+    "compact_physical_source_writes": 0,
+    "compact_physical_sink_writes": 0,
+    "formal_harvest_sources_per_operation": 1,
+    "formal_consumption_sinks_per_operation": 1,
+    "market_compact_stock_contribution": 0,
+    "freight_compact_stock_contribution": 0
+  }
+}

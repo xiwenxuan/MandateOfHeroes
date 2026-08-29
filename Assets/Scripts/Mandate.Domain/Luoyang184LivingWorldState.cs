@@ -621,7 +621,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class Luoyang184LivingWorldRuntimeState
     {
-        public const int FormatVersion = 6;
+        public const int FormatVersion = 7;
 
         public int Version = FormatVersion;
         public bool RequiresSourceRehydration;
@@ -696,6 +696,7 @@ namespace Mandate.Domain
             new List<LuoyangShortageResponseState>();
         public List<LuoyangLivingWorldDaySnapshotState> DaySnapshots =
             new List<LuoyangLivingWorldDaySnapshotState>();
+        public LuoyangFormalEconomyRuntimeState FormalEconomy;
         public LuoyangLivingWorldPerformanceState Performance =
             new LuoyangLivingWorldPerformanceState();
     }
@@ -802,7 +803,16 @@ namespace Mandate.Domain
                 runtime.HistoricalEvents == null || runtime.PlayerCommands == null ||
                 runtime.GovernmentEconomy == null ||
                 runtime.ShortageResponses == null ||
-                runtime.DaySnapshots == null || runtime.Performance == null)
+                runtime.DaySnapshots == null || runtime.Performance == null ||
+                runtime.FormalEconomy == null ||
+                !runtime.FormalEconomy.IsPhysicalAuthority ||
+                runtime.FormalEconomy.HouseholdFoodClaimsMilliunits == null ||
+                runtime.FormalEconomy.HouseholdFoodClaimsMilliunits.Count !=
+                    runtime.Households.Count ||
+                runtime.FormalEconomy.InventoryContainers == null ||
+                runtime.FormalEconomy.InventoryBindings == null ||
+                runtime.FormalEconomy.ProductBatches == null ||
+                runtime.FormalEconomy.InventoryTransactions == null)
                 throw new InvalidOperationException("Invalid Luoyang living-world runtime collections.");
             if (runtime.Workforce.Count != expectedPersons ||
                 runtime.Households.Count != expectedHouseholds ||

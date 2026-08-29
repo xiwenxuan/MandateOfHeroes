@@ -1,0 +1,57 @@
+{
+  "schema": "mandate.luoyang-economy-authority-audit.v1",
+  "baseline_head": "4343237b5f15e8da1ab1e137f1bc73fa95e0cd77",
+  "population": 700000,
+  "unknown_authority_count": 0,
+  "current_physical_authorities": [
+    {
+      "id": "luoyang.compact.long_run",
+      "persistence": "Luoyang checkpoint v6",
+      "writers": [
+        "Luoyang184LivingWorldSystem",
+        "Luoyang184IntelligentAgentRuntimeSystem",
+        "Luoyang184PlayerCommandSystem",
+        "Luoyang184T4IntegratedRuntimeSystem",
+        "LuoyangVisualPresentationSystem"
+      ],
+      "facts": [
+        "inventories",
+        "external_supplier_inventory",
+        "household_food_reserve",
+        "market_inventory",
+        "shipment_quantity",
+        "consumption",
+        "shortfall",
+        "tax",
+        "relief"
+      ]
+    },
+    {
+      "id": "world.formal.product_batches",
+      "persistence": "WorldState V78",
+      "writers": [
+        "ProductInventorySystem",
+        "FoodInventorySystem",
+        "FoodStockFormalizationSystem",
+        "AgricultureProductionSystem",
+        "FormalCountyMarketSystem",
+        "CivilianFreightSystem",
+        "formal public food and relief systems"
+      ],
+      "facts": [
+        "product_batches",
+        "inventory_transactions",
+        "formal_market_orders",
+        "formal_market_trades",
+        "civilian_freights",
+        "formal_household_consumption",
+        "formal_public_storage"
+      ]
+    }
+  ],
+  "current_parallel_authority": true,
+  "same_operation_double_write_observed": false,
+  "target_physical_authority": "ProductBatchState plus InventoryTransactionState",
+  "target_data_direction": "formal_to_compact_projection_only",
+  "compact_physical_writes_allowed_after_migration": 0
+}

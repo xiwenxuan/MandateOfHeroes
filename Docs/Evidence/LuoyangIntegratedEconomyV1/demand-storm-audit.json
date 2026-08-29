@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_freight_demand_storm",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "planning_repetitions": 10,
+  "active_demands_after_replanning": 1,
+  "original_order_quantity": 20,
+  "already_dispatched_quantity": 8,
+  "outstanding_demand_quantity": 12,
+  "duplicate_demand_storm": false,
+  "blocking_reason": "Demand idempotence is proven for the formal planner but not for the compact 700k supply planner.",
+  "tests": [
+    "SupplyDemandStormPreventionTests_RepeatedPlanningKeepsOneDemand",
+    "OutstandingFreightDemandTests_OnlyPlansUncommittedOrderRemainder"
+  ]
+}

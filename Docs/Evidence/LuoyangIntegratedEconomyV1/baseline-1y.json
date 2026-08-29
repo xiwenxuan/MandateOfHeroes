@@ -1,0 +1,15 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "normal_supply_1y",
+  "acceptance_status": "FAIL",
+  "scope": "formal_200_person_fixture_only",
+  "world_days": 360,
+  "closing_persons": 207,
+  "food_conservation_difference": 0,
+  "food_conservation_balanced": true,
+  "joint_700k_world_executed": false,
+  "required_day_month_year_series_present": false,
+  "blocking_reason": "A small formal world is stable for one year, but it is not the 700k Luoyang runtime and therefore cannot close the integrated one-year gate.",
+  "test": "IntegratedOneYearStabilityTests_FormalWorldHasNoEconomicInvariantFailure",
+  "source_log": "tmp/skill-verification/core-tests-20260829-193616-199.out.log"
+}

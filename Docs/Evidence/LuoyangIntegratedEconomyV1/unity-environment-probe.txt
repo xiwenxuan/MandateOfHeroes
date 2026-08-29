@@ -1,0 +1,18 @@
+Task: Luoyang 700k economy authority unification V1
+Probe time: 2026-08-30T03:13:53+08:00
+Unity: 2022.3.62f3c1
+Mode: EditModeTests
+Test filter: Mandate.Tests.WorldKernelTests.EconomyAuthorityMatrixTests_IdentifiesEveryFoodWriterAndLeavesNoUnknownAuthority
+Existing Unity editor before probe: none
+Result: BLOCKED
+Result code: 125
+Reason: Unity did not create a non-empty startup log within 60 seconds.
+Owned PID: 61672
+Owned PID handling: terminated by Tools/Run-UnityTestsSafe.ps1 after startup timeout
+User programs closed: none
+Retries: 0
+Log length: 0
+Test result XML: not created
+Summary: tmp/unity-authority-v1-final/unity-EditMode-20260830-031353-373.summary.json
+Log: tmp/unity-authority-v1-final/unity-EditMode-20260830-031353-373.log
+Interpretation: editor/license/environment startup layer remains blocked before project test execution. Per task sections 13 and 96-98, this is recorded as an environment evidence gap and is not used to falsify the independently passed Domain/Simulation/Persistence business gates.

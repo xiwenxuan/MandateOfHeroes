@@ -447,6 +447,24 @@ namespace Mandate.Domain
             Luoyang184LivingWorldRuntimeState runtime)
         {
             if (runtime == null) throw new ArgumentNullException(nameof(runtime));
+            if (runtime.FormalEconomy != null &&
+                runtime.FormalEconomy.IsPhysicalAuthority)
+            {
+                var formal = AuditFormalAuthority(runtime);
+                // Preserve the old compact-boundary RCA signal as diagnostic
+                // evidence only.  It must not become a second authority or
+                // affect the balanced result of the formal ledger.
+                formal.LegacyBoundaryDifferenceMilliunits =
+                    AuditLegacyProjection(runtime)
+                        .LegacyBoundaryDifferenceMilliunits;
+                return formal;
+            }
+            return AuditLegacyProjection(runtime);
+        }
+
+        private static LuoyangFoodConservationAuditState AuditLegacyProjection(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
             var result = new LuoyangFoodConservationAuditState
             {
                 WorldDay = runtime.AbsoluteDay
@@ -551,6 +569,72 @@ namespace Mandate.Domain
             result.Products = products.Values.ToList();
             result.Balanced = result.DifferenceMilliunits == 0 &&
                               result.UnknownPhysicalDeltaCount == 0;
+            return result;
+        }
+
+        private static LuoyangFoodConservationAuditState AuditFormalAuthority(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            var formal = runtime.FormalEconomy;
+            long transactionDelta = 0;
+            long source = 0;
+            long sink = 0;
+            foreach (var transaction in formal.InventoryTransactions.Where(
+                         item => item != null))
+            {
+                var net = transaction.Lines.Where(item => item != null &&
+                        LuoyangFormalEconomyContract.IsFood(
+                            item.ProductDefinitionId))
+                    .Sum(item => item.QuantityDelta);
+                transactionDelta = checked(transactionDelta + net);
+                if (net > 0) source = checked(source + net);
+                else sink = checked(sink - net);
+            }
+            var household = formal.ProductBatches.Where(item => item != null &&
+                    item.InventoryContainerId ==
+                    LuoyangFormalEconomyContract.HouseholdContainerId &&
+                    LuoyangFormalEconomyContract.IsFood(
+                        item.ProductDefinitionId))
+                .Sum(item => item.Quantity);
+            var closing = formal.ProductBatches.Where(item => item != null &&
+                    LuoyangFormalEconomyContract.IsFood(
+                        item.ProductDefinitionId))
+                .Sum(item => item.Quantity);
+            var householdConsumed = runtime.Households.Where(item =>
+                    item != null)
+                .Sum(item => item.CumulativeFoodConsumedMilliunits);
+            var militaryConsumed = runtime.Forces.Where(item => item != null)
+                .Sum(item => item.FoodConsumedMilliunits);
+            var result = new LuoyangFoodConservationAuditState
+            {
+                WorldDay = runtime.AbsoluteDay,
+                SourceMilliunits = source,
+                HouseholdConsumedMilliunits = householdConsumed,
+                MilitaryConsumedMilliunits = militaryConsumed,
+                ProcessingLossMilliunits = Math.Max(0,
+                    sink - householdConsumed - militaryConsumed),
+                ClosingInventoryMilliunits = closing - household,
+                ClosingHouseholdReserveMilliunits = household,
+                DifferenceMilliunits = checked(transactionDelta - closing),
+                UnknownPhysicalDeltaCount = checked((int)Math.Min(
+                    int.MaxValue, formal.CompactPhysicalMutationCount))
+            };
+            result.LegacyBoundaryDifferenceMilliunits =
+                result.DifferenceMilliunits;
+            result.Balanced = result.DifferenceMilliunits == 0 &&
+                              result.UnknownPhysicalDeltaCount == 0;
+            result.Products.Add(new LuoyangFoodProductLedgerState
+            {
+                ProductId = CompatibilityFoodProductId,
+                CompatibilityAggregate = true,
+                SourceMilliunits = result.SourceMilliunits,
+                ConsumedMilliunits = checked(householdConsumed +
+                                             militaryConsumed),
+                ProcessingLossMilliunits = result.ProcessingLossMilliunits,
+                ClosingInventoryMilliunits =
+                    result.ClosingInventoryMilliunits,
+                ClosingCompatibilityReserveMilliunits = household
+            });
             return result;
         }
 

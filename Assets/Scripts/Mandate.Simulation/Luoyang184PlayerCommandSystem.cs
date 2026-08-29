@@ -198,13 +198,20 @@ namespace Mandate.Simulation
             var household = runtime.Households[(int)person.HouseholdOrdinal];
             var inventory = runtime.Inventories.Where(item =>
                     item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId) &&
                     item.QuantityMilliunits > 0)
                 .OrderBy(item => item.Id, StringComparer.Ordinal).FirstOrDefault();
             if (inventory == null || household.Wealth <= 0)
                 throw new InvalidOperationException("市场库存或资金不足。");
             var quantity = Math.Min(inventory.QuantityMilliunits, 1_000L);
+            quantity = new LuoyangFormalEconomySystem().TransferToHousehold(
+                runtime, inventory.Id, (int)person.HouseholdOrdinal,
+                inventory.ProductId, quantity,
+                InventoryTransactionType.FoodMarketTransferred,
+                "market.player." + runtime.AbsoluteDay + "." + ordinal);
+            if (quantity <= 0)
+                throw new InvalidOperationException("正式市场库存不足。");
             var cost = Math.Min(household.Wealth, 1L);
-            inventory.QuantityMilliunits -= quantity;
             household.Wealth -= cost;
             var market = runtime.Markets.FirstOrDefault(item =>
                 item.ProductId == inventory.ProductId);
@@ -214,7 +221,6 @@ namespace Mandate.Simulation
             market.CashBalance += cost;
             market.RecentTradeQuantityMilliunits += quantity;
             market.RecentTradeValue += cost;
-            household.FoodReserveMilliunits += quantity;
             var trade = new LuoyangMarketTradeRuntimeState
             {
                 Id = "market_trade.player." + runtime.AbsoluteDay + "." +

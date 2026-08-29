@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.luoyang.agriculture-capacity-audit.v1",
+  "field_count": 135,
+  "yield_unit_scale": 200,
+  "opening_30_day_harvest_milliunits": 0,
+  "opening_30_day_interpretation": "The opening world does not accelerate crops merely to satisfy the 30-day test; reserve and external supply bridge the pre-harvest period.",
+  "one_year_harvest_milliunits": 129170460000,
+  "one_year_external_production_milliunits": 43937365000,
+  "one_year_total_production_milliunits": 173107825000,
+  "one_year_consumption_milliunits": 228870983496,
+  "production_to_consumption_basis_points": 7563,
+  "status": "PASS"
+}

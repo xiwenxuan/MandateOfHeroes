@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_quote_shock_trade_recovery",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_market_fixture",
+  "normal_reference_unit_price": 97,
+  "shock_reference_unit_price": 99,
+  "committed_trade_unit_price": 99,
+  "recovered_reference_unit_price": 98,
+  "direct_price_mutation_by_test": false,
+  "price_authority": "FormalMarketPriceState updated by committed formal trade",
+  "blocking_reason": "Direction and trade provenance are demonstrated in a fixture, not as an actual 700k Luoyang daily price series.",
+  "test": "LuoyangMarketSupplyPriceTests_FormalQuoteAndTradeExplainShockAndRecovery"
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "mandate.luoyang-integrated-economy-evidence.v1",
+  "scenario": "formal_carrier_shortage",
+  "acceptance_status": "PARTIAL",
+  "scope": "small_formal_freight_fixture",
+  "active_demands": 1,
+  "offers": 0,
+  "freights_created": 0,
+  "phantom_carriers_created": 0,
+  "blocking_reason": "No-phantom-capacity behavior is proven only in the formal fixture, not the actual Luoyang economy.",
+  "test": "CarrierShortageSupplyTests_NoCarrierCreatesNoPhantomFreight"
+}

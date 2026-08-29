@@ -1,0 +1,12 @@
+{
+  "schema": "mandate.luoyang.normal-demand-audit.v1",
+  "population": 700000,
+  "households": 142980,
+  "daily_food_demand_milliunits": 634226370,
+  "thirty_day_food_demand_milliunits": 19026791100,
+  "annual_food_demand_milliunits": 231492625050,
+  "authority_rule": "Sum of all formal food-market demand rows equals city daily demand exactly; non-food market rows carry zero food demand.",
+  "allocation_rule": "Food demand is divided in stable product-id order and the integer remainder is assigned once to the final food product.",
+  "root_cause_removed": "The previous prototype copied the complete city demand into every market product row and created a technical demand storm.",
+  "status": "PASS"
+}
