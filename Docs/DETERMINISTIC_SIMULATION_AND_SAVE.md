@@ -820,3 +820,16 @@ V70→V71是顺序迁移：旧档初始化空的`WorldDecisionAgents`与`WorldSi
 - Local Map/Cell Traversal/Streaming使用稳定地图版本与SHA-256校验；装卸表现对象不得改变Person、
   Facility、Inventory或世界Hash。相同初始存档、版本、指令、移动能力和正式世界状态必须得到
   相同CellRoute与最终Hash。本次CellRoute收敛不增加持久字段，因此Save Schema继续保持V77。
+
+## 20. 洛阳派生检查点的文件完整性与确定性状态摘要
+
+- `Luoyang184LivingWorldRuntimeState`继续使用v6派生检查点；本次食品守恒RCA不增加运行时字段，
+  正式World Save继续保持V77，不执行库存迁移或历史事务重建。
+- `checkpoint_sha256`覆盖完整gzip文件，包括Initialization/Simulation耗时和Managed Memory等
+  `Performance`遥测，只用于文件完整性；不同机器或独立运行允许该摘要不同。
+- manifest新增`deterministic_state_sha256`，对同一v6 runtime的规范JSON流式计算SHA-256，仅排除
+  根级`Performance`字段。人物、家户、设施、库存、流、市场、政府、军队、命令和其余权威状态仍
+  全部进入摘要，不得用该摘要掩盖任何业务差异。
+- 清单新增字段是向后兼容扩展，不改变checkpoint gzip结构或FormatVersion。测试必须证明修改
+  Performance不改变状态摘要，而任何权威库存变化都会改变它；大世界摘要必须流式计算，禁止先
+  构造完整JSON字符串造成峰值内存失控。

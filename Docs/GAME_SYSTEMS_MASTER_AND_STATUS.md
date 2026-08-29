@@ -1062,8 +1062,9 @@ M26-P0 已于 2026-08-06 完成首个可玩主循环竖切片，任务与证据�
 774/774、Unity EditMode 3/3、图形PlayMode 1/1和差异检查均通过；5,980 Profile构建实测60 ms、
 Managed Delta 14,006,144 bytes、GameObject 0，Unity 3×3加载92 ms且驻留19对象/9 Mesh/9 Collider。
 LocalSpace不是SubCell，旧LocalNav只保留表现几何
-与旧V77路段兼容。当前固定顺序改为：先执行食品库存守恒差额RCA与修复，再进入洛阳外围供应区与
-城市物流V1；不得继续在本阶段扩建第二套局部导航权威。
+与旧V77路段兼容。食品库存守恒差额RCA现已`ACCEPTED`：长期生活、完整核心与适用Unity食品目标
+回归均闭合。固定下一阶段为洛阳外围供应区与城市物流V1；不得继续在本阶段扩建第二套局部导航、
+库存、Cargo或Route权威。
 
 2026-08-12，`LUOYANG-184-T4-LIVING-WORLD-COMPLETION-MASTER-V1` 已达到
 `T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS`。受保护的 400,000 Person、
@@ -2296,3 +2297,26 @@ Cell Traversal任务已明确将LocalNav图降为表现/旧V77兼容资料，不
 CellTraversal专项核心8/8、洛阳局部移动专项17/17、固定指纹完整核心774/774、Unity EditMode 3/3、
 图形PlayMode 1/1、性能边界和差异检查全部通过，Introduced Regression为0。固定下一阶段是食品
 库存守恒差额RCA与修复；其后才进入洛阳外围供应区与城市物流V1。
+
+## 47. 正式食品库存守恒差额 RCA 与长期生活闭环 V1（2026-08-29）
+
+正式报告见
+[`FORMAL_FOOD_INVENTORY_CONSERVATION_RCA_AND_CLOSURE_REPORT.md`](FORMAL_FOOD_INVENTORY_CONSERVATION_RCA_AND_CLOSURE_REPORT.md)。
+原洛阳365日证据差额绝对值为12,724,917 milliunits，三次独立复现完全一致。首次差异发生在
+Day 0初始化：970,000粟米从太仓库存内部转入`household.compact_reserves`，旧证据只统计库存表而
+遗漏家户紧凑储备；Day 12起又遗漏`product.reference.food_equivalent`兼容食品。实际世界没有重复
+消费或错误产粮，根因是两个测试各自维护的过期食品allow-list与不完整Closing边界。
+
+本阶段新增只读正式/洛阳食品守恒审计器。正式食品集合来自Content Registry，逐Product、Owner/
+Inventory、Batch和InventoryTransaction重放，检查未知物理变化、内部转移、Reservation、重复ID、
+负批次和缺失引用；洛阳紧凑审计另记录Day、Phase、Flow和旧边界差额。修复后Day 0/1/7/30/90/
+180/365均严格为0，30日连续/Save-Load续跑一致，365日三次权威状态哈希一致，正式产品/库存/批次/
+事务审计JSON三次哈希一致。完整Core为781/781，失败0；审计246个食品批次与42笔食品事务耗时8 ms，
+不改变World Snapshot。
+
+World Save继续为V77，洛阳派生Checkpoint继续为v6；manifest只增加排除Performance遥测的
+`deterministic_state_sha256`，原文件SHA仍用于gzip完整性，不修改旧库存或重建历史事务。受控图形
+EngineSmoke通过；适用Unity食品独立fixture为1/1 PASS。一次无筛选全EditMode在300秒继续执行全项目
+无关测试时超时，保留为`blocked/124`历史诊断，不冒充全量PASS，也不影响本任务无Presentation变更的
+适用门禁。当前正式状态是`TASK_FORMAL_FOOD_INVENTORY_CONSERVATION_RCA_AND_CLOSURE_V1_ACCEPTED`，
+固定下一阶段为“洛阳外围供应区与城市物流V1”。

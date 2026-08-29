@@ -10276,6 +10276,13 @@ namespace Mandate.Tests
                 item.CountyGranaryGrain == 0), Is.True);
             left.Validate();
             right.Validate();
+            var auditor = new FormalFoodConservationAuditor();
+            var leftAudit = auditor.Audit(left, content);
+            var rightAudit = auditor.Audit(right, content);
+            Assert.That(leftAudit.Balanced, Is.True);
+            Assert.That(rightAudit.Balanced, Is.True);
+            Assert.That(leftAudit.Difference, Is.Zero);
+            Assert.That(rightAudit.Difference, Is.Zero);
             Assert.That(WorldSnapshotSerializer.Serialize(left, content),
                 Is.EqualTo(WorldSnapshotSerializer.Serialize(right, content)));
         }

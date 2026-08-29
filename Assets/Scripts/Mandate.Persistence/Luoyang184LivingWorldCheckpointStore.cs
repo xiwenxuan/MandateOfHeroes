@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Mandate.Domain;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Mandate.Persistence
 {
@@ -13,6 +14,7 @@ namespace Mandate.Persistence
         public string CheckpointPath;
         public string ManifestPath;
         public string Sha256;
+        public string DeterministicStateSha256;
         public long Bytes;
     }
 
@@ -56,6 +58,8 @@ namespace Mandate.Persistence
             if (File.Exists(checkpoint)) File.Delete(checkpoint);
             File.Move(temporary, checkpoint);
             var digest = Sha256(checkpoint);
+            var deterministicStateDigest =
+                ComputeDeterministicStateSha256(runtime);
             var manifest = new
             {
                 schema = "mandate.luoyang-184.living-world-checkpoint.v6",
@@ -70,7 +74,8 @@ namespace Mandate.Persistence
                 inventory_count = runtime.Inventories.Count,
                 checkpoint_file = CheckpointFileName,
                 checkpoint_bytes = new FileInfo(checkpoint).Length,
-                checkpoint_sha256 = digest
+                checkpoint_sha256 = digest,
+                deterministic_state_sha256 = deterministicStateDigest
             };
             var manifestPath = Path.Combine(root, ManifestFileName);
             File.WriteAllText(manifestPath,
@@ -81,6 +86,7 @@ namespace Mandate.Persistence
                 CheckpointPath = checkpoint,
                 ManifestPath = manifestPath,
                 Sha256 = digest,
+                DeterministicStateSha256 = deterministicStateDigest,
                 Bytes = new FileInfo(checkpoint).Length
             };
         }
@@ -294,6 +300,52 @@ namespace Mandate.Persistence
                 var builder = new StringBuilder(digest.Length * 2);
                 foreach (var value in digest) builder.Append(value.ToString("x2"));
                 return builder.ToString();
+            }
+        }
+
+        public static string ComputeDeterministicStateSha256(
+            Luoyang184LivingWorldRuntimeState runtime)
+        {
+            if (runtime == null) throw new ArgumentNullException(nameof(runtime));
+            using (var hash = SHA256.Create())
+            using (var crypto = new CryptoStream(Stream.Null, hash,
+                       CryptoStreamMode.Write))
+            using (var text = new StreamWriter(crypto,
+                       new UTF8Encoding(false), 4096, true))
+            using (var json = new JsonTextWriter(text))
+            {
+                var serializer = JsonSerializer.Create(
+                    new JsonSerializerSettings
+                    {
+                        Formatting = Formatting.None,
+                        NullValueHandling = NullValueHandling.Include,
+                        ContractResolver = new AuthorityStateContractResolver()
+                    });
+                serializer.Serialize(json, runtime);
+                json.Flush();
+                text.Flush();
+                crypto.FlushFinalBlock();
+                var digest = hash.Hash;
+                var builder = new StringBuilder(digest.Length * 2);
+                foreach (var value in digest) builder.Append(value.ToString("x2"));
+                return builder.ToString();
+            }
+        }
+
+        private sealed class AuthorityStateContractResolver :
+            DefaultContractResolver
+        {
+            protected override JsonProperty CreateProperty(
+                System.Reflection.MemberInfo member,
+                MemberSerialization memberSerialization)
+            {
+                var property = base.CreateProperty(member, memberSerialization);
+                if (member.DeclaringType ==
+                        typeof(Luoyang184LivingWorldRuntimeState) &&
+                    member.Name == nameof(
+                        Luoyang184LivingWorldRuntimeState.Performance))
+                    property.Ignored = true;
+                return property;
             }
         }
     }

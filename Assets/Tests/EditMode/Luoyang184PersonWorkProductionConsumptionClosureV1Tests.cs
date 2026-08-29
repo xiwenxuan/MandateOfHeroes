@@ -299,22 +299,11 @@ namespace Mandate.Tests
         public void ResourceConservationTests()
         {
             var runtime = LuoyangLivingWorldTestFixture.Day365;
-            var imported = runtime.InventoryFlows.Where(item =>
-                (item.OperationId == "scenario.opening.delivered_stock" ||
-                 item.OperationId == "supply.shipment_delivered") &&
-                IsFood(item.ProductId)).Sum(item => item.QuantityMilliunits);
-            var harvest = runtime.InventoryFlows.Where(item =>
-                item.OperationId == "production.crop_harvest" &&
-                IsFood(item.ProductId)).Sum(item => item.QuantityMilliunits);
-            var processingLoss = runtime.InventoryFlows.Where(item =>
-                item.OperationId == "production.recipe_settlement" &&
-                IsFood(item.ProductId)).Sum(item => item.LossMilliunits);
-            var consumed = runtime.Households.Sum(item =>
-                item.CumulativeFoodConsumedMilliunits);
-            var closing = runtime.Inventories.Where(item =>
-                IsFood(item.ProductId)).Sum(item => item.QuantityMilliunits);
-            Assert.That(imported + harvest,
-                Is.EqualTo(consumed + closing + processingLoss));
+            var audit = new LuoyangFoodConservationAuditor().Audit(runtime);
+
+            Assert.That(audit.DifferenceMilliunits, Is.Zero);
+            Assert.That(audit.UnknownPhysicalDeltaCount, Is.Zero);
+            Assert.That(audit.Balanced, Is.True);
         }
 
         [Test]
@@ -363,16 +352,6 @@ namespace Mandate.Tests
                     item.Id + ":" + item.QuantityMilliunits));
         }
 
-        private static bool IsFood(string productId) =>
-            productId == "product.food.millet_grain" ||
-            productId == "product.food.wheat_grain" ||
-            productId == "product.food.broomcorn_grain" ||
-            productId == "product.food.bean" ||
-            productId == CoreProductionContent.WheatGrainProductId ||
-            productId == CoreProductionContent.WheatFlourProductId ||
-            productId == CoreProductionContent.DryRationProductId ||
-            productId == CoreProductionContent.FreshMuttonProductId ||
-            productId == CoreProductionContent.OffalProductId;
     }
 
     public sealed partial class WorldKernelTests
