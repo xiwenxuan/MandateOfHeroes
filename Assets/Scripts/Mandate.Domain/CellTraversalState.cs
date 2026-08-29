@@ -33,6 +33,11 @@ namespace Mandate.Domain
         public const string Cart = "movement.capability.cart.v1";
         public const string PackAnimal = "movement.capability.pack-animal.v1";
         public const string Military = "movement.capability.military.v1";
+
+        public static readonly IReadOnlyList<string> All = new[]
+        {
+            Foot, Horse, Cart, PackAnimal, Military
+        };
     }
 
     public static class FacilityAccessRequirementIds
@@ -710,6 +715,31 @@ namespace Mandate.Domain
                 return LuoyangHumanScaleWorldTraversalRules
                     .IsFacilityAccessible(world,
                         segment.FormalWorldObjectId);
+            return false;
+        }
+
+        public static bool CanTraverseCondition(WorldState world,
+            string traversalConditionId, string formalWorldObjectId)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (string.Equals(traversalConditionId,
+                    CellTraversalIds.StaticConditionId,
+                    StringComparison.Ordinal)) return true;
+            if (string.Equals(traversalConditionId,
+                    CellTraversalIds.FormalRoadConditionId,
+                    StringComparison.Ordinal))
+                return LuoyangHumanScaleWorldTraversalRules
+                    .CanTraverseStrategicEdge(world, formalWorldObjectId);
+            if (string.Equals(traversalConditionId,
+                    CellTraversalIds.FormalPassageConditionId,
+                    StringComparison.Ordinal))
+                return LuoyangHumanScaleWorldTraversalRules
+                    .CanTraversePassage(world, formalWorldObjectId);
+            if (string.Equals(traversalConditionId,
+                    CellTraversalIds.FormalFacilityConditionId,
+                    StringComparison.Ordinal))
+                return LuoyangHumanScaleWorldTraversalRules
+                    .IsFacilityAccessible(world, formalWorldObjectId);
             return false;
         }
 

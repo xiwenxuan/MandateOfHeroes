@@ -614,12 +614,13 @@ namespace Mandate.Simulation
                 var batch = FindBatch(world, reservation.BatchId);
                 if (batch.OwnerFamilyId != sellerFamilyId ||
                     batch.StorageFacilityId != sellerStorageFacilityId ||
-                    batch.ReservedQuantity < reservation.RemainingQuantity ||
-                    !_content.TryGetFood(batch.ProductDefinitionId, out var food))
+                    batch.ReservedQuantity < reservation.RemainingQuantity)
                 {
                     throw new InvalidOperationException(
                         $"Invalid civilian freight reservation for {batch.Id}.");
                 }
+                _content.TryGetFood(
+                    batch.ProductDefinitionId, out var food);
                 var byCapacity = (capacityWeight - plannedWeight) /
                     batch.UnitWeight;
                 var take = Math.Min(
@@ -634,7 +635,8 @@ namespace Mandate.Simulation
                 plan.Add(new FoodTransferPlanLine(batch, take));
                 plannedQuantity = checked(plannedQuantity + take);
                 plannedNutrition = checked(
-                    plannedNutrition + take * food.NutritionBasisPoints);
+                    plannedNutrition + take *
+                    (food == null ? 0 : food.NutritionBasisPoints));
                 plannedWeight = checked(
                     plannedWeight + take * batch.UnitWeight);
             }
@@ -982,8 +984,11 @@ namespace Mandate.Simulation
                 plannedWeight = checked(
                     plannedWeight + take * batch.UnitWeight);
                 plannedNutrition = checked(
-                    plannedNutrition + take * _content.GetFood(
-                        batch.ProductDefinitionId).NutritionBasisPoints);
+                    plannedNutrition + take *
+                    (_content.TryGetFood(
+                        batch.ProductDefinitionId, out var food)
+                        ? food.NutritionBasisPoints
+                        : 0));
             }
             var result = new FoodTransferResult
             {

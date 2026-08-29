@@ -1,0 +1,69 @@
+{
+  "schema": "mandate.luoyang-outer-supply-catchment.v1",
+  "format_version": 1,
+  "catchment_id": "luoyang.supply-catchment.v1",
+  "world_id": "HanWorldV1",
+  "city_id": "location.capital.luoyang",
+  "source_package_relative_path": "../Luoyang184MetropolitanInitializationV1",
+  "selection_contract": "all facilities, settlements, agriculture units and formal routes in the protected metropolitan increment",
+  "administrative_effect": "none",
+  "is_projection_only": true,
+  "inclusive_population_target": 700000,
+  "materialized_world_population": 400000,
+  "materialized_outer_population": 130000,
+  "unmaterialized_population_gap": 300000,
+  "materialized_outer_households": 26907,
+  "selected_facility_count": 854,
+  "selected_settlement_count": 33,
+  "selected_agriculture_unit_count": 135,
+  "selected_storage_facility_count": 22,
+  "selected_road_facility_count": 267,
+  "food_product_definition_ids": [
+    "product.food.bean",
+    "product.food.broomcorn_grain",
+    "product.food.millet_grain",
+    "product.food.wheat_grain"
+  ],
+  "wood_product_definition_ids": [
+    "product.material.timber"
+  ],
+  "content_id_crosswalks": [
+    {
+      "source_id": "product.food.wheat_grain",
+      "formal_id": "product.wheat_grain",
+      "migration_id": "content-migration.luoyang-outer-supply.wheat-grain.v1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "outer_persons.bin",
+      "bytes": 10400032,
+      "sha256": "77c4ca3f863541cf3a25c6cefdd9e51158b6409e5612d4fc3e5e90f12e688ab9"
+    },
+    {
+      "path": "outer_households.bin",
+      "bytes": 861056,
+      "sha256": "7c54a0d413bf2b3b8a703abaa5270e975c9ff06bafd67ec39b252f2cb31cc29e"
+    },
+    {
+      "path": "facilities.json",
+      "bytes": 936288,
+      "sha256": "c11ce33a29b585a52a969789a8bb5541be8fc46d726b4508db657ce35b8e347d"
+    },
+    {
+      "path": "agriculture_supply.json",
+      "bytes": 522389,
+      "sha256": "1ab605099c3da2560367dc0eae7d9e4b1cd487bd2e185d676f38466a0f6bd7ca"
+    },
+    {
+      "path": "roads_logistics.json",
+      "bytes": 31773,
+      "sha256": "d6d3c1a6ca52c108c70d0d3db27a521723cb75f0da4f9f5696305210fcdb2f61"
+    },
+    {
+      "path": "spatial_plan.json",
+      "bytes": 16319,
+      "sha256": "ec8aa7fd955631262d0266c6bc574f4fd73690110ab4cbf3814073e4bd7b6999"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -14,6 +15,9 @@ namespace Mandate.Simulation
         public string TransportInventoryContainerId;
         public string RouteId;
         public List<string> RouteIds = new List<string>();
+        public ulong OriginCellId64;
+        public ulong TargetCellId64;
+        public string MovementCapabilityId = MovementCapabilityIds.PackAnimal;
         public long Quantity;
         public long FreightFee;
     }
@@ -31,6 +35,9 @@ namespace Mandate.Simulation
         public string CarrierPersonId;
         public string TransportInventoryContainerId;
         public List<string> RouteIds = new List<string>();
+        public ulong OriginCellId64;
+        public ulong TargetCellId64;
+        public string MovementCapabilityId = MovementCapabilityIds.PackAnimal;
         public long Quantity;
         public long FreightFee;
     }
@@ -57,15 +64,22 @@ namespace Mandate.Simulation
         private readonly FoodInventorySystem _foodInventory;
         private readonly FormalCountyMarketSystem _market;
         private readonly NamedRandom _random;
+        private readonly CellTraversalPlan _cellTraversalPlan;
+        private readonly CellTraversalPlanner _cellTraversalPlanner;
 
         public CivilianFreightSystem(
             ulong masterSeed,
-            ProductionContentRegistry content)
+            ProductionContentRegistry content,
+            CellTraversalPlan cellTraversalPlan = null)
         {
             _content = content ?? throw new ArgumentNullException(nameof(content));
             _foodInventory = new FoodInventorySystem(content);
             _market = new FormalCountyMarketSystem(content);
             _random = new NamedRandom(masterSeed);
+            _cellTraversalPlan = cellTraversalPlan;
+            _cellTraversalPlanner = cellTraversalPlan == null
+                ? null
+                : new CellTraversalPlanner(cellTraversalPlan);
         }
 
         public CivilianCarrierRegistrationState RegisterCarrier(
@@ -513,7 +527,7 @@ namespace Mandate.Simulation
             var container = ProductInventorySystem.FindContainer(
                 world, request.TransportInventoryContainerId);
             var product = _content.GetProduct(sell.ProductDefinitionId);
-            var food = _content.GetFood(sell.ProductDefinitionId);
+            _content.TryGetFood(sell.ProductDefinitionId, out var food);
             var requestedRouteIds = RequestRouteIds(request);
             var routePlan = BuildRoutePlan(
                 world,
@@ -521,6 +535,16 @@ namespace Mandate.Simulation
                 seller.LocationId,
                 buyer.LocationId);
             var route = FindRoute(world, requestedRouteIds[0]);
+            var cellRoute = BuildRequestedCellRoute(
+                world,
+                seller.LocationId,
+                buyer.LocationId,
+                request.OriginCellId64,
+                request.TargetCellId64,
+                request.MovementCapabilityId);
+            if (cellRoute != null && requestedRouteIds.Count != 1)
+                throw new InvalidOperationException(
+                    "Cell-routed civilian freight currently requires one continuous formal market route leg.");
             var demand = string.IsNullOrEmpty(request.DemandId)
                 ? null
                 : FindDemand(world, request.DemandId);
@@ -648,7 +672,7 @@ namespace Mandate.Simulation
                 ProductPerishabilityBasisPoints =
                     product.PerishabilityBasisPoints,
                 FoodSpoilageSensitivityBasisPoints =
-                    food.SpoilageSensitivityBasisPoints,
+                    food == null ? 0 : food.SpoilageSensitivityBasisPoints,
                 CargoUnitWeight = product.BaseWeight,
                 CreatedDay = world.AbsoluteDay,
                 DispatchedDay = world.AbsoluteDay,
@@ -656,6 +680,9 @@ namespace Mandate.Simulation
             };
             world.CivilianFreights.Add(freight);
             world.Journeys.Add(journey);
+            if (cellRoute != null)
+                BindCellRoute(world, freight, journey, carrier, cellRoute,
+                    false);
             if (demand != null)
             {
                 demand.Status = CivilianFreightDemandStatus.Dispatched;
@@ -768,6 +795,16 @@ namespace Mandate.Simulation
             var routePlan = BuildRoutePlan(
                 world, request.RouteIds, seller.LocationId,
                 destination.CountyLocationId);
+            var cellRoute = BuildRequestedCellRoute(
+                world,
+                seller.LocationId,
+                destination.CountyLocationId,
+                request.OriginCellId64,
+                request.TargetCellId64,
+                request.MovementCapabilityId);
+            if (cellRoute != null && request.RouteIds.Count != 1)
+                throw new InvalidOperationException(
+                    "Cell-routed public relief freight currently requires one continuous formal market route leg.");
             var firstRoute = FindRoute(world, request.RouteIds[0]);
             if (world.FoodInventoryAuthorityMode !=
                     FoodInventoryAuthorityMode.FormalProductBatches ||
@@ -921,6 +958,9 @@ namespace Mandate.Simulation
             };
             world.CivilianFreights.Add(freight);
             world.Journeys.Add(journey);
+            if (cellRoute != null)
+                BindCellRoute(world, freight, journey, carrier, cellRoute,
+                    false);
             AddLedger(
                 world, freight, CivilianFreightLedgerType.Dispatched,
                 carrier.Id, dispatch.InventoryTransactionId,
@@ -956,6 +996,9 @@ namespace Mandate.Simulation
             for (var i = 0; i < active.Count; i++)
             {
                 var freight = active[i];
+                if (freight.Status == CivilianFreightStatus.InTransit &&
+                    freight.UsesCellRoute && freight.CellRouteWaiting)
+                    TryRerouteCellFreight(world, freight);
                 if (freight.Status ==
                     CivilianFreightStatus.AwaitingNextLeg)
                 {
@@ -1030,6 +1073,37 @@ namespace Mandate.Simulation
                     Complete(world, freight);
                 }
             }
+        }
+
+        public bool TryRerouteCellFreight(WorldState world,
+            CivilianFreightState freight)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (freight == null) throw new ArgumentNullException(nameof(freight));
+            if (_cellTraversalPlanner == null || !freight.UsesCellRoute ||
+                !freight.CellRouteWaiting ||
+                freight.Status != CivilianFreightStatus.InTransit)
+                return false;
+            if (LuoyangCellTraversalRules.CanTraverseCondition(
+                    world,
+                    freight.CellRouteSegments[
+                        freight.CurrentCellRouteSegmentIndex]
+                        .TraversalConditionId,
+                    freight.CellRouteWaitingOnFormalWorldObjectId))
+                return false;
+            if (!_cellTraversalPlanner.TryFindRoute(
+                    freight.CellRouteCurrentCellId64,
+                    freight.CellRouteTargetCellId64,
+                    freight.CellRouteMovementCapabilityId,
+                    port => LuoyangCellTraversalRules.IsPortAvailable(
+                        world, port),
+                    out var route,
+                    out _)) return false;
+            var journey = FindJourney(world, freight.JourneyId);
+            var carrier = ProductInventorySystem.FindPerson(
+                world, freight.CarrierPersonId);
+            BindCellRoute(world, freight, journey, carrier, route, true);
+            return true;
         }
 
         private static void StartNextLeg(
@@ -1298,6 +1372,19 @@ namespace Mandate.Simulation
                 }
             }
             return false;
+        }
+
+        private static JourneyState FindJourney(
+            WorldState world, string journeyId)
+        {
+            for (var i = 0; i < world.Journeys.Count; i++)
+            {
+                if (string.Equals(world.Journeys[i].Id, journeyId,
+                        StringComparison.Ordinal))
+                    return world.Journeys[i];
+            }
+            throw new InvalidOperationException(
+                "Missing civilian freight Journey " + journeyId + ".");
         }
 
         private static long CalculateContainerWeight(
@@ -1610,6 +1697,113 @@ namespace Mandate.Simulation
                 }
             }
             return true;
+        }
+
+        private CellRoute BuildRequestedCellRoute(
+            WorldState world,
+            string originLocationId,
+            string targetLocationId,
+            ulong requestedOriginCellId64,
+            ulong requestedTargetCellId64,
+            string movementCapabilityId)
+        {
+            var originCellId64 = requestedOriginCellId64;
+            var targetCellId64 = requestedTargetCellId64;
+            if (originCellId64 == 0)
+                TryParseCellLocation(originLocationId, out originCellId64);
+            if (targetCellId64 == 0)
+                TryParseCellLocation(targetLocationId, out targetCellId64);
+            if (originCellId64 == 0 && targetCellId64 == 0) return null;
+            if (_cellTraversalPlanner == null || originCellId64 == 0 ||
+                targetCellId64 == 0)
+                throw new InvalidOperationException(
+                    "Cell-routed freight requires one formal Cell traversal plan and two formal Cell IDs.");
+            var capabilityId = string.IsNullOrWhiteSpace(movementCapabilityId)
+                ? MovementCapabilityIds.PackAnimal
+                : movementCapabilityId;
+            if (!MovementCapabilityIds.All.Contains(capabilityId))
+                throw new InvalidOperationException(
+                    "Civilian freight uses an unsupported movement capability.");
+            if (!_cellTraversalPlanner.TryFindRoute(
+                    originCellId64,
+                    targetCellId64,
+                    capabilityId,
+                    port => LuoyangCellTraversalRules.IsPortAvailable(
+                        world, port),
+                    out var route,
+                    out var failureReasonId))
+                throw new InvalidOperationException(
+                    "Civilian freight CellRoute planning failed: " +
+                    failureReasonId + ".");
+            return route;
+        }
+
+        private void BindCellRoute(WorldState world,
+            CivilianFreightState freight,
+            JourneyState journey,
+            PersonState carrier,
+            CellRoute route,
+            bool reroute)
+        {
+            if (route == null || route.Segments.Count == 0)
+                throw new InvalidOperationException(
+                    "Civilian freight cannot bind an empty CellRoute.");
+            var segments = new List<CivilianFreightCellRouteSegmentState>(
+                route.Segments.Count);
+            long remaining = 0;
+            for (var i = 0; i < route.Segments.Count; i++)
+            {
+                var source = route.Segments[i];
+                var segment = new CivilianFreightCellRouteSegmentState
+                {
+                    Sequence = i,
+                    Id = source.Id,
+                    KindId = source.KindId,
+                    FromCellId64 = source.FromCellId64,
+                    ToCellId64 = source.ToCellId64,
+                    DistanceCentimetres = source.DistanceCentimetres,
+                    TraversalCostPermille = source.TraversalCostPermille,
+                    TraversalConditionId = source.TraversalConditionId,
+                    FormalWorldObjectId = source.FormalWorldObjectId
+                };
+                segments.Add(segment);
+                remaining = checked(
+                    remaining + segment.WeightedDistanceCentimetres);
+            }
+            freight.UsesCellRoute = true;
+            freight.CellRoutePlanVersionId = _cellTraversalPlan.VersionId;
+            freight.CellRouteAssetHash = _cellTraversalPlan.AssetHash;
+            freight.CellRouteMovementCapabilityId =
+                route.MovementCapabilityId;
+            if (!reroute)
+                freight.CellRouteOriginCellId64 = route.OriginCellId64;
+            freight.CellRouteTargetCellId64 = route.TargetCellId64;
+            freight.CellRouteCurrentCellId64 = route.OriginCellId64;
+            freight.CellRouteSegments = segments;
+            freight.CurrentCellRouteSegmentIndex = 0;
+            freight.CurrentCellRouteSegmentRemainingWeightedCentimetres =
+                segments[0].WeightedDistanceCentimetres;
+            freight.CellRouteRemainingWeightedCentimetres = remaining;
+            freight.CellRouteWaiting = false;
+            freight.CellRouteWaitingReasonId = string.Empty;
+            freight.CellRouteWaitingOnFormalWorldObjectId = string.Empty;
+            if (reroute) freight.CellRouteRevision++;
+            journey.RemainingKilometers = checked((int)Math.Max(
+                1L, (remaining + 99_999L) / 100_000L));
+            carrier.CurrentCellId64 = route.OriginCellId64;
+        }
+
+        private static bool TryParseCellLocation(
+            string locationId, out ulong cellId64)
+        {
+            const string prefix = "cell.id64.";
+            cellId64 = 0;
+            return !string.IsNullOrEmpty(locationId) &&
+                locationId.StartsWith(prefix, StringComparison.Ordinal) &&
+                ulong.TryParse(locationId.Substring(prefix.Length),
+                    System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out cellId64) && cellId64 != 0;
         }
 
         private static CivilianRoutePath BuildRoutePlan(
@@ -2296,5 +2490,278 @@ namespace Mandate.Simulation
                 // consumer establishes the committed projection boundary.
             }
         }
+    }
+
+    public sealed class LuoyangSupplyCatchmentSelection
+    {
+        public const string V1Id = "luoyang.supply-catchment.v1";
+        public const int InclusivePopulationTarget = 700_000;
+
+        public string Id = V1Id;
+        public List<ulong> CellIds = new List<ulong>();
+        public List<string> SupplyLocationIds = new List<string>();
+        public List<string> CityLocationIds = new List<string>();
+        public List<string> SettlementIds = new List<string>();
+        public List<string> FacilityIds = new List<string>();
+
+        public void Normalize()
+        {
+            CellIds = CellIds.Distinct().OrderBy(item => item).ToList();
+            SupplyLocationIds = SortedUnique(SupplyLocationIds);
+            CityLocationIds = SortedUnique(CityLocationIds);
+            SettlementIds = SortedUnique(SettlementIds);
+            FacilityIds = SortedUnique(FacilityIds);
+        }
+
+        private static List<string> SortedUnique(IEnumerable<string> values) =>
+            (values ?? Array.Empty<string>()).Where(item =>
+                    !string.IsNullOrWhiteSpace(item))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(item => item, StringComparer.Ordinal)
+                .ToList();
+    }
+
+    public sealed class LuoyangSupplyCatchmentAudit
+    {
+        public int CellCount;
+        public int SettlementCount;
+        public int FacilityCount;
+        public int PermanentPersonCount;
+        public int HouseholdCount;
+        public int ProductionOrderCount;
+        public int StorageFacilityCount;
+        public int TraversalCoveredCellCount;
+        public List<string> CriticalReferenceErrors = new List<string>();
+        public bool Passed => CriticalReferenceErrors.Count == 0;
+    }
+
+    public sealed class LuoyangCitySupplyProjection
+    {
+        public long CurrentUsableFoodStock;
+        public long CurrentUsableNutritionBasisUnits;
+        public long DailyFoodDemandNutritionBasisUnits;
+        public double DaysOfSupply;
+        public long IncomingFreightQuantity;
+        public int DelayedFreightCount;
+        public int BlockedFreightCount;
+        public int HouseholdShortfallCount;
+        public long PublicGranaryStock;
+        public long MarketAvailableSupply;
+    }
+
+    public sealed class LuoyangSupplyProjectionSystem
+    {
+        private const int DaysPerYear = 360;
+        private const int DaysPerHouseholdSettlement = 30;
+        private readonly ProductionContentRegistry _content;
+
+        public LuoyangSupplyProjectionSystem(
+            ProductionContentRegistry content)
+        {
+            _content = content ?? throw new ArgumentNullException(
+                nameof(content));
+        }
+
+        public LuoyangSupplyCatchmentAudit AuditCatchment(
+            WorldState world,
+            LuoyangSupplyCatchmentSelection selection,
+            CellTraversalPlan traversalPlan)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (selection == null) throw new ArgumentNullException(
+                nameof(selection));
+            selection.Normalize();
+            var result = new LuoyangSupplyCatchmentAudit
+            {
+                CellCount = selection.CellIds.Count,
+                SettlementCount = selection.SettlementIds.Count,
+                FacilityCount = selection.FacilityIds.Count
+            };
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            for (var i = 0; i < selection.CellIds.Count; i++)
+            {
+                if (!grid.TryDecode(new WorldMapCellId(
+                        selection.CellIds[i]), out _, out _))
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-cell:" + selection.CellIds[i]);
+                if (traversalPlan != null &&
+                    traversalPlan.ProfilesByCellId.ContainsKey(
+                        selection.CellIds[i]))
+                    result.TraversalCoveredCellCount++;
+                else
+                    result.CriticalReferenceErrors.Add(
+                        "missing-traversal:" + selection.CellIds[i]);
+            }
+            for (var i = 0; i < selection.SettlementIds.Count; i++)
+                if (!world.Villages.Any(item => item != null &&
+                        item.Id == selection.SettlementIds[i]))
+                    result.CriticalReferenceErrors.Add(
+                        "missing-settlement:" + selection.SettlementIds[i]);
+            for (var i = 0; i < selection.FacilityIds.Count; i++)
+            {
+                var id = selection.FacilityIds[i];
+                if (!world.Facilities.Any(item => item != null &&
+                        item.Id == id) &&
+                    !world.VillageFacilities.Any(item => item != null &&
+                        item.Id == id))
+                    result.CriticalReferenceErrors.Add(
+                        "missing-facility:" + id);
+            }
+            var locations = new HashSet<string>(
+                selection.SupplyLocationIds, StringComparer.Ordinal);
+            result.PermanentPersonCount = world.People.Count(item =>
+                item != null && item.CountsTowardPopulation &&
+                locations.Contains(item.LocationId));
+            result.HouseholdCount = world.Families.Count(item =>
+                item != null && locations.Contains(item.LocationId));
+            result.ProductionOrderCount = world.AgricultureWorkOrders.Count(
+                item => item != null && world.Villages.Any(village =>
+                    village.Id == item.VillageId &&
+                    locations.Contains(village.LocationId))) +
+                world.ResourceExtractionOrders.Count(item => item != null &&
+                    locations.Contains(ResourceOrderLocation(world, item)));
+            result.StorageFacilityCount = world.VillageFacilities.Count(item =>
+                item != null && item.Kind ==
+                    VillageFacilityKind.HouseholdGranary &&
+                world.Villages.Any(village => village.Id == item.VillageId &&
+                    locations.Contains(village.LocationId)));
+            return result;
+        }
+
+        public LuoyangCitySupplyProjection BuildCityProjection(
+            WorldState world,
+            LuoyangSupplyCatchmentSelection selection)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (selection == null) throw new ArgumentNullException(
+                nameof(selection));
+            selection.Normalize();
+            var cityLocations = new HashSet<string>(
+                selection.CityLocationIds, StringComparer.Ordinal);
+            var result = new LuoyangCitySupplyProjection();
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch == null || batch.Quantity <= 0 ||
+                    batch.QualityBasisPoints <= 0 ||
+                    !_content.TryGetFood(
+                        batch.ProductDefinitionId, out var food) ||
+                    !cityLocations.Contains(BatchLocation(world, batch)) ||
+                    IsMilitaryOwned(world, batch)) continue;
+                var usable = Math.Max(0L,
+                    batch.Quantity - batch.ReservedQuantity);
+                result.CurrentUsableFoodStock = checked(
+                    result.CurrentUsableFoodStock + usable);
+                result.CurrentUsableNutritionBasisUnits = checked(
+                    result.CurrentUsableNutritionBasisUnits +
+                    usable * food.NutritionBasisPoints);
+                if (IsGovernmentOwned(world, batch))
+                    result.PublicGranaryStock = checked(
+                        result.PublicGranaryStock + usable);
+            }
+            long monthlyDemand = 0;
+            for (var i = 0; i < world.People.Count; i++)
+            {
+                var person = world.People[i];
+                if (person == null || !person.IsAlive ||
+                    !cityLocations.Contains(person.LocationId)) continue;
+                var age = Math.Max(
+                    0L, (world.AbsoluteDay - person.BirthDay) / DaysPerYear);
+                monthlyDemand = checked(monthlyDemand +
+                    (age < 15 || age > 60 ? 2L : 3L) * 10_000L);
+            }
+            result.DailyFoodDemandNutritionBasisUnits =
+                (monthlyDemand + DaysPerHouseholdSettlement - 1) /
+                DaysPerHouseholdSettlement;
+            result.DaysOfSupply = result.DailyFoodDemandNutritionBasisUnits == 0
+                ? 0d
+                : (double)result.CurrentUsableNutritionBasisUnits /
+                    result.DailyFoodDemandNutritionBasisUnits;
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                if (freight == null || freight.Status ==
+                        CivilianFreightStatus.Completed ||
+                    !cityLocations.Contains(freight.DestinationLocationId) ||
+                    !_content.TryGetFood(
+                        freight.ProductDefinitionId, out _)) continue;
+                result.IncomingFreightQuantity = checked(
+                    result.IncomingFreightQuantity +
+                    freight.RemainingCargoQuantity);
+                if (freight.CellRouteWaiting)
+                {
+                    result.DelayedFreightCount++;
+                    result.BlockedFreightCount++;
+                }
+            }
+            result.HouseholdShortfallCount = world.Families.Count(item =>
+                item != null && cityLocations.Contains(item.LocationId) &&
+                item.FoodSecurityBasisPoints < 10_000);
+            for (var i = 0; i < world.FormalMarketOrders.Count; i++)
+            {
+                var order = world.FormalMarketOrders[i];
+                if (order == null || order.Side != FormalMarketOrderSide.Sell ||
+                    order.Status != FormalMarketOrderStatus.Active ||
+                    !_content.TryGetFood(order.ProductDefinitionId, out _) ||
+                    !cityLocations.Contains(FamilyLocation(
+                        world, order.OwnerFamilyId))) continue;
+                result.MarketAvailableSupply = checked(
+                    result.MarketAvailableSupply + order.RemainingQuantity);
+            }
+            return result;
+        }
+
+        private static string ResourceOrderLocation(
+            WorldState world, ResourceExtractionOrderState order)
+        {
+            if (!string.IsNullOrEmpty(order.StorageFacilityId))
+            {
+                var storage = world.VillageFacilities.FirstOrDefault(item =>
+                    item.Id == order.StorageFacilityId);
+                var village = storage == null ? null :
+                    world.Villages.FirstOrDefault(item =>
+                        item.Id == storage.VillageId);
+                return village?.LocationId ?? string.Empty;
+            }
+            var site = world.ProductionSites.FirstOrDefault(item =>
+                item.Id == order.ProductionSiteId);
+            return site?.LocationId ?? string.Empty;
+        }
+
+        private static string BatchLocation(
+            WorldState world, ProductBatchState batch)
+        {
+            if (!string.IsNullOrEmpty(batch.StorageFacilityId))
+            {
+                var storage = world.VillageFacilities.FirstOrDefault(item =>
+                    item.Id == batch.StorageFacilityId);
+                var village = storage == null ? null :
+                    world.Villages.FirstOrDefault(item =>
+                        item.Id == storage.VillageId);
+                if (village != null) return village.LocationId;
+            }
+            var container = world.InventoryContainers.FirstOrDefault(item =>
+                item.Id == batch.InventoryContainerId);
+            return container?.LocationId ?? string.Empty;
+        }
+
+        private static bool IsMilitaryOwned(
+            WorldState world, ProductBatchState batch) =>
+            !string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+            world.Organizations.Any(item => item.Id ==
+                batch.OwnerOrganizationId && item.Type ==
+                OrganizationType.Military);
+
+        private static bool IsGovernmentOwned(
+            WorldState world, ProductBatchState batch) =>
+            !string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+            world.Organizations.Any(item => item.Id ==
+                batch.OwnerOrganizationId && item.Type ==
+                OrganizationType.Government);
+
+        private static string FamilyLocation(
+            WorldState world, string familyId) =>
+            world.Families.FirstOrDefault(item => item.Id == familyId)
+                ?.LocationId ?? string.Empty;
     }
 }

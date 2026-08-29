@@ -4393,7 +4393,8 @@ namespace Mandate.Simulation
             ulong masterSeed,
             ProductionContentRegistry productionContent = null,
             IPersonRepository personRepository = null,
-            WorldCommandRuntime commandRuntime = null)
+            WorldCommandRuntime commandRuntime = null,
+            CellTraversalPlan cellTraversalPlan = null)
         {
             _random = new NamedRandom(masterSeed);
             _personRepository = personRepository;
@@ -4408,7 +4409,8 @@ namespace Mandate.Simulation
                 productionContent ?? ProductionContentRegistry.CreateCore());
             _civilianFreightSystem = new CivilianFreightSystem(
                 masterSeed,
-                productionContent ?? ProductionContentRegistry.CreateCore());
+                productionContent ?? ProductionContentRegistry.CreateCore(),
+                cellTraversalPlan);
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent, personRepository);
             _formalHouseholdFoodMonthlyCommandScheduler =

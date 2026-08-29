@@ -833,3 +833,16 @@ V70→V71是顺序迁移：旧档初始化空的`WorldDecisionAgents`与`WorldSi
 - 清单新增字段是向后兼容扩展，不改变checkpoint gzip结构或FormatVersion。测试必须证明修改
   Performance不改变状态摘要，而任何权威库存变化都会改变它；大世界摘要必须流式计算，禁止先
   构造完整JSON字符串造成峰值内存失控。
+
+## 21. V78 农业早收与民运 CellRoute 存档合同
+
+- 农业工单保存早收规则ID、门槛、收获时成熟度、产量 basis points 和是否早收；规则变化不能重写
+  已完成或进行中工单的历史结果。
+- 既有 `CivilianFreightState` 保存 CellRoute 版本/摘要、移动能力、起终/当前 Cell、路段、路段内
+  进度、等待原因、等待正式对象和路线 Revision；货物数量仍只在 ProductBatch/Inventory 中。
+- Gate、Bridge 或 Road 状态不复制进货运权威；每次跨段前读取正式世界状态。等待存档加载后保持
+  原 Cell、Carrier 和移动容器，开放后从保存进度继续，到货结算仍由既有 Freight Arrival 幂等处理。
+- V77→V78 顺序迁移为旧农业工单补标准规则快照，并把旧民运明确为无 CellRoute；不生成路线、不
+  移动物资、不改变 Owner、不重建 Market Trade。
+- 相同初始存档、Seed、内容、命令和门桥变化必须得到相同早收产量、CellRoute、等待/到货状态与
+  完整 World Snapshot。

@@ -2320,3 +2320,27 @@ EngineSmoke通过；适用Unity食品独立fixture为1/1 PASS。一次无筛选�
 无关测试时超时，保留为`blocked/124`历史诊断，不冒充全量PASS，也不影响本任务无Presentation变更的
 适用门禁。当前正式状态是`TASK_FORMAL_FOOD_INVENTORY_CONSERVATION_RCA_AND_CLOSURE_V1_ACCEPTED`，
 固定下一阶段为“洛阳外围供应区与城市物流V1”。
+
+## 48. 洛阳外围供应区、正式物流与城市供给闭环 V1（2026-08-29）
+
+当前报告见
+[`LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_ACCEPTANCE_REPORT.md`](LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_ACCEPTANCE_REPORT.md)。
+V78 已把既有 Civilian Freight 接入四向 CellTraversal，保存移动能力、CellRoute 路段、进度与等待，
+并在 Road、Gate、Bridge 状态变化时等待或按能力重算；ProductBatch、Inventory、Market、Person、
+Mobile Container、Journey 和 Arrival 仍是原有同一本世界账。统一农业补入版本化80%早收门槛与产量
+后果，食品和木材核心垂直切片、城门中断/恢复、仓满等待、Save/Load、三次重放和守恒均已证明。
+
+只读供应区当前选择869 Cell、854 Facility、33 Settlement、135农业单元、22仓储和267道路，关键
+引用错误0。但实际世界仍只有400,000永久人物，其中外围增量130,000；700,000包含式目标仍差
+300,000，且现有设施承载不足。旧紧凑包的小麦ID已有显式迁移桥，豆、黍、粟仍保留为未解析内容。
+受控Unity专项又在生成启动日志前 `blocked/125`，没有 EditMode/PlayMode 和图形性能结果。
+
+本轮固定源码指纹完整Core为793/793、失败0；两项多年确定性慢测按精确名称使用900秒授权分类，
+其余保持300秒。全工程编译和差异检查通过，因此已实现代码没有已知Core退化；但这些结果不能替代
+缺失的Unity图形门禁或未物化人口事实。
+
+因此当前正式状态为
+`TASK_LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_NOT_ACCEPTED`。保留已实现的物流
+底座，但不得宣称70万人外围供给世界已经完成。全局下一步仍是先闭合缺失人口/家庭/设施、内容定义、
+长期正式世界接线和Unity证据；只有本任务转为ACCEPTED后，才进入城市供给—市场—家庭消费联合压力
+与可玩性验收V1。

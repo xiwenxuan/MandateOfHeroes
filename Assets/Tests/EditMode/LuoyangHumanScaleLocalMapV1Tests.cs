@@ -312,7 +312,8 @@ namespace Mandate.Tests
 
             var migrated = WorldSnapshotMigrator.MigrateToCurrent(world);
             var person = migrated.People.Single();
-            Assert.That(migrated.SchemaVersion, Is.EqualTo(77));
+            Assert.That(migrated.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(person.CurrentCellId64, Is.EqualTo(123));
             Assert.That(person.CurrentFacilityId,
                 Is.EqualTo("facility.local-map.v76"));

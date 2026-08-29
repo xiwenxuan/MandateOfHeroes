@@ -9361,6 +9361,113 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void EarlyHarvestYieldTests_ThresholdAndPenaltyUseUnifiedAgriculture()
+        {
+            var content = LoadHanFoodProductionContent();
+            var earlyWorld = VillagePrototypeFactory.Create(200, 25_902);
+            var fullWorld = VillagePrototypeFactory.Create(200, 25_902);
+            earlyWorld.ProductionContentManifest = content.CreateManifest();
+            fullWorld.ProductionContentManifest = content.CreateManifest();
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(earlyWorld);
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(fullWorld);
+            var earlyOrder = CreateEarlyHarvestTestOrder(
+                earlyWorld, content);
+            var fullOrder = CreateEarlyHarvestTestOrder(
+                fullWorld, content);
+            var earlySystem = new AgricultureProductionSystem(
+                earlyWorld.MasterSeed, content);
+            var fullSystem = new AgricultureProductionSystem(
+                fullWorld.MasterSeed, content);
+
+            earlyWorld.AbsoluteDay = earlyOrder.PlantingDay +
+                (earlyOrder.HarvestDay - earlyOrder.PlantingDay) * 79 / 100;
+            Assert.That(earlySystem.TryHarvestEarly(
+                earlyWorld, earlyOrder.Id), Is.False);
+            earlyWorld.AbsoluteDay = earlyOrder.PlantingDay +
+                (earlyOrder.HarvestDay - earlyOrder.PlantingDay) * 80 / 100;
+            Assert.That(earlySystem.GetMaturityBasisPoints(
+                earlyOrder, earlyWorld.AbsoluteDay), Is.EqualTo(8_000));
+            Assert.That(earlySystem.TryHarvestEarly(
+                earlyWorld, earlyOrder.Id), Is.True);
+
+            fullWorld.AbsoluteDay = fullOrder.HarvestDay;
+            fullSystem.ResolveDueOrders(
+                fullWorld, fullWorld.Villages[0].Id);
+            Assert.That(earlyOrder.EarlyHarvested, Is.True);
+            Assert.That(earlyOrder.MaturityBasisPointsAtHarvest,
+                Is.EqualTo(8_000));
+            Assert.That(earlyOrder.MaturityYieldBasisPoints,
+                Is.EqualTo(7_000));
+            Assert.That(fullOrder.EarlyHarvested, Is.False);
+            Assert.That(fullOrder.MaturityBasisPointsAtHarvest,
+                Is.EqualTo(10_000));
+            Assert.That(fullOrder.MaturityYieldBasisPoints,
+                Is.EqualTo(10_000));
+            Assert.That(earlyOrder.ProducedQuantity,
+                Is.LessThan(fullOrder.ProducedQuantity));
+            Assert.That(earlyWorld.ProductBatches.Exists(item =>
+                item.SourceWorkOrderId == earlyOrder.Id), Is.True);
+            Assert.That(fullWorld.ProductBatches.Exists(item =>
+                item.SourceWorkOrderId == fullOrder.Id), Is.True);
+            earlyWorld.Validate();
+            fullWorld.Validate();
+            var json = WorldSnapshotSerializer.Serialize(
+                earlyWorld, content);
+            var loaded = WorldSnapshotSerializer.Deserialize(json, content);
+            Assert.That(loaded.AgricultureWorkOrders.Single().EarlyHarvested,
+                Is.True);
+            Assert.That(WorldSnapshotSerializer.Serialize(loaded, content),
+                Is.EqualTo(json));
+        }
+
+        [Test]
+        public void Snapshot_V77ToV78InitializesHarvestAndFreightCellRouteContracts()
+        {
+            var content = LoadHanFoodProductionContent();
+            var agricultureWorld = VillagePrototypeFactory.Create(
+                200, 25_908);
+            agricultureWorld.ProductionContentManifest =
+                content.CreateManifest();
+            new FoodStockFormalizationSystem(content)
+                .FormalizeLegacyStocks(agricultureWorld);
+            var order = CreateEarlyHarvestTestOrder(
+                agricultureWorld, content);
+            order.HarvestRuleProfileId = null;
+            order.HarvestThresholdBasisPoints = 0;
+            order.MinimumEarlyHarvestYieldBasisPoints = 0;
+            order.MaturityBasisPointsAtHarvest = 0;
+            order.MaturityYieldBasisPoints = 0;
+            agricultureWorld.SchemaVersion = 77;
+            WorldSnapshotMigrator.MigrateToCurrent(agricultureWorld);
+            Assert.That(order.HarvestRuleProfileId,
+                Is.EqualTo(AgricultureHarvestContractIds.V1ProfileId));
+            Assert.That(order.HarvestThresholdBasisPoints, Is.EqualTo(8_000));
+            Assert.That(order.MinimumEarlyHarvestYieldBasisPoints,
+                Is.EqualTo(7_000));
+            Assert.That(order.MaturityBasisPointsAtHarvest,
+                Is.EqualTo(10_000));
+            agricultureWorld.Validate();
+
+            var freightFixture = PrepareCivilianFreightWorld(25_909, 12);
+            var freight = freightFixture.FreightSystem.Dispatch(
+                freightFixture.World, freightFixture.Request);
+            freight.CellRouteSegments = null;
+            freight.CellRoutePlanVersionId = null;
+            freight.CellRouteAssetHash = null;
+            freight.CellRouteMovementCapabilityId = null;
+            freight.CellRouteWaitingReasonId = null;
+            freight.CellRouteWaitingOnFormalWorldObjectId = null;
+            freightFixture.World.SchemaVersion = 77;
+            WorldSnapshotMigrator.MigrateToCurrent(freightFixture.World);
+            Assert.That(freight.UsesCellRoute, Is.False);
+            Assert.That(freight.CellRouteSegments, Is.Empty);
+            Assert.That(freight.CellRouteRevision, Is.Zero);
+            freightFixture.World.Validate();
+        }
+
+        [Test]
         public void Agriculture_InsufficientSeedRejectsWithoutChangingWorld()
         {
             var world = VillagePrototypeFactory.Create(200, 20_002);
@@ -19646,6 +19753,37 @@ namespace Mandate.Tests
             return result;
         }
 
+        private static AgricultureWorkOrderState CreateEarlyHarvestTestOrder(
+            WorldState world,
+            ProductionContentRegistry content)
+        {
+            world.AbsoluteDay = 90;
+            var family = world.Families[0];
+            var field = world.VillageFacilities.Find(item =>
+                item.Kind == VillageFacilityKind.Farmland);
+            var storage = world.VillageFacilities.Find(item =>
+                item.Kind == VillageFacilityKind.HouseholdGranary &&
+                item.OwnerFamilyId == family.Id);
+            var workers = AvailableAgricultureWorkers(world, family);
+            return new AgricultureProductionSystem(world.MasterSeed, content)
+                .CreateOrder(
+                    world,
+                    world.Villages[0].Id,
+                    family.Id,
+                    field.Id,
+                    storage.Id,
+                    workers[0],
+                    CoreProductionContent.WheatCropId,
+                    CoreProductionContent
+                        .PrototypeNorthernWheatVarietyId,
+                    CoreProductionContent.GrowWheatRecipeId,
+                    CoreProductionContent.PrototypeDrylandMethodId,
+                    ProductionControlMode.TargetInstruction,
+                    1,
+                    workers,
+                    world.AbsoluteDay + 180);
+        }
+
         private static ProductionContentPackageDefinition
             BuildTestProductionPackage(string packageId)
         {
@@ -20324,7 +20462,9 @@ namespace Mandate.Tests
 
         private static CivilianFreightFixture PrepareCivilianFreightWorld(
             ulong seed,
-            long quantity)
+            long quantity,
+            string productDefinitionId =
+                CoreProductionContent.WheatGrainProductId)
         {
             var content = LoadHanFoodProductionContent();
             var world = WorldState.Create(seed);
@@ -20564,7 +20704,7 @@ namespace Mandate.Tests
                 seller.Id,
                 sellerStorage.Id,
                 sellerPerson.Id,
-                CoreProductionContent.WheatGrainProductId,
+                productDefinitionId,
                 quantity);
             world.FoodInventoryAuthorityMode =
                 FoodInventoryAuthorityMode.FormalProductBatches;
@@ -20577,7 +20717,7 @@ namespace Mandate.Tests
                 originGovernance.Id,
                 seller.Id,
                 sellerStorage.Id,
-                CoreProductionContent.WheatGrainProductId,
+                productDefinitionId,
                 quantity,
                 2,
                 0,
@@ -20587,7 +20727,7 @@ namespace Mandate.Tests
                 destinationGovernance.Id,
                 buyer.Id,
                 buyerStorage.Id,
-                CoreProductionContent.WheatGrainProductId,
+                productDefinitionId,
                 quantity,
                 3,
                 0,

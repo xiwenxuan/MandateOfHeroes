@@ -206,6 +206,54 @@ namespace Mandate.Tests
             TestContext.WriteLine("Combined wall ms=" + timer.Elapsed.TotalMilliseconds.ToString("F3"));
         }
 
+        [Test]
+        public void LuoyangOuterSupplyCatchmentTests_ProjectionIsReferentiallyValidAndReportsPopulationGap()
+        {
+            var worldMapRoot = Path.Combine(Application.dataPath,
+                "StreamingAssets", "WorldMap");
+            var timer = Stopwatch.StartNew();
+            var reader = new LuoyangOuterSupplyCatchmentV1Reader(
+                Path.Combine(worldMapRoot,
+                    "LuoyangOuterSupplyCatchmentV1"));
+            var audit = reader.Audit();
+            timer.Stop();
+            Assert.That(audit.CriticalReferencesPassed, Is.True,
+                string.Join(",", audit.CriticalReferenceErrors));
+            Assert.That(reader.Manifest.IsProjectionOnly, Is.True);
+            Assert.That(reader.Manifest.AdministrativeEffect,
+                Is.EqualTo("none"));
+            Assert.That(audit.CellCount, Is.EqualTo(869));
+            Assert.That(audit.FacilityCount, Is.EqualTo(854));
+            Assert.That(audit.SettlementCount, Is.EqualTo(33));
+            Assert.That(audit.AgricultureUnitCount, Is.EqualTo(135));
+            Assert.That(audit.StorageFacilityCount, Is.EqualTo(22));
+            Assert.That(audit.RoadFacilityCount, Is.EqualTo(267));
+            Assert.That(audit.MaterializedOuterPopulation,
+                Is.EqualTo(130_000));
+            Assert.That(audit.MaterializedOuterHouseholds,
+                Is.EqualTo(26_907));
+            Assert.That(audit.MaterializedWorldPopulation,
+                Is.EqualTo(400_000));
+            Assert.That(audit.InclusivePopulationTarget,
+                Is.EqualTo(700_000));
+            Assert.That(audit.UnmaterializedPopulationGap,
+                Is.EqualTo(300_000));
+            Assert.That(audit.PopulationTargetMaterialized, Is.False);
+            Assert.That(reader.Definition.FoodProductDefinitionIds,
+                Does.Contain(CoreProductionContent.WheatGrainProductId));
+            Assert.That(reader.Definition.WoodProductDefinitionIds,
+                Does.Contain(CoreProductionContent.TimberMaterialProductId));
+            Assert.That(timer.ElapsedMilliseconds, Is.LessThan(3_000));
+            TestContext.WriteLine(
+                "OUTER_SUPPLY_CATCHMENT init_ms=" +
+                timer.ElapsedMilliseconds + " cells=" + audit.CellCount +
+                " facilities=" + audit.FacilityCount +
+                " settlements=" + audit.SettlementCount +
+                " materialized_outer_population=" +
+                audit.MaterializedOuterPopulation +
+                " population_gap=" + audit.UnmaterializedPopulationGap);
+        }
+
         private static void AssertRelation(int ordinal)
         {
             Assert.That(ordinal == -1 || ordinal >= 270000 && ordinal < 400000, Is.True);

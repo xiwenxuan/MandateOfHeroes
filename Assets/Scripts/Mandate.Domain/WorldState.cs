@@ -288,7 +288,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 77;
+        public const int CurrentSchemaVersion = 78;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -9643,6 +9643,8 @@ namespace Mandate.Domain
                     lostQuantity != freight.NaturalLossQuantity ||
                     deliveredQuantity != freight.DeliveredQuantity ||
                     feePaid != freight.FreightFeePaid ||
+                    !IsValidCivilianFreightCellRoute(
+                        freight, hasJourney ? journey : null, carrier) ||
                     freight.Status == CivilianFreightStatus.InTransit &&
                         (!hasJourney ||
                          journey.PersonId != freight.CarrierPersonId ||
@@ -9698,6 +9700,125 @@ namespace Mandate.Domain
                 routes,
                 orders,
                 freights);
+        }
+
+        private static bool IsValidCivilianFreightCellRoute(
+            CivilianFreightState freight,
+            JourneyState journey,
+            PersonState carrier)
+        {
+            if (freight.CellRouteSegments == null) return false;
+            if (!freight.UsesCellRoute)
+                return freight.CellRouteSegments.Count == 0 &&
+                    freight.CellRouteOriginCellId64 == 0 &&
+                    freight.CellRouteTargetCellId64 == 0 &&
+                    freight.CellRouteCurrentCellId64 == 0 &&
+                    freight.CurrentCellRouteSegmentIndex == 0 &&
+                    freight.CurrentCellRouteSegmentRemainingWeightedCentimetres ==
+                        0 &&
+                    freight.CellRouteRemainingWeightedCentimetres == 0 &&
+                    !freight.CellRouteWaiting &&
+                    freight.CellRouteRevision == 0;
+            if (string.IsNullOrWhiteSpace(freight.CellRoutePlanVersionId) ||
+                string.IsNullOrWhiteSpace(freight.CellRouteAssetHash) ||
+                freight.CellRouteAssetHash.Length != 64 ||
+                !IsKnownMovementCapability(
+                    freight.CellRouteMovementCapabilityId) ||
+                freight.CellRouteOriginCellId64 == 0 ||
+                freight.CellRouteTargetCellId64 == 0 ||
+                freight.CellRouteOriginCellId64 ==
+                    freight.CellRouteTargetCellId64 ||
+                freight.CellRouteCurrentCellId64 == 0 ||
+                freight.CellRouteSegments.Count == 0 ||
+                freight.CurrentCellRouteSegmentIndex < 0 ||
+                freight.CurrentCellRouteSegmentIndex >
+                    freight.CellRouteSegments.Count ||
+                freight.CellRouteRevision < 0)
+                return false;
+            long remaining = 0;
+            for (var i = 0; i < freight.CellRouteSegments.Count; i++)
+            {
+                var segment = freight.CellRouteSegments[i];
+                if (segment == null || segment.Sequence != i ||
+                    string.IsNullOrWhiteSpace(segment.Id) ||
+                    string.IsNullOrWhiteSpace(segment.KindId) ||
+                    segment.FromCellId64 == 0 || segment.ToCellId64 == 0 ||
+                    segment.DistanceCentimetres <= 0 ||
+                    segment.TraversalCostPermille < 1_000 ||
+                    segment.TraversalCostPermille > 10_000 ||
+                    string.IsNullOrWhiteSpace(
+                        segment.TraversalConditionId) ||
+                    i > 0 && freight.CellRouteSegments[i - 1]
+                        .ToCellId64 != segment.FromCellId64)
+                    return false;
+                if (i > freight.CurrentCellRouteSegmentIndex)
+                    remaining = checked(
+                        remaining + segment.WeightedDistanceCentimetres);
+            }
+            var inTransit = freight.Status ==
+                CivilianFreightStatus.InTransit;
+            if (inTransit)
+            {
+                if (journey == null ||
+                    freight.CurrentCellRouteSegmentIndex >=
+                        freight.CellRouteSegments.Count)
+                    return false;
+                var current = freight.CellRouteSegments[
+                    freight.CurrentCellRouteSegmentIndex];
+                if (freight.CellRouteCurrentCellId64 != current.FromCellId64 ||
+                    freight.CurrentCellRouteSegmentRemainingWeightedCentimetres <=
+                        0 ||
+                    freight.CurrentCellRouteSegmentRemainingWeightedCentimetres >
+                        current.WeightedDistanceCentimetres)
+                    return false;
+                remaining = checked(remaining +
+                    freight.CurrentCellRouteSegmentRemainingWeightedCentimetres);
+                if (freight.CellRouteRemainingWeightedCentimetres != remaining ||
+                    journey.RemainingKilometers != (int)Math.Max(1L,
+                        (remaining + 99_999L) / 100_000L) ||
+                    carrier.CurrentCellId64 !=
+                        freight.CellRouteCurrentCellId64)
+                    return false;
+                if (freight.CellRouteWaiting &&
+                    (string.IsNullOrWhiteSpace(
+                         freight.CellRouteWaitingReasonId) ||
+                     string.IsNullOrWhiteSpace(
+                         freight.CellRouteWaitingOnFormalWorldObjectId)))
+                    return false;
+                if (!freight.CellRouteWaiting &&
+                    (!string.IsNullOrEmpty(freight.CellRouteWaitingReasonId) ||
+                     !string.IsNullOrEmpty(
+                         freight.CellRouteWaitingOnFormalWorldObjectId)))
+                    return false;
+            }
+            else if (freight.CurrentCellRouteSegmentIndex !=
+                         freight.CellRouteSegments.Count ||
+                     freight.CellRouteCurrentCellId64 !=
+                         freight.CellRouteTargetCellId64 ||
+                     freight.CurrentCellRouteSegmentRemainingWeightedCentimetres !=
+                         0 ||
+                     freight.CellRouteRemainingWeightedCentimetres != 0 ||
+                     freight.CellRouteWaiting ||
+                     !string.IsNullOrEmpty(freight.CellRouteWaitingReasonId) ||
+                     !string.IsNullOrEmpty(
+                         freight.CellRouteWaitingOnFormalWorldObjectId))
+                return false;
+            if (freight.CellRouteRevision == 0 &&
+                freight.CellRouteSegments[0].FromCellId64 !=
+                    freight.CellRouteOriginCellId64)
+                return false;
+            return freight.CellRouteSegments[
+                freight.CellRouteSegments.Count - 1].ToCellId64 ==
+                freight.CellRouteTargetCellId64;
+        }
+
+        private static bool IsKnownMovementCapability(string capabilityId)
+        {
+            for (var i = 0; i < MovementCapabilityIds.All.Count; i++)
+                if (string.Equals(MovementCapabilityIds.All[i], capabilityId,
+                        StringComparison.Ordinal))
+                    return true;
+            return false;
         }
 
         private void ValidateHouseholdReliefPickups()
@@ -16311,8 +16432,17 @@ namespace Mandate.Domain
                     order.CreatedDay < 0 ||
                     order.PlantingDay < order.CreatedDay ||
                     order.HarvestDay <= order.PlantingDay ||
-                    order.HarvestDay > AbsoluteDay &&
-                    order.Status == ProductionOrderStatus.Completed ||
+                    string.IsNullOrWhiteSpace(order.HarvestRuleProfileId) ||
+                    order.HarvestThresholdBasisPoints <= 0 ||
+                    order.HarvestThresholdBasisPoints >= 10_000 ||
+                    order.MinimumEarlyHarvestYieldBasisPoints <= 0 ||
+                    order.MinimumEarlyHarvestYieldBasisPoints > 10_000 ||
+                    order.MaturityBasisPointsAtHarvest <
+                        order.HarvestThresholdBasisPoints ||
+                    order.MaturityBasisPointsAtHarvest > 10_000 ||
+                    order.MaturityYieldBasisPoints <
+                        order.MinimumEarlyHarvestYieldBasisPoints ||
+                    order.MaturityYieldBasisPoints > 10_000 ||
                     order.SettledDay < -1 ||
                     order.SettledDay > AbsoluteDay ||
                     order.LandUnits <= 0 ||
@@ -16328,12 +16458,21 @@ namespace Mandate.Domain
                     order.StoredQuantity < 0 ||
                     order.LostQuantity < 0 ||
                     order.Status == ProductionOrderStatus.Completed &&
-                    (order.SettledDay < order.HarvestDay ||
+                    (order.SettledDay < order.PlantingDay ||
+                     order.EarlyHarvested !=
+                        (order.MaturityBasisPointsAtHarvest < 10_000) ||
+                     order.EarlyHarvested &&
+                        order.SettledDay >= order.HarvestDay ||
+                     !order.EarlyHarvested &&
+                        order.SettledDay < order.HarvestDay ||
                      order.ProducedQuantity !=
                      order.StoredQuantity + order.LostQuantity) ||
                     order.Status == ProductionOrderStatus.Active &&
                     (order.SettledDay != -1 || order.ProducedQuantity != 0 ||
-                     order.StoredQuantity != 0 || order.LostQuantity != 0) ||
+                     order.StoredQuantity != 0 || order.LostQuantity != 0 ||
+                     order.EarlyHarvested ||
+                     order.MaturityBasisPointsAtHarvest != 10_000 ||
+                     order.MaturityYieldBasisPoints != 10_000) ||
                     order.AssignedWorkerIds == null ||
                     order.AssignedWorkerIds.Count == 0 ||
                     order.AppliedTechnologyIds == null)

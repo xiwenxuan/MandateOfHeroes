@@ -61,5 +61,53 @@ namespace Mandate.Tests.PlayMode
             Assert.That(GameObject.Find(
                 LuoyangHumanScaleStreamingRuntime.RootName), Is.Null);
         }
+
+        [UnityTest]
+        public IEnumerator SupplyFreightMarker_RefreshesWaitingAndArrivalAcrossFrames()
+        {
+            var world = WorldState.Create(184);
+            var freight = new CivilianFreightState
+            {
+                Id = "civilian_freight.playmode.presentation.v1",
+                CarrierPersonId = "person.playmode.carrier",
+                ProductDefinitionId =
+                    CoreProductionContent.TimberMaterialProductId,
+                Status = CivilianFreightStatus.InTransit,
+                UsesCellRoute = true,
+                CellRouteMovementCapabilityId =
+                    MovementCapabilityIds.PackAnimal,
+                CellRouteCurrentCellId64 = 4_114_717,
+                RemainingCargoQuantity = 40,
+                CellRouteWaiting = true,
+                CellRouteWaitingOnFormalWorldObjectId =
+                    "facility.instance.luoyang.184.gate.gumen"
+            };
+            world.CivilianFreights.Add(freight);
+            var runtime = LuoyangSupplyFreightPresentationRuntime.Build(
+                world, _ => Vector3.zero);
+            try
+            {
+                yield return null;
+                var marker = runtime.Markers[freight.Id];
+                Assert.That(marker.PresentationStateId, Is.EqualTo(
+                    LuoyangSupplyFreightPresentationIds
+                        .WaitingAtPassageStateId));
+                freight.Status = CivilianFreightStatus.Completed;
+                freight.CellRouteWaiting = false;
+                freight.CellRouteWaitingOnFormalWorldObjectId = string.Empty;
+                runtime.Refresh(world);
+                yield return null;
+                Assert.That(marker.PresentationStateId, Is.EqualTo(
+                    LuoyangSupplyFreightPresentationIds.ArrivedStateId));
+                Assert.That(marker.RemainingCargoQuantity, Is.EqualTo(40));
+            }
+            finally
+            {
+                runtime.Dispose();
+            }
+            yield return null;
+            Assert.That(GameObject.Find(
+                LuoyangSupplyFreightPresentationIds.RootName), Is.Null);
+        }
     }
 }

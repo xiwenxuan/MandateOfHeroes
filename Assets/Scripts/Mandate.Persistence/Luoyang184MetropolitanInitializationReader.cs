@@ -338,4 +338,317 @@ namespace Mandate.Persistence
             return builder.ToString();
         }
     }
+
+    /// <summary>
+    /// Resolves the V1 Luoyang supply catchment as a read-only selection over
+    /// the protected metropolitan package. It does not create a second map,
+    /// administrative unit, population ledger, or inventory authority.
+    /// </summary>
+    public sealed class LuoyangOuterSupplyCatchmentV1Reader
+    {
+        public const string ExpectedSchema =
+            "mandate.luoyang-outer-supply-catchment.v1";
+        private readonly string _rootPath;
+        private readonly string _sourceRootPath;
+        private readonly IReadOnlyList<string> _settlementIds;
+
+        public LuoyangOuterSupplyCatchmentV1Reader(string rootPath)
+        {
+            if (string.IsNullOrWhiteSpace(rootPath))
+                throw new ArgumentException(
+                    "A supply-catchment package root is required.",
+                    nameof(rootPath));
+            _rootPath = Path.GetFullPath(rootPath);
+            Manifest = ReadManifest(Path.Combine(_rootPath, "manifest.json"));
+            if (!string.Equals(Manifest.Schema, ExpectedSchema,
+                    StringComparison.Ordinal) ||
+                Manifest.FormatVersion != 1 ||
+                !Manifest.IsProjectionOnly ||
+                !string.Equals(Manifest.AdministrativeEffect, "none",
+                    StringComparison.Ordinal) ||
+                Manifest.InclusivePopulationTarget != 700_000 ||
+                Manifest.MaterializedWorldPopulation +
+                    Manifest.UnmaterializedPopulationGap !=
+                    Manifest.InclusivePopulationTarget)
+                throw new InvalidDataException(
+                    "Unsupported Luoyang outer-supply catchment contract.");
+            _sourceRootPath = Path.GetFullPath(Path.Combine(
+                _rootPath, Manifest.SourcePackageRelativePath));
+            Metropolitan = new Luoyang184MetropolitanInitializationReader(
+                _sourceRootPath);
+            _settlementIds = ReadSettlementIds(Path.Combine(
+                _sourceRootPath, "spatial_plan.json"));
+            Definition = BuildDefinition();
+        }
+
+        public LuoyangOuterSupplyCatchmentManifest Manifest { get; }
+        public Luoyang184MetropolitanInitializationReader Metropolitan
+        { get; }
+        public LuoyangOuterSupplyCatchmentDefinition Definition { get; }
+
+        public LuoyangOuterSupplyCatchmentDataAudit Audit()
+        {
+            var result = new LuoyangOuterSupplyCatchmentDataAudit
+            {
+                CellCount = Definition.CellIds.Count,
+                FacilityCount = Metropolitan.Facilities.Count,
+                SettlementCount = Definition.SettlementIds.Count,
+                AgricultureUnitCount = Metropolitan.Agriculture.Count,
+                StorageFacilityCount = Metropolitan.Facilities.Count(item =>
+                    item.StorageCapacity > 0),
+                RoadFacilityCount = Metropolitan.Facilities.Count(item =>
+                    string.Equals(item.CategoryId, "road",
+                        StringComparison.Ordinal)),
+                MaterializedWorldPopulation =
+                    Manifest.MaterializedWorldPopulation,
+                MaterializedOuterPopulation =
+                    Manifest.MaterializedOuterPopulation,
+                MaterializedOuterHouseholds =
+                    Manifest.MaterializedOuterHouseholds,
+                InclusivePopulationTarget =
+                    Manifest.InclusivePopulationTarget,
+                UnmaterializedPopulationGap =
+                    Manifest.UnmaterializedPopulationGap
+            };
+            foreach (var failure in Metropolitan.ValidatePackageFiles())
+                result.CriticalReferenceErrors.Add(
+                    "source-package:" + failure);
+            foreach (var sourceFile in Manifest.SourceFiles)
+            {
+                var path = Path.Combine(_sourceRootPath, sourceFile.Path);
+                if (!File.Exists(path))
+                {
+                    result.CriticalReferenceErrors.Add(
+                        "source-file-missing:" + sourceFile.Path);
+                    continue;
+                }
+                if (new FileInfo(path).Length != sourceFile.Bytes)
+                {
+                    result.CriticalReferenceErrors.Add(
+                        "source-file-size:" + sourceFile.Path);
+                    continue;
+                }
+                using (var stream = File.OpenRead(path))
+                using (var sha = SHA256.Create())
+                {
+                    var actual = LowerHex(sha.ComputeHash(stream));
+                    if (!string.Equals(actual, sourceFile.Sha256,
+                            StringComparison.Ordinal))
+                        result.CriticalReferenceErrors.Add(
+                            "source-file-sha256:" + sourceFile.Path);
+                }
+            }
+            if (Manifest.SelectedFacilityCount != result.FacilityCount ||
+                Manifest.SelectedSettlementCount != result.SettlementCount ||
+                Manifest.SelectedAgricultureUnitCount !=
+                    result.AgricultureUnitCount ||
+                Manifest.SelectedStorageFacilityCount !=
+                    result.StorageFacilityCount ||
+                Manifest.SelectedRoadFacilityCount != result.RoadFacilityCount)
+                result.CriticalReferenceErrors.Add(
+                    "manifest-selection-count-mismatch");
+            var cells = new HashSet<ulong>();
+            var facilities = new HashSet<string>(StringComparer.Ordinal);
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            for (var i = 0; i < Metropolitan.Facilities.Count; i++)
+            {
+                var facility = Metropolitan.Facilities[i];
+                try
+                {
+                    _ = new StableId(facility.FacilityId);
+                    _ = new StableId(facility.OwnerId);
+                }
+                catch (Exception)
+                {
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-facility-id:" + facility.FacilityId);
+                }
+                if (!facilities.Add(facility.FacilityId))
+                    result.CriticalReferenceErrors.Add(
+                        "duplicate-facility:" + facility.FacilityId);
+                if (!cells.Add(facility.CellId64))
+                    result.CriticalReferenceErrors.Add(
+                        "multiple-facilities-on-cell:" +
+                        facility.CellId64);
+                if (!string.IsNullOrEmpty(facility.SettlementId) &&
+                    !_settlementIds.Contains(facility.SettlementId,
+                        StringComparer.Ordinal))
+                    result.CriticalReferenceErrors.Add(
+                        "missing-settlement:" + facility.SettlementId);
+            }
+            for (var i = 0; i < Definition.CellIds.Count; i++)
+                if (!grid.TryDecode(new WorldMapCellId(
+                        Definition.CellIds[i]), out _, out _))
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-cell:" + Definition.CellIds[i]);
+            for (var i = 0; i < Metropolitan.Agriculture.Count; i++)
+            {
+                var field = Metropolitan.Agriculture[i];
+                if (!facilities.Contains(field.FacilityId) ||
+                    !cells.Contains(field.CellId64))
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-agriculture-reference:" + field.FieldId);
+            }
+            AuditContentReferences(result);
+            result.CriticalReferenceErrors.Sort(StringComparer.Ordinal);
+            result.UnresolvedContentDefinitionIds.Sort(StringComparer.Ordinal);
+            return result;
+        }
+
+        private void AuditContentReferences(
+            LuoyangOuterSupplyCatchmentDataAudit result)
+        {
+            var sourceIds = Manifest.FoodProductDefinitionIds.Concat(
+                    Manifest.WoodProductDefinitionIds)
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .Distinct(StringComparer.Ordinal).ToArray();
+            var formalIds = new HashSet<string>(
+                CoreProductionContent.CreatePackage().Products.Select(item =>
+                    item.Id), StringComparer.Ordinal);
+            var crosswalks = new Dictionary<string,
+                LuoyangOuterSupplyContentIdCrosswalk>(StringComparer.Ordinal);
+            foreach (var crosswalk in Manifest.ContentIdCrosswalks)
+            {
+                if (string.IsNullOrWhiteSpace(crosswalk.SourceId) ||
+                    string.IsNullOrWhiteSpace(crosswalk.FormalId) ||
+                    string.IsNullOrWhiteSpace(crosswalk.MigrationId))
+                {
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-content-crosswalk");
+                    continue;
+                }
+                try
+                {
+                    _ = new StableId(crosswalk.SourceId);
+                    _ = new StableId(crosswalk.FormalId);
+                    _ = new StableId(crosswalk.MigrationId);
+                }
+                catch (Exception)
+                {
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-content-crosswalk-id:" +
+                        crosswalk.SourceId);
+                    continue;
+                }
+                if (!sourceIds.Contains(crosswalk.SourceId,
+                        StringComparer.Ordinal) ||
+                    !formalIds.Contains(crosswalk.FormalId) ||
+                    !crosswalks.TryAdd(crosswalk.SourceId, crosswalk))
+                    result.CriticalReferenceErrors.Add(
+                        "invalid-content-crosswalk-target:" +
+                        crosswalk.SourceId);
+            }
+            foreach (var sourceId in sourceIds)
+                if (!formalIds.Contains(sourceId) &&
+                    !crosswalks.ContainsKey(sourceId))
+                    result.UnresolvedContentDefinitionIds.Add(sourceId);
+        }
+
+        private LuoyangOuterSupplyCatchmentDefinition BuildDefinition()
+        {
+            var definition = new LuoyangOuterSupplyCatchmentDefinition
+            {
+                Id = Manifest.CatchmentId
+            };
+            definition.CellIds.AddRange(Metropolitan.Facilities.Select(item =>
+                    item.CellId64).Concat(Metropolitan.Routes.SelectMany(item =>
+                    item.CellIds)).Distinct().OrderBy(item => item));
+            definition.FacilityIds.AddRange(Metropolitan.Facilities.Select(
+                    item => item.FacilityId).Distinct(StringComparer.Ordinal)
+                .OrderBy(item => item, StringComparer.Ordinal));
+            definition.SettlementIds.AddRange(_settlementIds.OrderBy(
+                item => item, StringComparer.Ordinal));
+            definition.FoodProductDefinitionIds.AddRange(
+                Manifest.FoodProductDefinitionIds.OrderBy(
+                    item => item, StringComparer.Ordinal));
+            definition.WoodProductDefinitionIds.AddRange(
+                Manifest.WoodProductDefinitionIds.OrderBy(
+                    item => item, StringComparer.Ordinal));
+            definition.ContentIdCrosswalks.AddRange(
+                Manifest.ContentIdCrosswalks.OrderBy(item => item.SourceId,
+                    StringComparer.Ordinal));
+            return definition;
+        }
+
+        private static LuoyangOuterSupplyCatchmentManifest ReadManifest(
+            string path)
+        {
+            var token = JObject.Parse(File.ReadAllText(path, Encoding.UTF8));
+            var result = new LuoyangOuterSupplyCatchmentManifest
+            {
+                Schema = (string)token["schema"],
+                FormatVersion = (int)token["format_version"],
+                CatchmentId = (string)token["catchment_id"],
+                WorldId = (string)token["world_id"],
+                CityId = (string)token["city_id"],
+                SourcePackageRelativePath =
+                    (string)token["source_package_relative_path"],
+                SelectionContract = (string)token["selection_contract"],
+                AdministrativeEffect =
+                    (string)token["administrative_effect"],
+                IsProjectionOnly = (bool)token["is_projection_only"],
+                InclusivePopulationTarget =
+                    (int)token["inclusive_population_target"],
+                MaterializedWorldPopulation =
+                    (int)token["materialized_world_population"],
+                MaterializedOuterPopulation =
+                    (int)token["materialized_outer_population"],
+                UnmaterializedPopulationGap =
+                    (int)token["unmaterialized_population_gap"],
+                MaterializedOuterHouseholds =
+                    (int)token["materialized_outer_households"],
+                SelectedFacilityCount =
+                    (int)token["selected_facility_count"],
+                SelectedSettlementCount =
+                    (int)token["selected_settlement_count"],
+                SelectedAgricultureUnitCount =
+                    (int)token["selected_agriculture_unit_count"],
+                SelectedStorageFacilityCount =
+                    (int)token["selected_storage_facility_count"],
+                SelectedRoadFacilityCount =
+                    (int)token["selected_road_facility_count"]
+            };
+            foreach (var value in token["food_product_definition_ids"] ??
+                     new JArray())
+                result.FoodProductDefinitionIds.Add((string)value);
+            foreach (var value in token["wood_product_definition_ids"] ??
+                     new JArray())
+                result.WoodProductDefinitionIds.Add((string)value);
+            foreach (var crosswalk in token["content_id_crosswalks"] ??
+                     new JArray())
+                result.ContentIdCrosswalks.Add(
+                    new LuoyangOuterSupplyContentIdCrosswalk
+                    {
+                        SourceId = (string)crosswalk["source_id"],
+                        FormalId = (string)crosswalk["formal_id"],
+                        MigrationId = (string)crosswalk["migration_id"]
+                    });
+            foreach (var file in token["source_files"] ?? new JArray())
+                result.SourceFiles.Add(new Luoyang184UrbanPackageFile
+                {
+                    Path = (string)file["path"],
+                    Bytes = (long)file["bytes"],
+                    Sha256 = (string)file["sha256"]
+                });
+            return result;
+        }
+
+        private static IReadOnlyList<string> ReadSettlementIds(string path)
+        {
+            var token = JObject.Parse(File.ReadAllText(path, Encoding.UTF8));
+            return (token["settlements"] ?? new JArray()).Select(item =>
+                    (string)item["settlement_id"])
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(item => item, StringComparer.Ordinal).ToArray();
+        }
+
+        private static string LowerHex(byte[] bytes)
+        {
+            var builder = new StringBuilder(bytes.Length * 2);
+            foreach (var value in bytes)
+                builder.Append(value.ToString("x2",
+                    CultureInfo.InvariantCulture));
+            return builder.ToString();
+        }
+    }
 }

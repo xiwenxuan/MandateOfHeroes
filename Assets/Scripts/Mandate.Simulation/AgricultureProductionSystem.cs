@@ -19,6 +19,26 @@ namespace Mandate.Simulation
             ProducedQuantity == StoredQuantity + LostQuantity;
     }
 
+    public sealed class AgricultureHarvestRuleProfile
+    {
+        public string Id = AgricultureHarvestContractIds.V1ProfileId;
+        public int HarvestThresholdBasisPoints = AgricultureHarvestContractIds
+            .DefaultHarvestThresholdBasisPoints;
+        public int MinimumEarlyHarvestYieldBasisPoints =
+            AgricultureHarvestContractIds.DefaultMinimumEarlyYieldBasisPoints;
+
+        public void Validate()
+        {
+            _ = new StableId(Id);
+            if (HarvestThresholdBasisPoints <= 0 ||
+                HarvestThresholdBasisPoints >= 10_000 ||
+                MinimumEarlyHarvestYieldBasisPoints <= 0 ||
+                MinimumEarlyHarvestYieldBasisPoints > 10_000)
+                throw new InvalidOperationException(
+                    "The agriculture harvest maturity profile is invalid.");
+        }
+    }
+
     public sealed class AgricultureProductionSystem
     {
         private const int SeasonLaborDaysPerLandUnit = 12;
@@ -27,18 +47,23 @@ namespace Mandate.Simulation
         private readonly ProductionContentRegistry _content;
         private readonly ResearchSystem _research;
         private readonly IPersonRepository _people;
+        private readonly AgricultureHarvestRuleProfile _harvestProfile;
         private WorldState _fallbackWorld;
         private IPersonRepository _fallbackPeople;
 
         public AgricultureProductionSystem(
             ulong masterSeed,
             ProductionContentRegistry content = null,
-            IPersonRepository people = null)
+            IPersonRepository people = null,
+            AgricultureHarvestRuleProfile harvestProfile = null)
         {
             _random = new NamedRandom(masterSeed);
             _content = content ?? ProductionContentRegistry.CreateCore();
             _research = new ResearchSystem(_content);
             _people = people;
+            _harvestProfile = harvestProfile ??
+                new AgricultureHarvestRuleProfile();
+            _harvestProfile.Validate();
         }
 
         public AgricultureWorkOrderState CreateOrder(
@@ -201,6 +226,13 @@ namespace Mandate.Simulation
                 CreatedDay = world.AbsoluteDay,
                 PlantingDay = world.AbsoluteDay,
                 HarvestDay = harvestDay,
+                HarvestRuleProfileId = _harvestProfile.Id,
+                HarvestThresholdBasisPoints =
+                    _harvestProfile.HarvestThresholdBasisPoints,
+                MinimumEarlyHarvestYieldBasisPoints =
+                    _harvestProfile.MinimumEarlyHarvestYieldBasisPoints,
+                MaturityBasisPointsAtHarvest = 10_000,
+                MaturityYieldBasisPoints = 10_000,
                 LandUnits = landUnits,
                 SeedQuantityCommitted = seedNeeded,
                 RequiredLaborDays = checked((int)ApplyFactor(
@@ -339,6 +371,46 @@ namespace Mandate.Simulation
             }
         }
 
+        public int GetMaturityBasisPoints(
+            AgricultureWorkOrderState order, long day)
+        {
+            if (order == null) throw new ArgumentNullException(nameof(order));
+            var duration = order.HarvestDay - order.PlantingDay;
+            if (duration <= 0)
+                throw new InvalidOperationException(
+                    "Agriculture maturity requires a positive growing period.");
+            var elapsed = Math.Max(0L, Math.Min(duration,
+                day - order.PlantingDay));
+            return (int)Math.Min(10_000L,
+                elapsed * 10_000L / duration);
+        }
+
+        public bool TryHarvestEarly(WorldState world, string workOrderId)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            if (string.IsNullOrWhiteSpace(workOrderId))
+                throw new ArgumentException(
+                    "An agriculture work-order ID is required.",
+                    nameof(workOrderId));
+            AgricultureWorkOrderState order = null;
+            for (var i = 0; i < world.AgricultureWorkOrders.Count; i++)
+                if (string.Equals(world.AgricultureWorkOrders[i].Id,
+                        workOrderId, StringComparison.Ordinal))
+                {
+                    order = world.AgricultureWorkOrders[i];
+                    break;
+                }
+            if (order == null)
+                throw new InvalidOperationException(
+                    "Missing agriculture work order " + workOrderId + ".");
+            if (order.Status != ProductionOrderStatus.Active ||
+                world.AbsoluteDay >= order.HarvestDay) return false;
+            var maturity = GetMaturityBasisPoints(order, world.AbsoluteDay);
+            if (maturity < order.HarvestThresholdBasisPoints) return false;
+            ResolveOrder(world, order, maturity);
+            return true;
+        }
+
         public AgricultureProductionAudit Audit(WorldState world)
         {
             if (world == null)
@@ -397,7 +469,8 @@ namespace Mandate.Simulation
             return audit;
         }
 
-        private void ResolveOrder(WorldState world, AgricultureWorkOrderState order)
+        private void ResolveOrder(WorldState world,
+            AgricultureWorkOrderState order, int maturityBasisPoints = 10_000)
         {
             _content.ValidateManifest(world.ProductionContentManifest);
             var recipe = _content.GetRecipe(order.RecipeDefinitionId);
@@ -445,6 +518,8 @@ namespace Mandate.Simulation
                 "weather",
                 8_500,
                 11_001);
+            var maturityYieldFactor = ResolveMaturityYieldBasisPoints(
+                order, maturityBasisPoints);
             long harvest = checked(
                 order.LandUnits * output.QuantityPerLandUnit);
             harvest = ApplyFactor(harvest, method.YieldBasisPoints);
@@ -458,6 +533,7 @@ namespace Mandate.Simulation
             harvest = ApplyFactor(harvest, FindLocation(
                 world, village.LocationId).PublicOrderBasisPoints);
             harvest = ApplyFactor(harvest, weatherFactor);
+            harvest = ApplyFactor(harvest, maturityYieldFactor);
 
             storage.InventoryUnits = ProductInventorySystem
                 .CalculatePhysicalInventoryUnits(
@@ -492,6 +568,9 @@ namespace Mandate.Simulation
             storage.InventoryUnits += stored;
             order.Status = ProductionOrderStatus.Completed;
             order.SettledDay = world.AbsoluteDay;
+            order.MaturityBasisPointsAtHarvest = maturityBasisPoints;
+            order.MaturityYieldBasisPoints = maturityYieldFactor;
+            order.EarlyHarvested = maturityBasisPoints < 10_000;
             order.ProducedQuantity = harvest;
             order.StoredQuantity = stored;
             order.LostQuantity = lost;
@@ -536,6 +615,22 @@ namespace Mandate.Simulation
                     : foodStored,
                 (int)Math.Min(int.MaxValue, harvest),
                 $"{family.DisplayName} harvested {harvest}, stored {stored}, lost {lost}.");
+        }
+
+        private int ResolveMaturityYieldBasisPoints(
+            AgricultureWorkOrderState order, int maturityBasisPoints)
+        {
+            if (maturityBasisPoints < order.HarvestThresholdBasisPoints ||
+                maturityBasisPoints > 10_000)
+                throw new InvalidOperationException(
+                    "Agriculture harvest maturity is outside the snapshotted rule.");
+            if (maturityBasisPoints == 10_000) return 10_000;
+            var span = 10_000 - order.HarvestThresholdBasisPoints;
+            return order.MinimumEarlyHarvestYieldBasisPoints +
+                (maturityBasisPoints - order.HarvestThresholdBasisPoints) *
+                (10_000 -
+                 order.MinimumEarlyHarvestYieldBasisPoints) /
+                Math.Max(1, span);
         }
 
         private void StoreFormalHarvest(

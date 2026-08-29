@@ -6,6 +6,14 @@ using Newtonsoft.Json;
 
 namespace Mandate.Domain
 {
+    public static class AgricultureHarvestContractIds
+    {
+        public const string V1ProfileId =
+            "mandate.agriculture.harvest-maturity.v1";
+        public const int DefaultHarvestThresholdBasisPoints = 8_000;
+        public const int DefaultMinimumEarlyYieldBasisPoints = 7_000;
+    }
+
     public enum ProductionControlMode : byte
     {
         PersonalLabor,
@@ -675,11 +683,13 @@ namespace Mandate.Domain
             {
                 var freight = world.CivilianFreights[i];
                 var product = GetProduct(freight.ProductDefinitionId);
-                var food = GetFood(freight.ProductDefinitionId);
+                TryGetFood(freight.ProductDefinitionId, out var food);
                 if (freight.ProductPerishabilityBasisPoints !=
                         product.PerishabilityBasisPoints ||
                     freight.FoodSpoilageSensitivityBasisPoints !=
-                        food.SpoilageSensitivityBasisPoints ||
+                        (food == null
+                            ? 0
+                            : food.SpoilageSensitivityBasisPoints) ||
                     freight.CargoUnitWeight != product.BaseWeight)
                 {
                     throw new ProductionContentException(
@@ -2581,6 +2591,12 @@ namespace Mandate.Domain
         public long CreatedDay;
         public long PlantingDay;
         public long HarvestDay;
+        public string HarvestRuleProfileId = string.Empty;
+        public int HarvestThresholdBasisPoints = 10_000;
+        public int MinimumEarlyHarvestYieldBasisPoints = 10_000;
+        public int MaturityBasisPointsAtHarvest = 10_000;
+        public int MaturityYieldBasisPoints = 10_000;
+        public bool EarlyHarvested;
         public long SettledDay = -1;
         public int LandUnits;
         public long SeedQuantityCommitted;

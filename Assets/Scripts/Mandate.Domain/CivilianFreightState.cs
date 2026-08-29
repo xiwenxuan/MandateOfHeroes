@@ -44,6 +44,24 @@ namespace Mandate.Domain
     }
 
     [Serializable]
+    public sealed class CivilianFreightCellRouteSegmentState
+    {
+        public int Sequence;
+        public string Id;
+        public string KindId;
+        public ulong FromCellId64;
+        public ulong ToCellId64;
+        public int DistanceCentimetres;
+        public int TraversalCostPermille;
+        public string TraversalConditionId;
+        public string FormalWorldObjectId;
+
+        public long WeightedDistanceCentimetres => Math.Max(
+            1L,
+            (long)DistanceCentimetres * TraversalCostPermille / 1_000L);
+    }
+
+    [Serializable]
     public sealed class CivilianFreightState
     {
         public string Id;
@@ -75,6 +93,22 @@ namespace Mandate.Domain
         public string JourneyId;
         public List<string> PlannedRouteIds = new List<string>();
         public int CurrentRouteIndex;
+        public bool UsesCellRoute;
+        public string CellRoutePlanVersionId = string.Empty;
+        public string CellRouteAssetHash = string.Empty;
+        public string CellRouteMovementCapabilityId = string.Empty;
+        public ulong CellRouteOriginCellId64;
+        public ulong CellRouteTargetCellId64;
+        public ulong CellRouteCurrentCellId64;
+        public List<CivilianFreightCellRouteSegmentState> CellRouteSegments =
+            new List<CivilianFreightCellRouteSegmentState>();
+        public int CurrentCellRouteSegmentIndex;
+        public long CurrentCellRouteSegmentRemainingWeightedCentimetres;
+        public long CellRouteRemainingWeightedCentimetres;
+        public bool CellRouteWaiting;
+        public string CellRouteWaitingReasonId = string.Empty;
+        public string CellRouteWaitingOnFormalWorldObjectId = string.Empty;
+        public int CellRouteRevision;
         public string DispatchInventoryTransactionId;
         public string ProductDefinitionId;
         public long DispatchedQuantity;

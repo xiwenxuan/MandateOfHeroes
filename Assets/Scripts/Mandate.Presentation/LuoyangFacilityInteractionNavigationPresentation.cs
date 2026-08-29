@@ -1499,4 +1499,175 @@ namespace Mandate.Presentation
             return material;
         }
     }
+
+    public static class LuoyangSupplyFreightPresentationIds
+    {
+        public const string RootName =
+            "LUOYANG_OUTER_SUPPLY_FREIGHT_PRESENTATION_V1";
+        public const string InTransitStateId =
+            "presentation.freight.in-transit.v1";
+        public const string WaitingAtPassageStateId =
+            "presentation.freight.waiting-at-passage.v1";
+        public const string ArrivedStateId =
+            "presentation.freight.arrived.v1";
+    }
+
+    /// <summary>
+    /// Read-only Unity marker for one persisted CivilianFreight. The marker
+    /// never changes inventory, route progress, ownership, or arrival state.
+    /// </summary>
+    public sealed class LuoyangSupplyFreightMarker : MonoBehaviour
+    {
+        private MeshRenderer _renderer;
+        private readonly MaterialPropertyBlock _properties =
+            new MaterialPropertyBlock();
+
+        public string FreightId { get; private set; }
+        public string CarrierPersonId { get; private set; }
+        public string ProductDefinitionId { get; private set; }
+        public string PresentationStateId { get; private set; }
+        public string WaitingOnFormalWorldObjectId { get; private set; }
+        public ulong CurrentCellId64 { get; private set; }
+        public long RemainingCargoQuantity { get; private set; }
+        public int RouteRevision { get; private set; }
+
+        public void Initialize(MeshRenderer renderer)
+        {
+            _renderer = renderer ?? throw new ArgumentNullException(
+                nameof(renderer));
+        }
+
+        public void Apply(CivilianFreightState freight, Vector3 position)
+        {
+            if (freight == null) throw new ArgumentNullException(
+                nameof(freight));
+            if (_renderer == null)
+                throw new InvalidOperationException(
+                    "Initialize the freight marker before applying state.");
+            FreightId = freight.Id;
+            CarrierPersonId = freight.CarrierPersonId;
+            ProductDefinitionId = freight.ProductDefinitionId;
+            CurrentCellId64 = freight.CellRouteCurrentCellId64;
+            RemainingCargoQuantity = freight.RemainingCargoQuantity;
+            RouteRevision = freight.CellRouteRevision;
+            WaitingOnFormalWorldObjectId =
+                freight.CellRouteWaitingOnFormalWorldObjectId;
+            PresentationStateId = freight.Status ==
+                    CivilianFreightStatus.Completed
+                ? LuoyangSupplyFreightPresentationIds.ArrivedStateId
+                : freight.CellRouteWaiting
+                    ? LuoyangSupplyFreightPresentationIds
+                        .WaitingAtPassageStateId
+                    : LuoyangSupplyFreightPresentationIds.InTransitStateId;
+            transform.position = position + Vector3.up * 0.11f;
+            transform.localScale = string.Equals(
+                    freight.CellRouteMovementCapabilityId,
+                    MovementCapabilityIds.Cart,
+                    StringComparison.Ordinal)
+                ? new Vector3(0.18f, 0.09f, 0.11f)
+                : new Vector3(0.10f, 0.13f, 0.08f);
+            var color = freight.Status == CivilianFreightStatus.Completed
+                ? new Color(0.30f, 0.82f, 0.42f, 1f)
+                : freight.CellRouteWaiting
+                    ? new Color(1f, 0.46f, 0.08f, 1f)
+                    : new Color(0.16f, 0.72f, 0.86f, 1f);
+            _properties.Clear();
+            _properties.SetColor("_Color", color);
+            _properties.SetColor("_BaseColor", color);
+            _renderer.SetPropertyBlock(_properties);
+        }
+    }
+
+    public sealed class LuoyangSupplyFreightPresentationRuntime : IDisposable
+    {
+        private readonly Dictionary<string, LuoyangSupplyFreightMarker>
+            _markers = new Dictionary<string, LuoyangSupplyFreightMarker>(
+                StringComparer.Ordinal);
+        private readonly Func<ulong, Vector3> _cellPositionResolver;
+        private readonly Material _sharedMaterial;
+
+        private LuoyangSupplyFreightPresentationRuntime(
+            Func<ulong, Vector3> cellPositionResolver)
+        {
+            _cellPositionResolver = cellPositionResolver ??
+                throw new ArgumentNullException(nameof(cellPositionResolver));
+            Root = new GameObject(
+                LuoyangSupplyFreightPresentationIds.RootName);
+            _sharedMaterial = CreateSupplyFreightMaterial();
+        }
+
+        public GameObject Root { get; }
+        public int LoadedMarkerCount => _markers.Count;
+        public IReadOnlyDictionary<string, LuoyangSupplyFreightMarker>
+            Markers => _markers;
+
+        public static LuoyangSupplyFreightPresentationRuntime Build(
+            WorldState world, Func<ulong, Vector3> cellPositionResolver)
+        {
+            var runtime = new LuoyangSupplyFreightPresentationRuntime(
+                cellPositionResolver);
+            runtime.Refresh(world);
+            return runtime;
+        }
+
+        public void Refresh(WorldState world)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            var visible = world.CivilianFreights.Where(item =>
+                    item != null && item.UsesCellRoute &&
+                    item.CellRouteCurrentCellId64 != 0)
+                .OrderBy(item => item.Id, StringComparer.Ordinal).ToArray();
+            var ids = new HashSet<string>(visible.Select(item => item.Id),
+                StringComparer.Ordinal);
+            foreach (var obsolete in _markers.Keys.Where(item =>
+                         !ids.Contains(item)).ToArray())
+            {
+                UnityEngine.Object.DestroyImmediate(
+                    _markers[obsolete].gameObject);
+                _markers.Remove(obsolete);
+            }
+            foreach (var freight in visible)
+            {
+                if (!_markers.TryGetValue(freight.Id, out var marker))
+                {
+                    var markerObject = GameObject.CreatePrimitive(
+                        PrimitiveType.Cube);
+                    markerObject.name = "FREIGHT_" + freight.Id;
+                    markerObject.transform.SetParent(Root.transform, false);
+                    var renderer = markerObject.GetComponent<MeshRenderer>();
+                    renderer.sharedMaterial = _sharedMaterial;
+                    marker = markerObject.AddComponent<
+                        LuoyangSupplyFreightMarker>();
+                    marker.Initialize(renderer);
+                    _markers.Add(freight.Id, marker);
+                }
+                marker.Apply(freight,
+                    _cellPositionResolver(
+                        freight.CellRouteCurrentCellId64));
+            }
+        }
+
+        public void Dispose()
+        {
+            if (Root != null) UnityEngine.Object.DestroyImmediate(Root);
+            if (_sharedMaterial != null)
+                UnityEngine.Object.DestroyImmediate(_sharedMaterial);
+            _markers.Clear();
+        }
+
+        private static Material CreateSupplyFreightMaterial()
+        {
+            var shader = Shader.Find("Sprites/Default") ??
+                         Shader.Find("Unlit/Color") ??
+                         Shader.Find("Standard");
+            if (shader == null)
+                throw new InvalidOperationException(
+                    "No shader is available for supply freight markers.");
+            return new Material(shader)
+            {
+                name = "Luoyang Supply Freight Marker Material V1",
+                color = Color.white
+            };
+        }
+    }
 }

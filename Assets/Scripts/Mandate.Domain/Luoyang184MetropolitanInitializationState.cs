@@ -149,4 +149,82 @@ namespace Mandate.Domain
         public long SupplyUnits { get; set; }
         public bool Arrived { get; set; }
     }
+
+    public sealed class LuoyangOuterSupplyCatchmentManifest
+    {
+        public string Schema { get; set; }
+        public int FormatVersion { get; set; }
+        public string CatchmentId { get; set; }
+        public string WorldId { get; set; }
+        public string CityId { get; set; }
+        public string SourcePackageRelativePath { get; set; }
+        public string SelectionContract { get; set; }
+        public string AdministrativeEffect { get; set; }
+        public bool IsProjectionOnly { get; set; }
+        public int InclusivePopulationTarget { get; set; }
+        public int MaterializedWorldPopulation { get; set; }
+        public int MaterializedOuterPopulation { get; set; }
+        public int UnmaterializedPopulationGap { get; set; }
+        public int MaterializedOuterHouseholds { get; set; }
+        public int SelectedFacilityCount { get; set; }
+        public int SelectedSettlementCount { get; set; }
+        public int SelectedAgricultureUnitCount { get; set; }
+        public int SelectedStorageFacilityCount { get; set; }
+        public int SelectedRoadFacilityCount { get; set; }
+        public List<string> FoodProductDefinitionIds { get; } =
+            new List<string>();
+        public List<string> WoodProductDefinitionIds { get; } =
+            new List<string>();
+        public List<LuoyangOuterSupplyContentIdCrosswalk> ContentIdCrosswalks
+        { get; } = new List<LuoyangOuterSupplyContentIdCrosswalk>();
+        public List<Luoyang184UrbanPackageFile> SourceFiles { get; } =
+            new List<Luoyang184UrbanPackageFile>();
+    }
+
+    public sealed class LuoyangOuterSupplyContentIdCrosswalk
+    {
+        public string SourceId { get; set; }
+        public string FormalId { get; set; }
+        public string MigrationId { get; set; }
+    }
+
+    public sealed class LuoyangOuterSupplyCatchmentDefinition
+    {
+        public string Id { get; set; }
+        public List<ulong> CellIds { get; } = new List<ulong>();
+        public List<string> FacilityIds { get; } = new List<string>();
+        public List<string> SettlementIds { get; } = new List<string>();
+        public List<string> FoodProductDefinitionIds { get; } =
+            new List<string>();
+        public List<string> WoodProductDefinitionIds { get; } =
+            new List<string>();
+        public List<LuoyangOuterSupplyContentIdCrosswalk> ContentIdCrosswalks
+        { get; } = new List<LuoyangOuterSupplyContentIdCrosswalk>();
+    }
+
+    public sealed class LuoyangOuterSupplyCatchmentDataAudit
+    {
+        public int CellCount { get; set; }
+        public int FacilityCount { get; set; }
+        public int SettlementCount { get; set; }
+        public int AgricultureUnitCount { get; set; }
+        public int StorageFacilityCount { get; set; }
+        public int RoadFacilityCount { get; set; }
+        public int MaterializedWorldPopulation { get; set; }
+        public int MaterializedOuterPopulation { get; set; }
+        public int MaterializedOuterHouseholds { get; set; }
+        public int InclusivePopulationTarget { get; set; }
+        public int UnmaterializedPopulationGap { get; set; }
+        public List<string> CriticalReferenceErrors { get; } =
+            new List<string>();
+        public List<string> UnresolvedContentDefinitionIds { get; } =
+            new List<string>();
+        public bool CriticalReferencesPassed =>
+            CriticalReferenceErrors.Count == 0;
+        public bool FormalContentBridgeComplete =>
+            UnresolvedContentDefinitionIds.Count == 0;
+        public bool PopulationTargetMaterialized =>
+            UnmaterializedPopulationGap == 0 &&
+            MaterializedWorldPopulation >= InclusivePopulationTarget;
+    }
 }

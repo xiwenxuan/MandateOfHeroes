@@ -152,6 +152,69 @@ namespace Mandate.Tests
                 Is.LessThan((long)visitedCells * 200_000L));
         }
 
+        [Test]
+        public void SupplyFreightPresentation_ShowsCarrierWaitingAndArrivalReadOnly()
+        {
+            var world = WorldState.Create(184);
+            var freight = new CivilianFreightState
+            {
+                Id = "civilian_freight.presentation.v1",
+                CarrierPersonId = "person.presentation.carrier",
+                ProductDefinitionId =
+                    CoreProductionContent.WheatGrainProductId,
+                Status = CivilianFreightStatus.InTransit,
+                UsesCellRoute = true,
+                CellRouteMovementCapabilityId =
+                    MovementCapabilityIds.Cart,
+                CellRouteCurrentCellId64 = 4_114_717,
+                RemainingCargoQuantity = 80,
+                CellRouteWaiting = true,
+                CellRouteWaitingOnFormalWorldObjectId =
+                    "facility.instance.luoyang.184.gate.gumen",
+                CellRouteRevision = 2
+            };
+            world.CivilianFreights.Add(freight);
+            var originalQuantity = freight.RemainingCargoQuantity;
+            var originalCell = freight.CellRouteCurrentCellId64;
+            var runtime = LuoyangSupplyFreightPresentationRuntime.Build(
+                world,
+                cellId => new Vector3(cellId == originalCell ? 2f : 0f,
+                    0f, 3f));
+            try
+            {
+                Assert.That(runtime.LoadedMarkerCount, Is.EqualTo(1));
+                var marker = runtime.Markers[freight.Id];
+                Assert.That(marker.CarrierPersonId,
+                    Is.EqualTo(freight.CarrierPersonId));
+                Assert.That(marker.PresentationStateId, Is.EqualTo(
+                    LuoyangSupplyFreightPresentationIds
+                        .WaitingAtPassageStateId));
+                Assert.That(marker.WaitingOnFormalWorldObjectId,
+                    Is.EqualTo(freight
+                        .CellRouteWaitingOnFormalWorldObjectId));
+                Assert.That(marker.transform.position.x, Is.EqualTo(2f));
+                Assert.That(freight.RemainingCargoQuantity,
+                    Is.EqualTo(originalQuantity));
+                Assert.That(freight.CellRouteCurrentCellId64,
+                    Is.EqualTo(originalCell));
+
+                freight.Status = CivilianFreightStatus.Completed;
+                freight.CellRouteWaiting = false;
+                freight.CellRouteWaitingOnFormalWorldObjectId = string.Empty;
+                runtime.Refresh(world);
+                Assert.That(marker.PresentationStateId, Is.EqualTo(
+                    LuoyangSupplyFreightPresentationIds.ArrivedStateId));
+                Assert.That(marker.RemainingCargoQuantity,
+                    Is.EqualTo(originalQuantity));
+            }
+            finally
+            {
+                runtime.Dispose();
+            }
+            Assert.That(GameObject.Find(
+                LuoyangSupplyFreightPresentationIds.RootName), Is.Null);
+        }
+
         private static LuoyangHumanScaleLocalMapPlanSource Load() =>
             new LuoyangHumanScaleLocalMapPlanSource(Path.Combine(
                 Directory.GetCurrentDirectory(), "Assets", "StreamingAssets",

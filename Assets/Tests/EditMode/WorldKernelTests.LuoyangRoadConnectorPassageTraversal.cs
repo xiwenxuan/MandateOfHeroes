@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Mandate.Domain;
@@ -9,6 +11,797 @@ namespace Mandate.Tests
 {
     public sealed partial class WorldKernelTests
     {
+        [Test]
+        public void FreightCellRoute_GateWaitSaveLoadAndRecoveryIsConservative()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_901, 12);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            Assert.That(passageSystem.EnsureInitialized(
+                fixture.World, runtime), Is.True);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gateId = fixture.World.LuoyangPassageTraversals.First(item =>
+                !string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(gateId,
+                out var originCellId64, out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            fixture.Request.MovementCapabilityId =
+                MovementCapabilityIds.PackAnimal;
+            var openingAudit = new FormalFoodConservationAuditor().Audit(
+                fixture.World, fixture.Content);
+            Assert.That(openingAudit.Balanced, Is.True);
+
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            Assert.That(freight.UsesCellRoute, Is.True);
+            Assert.That(freight.CellRouteSegments.Any(item =>
+                item.TraversalConditionId ==
+                    CellTraversalIds.FormalPassageConditionId &&
+                item.FormalWorldObjectId == gateId), Is.True);
+            Assert.That(passageSystem.EnqueueTransition(
+                fixture.World,
+                runtime,
+                gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.freight-cell-route-close.v1",
+                "person.freight-cell-route-controller"), Is.True);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 8 && !freight.CellRouteWaiting;
+                 segment++)
+                travel.AdvanceJourneysOneSegment(fixture.World);
+            Assert.That(freight.CellRouteWaiting, Is.True);
+            Assert.That(freight.CellRouteWaitingOnFormalWorldObjectId,
+                Is.EqualTo(gateId));
+            Assert.That(freight.DeliveredQuantity, Is.Zero);
+            var catchment = new LuoyangSupplyCatchmentSelection
+            {
+                CellIds = cellPlan.Profiles.Select(item => item.CellId64)
+                    .ToList(),
+                SupplyLocationIds = new List<string>
+                {
+                    "location.freight_origin_village",
+                    "location.freight_destination_village"
+                },
+                CityLocationIds = new List<string>
+                {
+                    "location.freight_destination_village"
+                },
+                SettlementIds = new List<string>
+                {
+                    "village.freight_origin",
+                    "village.freight_destination"
+                },
+                FacilityIds = new List<string>
+                {
+                    fixture.SellerStorage.Id,
+                    fixture.BuyerStorage.Id
+                }
+            };
+            var projectionSystem = new LuoyangSupplyProjectionSystem(
+                fixture.Content);
+            var catchmentAudit = projectionSystem.AuditCatchment(
+                fixture.World, catchment, cellPlan);
+            Assert.That(catchmentAudit.Passed, Is.True);
+            Assert.That(catchmentAudit.TraversalCoveredCellCount,
+                Is.EqualTo(catchmentAudit.CellCount));
+            Assert.That(catchmentAudit.PermanentPersonCount,
+                Is.GreaterThan(0));
+            Assert.That(catchmentAudit.HouseholdCount,
+                Is.GreaterThan(0));
+            Assert.That(catchmentAudit.StorageFacilityCount,
+                Is.EqualTo(3));
+            var blockedProjection = projectionSystem.BuildCityProjection(
+                fixture.World, catchment);
+            Assert.That(blockedProjection.IncomingFreightQuantity,
+                Is.EqualTo(freight.RemainingCargoQuantity));
+            Assert.That(blockedProjection.BlockedFreightCount, Is.EqualTo(1));
+            Assert.That(blockedProjection.DelayedFreightCount, Is.EqualTo(1));
+            Assert.That(blockedProjection.DailyFoodDemandNutritionBasisUnits,
+                Is.GreaterThan(0));
+            var waitingJson = WorldSnapshotSerializer.Serialize(
+                fixture.World, fixture.Content);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                waitingJson, fixture.Content);
+            var loadedFreight = loaded.CivilianFreights.Single(item =>
+                item.Id == freight.Id);
+            Assert.That(loadedFreight.CellRouteWaiting, Is.True);
+            Assert.That(WorldSnapshotSerializer.Serialize(
+                loaded, fixture.Content), Is.EqualTo(waitingJson));
+
+            var resumedRuntime = new WorldCommandRuntime();
+            var resumedPassageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            resumedPassageSystem.RegisterHandlers(resumedRuntime);
+            Assert.That(resumedPassageSystem.EnqueueTransition(
+                loaded,
+                resumedRuntime,
+                gateId,
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.freight-cell-route-reopen.v1",
+                "person.freight-cell-route-controller"), Is.True);
+            resumedRuntime.ProcessDue(loaded);
+            resumedRuntime.DispatchPublishedEvents(loaded);
+            var resumedFreightSystem = new CivilianFreightSystem(
+                loaded.MasterSeed, fixture.Content, cellPlan);
+            var resumedTravel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 32 && loadedFreight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                resumedTravel.AdvanceJourneysOneSegment(loaded);
+                resumedFreightSystem.ResolveArrivals(loaded);
+            }
+            Assert.That(loadedFreight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(loadedFreight.DeliveredQuantity,
+                Is.EqualTo(loadedFreight.DispatchedQuantity));
+            Assert.That(loadedFreight.NaturalLossQuantity, Is.Zero);
+            Assert.That(loadedFreight.CellRouteCurrentCellId64,
+                Is.EqualTo(targetCellId64));
+            var closingAudit = new FormalFoodConservationAuditor().Audit(
+                loaded, fixture.Content);
+            Assert.That(closingAudit.Balanced, Is.True);
+            Assert.That(closingAudit.Difference, Is.Zero);
+            var recoveredProjection = new LuoyangSupplyProjectionSystem(
+                fixture.Content).BuildCityProjection(loaded, catchment);
+            Assert.That(recoveredProjection.IncomingFreightQuantity, Is.Zero);
+            Assert.That(recoveredProjection.BlockedFreightCount, Is.Zero);
+            Assert.That(recoveredProjection.CurrentUsableFoodStock,
+                Is.GreaterThanOrEqualTo(loadedFreight.DeliveredQuantity));
+            Assert.That(recoveredProjection.DaysOfSupply,
+                Is.GreaterThan(0d));
+            loaded.Validate();
+        }
+
+        [Test]
+        public void FoodSupplyVerticalSlice_HarvestMarketFreightGateAndConsumptionBalance()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_902, 100);
+            fixture.Seller.FarmlandUnits = 1;
+            fixture.Seller.SeedGrain = 100;
+            var field = new VillageFacilityState
+            {
+                Id = "facility.freight_origin_farmland",
+                VillageId = "village.freight_origin",
+                Kind = VillageFacilityKind.Farmland,
+                OwnerFamilyId = fixture.Seller.Id,
+                ManagerPersonId = fixture.Seller.HeadPersonId,
+                Capacity = 1
+            };
+            fixture.World.VillageFacilities.Add(field);
+            var agriculture = new AgricultureProductionSystem(
+                fixture.World.MasterSeed, fixture.Content);
+            var order = agriculture.CreateOrder(
+                fixture.World,
+                "village.freight_origin",
+                fixture.Seller.Id,
+                field.Id,
+                fixture.SellerStorage.Id,
+                fixture.Seller.HeadPersonId,
+                CoreProductionContent.WheatCropId,
+                CoreProductionContent.PrototypeNorthernWheatVarietyId,
+                CoreProductionContent.GrowWheatRecipeId,
+                CoreProductionContent.PrototypeDrylandMethodId,
+                ProductionControlMode.TargetInstruction,
+                1,
+                new[] { fixture.Seller.HeadPersonId },
+                fixture.World.AbsoluteDay + 180);
+            fixture.World.AbsoluteDay = order.HarvestDay;
+            agriculture.ResolveDueOrders(
+                fixture.World, "village.freight_origin");
+            var harvestBatch = fixture.World.ProductBatches.Single(item =>
+                item.SourceWorkOrderId == order.Id);
+            Assert.That(harvestBatch.Quantity, Is.GreaterThan(0));
+            Assert.That(harvestBatch.StorageFacilityId,
+                Is.EqualTo(fixture.SellerStorage.Id));
+
+            var market = new FormalCountyMarketSystem(fixture.Content);
+            var sell = market.CreateSellOrder(
+                fixture.World,
+                "county_governance.freight_origin",
+                fixture.Seller.Id,
+                fixture.SellerStorage.Id,
+                harvestBatch.ProductDefinitionId,
+                checked((int)harvestBatch.Quantity),
+                2,
+                checked((int)fixture.World.AbsoluteDay),
+                checked((int)fixture.World.AbsoluteDay + 10));
+            var buy = market.CreateBuyOrder(
+                fixture.World,
+                "county_governance.freight_destination",
+                fixture.Buyer.Id,
+                fixture.BuyerStorage.Id,
+                harvestBatch.ProductDefinitionId,
+                checked((int)harvestBatch.Quantity),
+                3,
+                checked((int)fixture.World.AbsoluteDay),
+                checked((int)fixture.World.AbsoluteDay + 10));
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gateId = fixture.World.LuoyangPassageTraversals.First(item =>
+                !string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(
+                gateId, out var originCellId64, out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.BuyOrderId = buy.Id;
+            fixture.Request.SellOrderId = sell.Id;
+            fixture.Request.Quantity = harvestBatch.Quantity;
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            Assert.That(fixture.World.ProductBatches.Any(item =>
+                item.InventoryContainerId == fixture.Transport.Id &&
+                item.SourceWorkOrderId == order.Id), Is.True);
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 32 && freight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(fixture.World);
+                fixture.FreightSystem.ResolveArrivals(fixture.World);
+            }
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(freight.CellRouteSegments.Any(item =>
+                item.FormalWorldObjectId == gateId), Is.True);
+            var deliveredBatch = fixture.World.ProductBatches.Single(item =>
+                item.OwnerFamilyId == fixture.Buyer.Id &&
+                item.StorageFacilityId == fixture.BuyerStorage.Id &&
+                item.SourceWorkOrderId == order.Id);
+            var consumption = new FoodInventorySystem(fixture.Content)
+                .ConsumeFamilyFood(
+                    fixture.World,
+                    fixture.Buyer.Id,
+                    fixture.BuyerStorage.Id,
+                    fixture.Buyer.HeadPersonId,
+                    Math.Min(10_000L,
+                        deliveredBatch.Quantity * 10_000L));
+            Assert.That(consumption.ConsumedPhysicalQuantity,
+                Is.GreaterThan(0));
+            Assert.That(fixture.World.InventoryTransactions.Single(item =>
+                    item.Id == consumption.InventoryTransactionId).Type,
+                Is.EqualTo(InventoryTransactionType.FoodConsumed));
+            var conservation = new FormalFoodConservationAuditor().Audit(
+                fixture.World, fixture.Content);
+            Assert.That(conservation.Balanced, Is.True);
+            Assert.That(conservation.Difference, Is.Zero);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void WoodFreightCellRoute_UsesSameCarrierGateAndInventoryAuthority()
+        {
+            var fixture = PrepareCivilianFreightWorld(
+                25_903,
+                12,
+                CoreProductionContent.TimberMaterialProductId);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gateId = fixture.World.LuoyangPassageTraversals.First(item =>
+                !string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(gateId,
+                out var originCellId64, out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            fixture.Request.MovementCapabilityId =
+                MovementCapabilityIds.PackAnimal;
+            var loggingStorage = new VillageFacilityState
+            {
+                Id = "facility.freight_origin_logging_camp",
+                VillageId = "village.freight_origin",
+                Kind = VillageFacilityKind.HouseholdGranary,
+                OwnerFamilyId = fixture.Seller.Id,
+                ManagerPersonId = fixture.Seller.HeadPersonId,
+                Capacity = 20_000,
+                CapabilityTags = new List<string>
+                {
+                    CoreProductionContent.LoggingFacilityTag
+                }
+            };
+            fixture.World.VillageFacilities.Add(loggingStorage);
+            var forest = new ResourceBodyState
+            {
+                Id = "resource_body.freight_origin.forest.v1",
+                ResourceKindId = "resource_kind.temperate_forest_stand",
+                OutputProductDefinitionId =
+                    CoreProductionContent.TimberMaterialProductId,
+                LocationId = "location.freight_origin_village",
+                Provenance = "gameplay_reconstruction",
+                GenerationRuleVersion = "resource_rules.outer_supply.v1",
+                RequiredFacilityTag =
+                    CoreProductionContent.LoggingFacilityTag,
+                InitialQuantity = 100,
+                RemainingQuantity = 100,
+                QualityBasisPoints = 8_000,
+                ExtractionDifficultyBasisPoints = 8_000
+            };
+            fixture.World.ResourceBodies.Add(forest);
+            var openingWood = fixture.World.ProductBatches.Where(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.TimberMaterialProductId).Sum(item =>
+                item.Quantity) + forest.RemainingQuantity;
+            var extraction = new UpstreamResourceProductionSystem(
+                fixture.Content);
+            var extractionOrder = extraction.CreateFamilyOrder(
+                fixture.World,
+                forest.Id,
+                fixture.Seller.Id,
+                loggingStorage.Id,
+                fixture.Seller.HeadPersonId,
+                new[] { fixture.Seller.HeadPersonId },
+                ProductionControlMode.WorkOrder,
+                12);
+            fixture.World.AbsoluteDay = extractionOrder.FinishDay;
+            extraction.ResolveDueOrders(fixture.World);
+            var extractedBatch = fixture.World.ProductBatches.Single(item =>
+                item.SourceWorkOrderId == extractionOrder.Id);
+            var market = new FormalCountyMarketSystem(fixture.Content);
+            var sell = market.CreateSellOrder(
+                fixture.World,
+                "county_governance.freight_origin",
+                fixture.Seller.Id,
+                loggingStorage.Id,
+                CoreProductionContent.TimberMaterialProductId,
+                checked((int)extractedBatch.Quantity),
+                2,
+                checked((int)fixture.World.AbsoluteDay),
+                checked((int)fixture.World.AbsoluteDay + 10));
+            var buy = market.CreateBuyOrder(
+                fixture.World,
+                "county_governance.freight_destination",
+                fixture.Buyer.Id,
+                fixture.BuyerStorage.Id,
+                CoreProductionContent.TimberMaterialProductId,
+                checked((int)extractedBatch.Quantity),
+                3,
+                checked((int)fixture.World.AbsoluteDay),
+                checked((int)fixture.World.AbsoluteDay + 10));
+            fixture.Request.SellOrderId = sell.Id;
+            fixture.Request.BuyOrderId = buy.Id;
+            fixture.Request.Quantity = extractedBatch.Quantity;
+
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            Assert.That(fixture.World.ProductBatches.Any(item =>
+                item.InventoryContainerId == fixture.Transport.Id &&
+                item.SourceWorkOrderId == extractionOrder.Id), Is.True);
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 32 && freight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(fixture.World);
+                fixture.FreightSystem.ResolveArrivals(fixture.World);
+            }
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(freight.ProductDefinitionId,
+                Is.EqualTo(CoreProductionContent.TimberMaterialProductId));
+            Assert.That(freight.DeliveredQuantity, Is.EqualTo(12));
+            Assert.That(freight.NaturalLossQuantity, Is.Zero);
+            var closingWood = fixture.World.ProductBatches.Where(item =>
+                item.ProductDefinitionId ==
+                    CoreProductionContent.TimberMaterialProductId).Sum(item =>
+                item.Quantity) + forest.RemainingQuantity;
+            Assert.That(closingWood, Is.EqualTo(openingWood));
+            Assert.That(fixture.World.ProductBatches.Where(item =>
+                item.OwnerFamilyId == fixture.Buyer.Id &&
+                item.StorageFacilityId == fixture.BuyerStorage.Id &&
+                item.ProductDefinitionId ==
+                    CoreProductionContent.TimberMaterialProductId).Sum(item =>
+                item.Quantity), Is.EqualTo(12));
+            Assert.That(fixture.World.ProductBatches.Any(item =>
+                item.OwnerFamilyId == fixture.Buyer.Id &&
+                item.SourceWorkOrderId == extractionOrder.Id), Is.True);
+            Assert.That(freight.CellRouteCurrentCellId64,
+                Is.EqualTo(targetCellId64));
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FreightCellRoute_BridgeClosureWaitsAndReopenResumes()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_904, 12);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var bridgeId = fixture.World.LuoyangPassageTraversals.First(item =>
+                string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightPassageCellPlan(
+                bridgeId,
+                FacilitySpatialCapabilityIds.Bridge,
+                out var originCellId64,
+                out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+
+            Assert.That(passageSystem.EnqueueTransition(
+                fixture.World,
+                runtime,
+                bridgeId,
+                LuoyangRoadConnectorPassageTraversalIds.DestroyedStatusId,
+                "passage.reason.freight-bridge-destroyed.v1",
+                "person.freight-cell-route-controller"), Is.True);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 8 && !freight.CellRouteWaiting;
+                 segment++)
+                travel.AdvanceJourneysOneSegment(fixture.World);
+            Assert.That(freight.CellRouteWaiting, Is.True);
+            Assert.That(freight.CellRouteWaitingOnFormalWorldObjectId,
+                Is.EqualTo(bridgeId));
+            Assert.That(freight.DeliveredQuantity, Is.Zero);
+
+            Assert.That(passageSystem.EnqueueTransition(
+                fixture.World,
+                runtime,
+                bridgeId,
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.freight-bridge-repaired.v1",
+                "person.freight-cell-route-controller"), Is.True);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            for (var segment = 0;
+                 segment < 32 && freight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(fixture.World);
+                fixture.FreightSystem.ResolveArrivals(fixture.World);
+            }
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(freight.CellRouteCurrentCellId64,
+                Is.EqualTo(targetCellId64));
+            Assert.That(new FormalFoodConservationAuditor().Audit(
+                fixture.World, fixture.Content).Difference, Is.Zero);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FoodSupplyInterruptionTests_GateBlockCreatesShortfallAndRecovery()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_910, 12);
+            new ProductInventorySystem(fixture.Content)
+                .CreateFamilyOpeningBatch(
+                    fixture.World,
+                    fixture.Buyer.Id,
+                    fixture.BuyerStorage.Id,
+                    fixture.Buyer.HeadPersonId,
+                    CoreProductionContent.WheatGrainProductId,
+                    2);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gateId = fixture.World.LuoyangPassageTraversals.First(item =>
+                !string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(
+                gateId, out var originCellId64, out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            passageSystem.EnqueueTransition(fixture.World, runtime, gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.supply-interruption-close.v1",
+                "person.freight-cell-route-controller");
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 8 && !freight.CellRouteWaiting;
+                 segment++)
+                travel.AdvanceJourneysOneSegment(fixture.World);
+            Assert.That(freight.CellRouteWaiting, Is.True);
+
+            fixture.World.AbsoluteDay = 30;
+            var life = new VillageLifeSystem(
+                fixture.World.MasterSeed, fixture.Content);
+            var shortfall = life.ResolveFormalFoodMonthly(
+                fixture.World,
+                "village.freight_destination",
+                fixture.World.AbsoluteDay);
+            Assert.That(shortfall.HasShortfall, Is.True);
+            Assert.That(shortfall.ShortfallFamilyIds,
+                Does.Contain(fixture.Buyer.Id));
+            var selection = new LuoyangSupplyCatchmentSelection
+            {
+                CityLocationIds = new List<string>
+                {
+                    "location.freight_destination_village"
+                }
+            };
+            var blocked = new LuoyangSupplyProjectionSystem(fixture.Content)
+                .BuildCityProjection(fixture.World, selection);
+            Assert.That(blocked.CurrentUsableFoodStock, Is.Zero);
+            Assert.That(blocked.BlockedFreightCount, Is.EqualTo(1));
+            Assert.That(blocked.HouseholdShortfallCount, Is.EqualTo(1));
+
+            passageSystem.EnqueueTransition(fixture.World, runtime, gateId,
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.supply-interruption-reopen.v1",
+                "person.freight-cell-route-controller");
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            for (var segment = 0;
+                 segment < 32 && freight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(fixture.World);
+                fixture.FreightSystem.ResolveArrivals(fixture.World);
+            }
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            fixture.World.AbsoluteDay = 60;
+            var recovered = life.ResolveFormalFoodMonthly(
+                fixture.World,
+                "village.freight_destination",
+                fixture.World.AbsoluteDay);
+            Assert.That(recovered.HasShortfall, Is.False);
+            var recoveredProjection =
+                new LuoyangSupplyProjectionSystem(fixture.Content)
+                    .BuildCityProjection(fixture.World, selection);
+            Assert.That(recoveredProjection.BlockedFreightCount, Is.Zero);
+            Assert.That(recoveredProjection.CurrentUsableFoodStock,
+                Is.GreaterThan(0));
+            Assert.That(recoveredProjection.HouseholdShortfallCount,
+                Is.Zero);
+            Assert.That(new FormalFoodConservationAuditor().Audit(
+                fixture.World, fixture.Content).Difference, Is.Zero);
+            fixture.World.Validate();
+        }
+
+        [Test]
+        public void FreightCellRoute_RoadBlockReroutesPackAnimalOffRoadButNotCart()
+        {
+            var pack = CreateRoadRerouteFreightFixture(
+                25_905, MovementCapabilityIds.PackAnimal);
+            var packFreight = pack.Fixture.FreightSystem.Dispatch(
+                pack.Fixture.World, pack.Fixture.Request);
+            Assert.That(packFreight.CellRouteSegments.Any(item =>
+                item.FormalWorldObjectId == pack.RoadEdgeId), Is.True);
+            pack.Fixture.World.LuoyangRoadOperationalSegments.Single().StatusId =
+                LuoyangFormalPlayerMovementIds.DestroyedRoadStatusId;
+            var travel = new TravelSystem();
+            travel.AdvanceJourneysOneSegment(pack.Fixture.World);
+            Assert.That(packFreight.CellRouteWaiting, Is.True);
+            Assert.That(pack.Fixture.FreightSystem.TryRerouteCellFreight(
+                pack.Fixture.World, packFreight), Is.True);
+            Assert.That(packFreight.CellRouteRevision, Is.EqualTo(1));
+            Assert.That(packFreight.CellRouteSegments.Any(item =>
+                item.FormalWorldObjectId == pack.RoadEdgeId), Is.False);
+            Assert.That(packFreight.CellRouteSegments.Any(item =>
+                item.TraversalCostPermille > 1_000), Is.True);
+            for (var segment = 0;
+                 segment < 48 && packFreight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(pack.Fixture.World);
+                pack.Fixture.FreightSystem.ResolveArrivals(
+                    pack.Fixture.World);
+            }
+            Assert.That(packFreight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            pack.Fixture.World.Validate();
+
+            var cart = CreateRoadRerouteFreightFixture(
+                25_906, MovementCapabilityIds.Cart);
+            var cartFreight = cart.Fixture.FreightSystem.Dispatch(
+                cart.Fixture.World, cart.Fixture.Request);
+            cart.Fixture.World.LuoyangRoadOperationalSegments.Single().StatusId =
+                LuoyangFormalPlayerMovementIds.DestroyedRoadStatusId;
+            travel.AdvanceJourneysOneSegment(cart.Fixture.World);
+            Assert.That(cartFreight.CellRouteWaiting, Is.True);
+            Assert.That(cart.Fixture.FreightSystem.TryRerouteCellFreight(
+                cart.Fixture.World, cartFreight), Is.False);
+            Assert.That(cartFreight.CellRouteRevision, Is.Zero);
+            Assert.That(cartFreight.DeliveredQuantity, Is.Zero);
+            cart.Fixture.World.Validate();
+        }
+
+        [Test]
+        public void SupplyReplayTests_ThreeGateInterruptionRunsAreByteIdentical()
+        {
+            string expected = null;
+            for (var run = 0; run < 3; run++)
+            {
+                var actual = RunDeterministicFreightGateReplay();
+                if (expected == null) expected = actual;
+                else Assert.That(actual, Is.EqualTo(expected));
+            }
+        }
+
+        [Test]
+        public void OuterSupplyCatchmentDataAudit_ReferencesOneWorldAndReportsTargetGap()
+        {
+            var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
+                "Assets", "StreamingAssets", "WorldMap");
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            var reader = new LuoyangOuterSupplyCatchmentV1Reader(
+                Path.Combine(worldMapRoot,
+                    "LuoyangOuterSupplyCatchmentV1"));
+            var audit = reader.Audit();
+            var local = new LuoyangHumanScaleLocalMapPlanSource(worldMapRoot);
+            var traversal = LuoyangCellTraversalRules.CreatePlan(
+                local.Plan, local.StrategicRoads);
+            timer.Stop();
+            Assert.That(audit.CriticalReferencesPassed, Is.True,
+                string.Join(",", audit.CriticalReferenceErrors));
+            Assert.That(reader.Manifest.IsProjectionOnly, Is.True);
+            Assert.That(reader.Manifest.AdministrativeEffect,
+                Is.EqualTo("none"));
+            Assert.That(audit.CellCount, Is.EqualTo(869));
+            Assert.That(audit.FacilityCount, Is.EqualTo(854));
+            Assert.That(audit.SettlementCount, Is.EqualTo(33));
+            Assert.That(audit.AgricultureUnitCount, Is.EqualTo(135));
+            Assert.That(audit.StorageFacilityCount, Is.EqualTo(22));
+            Assert.That(audit.RoadFacilityCount, Is.EqualTo(267));
+            Assert.That(audit.MaterializedOuterPopulation,
+                Is.EqualTo(130_000));
+            Assert.That(audit.MaterializedOuterHouseholds,
+                Is.EqualTo(26_907));
+            Assert.That(audit.MaterializedWorldPopulation,
+                Is.EqualTo(400_000));
+            Assert.That(audit.InclusivePopulationTarget,
+                Is.EqualTo(700_000));
+            Assert.That(audit.UnmaterializedPopulationGap,
+                Is.EqualTo(300_000));
+            Assert.That(audit.PopulationTargetMaterialized, Is.False);
+            Assert.That(reader.Definition.CellIds.All(cellId =>
+                traversal.ProfilesByCellId.ContainsKey(cellId)), Is.True);
+            Assert.That(reader.Definition.FoodProductDefinitionIds,
+                Does.Contain("product.food.wheat_grain"));
+            Assert.That(reader.Definition.WoodProductDefinitionIds,
+                Does.Contain(CoreProductionContent.TimberMaterialProductId));
+            Assert.That(reader.Definition.ContentIdCrosswalks.Single(item =>
+                    item.SourceId == "product.food.wheat_grain").FormalId,
+                Is.EqualTo(CoreProductionContent.WheatGrainProductId));
+            Assert.That(audit.FormalContentBridgeComplete, Is.False);
+            Assert.That(audit.UnresolvedContentDefinitionIds,
+                Is.EquivalentTo(new[]
+                {
+                    "product.food.bean",
+                    "product.food.broomcorn_grain",
+                    "product.food.millet_grain"
+                }));
+            Assert.That(timer.ElapsedMilliseconds, Is.LessThan(10_000));
+            Console.WriteLine(
+                "OUTER_SUPPLY_PERF init_and_traversal_ms=" +
+                timer.ElapsedMilliseconds + " cells=" + audit.CellCount +
+                " facilities=" + audit.FacilityCount +
+                " population_gap=" + audit.UnmaterializedPopulationGap);
+        }
+
+        [Test]
+        public void FreightOriginInsufficientAndCarrierUnavailable_DoNotMutateWorld()
+        {
+            var insufficient = PrepareCivilianFreightWorld(25_911, 12);
+            insufficient.Request.Quantity = 13;
+            var insufficientBefore = WorldSnapshotSerializer.Serialize(
+                insufficient.World, insufficient.Content);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                insufficient.FreightSystem.Dispatch(
+                    insufficient.World, insufficient.Request));
+            Assert.That(WorldSnapshotSerializer.Serialize(
+                insufficient.World, insufficient.Content),
+                Is.EqualTo(insufficientBefore));
+
+            var unavailable = PrepareCivilianFreightWorld(25_912, 12);
+            unavailable.Carrier.LocationId =
+                "location.freight_destination_village";
+            var unavailableBefore = WorldSnapshotSerializer.Serialize(
+                unavailable.World, unavailable.Content);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                unavailable.FreightSystem.Dispatch(
+                    unavailable.World, unavailable.Request));
+            Assert.That(WorldSnapshotSerializer.Serialize(
+                unavailable.World, unavailable.Content),
+                Is.EqualTo(unavailableBefore));
+        }
+
+        [Test]
+        public void FreightDestinationFull_SaveLoadThenCapacityRecoveryCompletesOnce()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_913, 12);
+            fixture.BuyerStorage.Capacity = 0;
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+
+            new WorldSimulator(fixture.World.MasterSeed, fixture.Content)
+                .AdvanceSegments(fixture.World, 5);
+
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.AwaitingReceipt));
+            Assert.That(freight.DeliveredQuantity, Is.Zero);
+            var waitingJson = WorldSnapshotSerializer.Serialize(
+                fixture.World, fixture.Content);
+            var loaded = WorldSnapshotSerializer.Deserialize(
+                waitingJson, fixture.Content);
+            Assert.That(WorldSnapshotSerializer.Serialize(
+                loaded, fixture.Content), Is.EqualTo(waitingJson));
+            var loadedFreight = loaded.CivilianFreights.Single(item =>
+                item.Id == freight.Id);
+            loaded.VillageFacilities.Single(item =>
+                item.Id == fixture.BuyerStorage.Id).Capacity = 20_000;
+
+            var resumed = new CivilianFreightSystem(
+                loaded.MasterSeed, fixture.Content);
+            resumed.ResolveArrivals(loaded);
+            resumed.ResolveArrivals(loaded);
+
+            Assert.That(loadedFreight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(loadedFreight.RemainingCargoQuantity, Is.Zero);
+            Assert.That(loadedFreight.DispatchedQuantity, Is.EqualTo(
+                loadedFreight.DeliveredQuantity +
+                loadedFreight.NaturalLossQuantity));
+            Assert.That(new FormalFoodConservationAuditor().Audit(
+                loaded, fixture.Content).Difference, Is.Zero);
+            loaded.Validate();
+        }
+
         [Test]
         public void LuoyangPassageWorldState_CommandRoundTripPreservesStateAndAudit()
         {
@@ -1052,6 +1845,337 @@ namespace Mandate.Tests
                 .CreatePlan(performance, composition);
             return LuoyangRoadConnectorPassageTraversalRules.CreatePlan(
                 interaction);
+        }
+
+        private static CellTraversalPlan BuildFreightGateCellPlan(
+            string gateFacilityId,
+            out ulong originCellId64,
+            out ulong targetCellId64)
+        {
+            return BuildFreightPassageCellPlan(
+                gateFacilityId,
+                FacilitySpatialCapabilityIds.Gate,
+                out originCellId64,
+                out targetCellId64);
+        }
+
+        private static CellTraversalPlan BuildFreightPassageCellPlan(
+            string passageFacilityId,
+            string facilityCapabilityId,
+            out ulong originCellId64,
+            out ulong targetCellId64)
+        {
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            originCellId64 = grid.ToCellId(1_200, 2_000).Value;
+            var gateCellId64 = grid.ToCellId(1_200, 2_001).Value;
+            targetCellId64 = grid.ToCellId(1_200, 2_002).Value;
+            var origin = FreightCellProfile(originCellId64, string.Empty,
+                string.Empty);
+            var gate = FreightCellProfile(gateCellId64, passageFacilityId,
+                facilityCapabilityId);
+            var target = FreightCellProfile(targetCellId64, string.Empty,
+                string.Empty);
+            EnableFreightPort(origin, CellTraversalDirection.East,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            EnableFreightPort(gate, CellTraversalDirection.West,
+                CellTraversalIds.FormalPassageConditionId,
+                passageFacilityId);
+            EnableFreightPort(gate, CellTraversalDirection.East,
+                CellTraversalIds.FormalPassageConditionId,
+                passageFacilityId);
+            EnableFreightPort(target, CellTraversalDirection.West,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            return new CellTraversalPlan(
+                new[] { origin, gate, target }, new string('a', 64));
+        }
+
+        private static RoadRerouteFreightFixture
+            CreateRoadRerouteFreightFixture(
+                ulong seed, string movementCapabilityId)
+        {
+            const string roadEdgeId = "road.edge.freight-reroute.v1";
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            var originCellId64 = grid.ToCellId(1_210, 2_000).Value;
+            var roadCellId64 = grid.ToCellId(1_210, 2_001).Value;
+            var targetCellId64 = grid.ToCellId(1_210, 2_002).Value;
+            var alternateWestCellId64 = grid.ToCellId(1_209, 2_000).Value;
+            var alternateMiddleCellId64 = grid.ToCellId(1_209, 2_001).Value;
+            var alternateEastCellId64 = grid.ToCellId(1_209, 2_002).Value;
+            var origin = FreightCellProfile(originCellId64, string.Empty,
+                string.Empty);
+            var road = FreightCellProfile(roadCellId64, string.Empty,
+                FacilitySpatialCapabilityIds.Road);
+            var target = FreightCellProfile(targetCellId64, string.Empty,
+                string.Empty);
+            var alternateWest = FreightCellProfile(
+                alternateWestCellId64, string.Empty, string.Empty);
+            var alternateMiddle = FreightCellProfile(
+                alternateMiddleCellId64, string.Empty, string.Empty);
+            var alternateEast = FreightCellProfile(
+                alternateEastCellId64, string.Empty, string.Empty);
+            foreach (var profile in new[]
+                     {
+                         origin, road, target, alternateWest,
+                         alternateMiddle, alternateEast
+                     })
+                profile.InternalTopology = CellInternalTopology.OpenArea;
+            origin.TraversalCostPermilleByCapability[
+                MovementCapabilityIds.Cart] = 1_000;
+            road.TraversalCostPermilleByCapability[
+                MovementCapabilityIds.Cart] = 1_000;
+            target.TraversalCostPermilleByCapability[
+                MovementCapabilityIds.Cart] = 1_000;
+            EnableFreightPortForCapabilities(origin,
+                CellTraversalDirection.East,
+                CellTraversalIds.FormalRoadConditionId,
+                roadEdgeId,
+                MovementCapabilityIds.PackAnimal,
+                MovementCapabilityIds.Cart);
+            EnableFreightPortForCapabilities(road,
+                CellTraversalDirection.West,
+                CellTraversalIds.FormalRoadConditionId,
+                roadEdgeId,
+                MovementCapabilityIds.PackAnimal,
+                MovementCapabilityIds.Cart);
+            EnableFreightPortForCapabilities(road,
+                CellTraversalDirection.East,
+                CellTraversalIds.FormalRoadConditionId,
+                roadEdgeId,
+                MovementCapabilityIds.PackAnimal,
+                MovementCapabilityIds.Cart);
+            EnableFreightPortForCapabilities(target,
+                CellTraversalDirection.West,
+                CellTraversalIds.FormalRoadConditionId,
+                roadEdgeId,
+                MovementCapabilityIds.PackAnimal,
+                MovementCapabilityIds.Cart);
+
+            foreach (var profile in new[]
+                     {
+                         alternateWest, alternateMiddle, alternateEast
+                     })
+                profile.TraversalCostPermilleByCapability[
+                    MovementCapabilityIds.PackAnimal] = 1_500;
+            EnablePackAnimalPort(origin, CellTraversalDirection.North);
+            EnablePackAnimalPort(alternateWest,
+                CellTraversalDirection.South);
+            EnablePackAnimalPort(alternateWest,
+                CellTraversalDirection.East);
+            EnablePackAnimalPort(alternateMiddle,
+                CellTraversalDirection.West);
+            EnablePackAnimalPort(alternateMiddle,
+                CellTraversalDirection.East);
+            EnablePackAnimalPort(alternateEast,
+                CellTraversalDirection.West);
+            EnablePackAnimalPort(alternateEast,
+                CellTraversalDirection.South);
+            EnablePackAnimalPort(target, CellTraversalDirection.North);
+            var plan = new CellTraversalPlan(new[]
+            {
+                origin, road, target, alternateWest, alternateMiddle,
+                alternateEast
+            }, new string('b', 64));
+            var fixture = PrepareCivilianFreightWorld(seed, 12);
+            fixture.World.LuoyangLocalNavigationLocations.Add(
+                new LuoyangLocalNavigationLocationState
+                {
+                    Id = "local-navigation.freight.origin.v1",
+                    FacilityId = "facility.freight.origin",
+                    FacilityDefinitionId = "facility.public.road",
+                    SettlementLocationId =
+                        "location.freight_origin_village",
+                    CellId64 = originCellId64,
+                    GridColumn = 2_000,
+                    GridRow = 1_210
+                });
+            fixture.World.LuoyangLocalNavigationLocations.Add(
+                new LuoyangLocalNavigationLocationState
+                {
+                    Id = "local-navigation.freight.destination.v1",
+                    FacilityId = "facility.freight.destination",
+                    FacilityDefinitionId = "facility.public.road",
+                    SettlementLocationId =
+                        "location.freight_destination_village",
+                    CellId64 = targetCellId64,
+                    GridColumn = 2_002,
+                    GridRow = 1_210
+                });
+            fixture.World.LuoyangRoadOperationalSegments.Add(
+                new LuoyangRoadOperationalSegmentState
+                {
+                    Id = "road.operational.freight-reroute.v1",
+                    EdgeId = roadEdgeId,
+                    FromFacilityId = "facility.freight.origin",
+                    ToFacilityId = "facility.freight.destination",
+                    StatusId = LuoyangFormalPlayerMovementIds
+                        .OpenRoadStatusId,
+                    LastChangedDay = fixture.World.AbsoluteDay,
+                    LastChangedSegment = fixture.World.Segment,
+                    LastReasonId = "road.reason.initialized.v1",
+                    LastCommandId = "command.road.initialized.v1",
+                    LastEventId = "event.road.initialized.v1"
+                });
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, plan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            fixture.Request.MovementCapabilityId = movementCapabilityId;
+            return new RoadRerouteFreightFixture
+            {
+                Fixture = fixture,
+                RoadEdgeId = roadEdgeId
+            };
+        }
+
+        private static string RunDeterministicFreightGateReplay()
+        {
+            var fixture = PrepareCivilianFreightWorld(25_907, 12);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gateId = fixture.World.LuoyangPassageTraversals.First(item =>
+                !string.Equals(item.FacilityDefinitionId,
+                    "facility.public.bridge", StringComparison.Ordinal))
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(
+                gateId, out var originCellId64, out var targetCellId64);
+            fixture.FreightSystem = new CivilianFreightSystem(
+                fixture.World.MasterSeed, fixture.Content, cellPlan);
+            fixture.Request.OriginCellId64 = originCellId64;
+            fixture.Request.TargetCellId64 = targetCellId64;
+            var freight = fixture.FreightSystem.Dispatch(
+                fixture.World, fixture.Request);
+            passageSystem.EnqueueTransition(fixture.World, runtime, gateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.freight-replay-close.v1",
+                "person.freight-cell-route-controller");
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var travel = new TravelSystem();
+            for (var segment = 0;
+                 segment < 8 && !freight.CellRouteWaiting;
+                 segment++)
+                travel.AdvanceJourneysOneSegment(fixture.World);
+            passageSystem.EnqueueTransition(fixture.World, runtime, gateId,
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.freight-replay-open.v1",
+                "person.freight-cell-route-controller");
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            for (var segment = 0;
+                 segment < 32 && freight.Status !=
+                    CivilianFreightStatus.Completed;
+                 segment++)
+            {
+                travel.AdvanceJourneysOneSegment(fixture.World);
+                fixture.FreightSystem.ResolveArrivals(fixture.World);
+            }
+            Assert.That(freight.Status,
+                Is.EqualTo(CivilianFreightStatus.Completed));
+            Assert.That(new FormalFoodConservationAuditor().Audit(
+                fixture.World, fixture.Content).Difference, Is.Zero);
+            fixture.World.Validate();
+            return WorldSnapshotSerializer.Serialize(
+                fixture.World, fixture.Content);
+        }
+
+        private static CellTraversalProfile FreightCellProfile(
+            ulong cellId64, string facilityId, string capabilityId)
+        {
+            var profile = new CellTraversalProfile
+            {
+                CellId64 = cellId64,
+                TerrainCapabilityId = "terrain.capability.plains.v1",
+                FacilityId = facilityId,
+                FacilityDefinitionId = string.IsNullOrEmpty(facilityId)
+                    ? string.Empty
+                    : "facility.public.gate",
+                FacilityCapabilityId = capabilityId,
+                AccessRequirementId = FacilityAccessRequirementIds.Optional,
+                PassThroughAllowed = true,
+                InternalTopology = CellInternalTopology.Straight,
+                TraversalDistanceCentimetres = 800_000,
+                TraversalCostPermilleByCapability =
+                    new Dictionary<string, int>(StringComparer.Ordinal)
+                    {
+                        { MovementCapabilityIds.PackAnimal, 1_000 },
+                        { MovementCapabilityIds.Foot, 1_000 }
+                    }
+            };
+            foreach (var direction in CellTraversalDirections.All)
+                profile.Ports.Add(new CellTraversalPort
+                {
+                    Direction = direction,
+                    Enabled = false,
+                    AllowsEntry = false,
+                    AllowsExit = false,
+                    RoleId = CellTraversalPortRoleIds.Blocked,
+                    AccessPolicyId = FacilityAccessRequirementIds.Optional,
+                    TraversalConditionId = CellTraversalIds.StaticConditionId,
+                    MovementCapabilityIds = new List<string>()
+                });
+            return profile;
+        }
+
+        private static void EnablePackAnimalPort(
+            CellTraversalProfile profile,
+            CellTraversalDirection direction)
+        {
+            EnableFreightPortForCapabilities(
+                profile,
+                direction,
+                CellTraversalIds.StaticConditionId,
+                string.Empty,
+                MovementCapabilityIds.PackAnimal);
+        }
+
+        private static void EnableFreightPortForCapabilities(
+            CellTraversalProfile profile,
+            CellTraversalDirection direction,
+            string conditionId,
+            string formalWorldObjectId,
+            params string[] capabilities)
+        {
+            var port = profile.Port(direction);
+            port.Enabled = true;
+            port.AllowsEntry = true;
+            port.AllowsExit = true;
+            port.RoleId = string.Equals(conditionId,
+                    CellTraversalIds.FormalPassageConditionId,
+                    StringComparison.Ordinal)
+                ? CellTraversalPortRoleIds.Passage
+                : CellTraversalPortRoleIds.RoadConnection;
+            port.TraversalConditionId = conditionId;
+            port.FormalWorldObjectId = formalWorldObjectId;
+            port.WidthCentimetres = 400;
+            port.CapacityClass = 1;
+            port.MovementCapabilityIds.AddRange(capabilities);
+        }
+
+        private static void EnableFreightPort(
+            CellTraversalProfile profile,
+            CellTraversalDirection direction,
+            string conditionId,
+            string formalWorldObjectId)
+        {
+            EnableFreightPortForCapabilities(
+                profile,
+                direction,
+                conditionId,
+                formalWorldObjectId,
+                MovementCapabilityIds.PackAnimal,
+                MovementCapabilityIds.Foot);
+        }
+
+        private sealed class RoadRerouteFreightFixture
+        {
+            public CivilianFreightFixture Fixture;
+            public string RoadEdgeId;
         }
 
         private static LuoyangPassageOperationsFixture

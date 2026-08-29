@@ -257,6 +257,9 @@ namespace Mandate.Persistence
                     case 76:
                         MigrateVersionSeventySixToSeventySeven(world);
                         break;
+                    case 77:
+                        MigrateVersionSeventySevenToSeventyEight(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -2358,6 +2361,48 @@ namespace Mandate.Persistence
                 }
             }
             world.SchemaVersion = 77;
+        }
+
+        private static void MigrateVersionSeventySevenToSeventyEight(
+            WorldState world)
+        {
+            for (var i = 0; i < world.AgricultureWorkOrders.Count; i++)
+            {
+                var order = world.AgricultureWorkOrders[i];
+                order.HarvestRuleProfileId =
+                    AgricultureHarvestContractIds.V1ProfileId;
+                order.HarvestThresholdBasisPoints =
+                    AgricultureHarvestContractIds
+                        .DefaultHarvestThresholdBasisPoints;
+                order.MinimumEarlyHarvestYieldBasisPoints =
+                    AgricultureHarvestContractIds
+                        .DefaultMinimumEarlyYieldBasisPoints;
+                order.MaturityBasisPointsAtHarvest = 10_000;
+                order.MaturityYieldBasisPoints = 10_000;
+                order.EarlyHarvested = false;
+            }
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                freight.UsesCellRoute = false;
+                freight.CellRoutePlanVersionId = string.Empty;
+                freight.CellRouteAssetHash = string.Empty;
+                freight.CellRouteMovementCapabilityId = string.Empty;
+                freight.CellRouteOriginCellId64 = 0;
+                freight.CellRouteTargetCellId64 = 0;
+                freight.CellRouteCurrentCellId64 = 0;
+                freight.CellRouteSegments =
+                    new List<CivilianFreightCellRouteSegmentState>();
+                freight.CurrentCellRouteSegmentIndex = 0;
+                freight.CurrentCellRouteSegmentRemainingWeightedCentimetres =
+                    0;
+                freight.CellRouteRemainingWeightedCentimetres = 0;
+                freight.CellRouteWaiting = false;
+                freight.CellRouteWaitingReasonId = string.Empty;
+                freight.CellRouteWaitingOnFormalWorldObjectId = string.Empty;
+                freight.CellRouteRevision = 0;
+            }
+            world.SchemaVersion = 78;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(
