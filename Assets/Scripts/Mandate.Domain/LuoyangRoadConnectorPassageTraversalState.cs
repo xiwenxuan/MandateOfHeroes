@@ -1259,6 +1259,9 @@ namespace Mandate.Domain
                 return false;
             if (string.Equals(segment.TraversalConditionId,
                     LocalTraversalConditionIds.StaticWalkable,
+                    StringComparison.Ordinal) ||
+                string.Equals(segment.TraversalConditionId,
+                    CellTraversalIds.StaticConditionId,
                     StringComparison.Ordinal))
                 return string.IsNullOrEmpty(segment.FormalWorldObjectId);
             if (string.Equals(segment.TraversalConditionId,
@@ -1266,6 +1269,15 @@ namespace Mandate.Domain
                     StringComparison.Ordinal) ||
                 string.Equals(segment.TraversalConditionId,
                     LocalTraversalConditionIds.FormalPassageAvailable,
+                    StringComparison.Ordinal) ||
+                string.Equals(segment.TraversalConditionId,
+                    CellTraversalIds.FormalRoadConditionId,
+                    StringComparison.Ordinal) ||
+                string.Equals(segment.TraversalConditionId,
+                    CellTraversalIds.FormalPassageConditionId,
+                    StringComparison.Ordinal) ||
+                string.Equals(segment.TraversalConditionId,
+                    CellTraversalIds.FormalFacilityConditionId,
                     StringComparison.Ordinal))
                 return !string.IsNullOrEmpty(segment.FormalWorldObjectId);
             return false;

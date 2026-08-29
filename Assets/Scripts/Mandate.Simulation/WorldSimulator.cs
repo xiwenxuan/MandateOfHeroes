@@ -3548,8 +3548,8 @@ namespace Mandate.Simulation
             for (var index = 0; index < plan.Edges.Count; index++)
             {
                 var edge = plan.Edges[index];
-                var fromNode = _localMap.NodesById[plan.NodeIds[index]];
-                var toNode = _localMap.NodesById[plan.NodeIds[index + 1]];
+                var fromPoint = edge.Geometry.First();
+                var toPoint = edge.Geometry.Last();
                 accumulatedWeight = checked(accumulatedWeight +
                     (long)edge.DistanceCentimetres *
                     edge.TraversalCostPermille / 1000L);
@@ -3582,24 +3582,24 @@ namespace Mandate.Simulation
                         IsLocalHumanScale = true,
                         FormalWorldObjectId = edge.FormalWorldObjectId,
                         TraversalConditionId = edge.TraversalConditionId,
-                        FromLocalNodeId = fromNode.Id,
-                        ToLocalNodeId = toNode.Id,
-                        FromLocalSpaceId = fromNode.LocalSpaceId,
-                        ToLocalSpaceId = toNode.LocalSpaceId,
-                        FromCellId64 = fromNode.CellId64,
-                        ToCellId64 = toNode.CellId64,
+                        FromLocalNodeId = plan.NodeIds[index],
+                        ToLocalNodeId = plan.NodeIds[index + 1],
+                        FromLocalSpaceId = fromPoint.LocalSpaceId,
+                        ToLocalSpaceId = toPoint.LocalSpaceId,
+                        FromCellId64 = fromPoint.CellId64,
+                        ToCellId64 = toPoint.CellId64,
                         FromEastCentimetres = Centimetres(
-                            fromNode.LocalEastMetres),
+                            fromPoint.LocalEastMetres),
                         FromNorthCentimetres = Centimetres(
-                            fromNode.LocalNorthMetres),
+                            fromPoint.LocalNorthMetres),
                         FromElevationCentimetres = Centimetres(
-                            fromNode.ElevationMetres),
+                            fromPoint.ElevationMetres),
                         ToEastCentimetres = Centimetres(
-                            toNode.LocalEastMetres),
+                            toPoint.LocalEastMetres),
                         ToNorthCentimetres = Centimetres(
-                            toNode.LocalNorthMetres),
+                            toPoint.LocalNorthMetres),
                         ToElevationCentimetres = Centimetres(
-                            toNode.ElevationMetres)
+                            toPoint.ElevationMetres)
                     });
                 allocatedDuration = durationAtEnd;
                 allocatedStamina = staminaAtEnd;
@@ -3622,6 +3622,14 @@ namespace Mandate.Simulation
         {
             if (segment.IsLocalHumanScale)
             {
+                if (segment.TraversalConditionId.StartsWith(
+                        "cell-traversal.condition.",
+                        StringComparison.Ordinal))
+                    return LuoyangCellTraversalRules.CanTraverseSegment(world,
+                        new CellRouteSegment(segment.EdgeId,
+                            segment.FromCellId64, segment.ToCellId64,
+                            segment.TraversalConditionId,
+                            segment.FormalWorldObjectId));
                 if (_localMap == null || !_localMap.EdgesById.TryGetValue(
                         segment.EdgeId, out var localEdge) ||
                     !string.Equals(localEdge.TraversalConditionId,

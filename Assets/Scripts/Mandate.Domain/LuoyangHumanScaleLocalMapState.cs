@@ -519,6 +519,7 @@ namespace Mandate.Domain
             NavigationNodesByFacilityId { get; }
         public IReadOnlyDictionary<string, LuoyangLocalNavEdge> EdgesById
             { get; }
+        public CellTraversalPlan CellTraversal { get; internal set; }
     }
 
     public sealed class LuoyangStrategicLocalCoordinateService
@@ -687,6 +688,8 @@ namespace Mandate.Domain
                 orderedFootprints, orderedEntrances, orderedNodes,
                 orderedEdges, orderedTransitions,
                 orderedRejectedStrategicEdges, hash);
+            plan.CellTraversal = LuoyangCellTraversalRules.CreatePlan(plan,
+                strategicRoads);
             Validate(plan, wholeCity, strategicRoads);
             return plan;
         }
@@ -2081,13 +2084,15 @@ namespace Mandate.Domain
         internal LuoyangHumanScaleLocalRoute(string startFacilityId,
             string targetFacilityId, IReadOnlyList<string> nodeIds,
             IReadOnlyList<LuoyangLocalNavEdge> edges,
-            IReadOnlyList<LuoyangLocalRoutePoint> points)
+            IReadOnlyList<LuoyangLocalRoutePoint> points,
+            CellRoute cellRoute = null)
         {
             StartFacilityId = startFacilityId;
             TargetFacilityId = targetFacilityId;
             NodeIds = nodeIds;
             Edges = edges;
             Points = points;
+            CellRoute = cellRoute;
             DistanceCentimetres = edges.Sum(item =>
                 (long)item.DistanceCentimetres);
             WeightedDistanceCentimetres = edges.Sum(item =>
@@ -2099,6 +2104,7 @@ namespace Mandate.Domain
         public IReadOnlyList<string> NodeIds { get; }
         public IReadOnlyList<LuoyangLocalNavEdge> Edges { get; }
         public IReadOnlyList<LuoyangLocalRoutePoint> Points { get; }
+        public CellRoute CellRoute { get; }
         public long DistanceCentimetres { get; }
         public long WeightedDistanceCentimetres { get; }
     }
@@ -2106,30 +2112,15 @@ namespace Mandate.Domain
     public sealed class LuoyangHumanScaleLocalRoutePlanner
     {
         private readonly LuoyangHumanScaleLocalMapPlan _plan;
-        private readonly Dictionary<string, List<LuoyangLocalNavEdge>>
-            _adjacency;
-        private static readonly IComparer<Tuple<long, string>> QueueComparer =
-            Comparer<Tuple<long, string>>.Create((left, right) =>
-            {
-                var distance = left.Item1.CompareTo(right.Item1);
-                return distance != 0 ? distance : string.CompareOrdinal(
-                    left.Item2, right.Item2);
-            });
+        private readonly CellTraversalPlanner _cellPlanner;
 
         public LuoyangHumanScaleLocalRoutePlanner(
             LuoyangHumanScaleLocalMapPlan plan)
         {
             _plan = plan ?? throw new ArgumentNullException(nameof(plan));
-            _adjacency = plan.Nodes.ToDictionary(item => item.Id,
-                _ => new List<LuoyangLocalNavEdge>(), StringComparer.Ordinal);
-            foreach (var edge in plan.Edges)
-            {
-                _adjacency[edge.FromNodeId].Add(edge);
-                _adjacency[edge.ToNodeId].Add(edge);
-            }
-            foreach (var edges in _adjacency.Values)
-                edges.Sort((left, right) => string.CompareOrdinal(left.Id,
-                    right.Id));
+            _cellPlanner = new CellTraversalPlanner(plan.CellTraversal ??
+                throw new InvalidOperationException(
+                    "The Local Map has no Cell traversal authority."));
         }
 
         public bool TryFindRoute(string startFacilityId,
@@ -2140,102 +2131,41 @@ namespace Mandate.Domain
             out string failureReasonId)
         {
             route = null;
-            if (!_plan.NavigationNodesByFacilityId.TryGetValue(startFacilityId,
-                    out var start) ||
-                !_plan.NavigationNodesByFacilityId.TryGetValue(targetFacilityId,
-                    out var target))
+            if (!_plan.FacilityCapabilitiesByFacilityId.TryGetValue(
+                    startFacilityId, out var start) ||
+                !_plan.FacilityCapabilitiesByFacilityId.TryGetValue(
+                    targetFacilityId, out var target) ||
+                !_plan.EntrancesByFacilityId.ContainsKey(startFacilityId) ||
+                !_plan.EntrancesByFacilityId.ContainsKey(targetFacilityId))
             {
                 failureReasonId =
                     "local-route.failure.unknown-facility-entrance.v1";
                 return false;
             }
-            if (start.Id == target.Id)
+            if (start.CellId64 == target.CellId64)
             {
                 failureReasonId = "local-route.failure.same-location.v1";
                 return false;
             }
-            var distance = _plan.Nodes.ToDictionary(item => item.Id,
-                _ => long.MaxValue, StringComparer.Ordinal);
-            var previousNode = new Dictionary<string, string>(
-                StringComparer.Ordinal);
-            var previousEdge = new Dictionary<string, string>(
-                StringComparer.Ordinal);
-            distance[start.Id] = 0L;
-            var queue = new SortedSet<Tuple<long, string>>(QueueComparer)
-                { Tuple.Create(0L, start.Id) };
-            var visited = new HashSet<string>(StringComparer.Ordinal);
-            while (queue.Count > 0)
+            bool Available(CellTraversalPort port)
             {
-                var entry = queue.Min;
-                queue.Remove(entry);
-                var current = entry.Item2;
-                if (entry.Item1 != distance[current] ||
-                    !visited.Add(current)) continue;
-                if (current == target.Id) break;
-                foreach (var edge in _adjacency[current])
-                {
-                    if (!edge.IsWalkable ||
-                        (!string.IsNullOrEmpty(
-                             edge.SourceStrategicEdgeId) &&
-                         canTraverseStrategicEdge != null &&
-                         !canTraverseStrategicEdge(
-                             edge.SourceStrategicEdgeId)) ||
-                        (!string.IsNullOrEmpty(edge.PassageFacilityId) &&
-                         canTraversePassage != null &&
-                         !canTraversePassage(edge.PassageFacilityId)))
-                        continue;
-                    var next = edge.FromNodeId == current
-                        ? edge.ToNodeId : edge.FromNodeId;
-                    if (visited.Contains(next)) continue;
-                    var cost = (long)edge.DistanceCentimetres *
-                               edge.TraversalCostPermille / 1000L;
-                    var candidate = checked(distance[current] +
-                                            Math.Max(1L, cost));
-                    if (candidate > distance[next]) continue;
-                    if (candidate == distance[next] &&
-                        previousNode.TryGetValue(next, out var old) &&
-                        string.CompareOrdinal(current, old) >= 0) continue;
-                    distance[next] = candidate;
-                    previousNode[next] = current;
-                    previousEdge[next] = edge.Id;
-                    queue.Add(Tuple.Create(candidate, next));
-                }
+                if (string.Equals(port.TraversalConditionId,
+                        CellTraversalIds.FormalRoadConditionId,
+                        StringComparison.Ordinal))
+                    return canTraverseStrategicEdge == null ||
+                        canTraverseStrategicEdge(port.FormalWorldObjectId);
+                if (string.Equals(port.TraversalConditionId,
+                        CellTraversalIds.FormalPassageConditionId,
+                        StringComparison.Ordinal))
+                    return canTraversePassage == null ||
+                        canTraversePassage(port.FormalWorldObjectId);
+                return true;
             }
-            if (!previousNode.ContainsKey(target.Id))
-            {
-                failureReasonId = "local-route.failure.unreachable.v1";
-                return false;
-            }
-            var reverseNodes = new List<string>();
-            var reverseEdges = new List<LuoyangLocalNavEdge>();
-            for (var cursor = target.Id;; cursor = previousNode[cursor])
-            {
-                reverseNodes.Add(cursor);
-                if (cursor == start.Id) break;
-                reverseEdges.Add(_plan.EdgesById[previousEdge[cursor]]);
-            }
-            reverseNodes.Reverse();
-            reverseEdges.Reverse();
-            var points = new List<LuoyangLocalRoutePoint>();
-            for (var index = 0; index < reverseEdges.Count; index++)
-            {
-                var edge = reverseEdges[index];
-                var forward = edge.FromNodeId == reverseNodes[index];
-                var geometry = forward ? edge.Geometry :
-                    edge.Geometry.Reverse<LuoyangLocalRoutePoint>();
-                foreach (var source in geometry)
-                {
-                    if (points.Count > 0 && Math.Abs(points[points.Count - 1]
-                            .GlobalEastingMetres - source.GlobalEastingMetres) <
-                            0.0001d && Math.Abs(points[points.Count - 1]
-                            .GlobalNorthingMetres - source.GlobalNorthingMetres) <
-                            0.0001d) continue;
-                    points.Add(ClonePoint(source, points.Count));
-                }
-            }
-            route = new LuoyangHumanScaleLocalRoute(startFacilityId,
-                targetFacilityId, reverseNodes.ToArray(),
-                reverseEdges.ToArray(), points.ToArray());
+            if (!_cellPlanner.TryFindRoute(start.CellId64, target.CellId64,
+                    MovementCapabilityIds.Foot, Available, out var cellRoute,
+                    out failureReasonId)) return false;
+            route = ExpandPresentationRoute(startFacilityId,
+                targetFacilityId, cellRoute);
             failureReasonId = string.Empty;
             return true;
         }
@@ -2256,27 +2186,139 @@ namespace Mandate.Domain
                     "local-route.failure.facility-inaccessible.v1";
                 return false;
             }
-            return TryFindRoute(startFacilityId, targetFacilityId,
-                edgeId => LuoyangHumanScaleWorldTraversalRules
-                    .CanTraverseStrategicEdge(world, edgeId),
-                facilityId => LuoyangHumanScaleWorldTraversalRules
-                    .CanTraversePassage(world, facilityId),
-                out route, out failureReasonId);
+            if (!_cellPlanner.TryFindRoute(
+                    _plan.FacilityCapabilitiesByFacilityId[startFacilityId]
+                        .CellId64,
+                    _plan.FacilityCapabilitiesByFacilityId[targetFacilityId]
+                        .CellId64,
+                    MovementCapabilityIds.Foot,
+                    port => LuoyangCellTraversalRules.IsPortAvailable(world,
+                        port), out var cellRoute, out failureReasonId))
+            {
+                route = null;
+                return false;
+            }
+            route = ExpandPresentationRoute(startFacilityId,
+                targetFacilityId, cellRoute);
+            failureReasonId = string.Empty;
+            return true;
         }
 
-        private static LuoyangLocalRoutePoint ClonePoint(
-            LuoyangLocalRoutePoint source, int sequence) =>
-            new LuoyangLocalRoutePoint
+        private LuoyangHumanScaleLocalRoute ExpandPresentationRoute(
+            string startFacilityId, string targetFacilityId,
+            CellRoute cellRoute)
+        {
+            var start = _plan.EntrancesByFacilityId[startFacilityId];
+            var target = _plan.EntrancesByFacilityId[targetFacilityId];
+            var points = new List<LuoyangLocalRoutePoint>();
+            var nodeIds = new List<string>();
+            var edges = new List<LuoyangLocalNavEdge>();
+            for (var index = 0; index < cellRoute.Segments.Count; index++)
+            {
+                var segment = cellRoute.Segments[index];
+                var fromEast = segment.FromEastCentimetres;
+                var fromNorth = segment.FromNorthCentimetres;
+                var toEast = segment.ToEastCentimetres;
+                var toNorth = segment.ToNorthCentimetres;
+                if (index == 0)
+                {
+                    fromEast = Centimetres(start.EastMetres);
+                    fromNorth = Centimetres(start.NorthMetres);
+                }
+                if (index + 1 == cellRoute.Segments.Count)
+                {
+                    toEast = Centimetres(target.EastMetres);
+                    toNorth = Centimetres(target.NorthMetres);
+                }
+                var from = Point(segment.FromCellId64, fromEast, fromNorth,
+                    points.Count);
+                var to = Point(segment.ToCellId64, toEast, toNorth,
+                    points.Count + 1);
+                var fromNodeId = index == 0 ? start.AccessNodeId :
+                    AnchorId(from);
+                var toNodeId = index + 1 == cellRoute.Segments.Count
+                    ? target.AccessNodeId : AnchorId(to);
+                if (points.Count == 0)
+                {
+                    points.Add(from);
+                    nodeIds.Add(fromNodeId);
+                }
+                points.Add(to);
+                nodeIds.Add(toNodeId);
+                edges.Add(new LuoyangLocalNavEdge
+                {
+                    Id = segment.Id,
+                    FromNodeId = fromNodeId,
+                    ToNodeId = toNodeId,
+                    RoadClassId = RoadClass(segment),
+                    SourceStrategicEdgeId = string.Equals(
+                        segment.TraversalConditionId,
+                        CellTraversalIds.FormalRoadConditionId,
+                        StringComparison.Ordinal)
+                        ? segment.FormalWorldObjectId : string.Empty,
+                    PassageFacilityId = string.Equals(
+                        segment.TraversalConditionId,
+                        CellTraversalIds.FormalPassageConditionId,
+                        StringComparison.Ordinal)
+                        ? segment.FormalWorldObjectId : string.Empty,
+                    FormalWorldObjectId = segment.FormalWorldObjectId,
+                    TraversalConditionId = segment.TraversalConditionId,
+                    DistanceCentimetres = segment.DistanceCentimetres,
+                    TraversalCostPermille = segment.TraversalCostPermille,
+                    WidthCentimetres = 400,
+                    IsWalkable = true,
+                    CrossesStrategicCellBoundary =
+                        segment.FromCellId64 != segment.ToCellId64,
+                    Geometry = new List<LuoyangLocalRoutePoint>
+                    {
+                        from, to
+                    }
+                });
+            }
+            return new LuoyangHumanScaleLocalRoute(startFacilityId,
+                targetFacilityId, nodeIds.ToArray(), edges.ToArray(),
+                points.ToArray(), cellRoute);
+        }
+
+        private LuoyangLocalRoutePoint Point(ulong cellId64,
+            int eastCentimetres, int northCentimetres, int sequence)
+        {
+            var space = _plan.LocalSpacesByCellId[cellId64];
+            var east = eastCentimetres / 100d;
+            var north = northCentimetres / 100d;
+            return new LuoyangLocalRoutePoint
             {
                 Sequence = sequence,
-                LocalSpaceId = source.LocalSpaceId,
-                CellId64 = source.CellId64,
-                LocalEastMetres = source.LocalEastMetres,
-                LocalNorthMetres = source.LocalNorthMetres,
-                ElevationMetres = source.ElevationMetres,
-                GlobalEastingMetres = source.GlobalEastingMetres,
-                GlobalNorthingMetres = source.GlobalNorthingMetres
+                LocalSpaceId = space.Id,
+                CellId64 = cellId64,
+                LocalEastMetres = east,
+                LocalNorthMetres = north,
+                ElevationMetres = 0d,
+                GlobalEastingMetres = space.OriginEastingMetres + east,
+                GlobalNorthingMetres = space.OriginNorthingMetres + north
             };
+        }
+
+        private static string AnchorId(LuoyangLocalRoutePoint point) =>
+            "cell-route.anchor.v1." + point.CellId64 + "." +
+            Centimetres(point.LocalEastMetres) + "." +
+            Centimetres(point.LocalNorthMetres);
+
+        private static string RoadClass(CellRouteSegment segment) =>
+            string.Equals(segment.TraversalConditionId,
+                CellTraversalIds.FormalRoadConditionId,
+                StringComparison.Ordinal)
+                ? LuoyangHumanScaleLocalMapIds.PrimaryRoadClassId
+                : string.Equals(segment.TraversalConditionId,
+                    CellTraversalIds.FormalPassageConditionId,
+                    StringComparison.Ordinal)
+                    ? LuoyangHumanScaleLocalMapIds.GatePassageRoadClassId
+                    : LuoyangHumanScaleLocalMapIds
+                        .FacilityAccessRoadClassId;
+
+        private static int Centimetres(double metres) => checked(
+            (int)Math.Round(metres * 100d,
+                MidpointRounding.AwayFromZero));
     }
 
     public static class LuoyangHumanScaleWorldTraversalRules

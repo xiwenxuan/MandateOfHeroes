@@ -230,7 +230,14 @@ namespace Mandate.Tests
                     fixture.TargetFacilityId, out var movement,
                     out var localRoute, out var failure), Is.True, failure);
             Assert.That(movement.IsLocalHumanScale, Is.True);
+            Assert.That(localRoute.CellRoute, Is.Not.Null);
+            Assert.That(localRoute.CellRoute.MovementCapabilityId,
+                Is.EqualTo(MovementCapabilityIds.Foot));
             Assert.That(localRoute.Edges.Count, Is.GreaterThan(1));
+            Assert.That(localRoute.Edges.All(item =>
+                item.TraversalConditionId.StartsWith(
+                    "cell-traversal.condition.",
+                    StringComparison.Ordinal)), Is.True);
             Assert.That(movement.RequestCommandId,
                 Does.StartWith("luoyang.player-movement.request."));
             Assert.That(fixture.World.PersistentWorldCommands.Any(item =>
@@ -499,7 +506,7 @@ namespace Mandate.Tests
             var passageIndex = route.Edges.Select((edge, index) =>
                     new { edge, index }).First(item =>
                     item.edge.TraversalConditionId ==
-                    LocalTraversalConditionIds.FormalPassageAvailable &&
+                    CellTraversalIds.FormalPassageConditionId &&
                     fixture.Map.Plan.FacilityCapabilitiesByFacilityId[
                         item.edge.PassageFacilityId].CapabilityId ==
                     FacilitySpatialCapabilityIds.Gate).index;
@@ -546,7 +553,7 @@ namespace Mandate.Tests
             var passageIndex = route.Edges.Select((edge, index) =>
                     new { edge, index }).First(item =>
                     item.edge.TraversalConditionId ==
-                    LocalTraversalConditionIds.FormalPassageAvailable &&
+                    CellTraversalIds.FormalPassageConditionId &&
                     fixture.Map.Plan.FacilityCapabilitiesByFacilityId[
                         item.edge.PassageFacilityId].CapabilityId ==
                     FacilitySpatialCapabilityIds.Bridge).index;
@@ -773,9 +780,26 @@ namespace Mandate.Tests
                 var to = FindNearestAccess(selectedEdge.ToNodeId,
                     selectedEdge.Id, selectedEdge.PassageFacilityId,
                     adjacency, accessByNode, plan);
+                if (!string.IsNullOrEmpty(selectedEdge.PassageFacilityId))
+                {
+                    if (from == null) continue;
+                    to = selectedEdge.PassageFacilityId;
+                    if (planner.TryFindRoute(from, to, _ => true, _ => true,
+                            out var passageRoute, out _) &&
+                        passageRoute.Edges.Any(item => string.Equals(
+                            item.TraversalConditionId,
+                            CellTraversalIds.FormalPassageConditionId,
+                            StringComparison.Ordinal) && string.Equals(
+                            item.FormalWorldObjectId,
+                            selectedEdge.PassageFacilityId,
+                            StringComparison.Ordinal)))
+                        return Tuple.Create(from, to);
+                    continue;
+                }
                 if (from == null || to == null || from == to) continue;
                 if (planner.TryFindRoute(from, to, _ => true, _ => true,
-                        out var route, out _) && route.Edges.Any(predicate))
+                        out var route, out _) && route.Edges.Any(item =>
+                        item.CrossesStrategicCellBoundary))
                     return Tuple.Create(from, to);
             }
             throw new InvalidOperationException(

@@ -1053,15 +1053,17 @@ M26-P0 已于 2026-08-06 完成首个可玩主循环竖切片，任务与证据�
 
 ## 0E. 推荐后续建设顺序
 
-2026-08-29，`TASK_LUOYANG_HUMAN_SCALE_LOCAL_MAP_AND_NAVIGATION_V1` 已完成 V77 核心实现：同一正式
-洛阳被展开为5,980个派生LocalSpace，2,084/2,084 Facility取得人物尺度Capability/Anchor/
-Footprint，1,959节点、1,976边和4,920个跨Cell Transition接入同一个M26 Person、同一个
-`MovePersonCommand`、WorldTime、体力、口粮、存档和重放。完整核心回归766/766通过，3/3重放一致；
-LocalSpace不是SubCell，Streaming不卸载世界事实。当前受控Unity EditMode/PlayMode均因编辑器进程
-45秒内不生成启动日志而在安全入口返回`blocked/125`，没有实际执行测试，因此任务状态为
-`IMPLEMENTED_CORE_VERIFIED_UNITY_ENVIRONMENT_BLOCKED / NOT ACCEPTED`。当前最先收口Unity环境门禁与
-Unity点击、碰撞、Streaming和性能证据；只有该任务达到ACCEPTED后，才执行食品库存守恒差额RCA与
-修复，之后再进入洛阳外围供应区与城市物流V1。
+2026-08-29，`TASK_LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1` 已达到
+`LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTED`。同一正式洛阳的5,980个Cell
+全部取得North/East/South/West四向端口、内部拓扑、移动能力和人物尺度Traversal Metric，2,084/
+2,084 Facility全部取得Access规则；359个Road、18个Gate-type、2个Bridge均从正式数据派生。
+跨Cell正式路线权威已从旧LocalNav图收敛到`CellTraversalPlanner + CellRoute`，同一个M26 Person、
+`MovePersonCommand`、WorldTime、体力、口粮、V77存档和重放继续使用同一本世界账。完整核心回归
+774/774、Unity EditMode 3/3、图形PlayMode 1/1和差异检查均通过；5,980 Profile构建实测60 ms、
+Managed Delta 14,006,144 bytes、GameObject 0，Unity 3×3加载92 ms且驻留19对象/9 Mesh/9 Collider。
+LocalSpace不是SubCell，旧LocalNav只保留表现几何
+与旧V77路段兼容。当前固定顺序改为：先执行食品库存守恒差额RCA与修复，再进入洛阳外围供应区与
+城市物流V1；不得继续在本阶段扩建第二套局部导航权威。
 
 2026-08-12，`LUOYANG-184-T4-LIVING-WORLD-COMPLETION-MASTER-V1` 已达到
 `T4_LIVING_WORLD_V1_COMPLETE_WITH_DEFERRED_ENHANCEMENTS`。受保护的 400,000 Person、
@@ -2266,8 +2268,31 @@ V77为同一Person Location增加LocalSpace、Local Anchor及厘米整数坐标�
 4,920个连续跨Cell Transition，18项Gate-type Facility和2座Bridge均映射。3×3表现Streaming只
 装卸地形、道路Mesh/Collider、阻挡占地与点击代理，不创建或删除永久人物、设施或库存。
 
-当前状态为`LUOYANG_HUMAN_SCALE_LOCAL_MAP_V1_IMPLEMENTED_CORE_VERIFIED_UNITY_ENVIRONMENT_BLOCKED`：
-全工程编译、专项核心19/19、完整核心766/766、三次重放和差异检查通过；Domain地图生成和50条路径
-采样已记录。受控Unity EditMode/PlayMode分别启动独立PID后，均因45秒内没有非空启动日志返回
-`blocked/125`，没有测试XML，因此Formal Acceptance必须保持`NOT ACCEPTED`。不得用旧11/11、4/4
-Unity结果或Domain性能替代本阶段Unity证据。
+当前状态为`LUOYANG_HUMAN_SCALE_LOCAL_MAP_V1_ACCEPTED_PRESENTATION_SCOPE`：全工程编译、专项核心、
+完整核心774/774、受控Unity EditMode 3/3、图形PlayMode 1/1和差异检查均通过，原`blocked/125`
+环境门禁已解除。LocalSpace、Anchor、Footprint、入口、近景几何与3×3 Streaming正式保留；后续
+Cell Traversal任务已明确将LocalNav图降为表现/旧V77兼容资料，不再把它作为跨Cell正式路线权威。
+
+## 46. 洛阳人物尺度 Cell 四向通行、正式移动与近景表现 V1（2026-08-29）
+
+正式入口为
+[`TASK_LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1.md`](TASK_LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1.md)，
+验收见
+[`LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTANCE_REPORT.md`](LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTANCE_REPORT.md)，
+迁移审计见
+[`Evidence/LuoyangCellTraversalV1/existing-spatial-audit.md`](Evidence/LuoyangCellTraversalV1/existing-spatial-audit.md)。
+
+本任务坚持一个战略格等于一个Cell、一个Cell最多一个Facility占位；Road、Alley、Gate和Bridge也是
+占Cell的Facility。每个Cell固定拥有四个潜在端口，正式规划同时检查相邻反向端口、内部拓扑、人物/
+载具能力、建筑出入规则及正式道路/门桥动态状态。建筑可以作为目的地进入，但不得成为穿楼捷径；
+正式人物距离来自Traversal Metric，不以`CellCount × 2000m`或Unity坐标作为结算权威。
+
+洛阳5,980/5,980 Profile和2,084/2,084 Facility全部覆盖。Access审计以现有道路为依据：已有道路
+正面的7个仓储仓库、4个公共官仓和7个坞堡使用`RoadRequired`；37个商业仓库、10个仓储仓库、
+28个公共官仓和1个仓储官仓因正式数据无道路正面而保持`Optional`，没有凭空补路。V77路段字段已
+足以表达新CellRoute，因此不升级存档版本；旧V77路段条件继续兼容。
+
+当前状态为`LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTED`：全工程编译、
+CellTraversal专项核心8/8、洛阳局部移动专项17/17、固定指纹完整核心774/774、Unity EditMode 3/3、
+图形PlayMode 1/1、性能边界和差异检查全部通过，Introduced Regression为0。固定下一阶段是食品
+库存守恒差额RCA与修复；其后才进入洛阳外围供应区与城市物流V1。

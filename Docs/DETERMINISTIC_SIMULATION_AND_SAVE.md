@@ -812,9 +812,11 @@ V70→V71是顺序迁移：旧档初始化空的`WorldDecisionAgents`与`WorldSi
   厘米整数坐标；它是同一人物位置的更高精度表达，不是第二套位置对象。
 - 同一个持久`MovePersonCommand`可保存人物尺度地图版本/摘要及各局部路段的正式对象、通行条件、
   前后节点、LocalSpace、Cell和厘米坐标。Unity坐标、GameObject和NavMesh引用不进入存档。
-- Local Graph只保存/派生空间表达；Road、Gate、Bridge和Facility的生命周期、完整度及开闭状态
-  继续从正式世界事实读取，不在局部层复制。
+- 新移动命令由四向Cell Traversal端口与内部拓扑生成`CellRoute`，并映射到V77已有路段字段；
+  Local Graph只保留旧V77路段兼容和表现几何，不再决定跨Cell正式路线。Road、Gate、Bridge和
+  Facility的生命周期、完整度及开闭状态继续从正式世界事实读取，不在局部层复制。
 - V76→V77把既有位置明确标记为战略精度并规范化新增空字段，不重新生成地图、不移动人物、
   不改变设施、道路、库存或活动移动。
-- Local Map/Streaming使用稳定地图版本与SHA-256校验；装卸表现对象不得改变Person、Facility、
-  Inventory或世界Hash。相同初始存档、版本、指令和正式世界状态必须得到相同局部路线和最终Hash。
+- Local Map/Cell Traversal/Streaming使用稳定地图版本与SHA-256校验；装卸表现对象不得改变Person、
+  Facility、Inventory或世界Hash。相同初始存档、版本、指令、移动能力和正式世界状态必须得到
+  相同CellRoute与最终Hash。本次CellRoute收敛不增加持久字段，因此Save Schema继续保持V77。

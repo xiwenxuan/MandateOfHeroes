@@ -171,26 +171,42 @@ namespace Mandate.Presentation
 
         private void BuildRoads(Transform parent, ulong cellId64)
         {
-            var edges = _plan.Edges.Where(item => item.Geometry.Any(point =>
-                point.CellId64 == cellId64)).ToArray();
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
-            foreach (var edge in edges)
+            if (_plan.CellTraversal == null ||
+                !_plan.CellTraversal.ProfilesByCellId.TryGetValue(cellId64,
+                    out var profile)) return;
+            var isRoadLike = string.Equals(profile.FacilityCapabilityId,
+                    FacilitySpatialCapabilityIds.Road,
+                    StringComparison.Ordinal) ||
+                string.Equals(profile.FacilityCapabilityId,
+                    FacilitySpatialCapabilityIds.Gate,
+                    StringComparison.Ordinal) ||
+                string.Equals(profile.FacilityCapabilityId,
+                    FacilitySpatialCapabilityIds.Bridge,
+                    StringComparison.Ordinal);
+            if (!isRoadLike) return;
+            var space = _plan.LocalSpacesByCellId[cellId64];
+            var center = _positionResolver(
+                space.OriginEastingMetres + space.WidthMetres * 0.5d,
+                space.OriginNorthingMetres + space.HeightMetres * 0.5d);
+            foreach (var port in profile.Ports.Where(item => item.Enabled &&
+                         (!string.Equals(profile.FacilityCapabilityId,
+                              FacilitySpatialCapabilityIds.Road,
+                              StringComparison.Ordinal) ||
+                          string.Equals(item.RoleId,
+                              CellTraversalPortRoleIds.RoadConnection,
+                              StringComparison.Ordinal))))
             {
-                for (var index = 1; index < edge.Geometry.Count; index++)
-                {
-                    var first = edge.Geometry[index - 1];
-                    var second = edge.Geometry[index];
-                    if (first.CellId64 != cellId64 &&
-                        second.CellId64 != cellId64) continue;
-                    AddRibbon(vertices, triangles,
-                        _positionResolver(first.GlobalEastingMetres,
-                            first.GlobalNorthingMetres),
-                        _positionResolver(second.GlobalEastingMetres,
-                            second.GlobalNorthingMetres),
-                        Math.Max(0.08f, edge.WidthCentimetres / 100f /
-                            _plan.WorldScale.WorldMetresPerUnityUnit));
-                }
+                var east = CellTraversalDirections.EastCentimetres(
+                    port.Direction) / 100d;
+                var north = CellTraversalDirections.NorthCentimetres(
+                    port.Direction) / 100d;
+                AddRibbon(vertices, triangles, center, _positionResolver(
+                        space.OriginEastingMetres + east,
+                        space.OriginNorthingMetres + north),
+                    Math.Max(0.08f, port.WidthCentimetres / 100f /
+                        _plan.WorldScale.WorldMetresPerUnityUnit));
             }
             if (vertices.Count == 0) return;
             var mesh = new Mesh { name = "LOCAL_ROADS_" + cellId64 };

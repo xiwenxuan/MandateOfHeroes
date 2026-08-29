@@ -1427,3 +1427,24 @@ the offset global coordinate for the existing terrain height sampler and remains
 presentation batching budget. This route does not freeze the nationwide art style, supply a high-resolution Luoyang
 DEM, create simulation SubCells, or implement collision, navigation, interiors, damage animation or supply-region
 materialization.
+
+### Current Luoyang Cell traversal ports and human-scale movement V1 route
+
+For work that changes the authoritative four-way Cell traversal contract, internal Cell topology, movement
+capabilities, Facility access requirements, traversal metrics, CellRoute planning, MovePersonCommand integration,
+V77 local-segment compatibility, or Unity expansion of CellRoute into a presentation path, read
+`Docs/TASK_LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1.md`,
+`Docs/LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTANCE_REPORT.md` and
+`Docs/Evidence/LuoyangCellTraversalV1/existing-spatial-audit.md` together with the human-scale local-map task,
+formal player-movement task and deterministic save contract.
+
+The current status is `LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTED`. All 5,980 Luoyang
+Cells have four potential cardinal ports and all 2,084 Facilities have a traversal/access profile. The formal data
+contains 359 Road Facilities, 18 Gate-type Facilities and 2 Bridges. Existing road frontage supports 18
+`RoadRequired` Facilities; unserved warehouse/granary records remain `Optional` rather than inventing roads.
+`CellTraversalPlanner + CellRoute` is now the cross-Cell movement authority. The previous LocalNav graph remains
+only for presentation geometry and old V77 segment compatibility. The Save Schema stays V77 because existing
+segment fields already preserve formal-object conditions, Cells and centimetre coordinates. Verification passed
+targeted core 8/8 and 17/17, frozen complete core 774/774, Unity EditMode 3/3 and graphical PlayMode 1/1 with zero
+introduced regressions. The fixed next order is food-inventory conservation RCA/fix, followed by Luoyang external
+supply area and city logistics V1; do not continue by creating a second local spatial authority.
