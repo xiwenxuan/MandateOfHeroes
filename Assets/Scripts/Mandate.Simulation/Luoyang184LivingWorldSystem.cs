@@ -70,6 +70,7 @@ namespace Mandate.Simulation
             AllocateOpeningHouseholdFood(runtime);
             BuildExternalSuppliers(runtime);
             BuildCrops(runtime);
+            new Luoyang184AgricultureDueScheduler().Initialize(runtime);
             BuildMarkets(runtime);
             BuildIntelligentAgents(runtime);
             new Luoyang184T4IntegratedRuntimeSystem().Initialize(runtime);
@@ -166,7 +167,11 @@ namespace Mandate.Simulation
                 harvestedMilliunits = 0;
                 return false;
             }
-            return Harvest(runtime, crop, out harvestedMilliunits);
+            var harvested = Harvest(runtime, crop, out harvestedMilliunits);
+            if (harvested)
+                new Luoyang184AgricultureDueScheduler().Reschedule(
+                    runtime, crop);
+            return harvested;
         }
 
         public Luoyang184LivingWorldState BuildWorldSummary(
@@ -399,7 +404,10 @@ namespace Mandate.Simulation
                     FacilityId = facility.FacilityId,
                     DefinitionId = facility.DefinitionId,
                     OwnerId = facility.OwnerId,
+                    SettlementId = facility.SettlementId,
                     CellId64 = facility.CellId64,
+                    ResidentCapacity = facility.ResidentCapacity,
+                    CurrentResidents = facility.CurrentResidents,
                     RecipeId = recipe,
                     InputProductId = input,
                     OutputProductId = output,
@@ -1006,27 +1014,8 @@ namespace Mandate.Simulation
 
         private void ResolveProduction(Luoyang184LivingWorldRuntimeState runtime)
         {
-            foreach (var crop in runtime.Crops.OrderBy(item => item.FieldId,
-                         StringComparer.Ordinal))
-            {
-                if (crop.Phase == LuoyangCropPhase.Harvested)
-                {
-                    if (runtime.AbsoluteDay < crop.NextPlantingDay) continue;
-                    if (!TrySowNextCycle(runtime, crop)) continue;
-                }
-                crop.MaturityBasisPoints = Luoyang184LivingWorldRules
-                    .CalculateMaturityBasisPoints(runtime.AbsoluteDay,
-                        crop.PlantingDay, crop.FullMaturityDay);
-                crop.Phase = crop.MaturityBasisPoints < 8_000
-                    ? LuoyangCropPhase.Growing
-                    : crop.MaturityBasisPoints < 10_000
-                        ? LuoyangCropPhase.Harvestable
-                        : crop.MaturityBasisPoints <= 11_000
-                            ? LuoyangCropPhase.Mature
-                            : LuoyangCropPhase.AtRisk;
-                if (crop.MaturityBasisPoints >= 10_000)
-                    Harvest(runtime, crop, out _);
-            }
+            new Luoyang184AgricultureDueScheduler().DispatchDue(
+                runtime, crop => AdvanceCropDue(runtime, crop));
 
             foreach (var facility in runtime.Facilities.OrderBy(item =>
                          item.FacilityId, StringComparer.Ordinal))
@@ -1104,6 +1093,31 @@ namespace Mandate.Simulation
                 facility.CycleDueDay = -1;
                 facility.ProductionProgressBasisPoints = 10_000;
             }
+        }
+
+        private void AdvanceCropDue(
+            Luoyang184LivingWorldRuntimeState runtime,
+            LuoyangCropRuntimeState crop)
+        {
+            if (crop.Phase == LuoyangCropPhase.Harvested ||
+                crop.Phase == LuoyangCropPhase.Fallow)
+            {
+                if (runtime.AbsoluteDay < crop.NextPlantingDay) return;
+                if (!TrySowNextCycle(runtime, crop)) return;
+            }
+            crop.MaturityBasisPoints = Luoyang184LivingWorldRules
+                .CalculateMaturityBasisPoints(runtime.AbsoluteDay,
+                    crop.PlantingDay, crop.FullMaturityDay);
+            crop.Phase = crop.MaturityBasisPoints <
+                         crop.EarlyHarvestMinimumBasisPoints
+                ? LuoyangCropPhase.Growing
+                : crop.MaturityBasisPoints < 10_000
+                    ? LuoyangCropPhase.Harvestable
+                    : crop.MaturityBasisPoints <= 11_000
+                        ? LuoyangCropPhase.Mature
+                        : LuoyangCropPhase.AtRisk;
+            if (crop.MaturityBasisPoints >= 10_000)
+                Harvest(runtime, crop, out _);
         }
 
         private bool Harvest(Luoyang184LivingWorldRuntimeState runtime,

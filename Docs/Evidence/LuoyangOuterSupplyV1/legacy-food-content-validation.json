@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.evidence.luoyang-legacy-food-content-validation.v1",
+  "core_package_id": "content.core.production",
+  "core_version": "11.1.0",
+  "han_food_package_id": "content.scenario.han_food_extension",
+  "han_food_version": "2.1.0",
+  "combined_product_count": 45,
+  "combined_food_count": 9,
+  "legacy_food_definition_count": 3,
+  "legacy_opening_share_basis_points": 0,
+  "definition_load_creates_inventory": false,
+  "outer_agriculture_references_resolved": "135/135",
+  "unresolved_content_ids": [],
+  "manifest_deterministic": true,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183156-039.summary.json",
+  "result": "PASS"
+}

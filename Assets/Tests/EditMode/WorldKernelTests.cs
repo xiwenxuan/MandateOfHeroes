@@ -9010,7 +9010,7 @@ namespace Mandate.Tests
             Assert.That(fromResource.CropCount, Is.EqualTo(1));
             Assert.That(fromResource.CropVarietyCount, Is.EqualTo(1));
             Assert.That(fromResource.QualityDimensionCount, Is.EqualTo(9));
-            Assert.That(fromResource.ProductCount, Is.EqualTo(32));
+            Assert.That(fromResource.ProductCount, Is.EqualTo(37));
             Assert.That(fromResource.RecipeCount, Is.EqualTo(16));
             Assert.That(fromResource.MethodCount, Is.EqualTo(14));
             Assert.That(fromResource.SkillCount, Is.EqualTo(9));
@@ -9084,14 +9084,14 @@ namespace Mandate.Tests
         }
 
         [Test]
-        public void ProductionContent_HanFoodExtensionLoadsFiveCropsAndSixFoods()
+        public void ProductionContent_HanFoodExtensionLoadsLegacyStableFoods()
         {
             var registry = LoadHanFoodProductionContent();
 
             Assert.That(registry.CropCount, Is.EqualTo(5));
             Assert.That(registry.CropVarietyCount, Is.EqualTo(5));
-            Assert.That(registry.ProductCount, Is.EqualTo(40));
-            Assert.That(registry.FoodCount, Is.EqualTo(6));
+            Assert.That(registry.ProductCount, Is.EqualTo(45));
+            Assert.That(registry.FoodCount, Is.EqualTo(9));
             Assert.That(registry.RecipeCount, Is.EqualTo(20));
             Assert.That(registry.MethodCount, Is.EqualTo(18));
             Assert.That(
@@ -9102,6 +9102,15 @@ namespace Mandate.Tests
                     .VolumeBasisPoints,
                 Is.EqualTo(8_000));
             Assert.That(registry.CreateManifest().Packages.Count, Is.EqualTo(2));
+            Assert.That(registry.GetFood(
+                    CoreProductionContent.LegacyOuterBeanFoodProductId)
+                .OpeningShareBasisPoints, Is.Zero);
+            Assert.That(registry.GetFood(
+                    CoreProductionContent.LegacyOuterBroomcornFoodProductId)
+                .OpeningShareBasisPoints, Is.Zero);
+            Assert.That(registry.GetFood(
+                    CoreProductionContent.LegacyOuterMilletFoodProductId)
+                .OpeningShareBasisPoints, Is.Zero);
         }
 
         [Test]
@@ -12402,7 +12411,7 @@ namespace Mandate.Tests
             Assert.That(loaded.CivilianMedicalCases, Is.Empty);
             Assert.That(loaded.CivilianMedicalTreatments, Is.Empty);
             Assert.That(loaded.ProductionContentManifest.Packages[0].Version,
-                Is.EqualTo("11.0.0"));
+                Is.EqualTo("11.1.0"));
             loaded.Validate();
         }
 

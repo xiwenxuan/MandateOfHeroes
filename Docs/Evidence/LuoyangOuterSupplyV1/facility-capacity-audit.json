@@ -1,0 +1,19 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-facility-capacity.v1",
+  "world_facility_count": 2779,
+  "added_residence_facility_count": 695,
+  "selected_outer_facility_count": 1549,
+  "selected_outer_unique_cell_count": 1549,
+  "outer_settlement_count": 33,
+  "baseline_outer_residence_capacity": 136500,
+  "added_residence_capacity": 314987,
+  "total_outer_residence_capacity": 451487,
+  "baseline_outer_assigned_residents": 130000,
+  "added_assigned_residents": 300000,
+  "total_outer_assigned_residents": 430000,
+  "capacity_headroom": 21487,
+  "one_facility_per_cell": true,
+  "invalid_settlement_count": 0,
+  "over_capacity_facility_count": 0,
+  "result": "PASS"
+}

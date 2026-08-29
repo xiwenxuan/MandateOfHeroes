@@ -207,7 +207,7 @@ namespace Mandate.Tests
         }
 
         [Test]
-        public void LuoyangOuterSupplyCatchmentTests_ProjectionIsReferentiallyValidAndReportsPopulationGap()
+        public void LuoyangOuterSupplyCatchmentTests_ProjectionIsReferentiallyValidAndClosesPopulationGap()
         {
             var worldMapRoot = Path.Combine(Application.dataPath,
                 "StreamingAssets", "WorldMap");
@@ -222,23 +222,23 @@ namespace Mandate.Tests
             Assert.That(reader.Manifest.IsProjectionOnly, Is.True);
             Assert.That(reader.Manifest.AdministrativeEffect,
                 Is.EqualTo("none"));
-            Assert.That(audit.CellCount, Is.EqualTo(869));
-            Assert.That(audit.FacilityCount, Is.EqualTo(854));
+            Assert.That(audit.CellCount, Is.EqualTo(1564));
+            Assert.That(audit.FacilityCount, Is.EqualTo(1549));
             Assert.That(audit.SettlementCount, Is.EqualTo(33));
             Assert.That(audit.AgricultureUnitCount, Is.EqualTo(135));
             Assert.That(audit.StorageFacilityCount, Is.EqualTo(22));
             Assert.That(audit.RoadFacilityCount, Is.EqualTo(267));
             Assert.That(audit.MaterializedOuterPopulation,
-                Is.EqualTo(130_000));
+                Is.EqualTo(430_000));
             Assert.That(audit.MaterializedOuterHouseholds,
-                Is.EqualTo(26_907));
+                Is.EqualTo(88_988));
             Assert.That(audit.MaterializedWorldPopulation,
-                Is.EqualTo(400_000));
+                Is.EqualTo(700_000));
             Assert.That(audit.InclusivePopulationTarget,
                 Is.EqualTo(700_000));
             Assert.That(audit.UnmaterializedPopulationGap,
-                Is.EqualTo(300_000));
-            Assert.That(audit.PopulationTargetMaterialized, Is.False);
+                Is.Zero);
+            Assert.That(audit.PopulationTargetMaterialized, Is.True);
             Assert.That(reader.Definition.FoodProductDefinitionIds,
                 Does.Contain(CoreProductionContent.WheatGrainProductId));
             Assert.That(reader.Definition.WoodProductDefinitionIds,

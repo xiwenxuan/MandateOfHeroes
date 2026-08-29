@@ -158,6 +158,7 @@ namespace Mandate.Domain
         public string WorldId { get; set; }
         public string CityId { get; set; }
         public string SourcePackageRelativePath { get; set; }
+        public string PopulationOverlayRelativePath { get; set; }
         public string SelectionContract { get; set; }
         public string AdministrativeEffect { get; set; }
         public bool IsProjectionOnly { get; set; }

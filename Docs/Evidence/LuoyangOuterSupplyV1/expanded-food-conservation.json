@@ -1,0 +1,16 @@
+{
+  "schema": "mandate.evidence.luoyang-expanded-food-conservation.v1",
+  "population": 700000,
+  "daily_food_demand_milliunits": 634226370,
+  "thirty_day_difference_milliunits": 0,
+  "one_year_difference_milliunits": 0,
+  "food_vertical_slice": "PASS",
+  "production": "PASS",
+  "storage": "PASS",
+  "freight": "PASS",
+  "consumption": "PASS",
+  "shortfall_behavior": "PASS",
+  "legacy_new_id_double_count": false,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183359-115.summary.json",
+  "result": "PASS"
+}

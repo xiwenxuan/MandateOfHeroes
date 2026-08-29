@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-population-gap.v1",
+  "inclusive_population_target": 700000,
+  "baseline_world_population": 400000,
+  "computed_gap": 300000,
+  "added_permanent_persons": 300000,
+  "actual_world_population": 700000,
+  "actual_outer_population": 430000,
+  "remaining_gap": 0,
+  "calculation_was_data_driven": true,
+  "population_authority": "compact permanent person records",
+  "summary_counter_only": false,
+  "result": "PASS"
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "mandate.luoyang-outer-supply-remediation.v1",
+  "format_version": 1,
+  "scenario_id": "scenario.han.184.yellow_turban",
+  "world_id": "HanWorldV1",
+  "city_id": "location.capital.luoyang",
+  "base_package_relative_path": "../Luoyang184MetropolitanInitializationV1",
+  "base_manifest_sha256": "6959cb130e408ce65be2861c6aec927f2493d6cf59d52b9d6847f2233c398b7d",
+  "inclusive_population_target": 700000,
+  "base_person_count": 400000,
+  "added_person_count": 300000,
+  "person_count": 700000,
+  "base_household_count": 80899,
+  "added_household_count": 62081,
+  "household_count": 142980,
+  "base_facility_count": 2084,
+  "added_facility_count": 695,
+  "facility_count": 2779,
+  "settlement_count": 33,
+  "person_record_size": 80,
+  "household_record_size": 32,
+  "files": [
+    {
+      "path": "audit_summary.json",
+      "bytes": 671,
+      "sha256": "ad39c53ded3021109b609f8e27dcbb277561df360ff38efd0060e4f86f69a1d3"
+    },
+    {
+      "path": "facilities.json",
+      "bytes": 820712,
+      "sha256": "a0c345eaf6a92fad4389862a6e48f78c214416bece4470b8fe718b18a29b2dbd"
+    },
+    {
+      "path": "households.bin",
+      "bytes": 1986624,
+      "sha256": "ab4a47f53c14ca2c39cbf1ad31cb46697af182da3a3071f847980a91b4ecc85c"
+    },
+    {
+      "path": "persons.bin",
+      "bytes": 24000032,
+      "sha256": "88a79f39b665cb7efbc70dfbc07590dab5b64d407acd5e4118f132fbd40b746f"
+    },
+    {
+      "path": "settlements.json",
+      "bytes": 9462,
+      "sha256": "aff05c456997de0e60e4625c1be962cb38ce4896e213496002ac3e0440eab67d"
+    }
+  ],
+  "generated_at_is_metadata_only": true
+}

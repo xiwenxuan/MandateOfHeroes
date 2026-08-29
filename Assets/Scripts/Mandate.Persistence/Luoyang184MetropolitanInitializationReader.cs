@@ -350,7 +350,10 @@ namespace Mandate.Persistence
             "mandate.luoyang-outer-supply-catchment.v1";
         private readonly string _rootPath;
         private readonly string _sourceRootPath;
+        private readonly string _populationOverlayRootPath;
         private readonly IReadOnlyList<string> _settlementIds;
+        private readonly IReadOnlyList<Luoyang184LivingFacilitySourceRecord>
+            _selectedFacilities;
 
         public LuoyangOuterSupplyCatchmentV1Reader(string rootPath)
         {
@@ -376,6 +379,31 @@ namespace Mandate.Persistence
                 _rootPath, Manifest.SourcePackageRelativePath));
             Metropolitan = new Luoyang184MetropolitanInitializationReader(
                 _sourceRootPath);
+            _populationOverlayRootPath = Path.GetFullPath(Path.Combine(
+                _rootPath, Manifest.PopulationOverlayRelativePath));
+            Expanded =
+                new Luoyang184OuterSupplyRemediationPopulationSource(
+                    _populationOverlayRootPath);
+            _selectedFacilities = Metropolitan.Facilities.Select(item =>
+                    new Luoyang184LivingFacilitySourceRecord
+                    {
+                        FacilityIndex = item.GlobalFacilityIndex,
+                        FacilityId = item.FacilityId,
+                        DefinitionId = item.DefinitionId,
+                        CategoryId = item.CategoryId,
+                        OwnerId = item.OwnerId,
+                        ControllerId = item.AdministrativeControllerId,
+                        SettlementId = item.SettlementId,
+                        CellId64 = item.CellId64,
+                        ResidentCapacity = item.ResidentialCapacity,
+                        CurrentResidents = item.CurrentResidents,
+                        WorkerCapacity = item.WorkerCapacity,
+                        CurrentWorkers = item.CurrentWorkers,
+                        StorageCapacity = item.StorageCapacity
+                    })
+                .Concat(Expanded.Facilities.Skip(
+                    Expanded.FacilityCount - Expanded.AddedFacilityCount))
+                .OrderBy(item => item.FacilityIndex).ToArray();
             _settlementIds = ReadSettlementIds(Path.Combine(
                 _sourceRootPath, "spatial_plan.json"));
             Definition = BuildDefinition();
@@ -384,6 +412,8 @@ namespace Mandate.Persistence
         public LuoyangOuterSupplyCatchmentManifest Manifest { get; }
         public Luoyang184MetropolitanInitializationReader Metropolitan
         { get; }
+        public Luoyang184OuterSupplyRemediationPopulationSource Expanded
+        { get; }
         public LuoyangOuterSupplyCatchmentDefinition Definition { get; }
 
         public LuoyangOuterSupplyCatchmentDataAudit Audit()
@@ -391,12 +421,12 @@ namespace Mandate.Persistence
             var result = new LuoyangOuterSupplyCatchmentDataAudit
             {
                 CellCount = Definition.CellIds.Count,
-                FacilityCount = Metropolitan.Facilities.Count,
+                FacilityCount = _selectedFacilities.Count,
                 SettlementCount = Definition.SettlementIds.Count,
                 AgricultureUnitCount = Metropolitan.Agriculture.Count,
-                StorageFacilityCount = Metropolitan.Facilities.Count(item =>
+                StorageFacilityCount = _selectedFacilities.Count(item =>
                     item.StorageCapacity > 0),
-                RoadFacilityCount = Metropolitan.Facilities.Count(item =>
+                RoadFacilityCount = _selectedFacilities.Count(item =>
                     string.Equals(item.CategoryId, "road",
                         StringComparison.Ordinal)),
                 MaterializedWorldPopulation =
@@ -413,6 +443,9 @@ namespace Mandate.Persistence
             foreach (var failure in Metropolitan.ValidatePackageFiles())
                 result.CriticalReferenceErrors.Add(
                     "source-package:" + failure);
+            foreach (var failure in Expanded.ValidatePackageFiles())
+                result.CriticalReferenceErrors.Add(
+                    "population-overlay:" + failure);
             foreach (var sourceFile in Manifest.SourceFiles)
             {
                 var path = Path.Combine(_sourceRootPath, sourceFile.Path);
@@ -450,9 +483,9 @@ namespace Mandate.Persistence
             var cells = new HashSet<ulong>();
             var facilities = new HashSet<string>(StringComparer.Ordinal);
             var grid = GlobalSpatialFoundationV1.CreateCellGrid();
-            for (var i = 0; i < Metropolitan.Facilities.Count; i++)
+            for (var i = 0; i < _selectedFacilities.Count; i++)
             {
-                var facility = Metropolitan.Facilities[i];
+                var facility = _selectedFacilities[i];
                 try
                 {
                     _ = new StableId(facility.FacilityId);
@@ -500,6 +533,8 @@ namespace Mandate.Persistence
         {
             var sourceIds = Manifest.FoodProductDefinitionIds.Concat(
                     Manifest.WoodProductDefinitionIds)
+                .Concat(Metropolitan.Agriculture.Select(item =>
+                    item.ProductDefinitionId))
                 .Where(item => !string.IsNullOrWhiteSpace(item))
                 .Distinct(StringComparer.Ordinal).ToArray();
             var formalIds = new HashSet<string>(
@@ -550,10 +585,10 @@ namespace Mandate.Persistence
             {
                 Id = Manifest.CatchmentId
             };
-            definition.CellIds.AddRange(Metropolitan.Facilities.Select(item =>
+            definition.CellIds.AddRange(_selectedFacilities.Select(item =>
                     item.CellId64).Concat(Metropolitan.Routes.SelectMany(item =>
                     item.CellIds)).Distinct().OrderBy(item => item));
-            definition.FacilityIds.AddRange(Metropolitan.Facilities.Select(
+            definition.FacilityIds.AddRange(_selectedFacilities.Select(
                     item => item.FacilityId).Distinct(StringComparer.Ordinal)
                 .OrderBy(item => item, StringComparer.Ordinal));
             definition.SettlementIds.AddRange(_settlementIds.OrderBy(
@@ -583,6 +618,8 @@ namespace Mandate.Persistence
                 CityId = (string)token["city_id"],
                 SourcePackageRelativePath =
                     (string)token["source_package_relative_path"],
+                PopulationOverlayRelativePath =
+                    (string)token["population_overlay_relative_path"],
                 SelectionContract = (string)token["selection_contract"],
                 AdministrativeEffect =
                     (string)token["administrative_effect"],

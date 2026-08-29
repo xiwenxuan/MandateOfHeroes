@@ -1346,6 +1346,16 @@ namespace Mandate.Domain
             "crop_variety.wheat.prototype_northern";
         public const string WheatSeedProductId = "product.wheat_seed";
         public const string WheatGrainProductId = "product.wheat_grain";
+        public const string LegacyOuterBeanFoodProductId =
+            "product.food.bean";
+        public const string LegacyOuterBroomcornFoodProductId =
+            "product.food.broomcorn_grain";
+        public const string LegacyOuterMilletFoodProductId =
+            "product.food.millet_grain";
+        public const string LegacyOuterMulberryLeafProductId =
+            "product.material.mulberry_leaf";
+        public const string LegacyOuterWoolAndHideProductId =
+            "product.livestock.wool_and_hide";
         public const string WheatFlourProductId = "product.wheat_flour";
         public const string WheatBranProductId = "product.wheat_bran";
         public const string DryRationProductId = "product.dry_ration";
@@ -1486,7 +1496,7 @@ namespace Mandate.Domain
             var package = new ProductionContentPackageDefinition
             {
                 PackageId = PackageId,
-                Version = "11.0.0",
+                Version = "11.1.0",
                 LoadOrder = 0,
                 Required = true
             };
@@ -1562,6 +1572,101 @@ namespace Mandate.Domain
                     "product.grain",
                     "product.market",
                     "product.military_supply"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = LegacyOuterBeanFoodProductId,
+                DisplayName = "豆（外围旧稳定契约）",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 700,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    IntegrityQualityDimensionId,
+                    NutritionQualityDimensionId),
+                CategoryTags = new List<string>
+                {
+                    "product.food",
+                    "product.legume",
+                    "product.market",
+                    "product.fodder",
+                    "product.legacy_contract"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = LegacyOuterBroomcornFoodProductId,
+                DisplayName = "黍米（外围旧稳定契约）",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 450,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    IntegrityQualityDimensionId,
+                    NutritionQualityDimensionId),
+                CategoryTags = new List<string>
+                {
+                    "product.food",
+                    "product.grain",
+                    "product.market",
+                    "product.legacy_contract"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = LegacyOuterMilletFoodProductId,
+                DisplayName = "粟米（外围旧稳定契约）",
+                UnitId = GrainUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 500,
+                QualityDimensionIds = QualityDimensions(
+                    PurityQualityDimensionId,
+                    IntegrityQualityDimensionId,
+                    NutritionQualityDimensionId),
+                CategoryTags = new List<string>
+                {
+                    "product.food",
+                    "product.grain",
+                    "product.market",
+                    "product.military_supply",
+                    "product.legacy_contract"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = LegacyOuterMulberryLeafProductId,
+                DisplayName = "桑叶（外围旧稳定契约）",
+                UnitId = ItemUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 1_800,
+                QualityDimensionIds = QualityDimensions(
+                    IntegrityQualityDimensionId,
+                    HealthQualityDimensionId),
+                CategoryTags = new List<string>
+                {
+                    "product.material",
+                    "product.sericulture_input",
+                    "product.market",
+                    "product.legacy_contract"
+                }
+            });
+            package.Products.Add(new ProductDefinition
+            {
+                Id = LegacyOuterWoolAndHideProductId,
+                DisplayName = "毛皮畜产（外围旧稳定契约）",
+                UnitId = ItemUnitId,
+                BaseWeight = 1,
+                PerishabilityBasisPoints = 1_200,
+                QualityDimensionIds = QualityDimensions(
+                    IntegrityQualityDimensionId,
+                    HealthQualityDimensionId),
+                CategoryTags = new List<string>
+                {
+                    "product.livestock_output",
+                    "product.material",
+                    "product.market",
+                    "product.legacy_contract"
                 }
             });
             package.Products.Add(new ProductDefinition

@@ -1,0 +1,18 @@
+LUOYANG OUTER SUPPLY V1 - FINAL UNITY PLAYMODE
+Date: 2026-08-29
+Unity: 2022.3.62f3c1
+Graphics enabled: true
+Status: PASS
+Executed: 3
+Passed: 3
+Failed: 0
+
+PASS 700K compact living-world dashboard, selectors and player command
+  tmp/unity-validation/unity-PlayMode-20260829-183516-412.summary.json
+PASS five-Cell streaming round trip without regeneration
+  tmp/unity-validation/unity-PlayMode-20260829-183540-130.summary.json
+PASS freight waiting-to-arrival presentation refresh
+  tmp/unity-validation/unity-PlayMode-20260829-183558-562.summary.json
+
+The earlier class-level filter and wrong-namespace filter produced zero executed tests;
+they were test-selection diagnostics, not product failures, and are not used as PASS evidence.

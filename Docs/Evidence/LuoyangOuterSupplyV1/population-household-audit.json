@@ -1,0 +1,21 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-population-household.v1",
+  "person_count": 700000,
+  "added_person_count": 300000,
+  "household_count": 142980,
+  "added_household_count": 62081,
+  "outer_household_count": 88988,
+  "added_labor_capable_person_count": 217802,
+  "added_unassigned_labor_capable_person_count": 217802,
+  "permanent_ids_unique": true,
+  "household_membership_unique": true,
+  "orphan_person_count": 0,
+  "orphan_household_count": 0,
+  "invalid_residence_reference_count": 0,
+  "package_partition_count": 56,
+  "person_gameobjects_created": 0,
+  "person_navmesh_agents_created": 0,
+  "deterministic_rebuild_file_count": 6,
+  "deterministic_rebuild_difference_count": 0,
+  "result": "PASS"
+}

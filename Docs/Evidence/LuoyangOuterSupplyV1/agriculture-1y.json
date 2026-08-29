@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-agriculture-1y.v1",
+  "world_days": 365,
+  "farms": 135,
+  "harvested_farms": 135,
+  "schedule_dispatches": 4499,
+  "advance_milliseconds": 66595,
+  "peak_managed_memory_bytes": 233311560,
+  "all_farms_have_cumulative_yield": true,
+  "all_farms_entered_second_or_later_cycle": true,
+  "duplicate_harvest_id_count": 0,
+  "food_conservation_difference_milliunits": 0,
+  "result": "PASS"
+}

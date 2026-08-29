@@ -1,6 +1,6 @@
 {
   "PackageId": "content.core.production",
-  "Version": "11.0.0",
+  "Version": "11.1.0",
   "LoadOrder": 0,
   "Required": true,
   "Crops": [
@@ -116,6 +116,96 @@
       ],
       "BaseWeight": 1,
       "PerishabilityBasisPoints": 600
+    },
+    {
+      "Id": "product.food.bean",
+      "DisplayName": "豆（外围旧稳定契约）",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.legume",
+        "product.market",
+        "product.fodder",
+        "product.legacy_contract"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity",
+        "quality.nutrition"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 700
+    },
+    {
+      "Id": "product.food.broomcorn_grain",
+      "DisplayName": "黍米（外围旧稳定契约）",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.grain",
+        "product.market",
+        "product.legacy_contract"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity",
+        "quality.nutrition"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 450
+    },
+    {
+      "Id": "product.food.millet_grain",
+      "DisplayName": "粟米（外围旧稳定契约）",
+      "UnitId": "unit.grain",
+      "CategoryTags": [
+        "product.food",
+        "product.grain",
+        "product.market",
+        "product.military_supply",
+        "product.legacy_contract"
+      ],
+      "QualityDimensionIds": [
+        "quality.purity",
+        "quality.integrity",
+        "quality.nutrition"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 500
+    },
+    {
+      "Id": "product.material.mulberry_leaf",
+      "DisplayName": "桑叶（外围旧稳定契约）",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.material",
+        "product.sericulture_input",
+        "product.market",
+        "product.legacy_contract"
+      ],
+      "QualityDimensionIds": [
+        "quality.integrity",
+        "quality.health"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 1800
+    },
+    {
+      "Id": "product.livestock.wool_and_hide",
+      "DisplayName": "毛皮畜产（外围旧稳定契约）",
+      "UnitId": "unit.item",
+      "CategoryTags": [
+        "product.livestock_output",
+        "product.material",
+        "product.market",
+        "product.legacy_contract"
+      ],
+      "QualityDimensionIds": [
+        "quality.integrity",
+        "quality.health"
+      ],
+      "BaseWeight": 1,
+      "PerishabilityBasisPoints": 1200
     },
     {
       "Id": "product.wheat_flour",

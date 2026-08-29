@@ -672,7 +672,7 @@ namespace Mandate.Tests
         }
 
         [Test]
-        public void OuterSupplyCatchmentDataAudit_ReferencesOneWorldAndReportsTargetGap()
+        public void OuterSupplyCatchmentDataAudit_ReferencesOneWorldAndClosesTargetGap()
         {
             var worldMapRoot = Path.Combine(Directory.GetCurrentDirectory(),
                 "Assets", "StreamingAssets", "WorldMap");
@@ -690,23 +690,23 @@ namespace Mandate.Tests
             Assert.That(reader.Manifest.IsProjectionOnly, Is.True);
             Assert.That(reader.Manifest.AdministrativeEffect,
                 Is.EqualTo("none"));
-            Assert.That(audit.CellCount, Is.EqualTo(869));
-            Assert.That(audit.FacilityCount, Is.EqualTo(854));
+            Assert.That(audit.CellCount, Is.EqualTo(1564));
+            Assert.That(audit.FacilityCount, Is.EqualTo(1549));
             Assert.That(audit.SettlementCount, Is.EqualTo(33));
             Assert.That(audit.AgricultureUnitCount, Is.EqualTo(135));
             Assert.That(audit.StorageFacilityCount, Is.EqualTo(22));
             Assert.That(audit.RoadFacilityCount, Is.EqualTo(267));
             Assert.That(audit.MaterializedOuterPopulation,
-                Is.EqualTo(130_000));
+                Is.EqualTo(430_000));
             Assert.That(audit.MaterializedOuterHouseholds,
-                Is.EqualTo(26_907));
+                Is.EqualTo(88_988));
             Assert.That(audit.MaterializedWorldPopulation,
-                Is.EqualTo(400_000));
+                Is.EqualTo(700_000));
             Assert.That(audit.InclusivePopulationTarget,
                 Is.EqualTo(700_000));
             Assert.That(audit.UnmaterializedPopulationGap,
-                Is.EqualTo(300_000));
-            Assert.That(audit.PopulationTargetMaterialized, Is.False);
+                Is.Zero);
+            Assert.That(audit.PopulationTargetMaterialized, Is.True);
             Assert.That(reader.Definition.CellIds.All(cellId =>
                 traversal.ProfilesByCellId.ContainsKey(cellId)), Is.True);
             Assert.That(reader.Definition.FoodProductDefinitionIds,
@@ -716,14 +716,8 @@ namespace Mandate.Tests
             Assert.That(reader.Definition.ContentIdCrosswalks.Single(item =>
                     item.SourceId == "product.food.wheat_grain").FormalId,
                 Is.EqualTo(CoreProductionContent.WheatGrainProductId));
-            Assert.That(audit.FormalContentBridgeComplete, Is.False);
-            Assert.That(audit.UnresolvedContentDefinitionIds,
-                Is.EquivalentTo(new[]
-                {
-                    "product.food.bean",
-                    "product.food.broomcorn_grain",
-                    "product.food.millet_grain"
-                }));
+            Assert.That(audit.FormalContentBridgeComplete, Is.True);
+            Assert.That(audit.UnresolvedContentDefinitionIds, Is.Empty);
             Assert.That(timer.ElapsedMilliseconds, Is.LessThan(10_000));
             Console.WriteLine(
                 "OUTER_SUPPLY_PERF init_and_traversal_ms=" +

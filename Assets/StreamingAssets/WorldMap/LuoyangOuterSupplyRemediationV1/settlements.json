@@ -1,0 +1,269 @@
+{
+  "schema": "mandate.luoyang-outer-supply-remediation-settlements.v1",
+  "settlements": [
+    {
+      "settlement_id": "settlement.gate.north",
+      "display_name": "北郭",
+      "added_population": 17308,
+      "added_residential_facilities": 40,
+      "added_residence_capacity": 18173,
+      "existing_route_id": "route.metropolitan.settlement.gate.north"
+    },
+    {
+      "settlement_id": "settlement.gate.east",
+      "display_name": "东郭",
+      "added_population": 16154,
+      "added_residential_facilities": 37,
+      "added_residence_capacity": 16961,
+      "existing_route_id": "route.metropolitan.settlement.gate.east"
+    },
+    {
+      "settlement_id": "settlement.gate.west",
+      "display_name": "西郭",
+      "added_population": 15000,
+      "added_residential_facilities": 35,
+      "added_residence_capacity": 15750,
+      "existing_route_id": "route.metropolitan.settlement.gate.west"
+    },
+    {
+      "settlement_id": "settlement.gate.south",
+      "display_name": "南郭",
+      "added_population": 20769,
+      "added_residential_facilities": 48,
+      "added_residence_capacity": 21807,
+      "existing_route_id": "route.metropolitan.settlement.gate.south"
+    },
+    {
+      "settlement_id": "settlement.south.taixue",
+      "display_name": "太学外坊",
+      "added_population": 27692,
+      "added_residential_facilities": 63,
+      "added_residence_capacity": 29076,
+      "existing_route_id": "route.metropolitan.settlement.south.taixue"
+    },
+    {
+      "settlement_id": "settlement.south.ritual",
+      "display_name": "礼制南郊",
+      "added_population": 23077,
+      "added_residential_facilities": 53,
+      "added_residence_capacity": 24230,
+      "existing_route_id": "route.metropolitan.settlement.south.ritual"
+    },
+    {
+      "settlement_id": "settlement.road.east",
+      "display_name": "东驿聚",
+      "added_population": 13846,
+      "added_residential_facilities": 32,
+      "added_residence_capacity": 14538,
+      "existing_route_id": "route.metropolitan.settlement.road.east"
+    },
+    {
+      "settlement_id": "settlement.road.west",
+      "display_name": "西驿聚",
+      "added_population": 11538,
+      "added_residential_facilities": 27,
+      "added_residence_capacity": 12114,
+      "existing_route_id": "route.metropolitan.settlement.road.west"
+    },
+    {
+      "settlement_id": "settlement.road.north",
+      "display_name": "北道聚",
+      "added_population": 11538,
+      "added_residential_facilities": 27,
+      "added_residence_capacity": 12114,
+      "existing_route_id": "route.metropolitan.settlement.road.north"
+    },
+    {
+      "settlement_id": "village.mangshan.1",
+      "display_name": "邙南一里",
+      "added_population": 10385,
+      "added_residential_facilities": 24,
+      "added_residence_capacity": 10904,
+      "existing_route_id": "route.metropolitan.village.mangshan.1"
+    },
+    {
+      "settlement_id": "village.mangshan.2",
+      "display_name": "邙南二里",
+      "added_population": 10385,
+      "added_residential_facilities": 24,
+      "added_residence_capacity": 10904,
+      "existing_route_id": "route.metropolitan.village.mangshan.2"
+    },
+    {
+      "settlement_id": "village.luoshui.east",
+      "display_name": "洛水东里",
+      "added_population": 10385,
+      "added_residential_facilities": 24,
+      "added_residence_capacity": 10904,
+      "existing_route_id": "route.metropolitan.village.luoshui.east"
+    },
+    {
+      "settlement_id": "village.luoshui.west",
+      "display_name": "洛水西里",
+      "added_population": 10385,
+      "added_residential_facilities": 24,
+      "added_residence_capacity": 10904,
+      "existing_route_id": "route.metropolitan.village.luoshui.west"
+    },
+    {
+      "settlement_id": "village.hebei.east",
+      "display_name": "河北东里",
+      "added_population": 9231,
+      "added_residential_facilities": 21,
+      "added_residence_capacity": 9692,
+      "existing_route_id": "route.metropolitan.village.hebei.east"
+    },
+    {
+      "settlement_id": "village.hebei.west",
+      "display_name": "河北西里",
+      "added_population": 9231,
+      "added_residential_facilities": 21,
+      "added_residence_capacity": 9692,
+      "existing_route_id": "route.metropolitan.village.hebei.west"
+    },
+    {
+      "settlement_id": "village.south.east",
+      "display_name": "南郊东里",
+      "added_population": 9231,
+      "added_residential_facilities": 21,
+      "added_residence_capacity": 9692,
+      "existing_route_id": "route.metropolitan.village.south.east"
+    },
+    {
+      "settlement_id": "village.south.west",
+      "display_name": "南郊西里",
+      "added_population": 9231,
+      "added_residential_facilities": 21,
+      "added_residence_capacity": 9692,
+      "existing_route_id": "route.metropolitan.village.south.west"
+    },
+    {
+      "settlement_id": "estate.henan.1",
+      "display_name": "河南尹东庄",
+      "added_population": 3462,
+      "added_residential_facilities": 8,
+      "added_residence_capacity": 3635,
+      "existing_route_id": "route.metropolitan.estate.henan.1"
+    },
+    {
+      "settlement_id": "estate.henan.2",
+      "display_name": "河南尹西庄",
+      "added_population": 3462,
+      "added_residential_facilities": 8,
+      "added_residence_capacity": 3635,
+      "existing_route_id": "route.metropolitan.estate.henan.2"
+    },
+    {
+      "settlement_id": "estate.henan.3",
+      "display_name": "洛南东庄",
+      "added_population": 3461,
+      "added_residential_facilities": 8,
+      "added_residence_capacity": 3634,
+      "existing_route_id": "route.metropolitan.estate.henan.3"
+    },
+    {
+      "settlement_id": "estate.henan.4",
+      "display_name": "洛南西庄",
+      "added_population": 3461,
+      "added_residential_facilities": 8,
+      "added_residence_capacity": 3634,
+      "existing_route_id": "route.metropolitan.estate.henan.4"
+    },
+    {
+      "settlement_id": "hamlet.farm.1",
+      "display_name": "东原农聚",
+      "added_population": 6923,
+      "added_residential_facilities": 16,
+      "added_residence_capacity": 7269,
+      "existing_route_id": "route.metropolitan.hamlet.farm.1"
+    },
+    {
+      "settlement_id": "hamlet.farm.2",
+      "display_name": "西原农聚",
+      "added_population": 6923,
+      "added_residential_facilities": 16,
+      "added_residence_capacity": 7269,
+      "existing_route_id": "route.metropolitan.hamlet.farm.2"
+    },
+    {
+      "settlement_id": "hamlet.farm.3",
+      "display_name": "北原农聚",
+      "added_population": 6923,
+      "added_residential_facilities": 16,
+      "added_residence_capacity": 7269,
+      "existing_route_id": "route.metropolitan.hamlet.farm.3"
+    },
+    {
+      "settlement_id": "hamlet.farm.4",
+      "display_name": "洛南农聚",
+      "added_population": 6923,
+      "added_residential_facilities": 16,
+      "added_residence_capacity": 7269,
+      "existing_route_id": "route.metropolitan.hamlet.farm.4"
+    },
+    {
+      "settlement_id": "hamlet.farm.5",
+      "display_name": "伊洛农聚",
+      "added_population": 4615,
+      "added_residential_facilities": 11,
+      "added_residence_capacity": 4845,
+      "existing_route_id": "route.metropolitan.hamlet.farm.5"
+    },
+    {
+      "settlement_id": "logistics.east",
+      "display_name": "东关转运聚",
+      "added_population": 3461,
+      "added_residential_facilities": 8,
+      "added_residence_capacity": 3634,
+      "existing_route_id": "route.metropolitan.logistics.east"
+    },
+    {
+      "settlement_id": "logistics.west",
+      "display_name": "西关转运聚",
+      "added_population": 2769,
+      "added_residential_facilities": 7,
+      "added_residence_capacity": 2907,
+      "existing_route_id": "route.metropolitan.logistics.west"
+    },
+    {
+      "settlement_id": "logistics.north",
+      "display_name": "北关转运聚",
+      "added_population": 2769,
+      "added_residential_facilities": 7,
+      "added_residence_capacity": 2907,
+      "existing_route_id": "route.metropolitan.logistics.north"
+    },
+    {
+      "settlement_id": "logistics.south",
+      "display_name": "南关转运聚",
+      "added_population": 2538,
+      "added_residential_facilities": 6,
+      "added_residence_capacity": 2664,
+      "existing_route_id": "route.metropolitan.logistics.south"
+    },
+    {
+      "settlement_id": "water.luoshui.east",
+      "display_name": "洛水东汲水聚",
+      "added_population": 2308,
+      "added_residential_facilities": 6,
+      "added_residence_capacity": 2423,
+      "existing_route_id": "route.metropolitan.water.luoshui.east"
+    },
+    {
+      "settlement_id": "water.luoshui.west",
+      "display_name": "洛水西汲水聚",
+      "added_population": 2308,
+      "added_residential_facilities": 6,
+      "added_residence_capacity": 2423,
+      "existing_route_id": "route.metropolitan.water.luoshui.west"
+    },
+    {
+      "settlement_id": "water.yangqu",
+      "display_name": "阳渠水工聚",
+      "added_population": 2308,
+      "added_residential_facilities": 6,
+      "added_residence_capacity": 2423,
+      "existing_route_id": "route.metropolitan.water.yangqu"
+    }
+  ]
+}

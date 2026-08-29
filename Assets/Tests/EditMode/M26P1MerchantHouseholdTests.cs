@@ -345,7 +345,7 @@ namespace Mandate.Tests
                 .Replace(
                     "\"SchemaVersion\": " + WorldState.CurrentSchemaVersion,
                     "\"SchemaVersion\": 64")
-                .Replace("\"Version\": \"11.0.0\"", "\"Version\": \"10.0.0\"");
+                .Replace("\"Version\": \"11.1.0\"", "\"Version\": \"10.0.0\"");
 
             var loaded = WorldSnapshotSerializer.Deserialize(json);
 
@@ -355,7 +355,7 @@ namespace Mandate.Tests
                 item.Id == "commodity.cloth").ProductDefinitionId,
                 Is.EqualTo(CoreProductionContent.PlainClothProductId));
             Assert.That(loaded.ProductionContentManifest.Packages[0].Version,
-                Is.EqualTo("11.0.0"));
+                Is.EqualTo("11.1.0"));
         }
 
         [Test]

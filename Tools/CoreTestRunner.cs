@@ -147,7 +147,7 @@ internal static class CoreTestRunner
                 failed++;
                 Console.WriteLine(
                     "FAIL " + method.Name + ": " +
-                    (exception.InnerException ?? exception).Message);
+                    (exception.InnerException ?? exception));
             }
         }
 

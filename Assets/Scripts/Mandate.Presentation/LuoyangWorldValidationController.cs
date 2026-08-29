@@ -85,8 +85,14 @@ namespace Mandate.Presentation
                 _integratedWorld = WorldState.Create(184);
                 new Luoyang184HistoricalPersonFamilyIntegrationBootstrap(
                     metropolitanRoot, historicalPersonRoot).Integrate(_integratedWorld);
-                var livingSource = new Luoyang184LivingWorldSourceAdapter(
-                    metropolitanRoot);
+                var remediationRoot = Path.Combine(
+                    Application.streamingAssetsPath, "WorldMap",
+                    "LuoyangOuterSupplyRemediationV1");
+                var remediation =
+                    new Luoyang184OuterSupplyRemediationBootstrap(
+                        remediationRoot);
+                remediation.Integrate(_integratedWorld);
+                var livingSource = remediation.Source;
                 _livingSystem = new Luoyang184LivingWorldSystem(livingSource);
                 _livingRuntime = _livingSystem.CreateRuntime(184UL);
                 _livingSystem.AdvanceTo(_livingRuntime, 1);

@@ -1,0 +1,10 @@
+LUOYANG OUTER SUPPLY V1 - FINAL UNITY PROJECT LOAD
+Date: 2026-08-29
+Unity: 2022.3.62f3c1
+Mode: ProjectLoadSmoke
+Status: PASS
+PID: 24812
+Duration: 20.702 seconds
+Safe runner forced cleanup: false
+Log: tmp/unity-validation/unity-ProjectLoadSmoke-20260829-183115-896.log
+Summary: tmp/unity-validation/unity-ProjectLoadSmoke-20260829-183115-896.summary.json

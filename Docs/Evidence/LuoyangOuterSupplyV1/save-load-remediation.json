@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-save-load-remediation.v1",
+  "save_schema": 78,
+  "population_count_round_trip": 700000,
+  "household_count_round_trip": 142980,
+  "facility_count_round_trip": 2779,
+  "added_residents_round_trip": 300000,
+  "content_references_round_trip": true,
+  "agriculture_schedule_round_trip": true,
+  "growth_round_trip": true,
+  "gate_waiting_round_trip": true,
+  "freight_round_trip": true,
+  "inventory_round_trip": true,
+  "deterministic_state_hash_verified": true,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183213-289.summary.json",
+  "result": "PASS"
+}

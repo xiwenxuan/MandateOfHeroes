@@ -1,0 +1,24 @@
+LUOYANG OUTER SUPPLY V1 - FINAL UNITY EDITMODE
+Date: 2026-08-29
+Unity: 2022.3.62f3c1
+Status: PASS
+Executed: 8
+Passed: 8
+Failed: 0
+
+PASS Legacy food definition resolution
+  tmp/unity-validation/unity-EditMode-20260829-183156-039.summary.json
+PASS V78 population/household/residence-capacity persistence
+  tmp/unity-validation/unity-EditMode-20260829-183213-289.summary.json
+PASS unified 80-percent early harvest and yield penalty
+  tmp/unity-validation/unity-EditMode-20260829-183230-713.summary.json
+PASS 135-farm 30-day scheduling and schedule round trip
+  tmp/unity-validation/unity-EditMode-20260829-183257-094.summary.json
+PASS FOOD production-to-consumption vertical slice and conservation
+  tmp/unity-validation/unity-EditMode-20260829-183359-115.summary.json
+PASS CellRoute/Gate wait/save/reopen/recovery
+  tmp/unity-validation/unity-EditMode-20260829-183414-714.summary.json
+PASS WOOD shared freight regression
+  tmp/unity-validation/unity-EditMode-20260829-183430-400.summary.json
+PASS three-run gate interruption replay
+  tmp/unity-validation/unity-EditMode-20260829-183446-165.summary.json

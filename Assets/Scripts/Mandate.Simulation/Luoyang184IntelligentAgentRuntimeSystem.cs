@@ -269,18 +269,20 @@ namespace Mandate.Simulation
             var demand = runtime.DailyFoodDemandMilliunits;
             var food = runtime.Inventories.Where(item => IsFood(item.ProductId))
                 .Sum(item => item.QuantityMilliunits);
-            var housing = runtime.Facilities.Sum(item => Math.Max(0,
-                item.DefinitionId.IndexOf("residential", StringComparison.OrdinalIgnoreCase) >= 0
-                    ? Math.Max(1, item.OptimalWorkers) : 0));
+            var housing = runtime.Facilities.Sum(item =>
+                (long)Math.Max(0, item.ResidentCapacity));
             var activePopulation = runtime.CurrentLocalPopulation;
             return new SharedSignals
             {
                 FoodPressure = Shortage(food, demand * 30),
                 InventoryPressure = Shortage(food, demand * 14),
                 EmploymentPressure = runtime.Workforce.Count == 0 ? 0 :
-                    index.UnemployedCount * 10_000 / runtime.Workforce.Count,
-                HousingPressure = housing <= 0 ? 10_000 : Math.Min(10_000,
-                    activePopulation * 10_000 / housing),
+                    (int)Math.Min(10_000L,
+                        (long)index.UnemployedCount * 10_000 /
+                        runtime.Workforce.Count),
+                HousingPressure = housing <= 0 ? 10_000 :
+                    (int)Math.Min(10_000L,
+                        (long)activePopulation * 10_000L / housing),
                 StoragePressure = StoragePressure(runtime),
                 PricePressure = runtime.Markets.Count == 0 ? 0 :
                     runtime.Markets.Max(item => item.CurrentPriceBasisPoints) - 10_000,

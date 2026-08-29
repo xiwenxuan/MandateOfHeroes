@@ -1,0 +1,34 @@
+{
+  "schema": "mandate.evidence.luoyang-legacy-food-id-audit.v1",
+  "legacy_foods": [
+    {
+      "stable_id": "product.food.bean",
+      "display_name": "豆（外围旧稳定契约）",
+      "canonical_unit": "unit.grain",
+      "role": "food, legume, market, fodder",
+      "formal_definition": true,
+      "silent_remap": false
+    },
+    {
+      "stable_id": "product.food.broomcorn_grain",
+      "display_name": "黍米（外围旧稳定契约）",
+      "canonical_unit": "unit.grain",
+      "role": "food, grain, market",
+      "formal_definition": true,
+      "silent_remap": false
+    },
+    {
+      "stable_id": "product.food.millet_grain",
+      "display_name": "粟米（外围旧稳定契约）",
+      "canonical_unit": "unit.grain",
+      "role": "food, grain, market, military supply",
+      "formal_definition": true,
+      "silent_remap": false
+    }
+  ],
+  "legacy_id_resolution": "3/3",
+  "missing_definition_count": 0,
+  "duplicate_id_count": 0,
+  "illegal_alias_count": 0,
+  "result": "PASS"
+}

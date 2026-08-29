@@ -1,0 +1,19 @@
+LUOYANG OUTER SUPPLY V1 - FINAL UNITY PERFORMANCE
+Date: 2026-08-29
+Unity: 2022.3.62f3c1
+Graphics enabled: true
+Population: 700000 compact permanent records
+Households: 142980
+Facilities: 2779
+Initialization: 5919 ms
+Loaded/additional GameObjects: 2
+Allocated memory before: 108006295 bytes
+Allocated memory after: 109823756 bytes
+Allocated memory delta: 1817461 bytes
+Frame samples: 20
+Average frame time: 6.698 ms
+Maximum sampled frame time: 130.639 ms
+Five-Cell streaming round trip: PASS, resident window returned without regeneration
+Freight marker refresh: PASS, waiting and arrival states observed across frames
+Conclusion: ACCEPTABLE FOR V1
+Source: tmp/unity-validation/unity-PlayMode-20260829-183516-412.log

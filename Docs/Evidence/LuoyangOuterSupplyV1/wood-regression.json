@@ -1,0 +1,11 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-wood-regression.v1",
+  "resource_body_to_batch": "PASS",
+  "shared_civilian_freight": "PASS",
+  "cell_route": "PASS",
+  "gate_passage": "PASS",
+  "inventory_authority": "PASS",
+  "food_specific_branch_used": false,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183430-400.summary.json",
+  "result": "PASS"
+}

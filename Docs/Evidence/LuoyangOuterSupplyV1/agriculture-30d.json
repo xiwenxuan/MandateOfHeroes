@@ -1,0 +1,18 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-agriculture-30d.v1",
+  "world_days": 30,
+  "population": 700000,
+  "households": 142980,
+  "farms": 135,
+  "scheduled_farms": 135,
+  "schedule_dispatches": 405,
+  "initialization_milliseconds": 2994,
+  "advance_milliseconds": 6266,
+  "peak_managed_memory_bytes": 212767200,
+  "daily_food_demand_milliunits": 634226370,
+  "all_farms_progressed": true,
+  "all_next_due_days_future": true,
+  "save_load_schedule_equal": true,
+  "food_conservation_difference_milliunits": 0,
+  "result": "PASS"
+}

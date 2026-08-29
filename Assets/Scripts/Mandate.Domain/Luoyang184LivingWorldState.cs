@@ -101,6 +101,7 @@ namespace Mandate.Domain
         public string CategoryId;
         public string OwnerId;
         public string ControllerId;
+        public string SettlementId;
         public ulong CellId64;
         public int ResidentCapacity;
         public int CurrentResidents;
@@ -270,7 +271,10 @@ namespace Mandate.Domain
         public string FacilityId;
         public string DefinitionId;
         public string OwnerId;
+        public string SettlementId;
         public ulong CellId64;
+        public int ResidentCapacity;
+        public int CurrentResidents;
         public string RecipeId;
         public string InputProductId;
         public string OutputProductId;
@@ -321,6 +325,16 @@ namespace Mandate.Domain
         public long CumulativeLostYieldMilliunits;
         public int AssignedWorkers;
         public LuoyangCropPhase Phase;
+        public long NextDueDay = -1;
+        public int ScheduleRevision;
+    }
+
+    [Serializable]
+    public sealed class LuoyangAgricultureDueEntryState
+    {
+        public long DueDay;
+        public int CropIndex;
+        public int ScheduleRevision;
     }
 
     [Serializable]
@@ -627,6 +641,9 @@ namespace Mandate.Domain
             new List<LuoyangFacilityProductionRuntimeState>();
         public List<LuoyangCropRuntimeState> Crops =
             new List<LuoyangCropRuntimeState>();
+        public List<LuoyangAgricultureDueEntryState> AgricultureDueEntries =
+            new List<LuoyangAgricultureDueEntryState>();
+        public long AgricultureScheduleDispatchCount;
         public List<LuoyangHouseholdConsumptionState> Households =
             new List<LuoyangHouseholdConsumptionState>();
         public List<LuoyangInventoryBalanceState> Inventories =
@@ -764,7 +781,9 @@ namespace Mandate.Domain
             if (runtime == null) throw new ArgumentNullException(nameof(runtime));
             if (runtime.Version != Luoyang184LivingWorldRuntimeState.FormatVersion ||
                 runtime.Workforce == null || runtime.Facilities == null ||
-                runtime.Crops == null || runtime.Households == null ||
+                runtime.Crops == null ||
+                runtime.AgricultureDueEntries == null ||
+                runtime.Households == null ||
                 runtime.Inventories == null || runtime.InventoryFlows == null ||
                 runtime.ExternalSuppliers == null ||
                 runtime.SupplyOrders == null || runtime.Shipments == null ||
@@ -793,6 +812,32 @@ namespace Mandate.Domain
                 runtime.CurrentLocalPopulation > runtime.Workforce.Count)
                 throw new InvalidOperationException(
                     "Invalid Luoyang current-location population cache.");
+
+            var scheduledCrops = new HashSet<int>();
+            long previousDueDay = long.MinValue;
+            for (var i = 0; i < runtime.AgricultureDueEntries.Count; i++)
+            {
+                var entry = runtime.AgricultureDueEntries[i];
+                if (entry == null || entry.CropIndex < 0 ||
+                    entry.CropIndex >= runtime.Crops.Count ||
+                    entry.DueDay <= runtime.AbsoluteDay ||
+                    entry.DueDay < previousDueDay)
+                    throw new InvalidOperationException(
+                        "Invalid agriculture due entry.");
+                var crop = runtime.Crops[entry.CropIndex];
+                if (entry.ScheduleRevision == crop.ScheduleRevision &&
+                    entry.DueDay == crop.NextDueDay &&
+                    !scheduledCrops.Add(entry.CropIndex))
+                    throw new InvalidOperationException(
+                        "A crop has more than one active due entry.");
+                previousDueDay = entry.DueDay;
+            }
+            if (scheduledCrops.Count != runtime.Crops.Count ||
+                runtime.Crops.Any(item => item == null ||
+                    item.NextDueDay <= runtime.AbsoluteDay ||
+                    item.ScheduleRevision <= 0))
+                throw new InvalidOperationException(
+                    "Every Luoyang crop must have one future due schedule.");
 
             var activePersons = new HashSet<uint>();
             for (var i = 0; i < runtime.Workforce.Count; i++)

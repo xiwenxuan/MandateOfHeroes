@@ -1,0 +1,15 @@
+{
+  "schema": "mandate.evidence.luoyang-expanded-gate-interruption.v1",
+  "cell_route_used": true,
+  "closed_gate_caused_wait": true,
+  "waiting_state_round_tripped": true,
+  "delivery_while_closed": 0,
+  "reopen_resumed_same_freight": true,
+  "delivered_equals_dispatched": true,
+  "natural_loss": 0,
+  "duplicate_delivery_count": 0,
+  "closing_food_difference": 0,
+  "three_run_replay_identical": true,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183414-714.summary.json",
+  "result": "PASS"
+}

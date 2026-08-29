@@ -1519,8 +1519,7 @@ namespace Mandate.Presentation
     public sealed class LuoyangSupplyFreightMarker : MonoBehaviour
     {
         private MeshRenderer _renderer;
-        private readonly MaterialPropertyBlock _properties =
-            new MaterialPropertyBlock();
+        private MaterialPropertyBlock _properties;
 
         public string FreightId { get; private set; }
         public string CarrierPersonId { get; private set; }
@@ -1530,6 +1529,11 @@ namespace Mandate.Presentation
         public ulong CurrentCellId64 { get; private set; }
         public long RemainingCargoQuantity { get; private set; }
         public int RouteRevision { get; private set; }
+
+        private void Awake()
+        {
+            _properties = new MaterialPropertyBlock();
+        }
 
         public void Initialize(MeshRenderer renderer)
         {

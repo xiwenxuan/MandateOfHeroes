@@ -2330,17 +2330,18 @@ V78 已把既有 Civilian Freight 接入四向 CellTraversal，保存移动能�
 Mobile Container、Journey 和 Arrival 仍是原有同一本世界账。统一农业补入版本化80%早收门槛与产量
 后果，食品和木材核心垂直切片、城门中断/恢复、仓满等待、Save/Load、三次重放和守恒均已证明。
 
-只读供应区当前选择869 Cell、854 Facility、33 Settlement、135农业单元、22仓储和267道路，关键
-引用错误0。但实际世界仍只有400,000永久人物，其中外围增量130,000；700,000包含式目标仍差
-300,000，且现有设施承载不足。旧紧凑包的小麦ID已有显式迁移桥，豆、黍、粟仍保留为未解析内容。
-受控Unity专项又在生成启动日志前 `blocked/125`，没有 EditMode/PlayMode 和图形性能结果。
+首次验收的`NOT ACCEPTED`历史保留在原报告。Remediation以`748a15b`为基线，重新计算并物化缺失
+300,000名永久人物、62,081户和695个一Cell一Facility住宅，最终世界为700,000人、142,980户、
+2,779 Facility；外围430,000居民由451,487住宅容量承载，人口Gap为0。只读供应区随之扩为1,564
+Cell、1,549 Facility，仍覆盖33 Settlement、135农业单元、22仓储和267道路。
 
-本轮固定源码指纹完整Core为793/793、失败0；两项多年确定性慢测按精确名称使用900秒授权分类，
-其余保持300秒。全工程编译和差异检查通过，因此已实现代码没有已知Core退化；但这些结果不能替代
-缺失的Unity图形门禁或未物化人口事实。
+豆、黍、粟三个旧稳定食品ID已直接进入正式Content Registry，不改名、不静默映射且不生成开局库存。
+135/135农业记录保存`NextDueDay`与调度修订，通过持久化到期索引进入WorldTime长期运行；30日、1年、
+Save/Load、3次Replay和食品守恒均通过。70万人真实家庭日需求为634,226,370 milliunits，没有通过提高
+产量或降低消费制造供给良好结果。
 
-因此当前正式状态为
-`TASK_LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_NOT_ACCEPTED`。保留已实现的物流
-底座，但不得宣称70万人外围供给世界已经完成。全局下一步仍是先闭合缺失人口/家庭/设施、内容定义、
-长期正式世界接线和Unity证据；只有本任务转为ACCEPTED后，才进入城市供给—市场—家庭消费联合压力
-与可玩性验收V1。
+最终固定源码指纹完整Core为799/799、失败0；Project Load Smoke、适用EditMode及有图形PlayMode均
+通过。70万人Unity场景初始化5,919ms，仅新增2个GameObject，分配增量1,817,461 bytes，20帧平均
+6.698ms；性能结论为`ACCEPTABLE FOR V1`。因此当前正式状态更新为
+`TASK_LUOYANG_OUTER_SUPPLY_FORMAL_LOGISTICS_AND_CITY_SUPPLY_LOOP_V1_ACCEPTED`。全局下一任务固定为
+“洛阳城市供给—市场—家庭消费联合压力与可玩性验收V1”；该下一任务尚未实现。

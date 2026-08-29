@@ -107,6 +107,7 @@ namespace Mandate.Persistence
                     CategoryId = Text(token, "category_id"),
                     OwnerId = Text(token, "owner_id"),
                     ControllerId = Text(token, "controller_id"),
+                    SettlementId = Text(token, "settlement_id"),
                     CellId64 = token["cell_id64"]?.Value<ulong>() ?? 0,
                     ResidentCapacity = Integer(token,
                         "recommended_residential_capacity",

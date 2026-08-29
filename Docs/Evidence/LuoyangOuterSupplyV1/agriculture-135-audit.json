@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-agriculture-135.v1",
+  "record_count": 135,
+  "scheduled_count": 135,
+  "invalid_record_count": 0,
+  "missing_content_count": 0,
+  "missing_cell_count": 0,
+  "missing_facility_count": 0,
+  "missing_owner_count": 0,
+  "missing_storage_count": 0,
+  "missing_schedule_count": 0,
+  "duplicate_active_schedule_count": 0,
+  "scheduler": "persistent due index",
+  "per_tick_source_record_scan": false,
+  "early_harvest_rule_reused": true,
+  "result": "PASS"
+}

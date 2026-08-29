@@ -1,0 +1,20 @@
+{
+  "schema": "mandate.luoyang-outer-supply-remediation-audit.v1",
+  "inclusive_population_target": 700000,
+  "base_person_count": 400000,
+  "computed_population_gap": 300000,
+  "added_person_count": 300000,
+  "total_person_count": 700000,
+  "base_household_count": 80899,
+  "added_household_count": 62081,
+  "total_household_count": 142980,
+  "base_facility_count": 2084,
+  "added_facility_count": 695,
+  "total_facility_count": 2779,
+  "settlement_count": 33,
+  "residence_capacity": 314987,
+  "assigned_residents": 300000,
+  "labor_capable_person_count": 217802,
+  "unassigned_labor_capable_person_count": 217802,
+  "one_facility_per_cell": true
+}

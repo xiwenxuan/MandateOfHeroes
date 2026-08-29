@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.evidence.luoyang-outer-replay-remediation.v1",
+  "agriculture_runs": 3,
+  "agriculture_state_hashes_identical": true,
+  "population_facts_identical": true,
+  "household_facts_identical": true,
+  "farm_states_identical": true,
+  "harvest_states_identical": true,
+  "food_inventory_identical": true,
+  "gate_interruption_runs": 3,
+  "gate_interruption_snapshots_identical": true,
+  "unity_editmode_summary": "tmp/unity-validation/unity-EditMode-20260829-183446-165.summary.json",
+  "result": "PASS"
+}

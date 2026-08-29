@@ -1,6 +1,6 @@
 {
   "PackageId": "content.scenario.han_food_extension",
-  "Version": "2.0.0",
+  "Version": "2.1.0",
   "LoadOrder": 100,
   "Required": true,
   "Crops": [
@@ -204,6 +204,39 @@
       "ConsumptionPriority": 10,
       "SourceLayer": "gameplay_completion",
       "SourceNote": "M24-P7第二候选校准参数，不代表汉代全国统一比例。"
+    },
+    {
+      "ProductDefinitionId": "product.food.bean",
+      "OpeningShareBasisPoints": 0,
+      "NutritionBasisPoints": 12500,
+      "VolumeBasisPoints": 11500,
+      "SpoilageSensitivityBasisPoints": 11000,
+      "MarketValueBasisPoints": 11500,
+      "ConsumptionPriority": 30,
+      "SourceLayer": "legacy_contract",
+      "SourceNote": "保留洛阳外围既有豆食品稳定ID；只补正式定义，不生成库存，也不映射为product.soybean。"
+    },
+    {
+      "ProductDefinitionId": "product.food.broomcorn_grain",
+      "OpeningShareBasisPoints": 0,
+      "NutritionBasisPoints": 9800,
+      "VolumeBasisPoints": 9000,
+      "SpoilageSensitivityBasisPoints": 7000,
+      "MarketValueBasisPoints": 8500,
+      "ConsumptionPriority": 60,
+      "SourceLayer": "legacy_contract",
+      "SourceNote": "保留洛阳外围既有黍米稳定ID；只补正式定义，不生成库存，也不映射为product.broomcorn_millet_grain。"
+    },
+    {
+      "ProductDefinitionId": "product.food.millet_grain",
+      "OpeningShareBasisPoints": 0,
+      "NutritionBasisPoints": 10200,
+      "VolumeBasisPoints": 9500,
+      "SpoilageSensitivityBasisPoints": 8000,
+      "MarketValueBasisPoints": 9000,
+      "ConsumptionPriority": 50,
+      "SourceLayer": "legacy_contract",
+      "SourceNote": "保留洛阳外围既有粟米稳定ID；只补正式定义，不生成库存，也不映射为product.millet_grain。"
     }
   ],
   "Recipes": [
