@@ -2371,3 +2371,29 @@ PID且未重试；按任务书作为环境缺口，不否定Domain/Simulation/Pe
 上一“洛阳城市供给—市场—家庭消费联合压力与可玩性验收V1”报告继续保持`NOT ACCEPTED`。下一任务
 固定回到该联合任务做Final Remediation / Re-acceptance，补Gate/Road/Production/Carrier/Storage、
 政府采购与赈济、玩家Supply Card和商旅介入、Save/Load、Replay及Unity证据，不再重建经济底层。
+
+## 50. 洛阳城市供给—市场—家庭消费联合压力与可玩性验收 V1 Final Re-Acceptance（2026-08-30）
+
+当前报告见
+[`LUOYANG_SUPPLY_MARKET_HOUSEHOLD_INTEGRATED_STRESS_AND_PLAYABILITY_V1_ACCEPTANCE_REPORT.md`](LUOYANG_SUPPLY_MARKET_HOUSEHOLD_INTEGRATED_STRESS_AND_PLAYABILITY_V1_ACCEPTANCE_REPORT.md)。
+原First Attempt的`NOT ACCEPTED`及双权威、普遍缺粮和Unity阻塞证据保留；当前结论在
+Authority Unification基线`ee9c947`之上重新验收为`ACCEPTED`。
+
+世界Save继续为V78，洛阳派生Checkpoint由v7顺序升为v8。运输保存已收/待收货量、
+路线/仓储等待、玩家承运人与出售幂等状态；v7→v8从已有正式Freight Container批次重建
+剩余货量，不移动或创造食品。Gate、Road和Bridge仍由正式WorldState唯一持有，
+经济层只保存路线摘要与等待引用。
+
+普通玩家视图已有只读“洛阳粮食供应”卡，显示供应状态、可支撑天数、粮价、已知在途/
+受阻/待入库、家庭短缺和政府采购/赈济；路线细节遵守有限认知，公开库存总量只统计市场与政府容器，不泄露家户、私人组织或军用储备。
+玩家商旅使用既有永久Person、Household现金、ProductBatch、移动容器、CellTraversal/Gate、
+目的仓和正式市场完成购买、运输、到货和出售；没有玩家专属经济。
+
+本轮正常30日/1年不重新调参且守恒差额0；Gate、Road、Production、Carrier、Storage、Market、
+政府采购、赈济、Demand、Combined、玩家行动、失败不变性、Save/Load和3/3 Replay均通过。
+完整Core为858/858，Introduced Regression为0；Project Load、EditMode 9/9、图形PlayMode 4/4均通过。
+Unity初始化6,291ms，20帧平均6.328ms；性能结论为`ACCEPTABLE FOR V1`。
+
+下一正式阶段是 M26 商旅/商号玩法收口、Product Readiness 与20—30分钟独立人工盲玩V1。
+该阶段聚焦行情信息、货物准备、岗位、路线成本/风险、交易反馈、商号经营、账本、失败恢复、
+教程和人类盲玩缺陷，不再重建经济Authority。

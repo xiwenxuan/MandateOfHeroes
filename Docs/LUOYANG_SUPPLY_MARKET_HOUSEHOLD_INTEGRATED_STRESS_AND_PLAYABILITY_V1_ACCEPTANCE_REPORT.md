@@ -1,6 +1,19 @@
 # 洛阳城市供给—市场—家庭消费联合压力与可玩性验收 V1
 
-## 结论
+## Final Re-Acceptance 结论（2026-08-30）
+
+**ACCEPTED**
+
+Authority Unification 之后的 Final Remediation 已关闭原任务未通过项：正式粮食批次/
+事务继续是唯一物理权威，洛阳70万人普通玩家供给卡与正式商旅闭环已接入，
+仓满时货物不再被误标为送达，Gate/Road/Storage/市场/玩家行动的压力、恢复、
+守恒、存读和重放证据已完成。本轮 Full Core 858/858 PASS，Unity Project Load、
+EditMode 9/9、图形 PlayMode 4/4 及玩家界面/商旅介入/表现性能均通过。
+
+以下 `NOT ACCEPTED` 结论与当时数据作为 First Attempt / Authority Blocker 历史原样保留，
+不代表当前状态。
+
+## First Attempt / Authority Blocker 历史结论
 
 **NOT ACCEPTED**
 
@@ -175,3 +188,114 @@
 - `Docs/Evidence/LuoyangIntegratedEconomyV1/screenshots/README.md`
 
 本轮不创建提交、不推送，因为任务书只授权在全部适用 Gate 通过后执行这些外部状态变更。
+
+## Final Remediation / Final Re-Acceptance（2026-08-30）
+
+### 版本与基线
+
+| 项目 | 结果 |
+|---|---|
+| Final Remediation Baseline Commit | `ee9c947c692b3fc2485f5f351906dd005a38b380` |
+| Final Implementation Commit | `fce64a77901f6012060b38d79b29c5374e116a4d` |
+| Branch | `codex/m23-p4-quality-artisan-growth` |
+| World Save Version | V78 |
+| Luoyang Derived Checkpoint | v8，v7→v8顺序迁移 |
+| World Rules Version | 1 |
+| Core Production Content | `content.core.production` 11.1.0 |
+| Han Food Content | `content.scenario.han_food_extension` 2.1.0 |
+| Unity | 2022.3.62f3c1 (1623fc0bbb97) |
+| Population / Households | 700,000 / 142,980 |
+| Formal Authority | `ProductBatchState + InventoryTransactionState` |
+| Compact Role | Formal → Compact 单向 Projection / Cache / Index |
+
+正常供应未在本任务重新调参。30日确认性回归为短缺0、期末
+120,819,691,306、190日供给、正式食品差额0；1年回归中农业、市场、民运和消费
+持续运行，期末56,456,320,382、89日供给，正式食品差额0。
+
+### Final Stress Matrix
+
+| 场景 | 最终结果 |
+|---|---|
+| Gate Shock / Recovery | PASS。正式 Gate 关闭后玩家货物保留在正式移动容器并等待；重开后同一货物只到货/出售一次，守恒差额0。 |
+| Multi-Gate / Road | PASS。两个正式 Gate 的阻断对象不折叠；无合法替代时明确等待，存在合法 Road 替代时路线 Revision=1，货物不复制。 |
+| Production Shock | PASS。通过正式80%早收规则产生1对2的产量差，未直接删除城市库存。 |
+| Carrier Shortage | PASS。活动需求1、报价0/货运0，没有 Phantom Carrier。 |
+| Storage Bottleneck | PASS。目的仓满时已收0、待收量保留；扩容后幂等续收，无丢失/复制。 |
+| Market Tightening | PASS。正式报价从97变为99，正式成交99，恢复98；未直接乘价格。 |
+| Public Procurement / Relief | PASS。采购5、付款10，赈济送达2并消费2；现金与食品差额均0。 |
+| Demand / Outstanding Supply | PASS。重复计划保持单一活动需求，只计划未提交余量，恢复后不重复到货。 |
+| Combined Stress | PASS。正式货运1，现金差额0，食品差额0。这是 gameplay / technical stress，不是184年历史灾害结论。 |
+
+### 玩家可见与正式介入
+
+普通界面新增“洛阳粮食供应”卡，显示供应状态、可支撑天数、公开市场/政府粮食、代表单位价、
+已知在途/受阻/待入库运输、短缺户数与政府采购/赈济。卡片只读正式批次投影，
+只对已知路线暴露运输细节，公开总量排除家户、私人组织和军用容器。读取前后确定性状态哈希一致。
+
+玩家商旅使用既有永久Person、Household资金、正式ProductBatch、正式移动容器、已知路线、
+CellTraversal/Gate、目的仓与正式市场；购买扣玩家家户现金，到货出售由市场需求付款，
+没有玩家专属库存或规模倍增。运力、资金、货物、请求、需求、仓容、已知路线和Gate失败
+均返回稳定理由，且失败前后世界哈希不变。
+
+### 存档、重放、性能与回归
+
+| 项目 | 结果 |
+|---|---|
+| Save / Load | PASS。v8保留已收/待收货量、路线/仓储等待、玩家承运人、已知路线和出售幂等状态；往返哈希一致，投影差额0。 |
+| Replay | PASS，3/3正式哈希一致。 |
+| 22 Previous Scenarios | 22/22 PASS；未删除旧测试。 |
+| AI Regression | 受影响5/5 PASS，且包含在完整858项回归中。 |
+| Full Compile | PASS。 |
+| Full Core | 858/858 PASS。合法长测按用户授权分类并单独延长；普通批次仍使用300秒硬上限。 |
+| Simulation Performance | 30日4,570ms/204,340,472 bytes/79批次/142事务；1年49,555ms/209,521,488 bytes/6,184批次/7,222事务；70万人玩家投影100次7ms。`ACCEPTABLE FOR V1`。 |
+| Introduced Regression | 0 |
+
+### Unity Gate Q
+
+| 项目 | 结果 |
+|---|---|
+| EngineSmoke | 本轮未重复；Project Load、EditMode和图形PlayMode已成功进入同一Editor，EngineSmoke仅为起动层诊断项，非Gate Q新增独立门禁。 |
+| Project Load | PASS，50.334s。 |
+| EditMode | 9/9 PASS，外层215.079s。 |
+| Graphical PlayMode | 4/4 PASS，外层54.415s。 |
+| Player Supply Card | PASS，普通视图可见并只读正式权威。 |
+| Player Merchant Gameplay | PASS，普通操作生成含正式移动容器货物的玩家运输。 |
+| Graphics / Presentation Performance | 初始化6,291ms，2个GameObject，分配增量1,816,477 bytes，20帧平均6.328ms，最大124.539ms。`ACCEPTABLE FOR V1`。 |
+
+### Acceptance Gates A—Q
+
+| Gate | 结果 |
+|---|---|
+| A Authority Baseline | PASS |
+| B Normal Baseline | PASS |
+| C Gate Shock | PASS |
+| D Road Shock | PASS |
+| E Production Shock | PASS |
+| F Carrier Shortage | PASS |
+| G Storage Bottleneck | PASS |
+| H Public Economy | PASS |
+| I Demand Storm | PASS |
+| J Player Supply Card | PASS |
+| K Player Merchant Intervention | PASS |
+| L Player Failure Feedback | PASS |
+| M Food Conservation | PASS |
+| N Save / Load | PASS |
+| O Replay | PASS |
+| P Simulation Performance | `ACCEPTABLE FOR V1` |
+| Q Unity | PASS / `ACCEPTABLE FOR V1` |
+
+最终结果：`ACCEPTED`。下一正式阶段进入 M26 商旅/商号玩法收口、Product Readiness 与
+20—30分钟独立人工盲玩，不再重建经济权威。
+
+### Final Evidence Index
+
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/final-remediation-baseline.md`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/final-closure-gap-list.md`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/final-remediation-scenario-matrix.json`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/player-supply-card.json`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/player-merchant-intervention.json`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/player-failure-feedback.json`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/final-save-replay-performance.json`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/unity-final-reacceptance.md`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/full-core-regression.md`
+- `Docs/Evidence/LuoyangIntegratedEconomyV1/final-reacceptance-summary.md`

@@ -1,0 +1,17 @@
+{
+  "schema": "mandate.luoyang.player_merchant_failures.v1",
+  "cases": [
+    "invalid_request",
+    "carrier_busy",
+    "carrier_capacity_exceeded",
+    "insufficient_cash",
+    "insufficient_cargo",
+    "unknown_route",
+    "route_blocked_by_formal_gate",
+    "destination_full",
+    "no_market_demand"
+  ],
+  "contract": "each failure returns a stable reason and performs no economic mutation",
+  "verification": "deterministic state hash is identical before and after every exercised rejection",
+  "result": "pass"
+}

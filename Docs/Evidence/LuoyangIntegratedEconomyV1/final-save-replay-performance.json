@@ -1,0 +1,45 @@
+{
+  "schema": "mandate.luoyang.integrated_economy.save_replay_performance.v1",
+  "save_load": {
+    "world_save_version": 78,
+    "derived_checkpoint_version": 8,
+    "preserves": [
+      "remaining_cargo",
+      "received_cargo",
+      "route_waiting",
+      "storage_waiting",
+      "merchant_carrier",
+      "player_sale_settlement",
+      "formal_authority_revision"
+    ],
+    "deterministic_hash_round_trip": true,
+    "projection_difference": 0,
+    "result": "pass"
+  },
+  "replay": {
+    "runs": 3,
+    "identical_hashes": 3,
+    "result": "pass"
+  },
+  "simulation_performance": {
+    "normal_30d_runtime_ms": 4570,
+    "normal_30d_peak_managed_bytes": 204340472,
+    "normal_30d_batches": 79,
+    "normal_30d_transactions": 142,
+    "normal_1y_runtime_ms": 49555,
+    "normal_1y_peak_managed_bytes": 209521488,
+    "normal_1y_batches": 6184,
+    "normal_1y_transactions": 7222,
+    "player_projection_100_editmode_ms": 7,
+    "result": "acceptable_for_v1"
+  },
+  "unity_performance": {
+    "initialization_ms": 6291,
+    "loaded_gameobjects": 2,
+    "allocated_memory_delta_bytes": 1816477,
+    "sample_frames": 20,
+    "average_frame_ms": 6.328,
+    "maximum_frame_ms": 124.539,
+    "result": "acceptable_for_v1"
+  }
+}

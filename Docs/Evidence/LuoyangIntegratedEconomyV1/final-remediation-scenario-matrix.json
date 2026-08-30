@@ -1,0 +1,132 @@
+{
+  "schema": "mandate.luoyang.integrated_economy.final_matrix.v1",
+  "recorded_at": "2026-08-30",
+  "baseline_commit": "ee9c947c692b3fc2485f5f351906dd005a38b380",
+  "population": 700000,
+  "households": 142980,
+  "world_save_version": 78,
+  "luoyang_checkpoint_version": 8,
+  "formal_physical_authority": [
+    "ProductBatchState",
+    "InventoryTransactionState"
+  ],
+  "compact_role": "formal_to_compact_projection_cache_index_only",
+  "scenarios": [
+    {
+      "id": "normal-30d",
+      "scope": "luoyang_700k_runtime",
+      "duration_days": 30,
+      "opening_food": 133187537700,
+      "production_external": 6660000000,
+      "consumption": 19026791100,
+      "closing_food": 120819691306,
+      "days_of_supply": 190,
+      "shortfall_households": 0,
+      "transport_loss": 35294,
+      "food_difference": 0,
+      "result": "pass"
+    },
+    {
+      "id": "normal-1y",
+      "scope": "luoyang_700k_runtime",
+      "duration_days": 365,
+      "agriculture_production": 129170460000,
+      "consumption": 228870983496,
+      "closing_food": 56456320382,
+      "days_of_supply": 89,
+      "transport_loss": 458822,
+      "food_difference": 0,
+      "result": "pass"
+    },
+    {
+      "id": "gate-shock-and-recovery",
+      "scope": "luoyang_700k_runtime_plus_formal_cell_traversal",
+      "formal_state": "LuoyangPassageTraversalState",
+      "blocked_effect": "player cargo remains in formal mobile container; household consumption continues",
+      "recovery": "same cargo arrives once after gate reopens; player sale settles once",
+      "food_difference": 0,
+      "result": "pass"
+    },
+    {
+      "id": "multi-gate-and-road-routing",
+      "scope": "shared_formal_cell_traversal_mechanism",
+      "formal_state": "two distinct gate objects plus road state",
+      "limited_knowledge": true,
+      "road_route_revision": 1,
+      "remaining_cargo": 12,
+      "result": "pass"
+    },
+    {
+      "id": "production-shock",
+      "scope": "shared_formal_production_mechanism",
+      "mechanism": "versioned 80 percent early-harvest rule",
+      "expected_normal_yield": 2,
+      "actual_early_yield": 1,
+      "direct_stock_deletion": false,
+      "result": "pass"
+    },
+    {
+      "id": "carrier-shortage",
+      "scope": "shared_formal_freight_mechanism",
+      "active_demand": 1,
+      "offers": 0,
+      "freights": 0,
+      "phantom_capacity": false,
+      "result": "pass"
+    },
+    {
+      "id": "storage-bottleneck",
+      "scope": "luoyang_700k_runtime",
+      "cargo_holder": "formal_mobile_inventory_container",
+      "received_while_full": 0,
+      "waiting_state_persisted": true,
+      "receipt_after_capacity": "exactly_once",
+      "result": "pass"
+    },
+    {
+      "id": "market-tightening",
+      "scope": "shared_formal_market_mechanism",
+      "normal_price": 97,
+      "shock_price": 99,
+      "trade_price": 99,
+      "recovered_price": 98,
+      "direct_price_multiplier": false,
+      "result": "pass"
+    },
+    {
+      "id": "public-procurement-and-relief",
+      "scope": "shared_formal_public_economy_mechanism",
+      "procurement_quantity": 5,
+      "procurement_money": 10,
+      "relief_delivered": 2,
+      "relief_consumed": 2,
+      "cash_difference": 0,
+      "food_difference": 0,
+      "result": "pass"
+    },
+    {
+      "id": "demand-outstanding-and-combined",
+      "scope": "shared_formal_authority",
+      "duplicate_daily_demand": false,
+      "duplicate_freight": false,
+      "active_freights": 1,
+      "cash_difference": 0,
+      "food_difference": 0,
+      "result": "pass"
+    },
+    {
+      "id": "player-merchant-intervention",
+      "scope": "luoyang_700k_runtime",
+      "permanent_person": true,
+      "real_household_cash": true,
+      "real_product_batch": true,
+      "real_mobile_container": true,
+      "formal_cell_route_and_gate": true,
+      "real_market_sale": true,
+      "scale_multiplier": false,
+      "result": "pass"
+    }
+  ],
+  "introduced_regression": 0,
+  "result": "pass"
+}

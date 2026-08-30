@@ -1,0 +1,23 @@
+{
+  "schema": "mandate.luoyang.player_supply_card.v1",
+  "source": "LuoyangPlayerSupplyProjectionSystem",
+  "authority": "read_only_formal_batch_projection",
+  "ordinary_view": true,
+  "developer_console_required": false,
+  "fields": [
+    "supply_state",
+    "stock_days",
+    "public_market_and_government_food_stock",
+    "representative_unit_price",
+    "known_incoming_shipments",
+    "known_blocked_shipments",
+    "known_storage_waiting_shipments",
+    "household_shortage_count",
+    "public_procurement",
+    "relief"
+  ],
+  "knowledge_filter": "only known routes expose shipment details; stock totals include only public market and government containers, excluding household, private organization and military reserves",
+  "read_before_after_state_hash_identical": true,
+  "unity_playmode": "pass",
+  "result": "pass"
+}

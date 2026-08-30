@@ -1,0 +1,14 @@
+{
+  "schema": "mandate.luoyang.player_merchant_intervention.v1",
+  "population_scope": 700000,
+  "actor": "existing permanent person referenced by workforce ordinal",
+  "purchase": "player household cash transfers to formal supplier",
+  "cargo": "ProductBatch in formal freight inventory container",
+  "movement": "known logical route assessed by formal CellTraversal against current road and gate state",
+  "arrival": "destination capacity enforces partial or waiting receipt",
+  "sale": "formal market demand pays the player household and records the real market trade",
+  "idempotence": "receipt and player sale settle once",
+  "player_only_economy": false,
+  "unity_playmode": "pass",
+  "result": "pass"
+}

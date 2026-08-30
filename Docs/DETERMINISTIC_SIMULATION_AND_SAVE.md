@@ -846,3 +846,19 @@ V70→V71是顺序迁移：旧档初始化空的`WorldDecisionAgents`与`WorldSi
   移动物资、不改变 Owner、不重建 Market Trade。
 - 相同初始存档、Seed、内容、命令和门桥变化必须得到相同早收产量、CellRoute、等待/到货状态与
   完整 World Snapshot。
+
+## 22. V78 世界存档与洛阳派生检查点 v8 玩家供给合同
+
+- 正式 World Save 继续为V78；本任务没有把洛阳玩家商旅变成新的全世界权威集合。
+- `Luoyang184LivingWorldRuntimeState` 派生检查点由v7升为v8，保存Shipment的累计已收量、
+  剩余移动货量、路线/仓储等待原因、正式阻断对象、物理路线摘要、路线Revision、
+  玩家定向标记、买方家户和出售幂等状态；玩家承运人保存永久Person ordinal、运力、
+  当前Shipment与已知路线。
+- v7→v8为顺序迁移。旧运输的剩余货量从已有正式Freight Container中的ProductBatch重建；
+  旧版在仓容不足时误标为Delivered的运输会转为待收货，不生成、删除或重随机货物。
+- Gate、Bridge、Road开闭与完整度仍只由正式WorldState持有。v8只保存运输对当时路线的
+  摘要和等待引用，读档后每次续行仍重读正式CellTraversal，不复制一套经济通行状态。
+- 发运守恒合同为 `shipped = dispatch losses + received + remaining cargo`。只有Remaining Cargo为0才可
+  标记Delivered；部分收货和玩家出售必须幂等，Save/Load不得重复收货或重复付款。
+- 相同v8初始检查点、Seed、正式路线状态和玩家指令必须得到相同批次、现金、
+  运输/等待/到货状态和确定性状态摘要。
