@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Mandate.Domain;
@@ -65,7 +66,7 @@ namespace Mandate.Persistence
                 ComputeDeterministicStateSha256(runtime);
             var manifest = new
             {
-                schema = "mandate.luoyang-184.living-world-checkpoint.v7",
+                schema = "mandate.luoyang-184.living-world-checkpoint.v8",
                 format_version = runtime.Version,
                 source_package_id = runtime.SourcePackageId,
                 protected_package_digest = runtime.ProtectedPackageDigest,
@@ -315,6 +316,59 @@ namespace Mandate.Persistence
                         "V7 formal household claim order does not match the " +
                         "checkpoint household order.");
                 runtime.FormalEconomy.HouseholdOrderHash = householdHash;
+                LuoyangFormalEconomyDomain.RebuildProjection(runtime);
+                runtime.MerchantCarriers ??=
+                    new System.Collections.Generic.List<
+                        LuoyangMerchantCarrierRuntimeState>();
+                foreach (var shipment in runtime.Shipments)
+                {
+                    var cargoContainerId =
+                        LuoyangFormalEconomyContract.FreightContainerId(
+                            shipment.Id);
+                    var cargo = runtime.FormalEconomy.ProductBatches
+                        .Where(item => item.InventoryContainerId ==
+                                       cargoContainerId &&
+                                     item.ProductDefinitionId ==
+                                       shipment.ProductId)
+                        .Sum(item => item.Quantity);
+                    cargo = Math.Max(0L, Math.Min(
+                        shipment.DeliveredQuantityMilliunits, cargo));
+                    shipment.RemainingCargoQuantityMilliunits = cargo;
+                    shipment.ReceivedQuantityMilliunits = checked(
+                        shipment.DeliveredQuantityMilliunits - cargo);
+                    shipment.Delivered = cargo == 0;
+                    shipment.AwaitingReceipt = cargo > 0;
+                    shipment.RouteWaiting = false;
+                    shipment.WaitingReasonId = cargo > 0
+                        ? "supply.waiting.destination-capacity.v1"
+                        : string.Empty;
+                    shipment.WaitingFormalObjectId = cargo > 0
+                        ? shipment.DestinationInventoryId
+                        : string.Empty;
+                    shipment.PhysicalRouteSignature ??= shipment.RouteId;
+                    shipment.BuyerHouseholdOrdinal = uint.MaxValue;
+                    var order = runtime.SupplyOrders.Find(item =>
+                        item.Id == shipment.OrderId);
+                    if (order != null)
+                    {
+                        order.DeliveredQuantityMilliunits =
+                            shipment.ReceivedQuantityMilliunits;
+                        order.Status = shipment.Delivered
+                            ? LuoyangSupplyOrderStatus.Delivered
+                            : LuoyangSupplyOrderStatus.InTransit;
+                    }
+                }
+                runtime.Version = 8;
+            }
+            if (runtime.Version == 8)
+            {
+                runtime.MerchantCarriers ??=
+                    new System.Collections.Generic.List<
+                        LuoyangMerchantCarrierRuntimeState>();
+                if (runtime.FormalEconomy == null ||
+                    !runtime.FormalEconomy.IsPhysicalAuthority)
+                    throw new InvalidDataException(
+                        "V8 checkpoint has no formal economy authority.");
                 LuoyangFormalEconomyDomain.RebuildProjection(runtime);
             }
             return runtime;

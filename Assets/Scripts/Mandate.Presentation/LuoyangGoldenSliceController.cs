@@ -25,6 +25,11 @@ namespace Mandate.Presentation
         private ulong _selectedBuildCellId;
         private string _playableMessage =
             "选择人物、设施或商队；建设模式会显示真实可开发 Cell。";
+        private LuoyangPlayerSupplyProjection _supplyCard;
+        private long _supplyCardRevision = -1;
+        private long _supplyCardDay = -1;
+        private uint _supplyCardPersonOrdinal = uint.MaxValue;
+        private string _supplyCardKnownRoutes = string.Empty;
 
         public bool UsesPlayablePresentation => _usePlayablePresentation;
         public bool BuildModeEnabled => _buildMode;
@@ -32,6 +37,7 @@ namespace Mandate.Presentation
         public MapVisualLod VisualLod => _visualLod;
         public LuoyangGoldenSliceProjection GoldenSlice => _goldenSlice;
         public string PlayableMessage => _playableMessage;
+        public LuoyangPlayerSupplyProjection SupplyCard => _supplyCard;
 
         private void InitializePlayablePresentation()
         {
@@ -45,6 +51,7 @@ namespace Mandate.Presentation
                 .ThenBy(item => item.HouseholdOrdinal).FirstOrDefault();
             if (capable != null) SelectLivingPerson(capable.HeadPersonOrdinal);
             RefreshGoldenSlice();
+            RefreshSupplyCard();
             _goldenSliceBackground = Resources.Load<Texture2D>(
                 "Art/Han/Luoyang/luoyang-golden-slice-v1");
         }
@@ -62,6 +69,89 @@ namespace Mandate.Presentation
                 _visualLod == MapVisualLod.City ? 48 : 16;
             _goldenSlice = _visualSystem.BuildProjection(_livingRuntime,
                 actorBudget, _visualLod == MapVisualLod.Close ? 96 : 72);
+            RefreshSupplyCard();
+        }
+
+        public void RefreshSupplyCard()
+        {
+            if (_livingRuntime == null) return;
+            var carrier = _livingRuntime.MerchantCarriers.Find(item =>
+                item.PersonOrdinal == _selectedLivingPersonOrdinal);
+            var knownRoutes = carrier?.KnownRouteIds ??
+                new System.Collections.Generic.List<string>();
+            var knownRouteKey = string.Join("|", knownRoutes);
+            if (_supplyCard != null && _supplyCardRevision ==
+                    _livingRuntime.FormalEconomy.Revision &&
+                _supplyCardDay == _livingRuntime.AbsoluteDay &&
+                _supplyCardPersonOrdinal == _selectedLivingPersonOrdinal &&
+                _supplyCardKnownRoutes == knownRouteKey)
+                return;
+            _supplyCard = LuoyangPlayerSupplyProjectionSystem.Build(
+                _livingRuntime, knownRoutes);
+            _supplyCardRevision = _livingRuntime.FormalEconomy.Revision;
+            _supplyCardDay = _livingRuntime.AbsoluteDay;
+            _supplyCardPersonOrdinal = _selectedLivingPersonOrdinal;
+            _supplyCardKnownRoutes = knownRouteKey;
+        }
+
+        public bool RegisterSelectedPlayerMerchantCarrier()
+        {
+            if (_livingRuntime == null) return false;
+            var knownRoutes = _livingRuntime.ExternalSuppliers
+                .Where(item => LuoyangFormalEconomySystem.IsFood(
+                    item.ProductId))
+                .OrderBy(item => item.DistanceKilometers)
+                .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
+                .Select(item => item.RouteId).Distinct(StringComparer.Ordinal)
+                .Take(2).ToArray();
+            if (knownRoutes.Length == 0) return false;
+            try
+            {
+                _livingSystem.RegisterPlayerMerchantCarrier(_livingRuntime,
+                    _selectedLivingPersonOrdinal, 200_000L, knownRoutes);
+                _playableMessage = "已登记一辆小型商车，并记录已知供应路线。";
+                RefreshSupplyCard();
+                return true;
+            }
+            catch (InvalidOperationException exception)
+            {
+                _playableMessage = "无法登记商车：" + exception.Message;
+                return false;
+            }
+        }
+
+        public bool DispatchSelectedPlayerMerchantSupply()
+        {
+            if (_livingRuntime == null) return false;
+            var carrier = _livingRuntime.MerchantCarriers.Find(item =>
+                item.PersonOrdinal == _selectedLivingPersonOrdinal);
+            if (carrier == null && !RegisterSelectedPlayerMerchantCarrier())
+                return false;
+            carrier = _livingRuntime.MerchantCarriers.Find(item =>
+                item.PersonOrdinal == _selectedLivingPersonOrdinal);
+            var supplier = _livingRuntime.ExternalSuppliers.Where(item =>
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId) &&
+                    carrier.KnownRouteIds.Contains(item.RouteId,
+                        StringComparer.Ordinal))
+                .OrderBy(item => item.DistanceKilometers)
+                .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
+                .FirstOrDefault();
+            var destination = supplier == null ? null :
+                _livingRuntime.Inventories.Where(item =>
+                        item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                        item.ProductId == supplier.ProductId)
+                    .OrderBy(item => item.Id, StringComparer.Ordinal)
+                    .FirstOrDefault();
+            if (supplier == null || destination == null) return false;
+            var result = _livingSystem.DispatchPlayerMerchant(_livingRuntime,
+                _selectedLivingPersonOrdinal, supplier.SupplierId,
+                destination.Id, Math.Min(100_000L, carrier
+                    .CapacityMilliunits));
+            _playableMessage = result.Succeeded
+                ? "商车已装载并启程；到货后会按市场实际价格结算。"
+                : MerchantFailureText(result.Failure);
+            RefreshGoldenSlice();
+            return result.Succeeded;
         }
 
         public void SetPlayablePresentation(bool enabled)
@@ -336,7 +426,10 @@ namespace Mandate.Presentation
             GUI.Label(new Rect(32, 17, 560, 30),
                 "群雄志：仕途 · 184 洛阳 Golden Slice", title);
             GUI.Label(new Rect(32, 45, 750, 20),
-                "同一世界：400,000人物 · 80,899家户 · 2,084开局设施 · Runtime Day " +
+                "同一世界：" + _livingRuntime.Workforce.Count.ToString("N0") +
+                "人物 · " + _livingRuntime.Households.Count.ToString("N0") +
+                "家户 · " + _livingRuntime.Facilities.Count.ToString("N0") +
+                "设施 · Runtime Day " +
                 _livingRuntime.AbsoluteDay);
             DrawHeaderButtons();
 
@@ -531,8 +624,81 @@ namespace Mandate.Presentation
             GUILayout.Label(_buildMode ? "建设与产业" : "世界实体", heading);
             GUILayout.Label(_playableMessage, GUILayout.Height(42));
             if (_buildMode) DrawBuildInspector();
-            else DrawEntityInspector();
+            else
+            {
+                DrawSupplyCard();
+                DrawEntityInspector();
+            }
             GUILayout.EndArea();
+        }
+
+        private void DrawSupplyCard()
+        {
+            RefreshSupplyCard();
+            if (_supplyCard == null) return;
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Label("洛阳粮食供应", new GUIStyle(GUI.skin.label)
+                { fontStyle = FontStyle.Bold });
+            GUILayout.Label("状态：" + SupplyStatusText(_supplyCard.StatusId) +
+                "　可供约 " + _supplyCard.StockDays + " 日\n" +
+                "公开市仓粮食 " +
+                (_supplyCard.CityFoodStockMilliunits / 1_000L)
+                    .ToString("N0") + " 单位　参考粮价 " +
+                _supplyCard.RepresentativeUnitPrice.ToString("N0") +
+                " 钱/千单位\n" +
+                "已知在途 " + _supplyCard.KnownIncomingShipmentCount +
+                " 队　路线受阻 " + _supplyCard.KnownBlockedShipmentCount +
+                "　等候入库 " +
+                _supplyCard.KnownStorageWaitingShipmentCount + "\n" +
+                "今日短缺家户 " +
+                _supplyCard.CurrentHouseholdShortageCount +
+                "　官府采购 " +
+                (_supplyCard.PublicProcurementActive ? "进行中" : "无") +
+                "　赈济 " + (_supplyCard.ReliefActive ? "进行中" : "无"));
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("登记商车"))
+                RegisterSelectedPlayerMerchantCarrier();
+            if (GUILayout.Button("小批运粮"))
+                DispatchSelectedPlayerMerchantSupply();
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+        }
+
+        private static string SupplyStatusText(string statusId)
+        {
+            switch (statusId)
+            {
+                case "supply.status.shortage.v1": return "发生短缺";
+                case "supply.status.route-delayed.v1": return "路线延误";
+                case "supply.status.storage-delayed.v1": return "等待入库";
+                case "supply.status.tight.v1": return "供应偏紧";
+                default: return "供应正常";
+            }
+        }
+
+        private static string MerchantFailureText(
+            LuoyangMerchantDispatchFailure failure)
+        {
+            switch (failure)
+            {
+                case LuoyangMerchantDispatchFailure.CarrierBusy:
+                    return "商车仍在途中。";
+                case LuoyangMerchantDispatchFailure.UnknownRoute:
+                    return "尚未掌握可用路线。";
+                case LuoyangMerchantDispatchFailure.RouteBlocked:
+                    return "道路或城门暂不可通行。";
+                case LuoyangMerchantDispatchFailure.InsufficientCash:
+                    return "家户资金不足。";
+                case LuoyangMerchantDispatchFailure.InsufficientCargo:
+                    return "供应地没有足够现货。";
+                case LuoyangMerchantDispatchFailure.CarrierCapacityExceeded:
+                    return "商车装载能力不足。";
+                case LuoyangMerchantDispatchFailure.DestinationFull:
+                    return "市场仓库已满。";
+                case LuoyangMerchantDispatchFailure.NoMarketDemand:
+                    return "市场当前没有有效需求。";
+                default: return "当前无法建立这笔运输。";
+            }
         }
 
         private void DrawBuildInspector()
@@ -603,7 +769,11 @@ namespace Mandate.Presentation
             }
             else
                 GUILayout.Label("点击地图上的设施缩写、人物圆点、车队或农田。\n\n" +
-                    "普通人物和设施来自40万永久人口及2,084项开局Facility；" +
+                    "普通人物和设施来自" +
+                    _livingRuntime.Workforce.Count.ToString("N0") +
+                    "名永久人物及" +
+                    _livingRuntime.Facilities.Count.ToString("N0") +
+                    "项开局设施；" +
                     "图标销毁不会删除世界人物。" +
                     "\n\n正常视图不显示 Cell 网格。切换建设模式才显示。" );
         }

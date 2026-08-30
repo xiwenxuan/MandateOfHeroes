@@ -240,8 +240,34 @@ namespace Mandate.Domain
         public long NaturalLossMilliunits;
         public long RiskLossMilliunits;
         public long DeliveredQuantityMilliunits;
+        // DeliveredQuantityMilliunits is the net quantity placed in the
+        // mobile formal container after dispatch loss.  Receipt can be
+        // partial when the destination has no free capacity, so the two
+        // fields below are the authoritative receipt progress.
+        public long ReceivedQuantityMilliunits;
+        public long RemainingCargoQuantityMilliunits;
         public long PurchaseCost;
         public bool Delivered;
+        public bool AwaitingReceipt;
+        public bool RouteWaiting;
+        public string WaitingReasonId;
+        public string WaitingFormalObjectId;
+        public string PhysicalRouteSignature;
+        public int RouteRevision;
+        public bool PlayerDirected;
+        public uint BuyerHouseholdOrdinal = uint.MaxValue;
+        public bool PlayerSaleSettled;
+        public long PlayerSaleRevenue;
+    }
+
+    [Serializable]
+    public sealed class LuoyangMerchantCarrierRuntimeState
+    {
+        public string Id;
+        public uint PersonOrdinal;
+        public long CapacityMilliunits;
+        public string CurrentShipmentId;
+        public List<string> KnownRouteIds = new List<string>();
     }
 
     [Serializable]
@@ -621,7 +647,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class Luoyang184LivingWorldRuntimeState
     {
-        public const int FormatVersion = 7;
+        public const int FormatVersion = 8;
 
         public int Version = FormatVersion;
         public bool RequiresSourceRehydration;
@@ -656,6 +682,8 @@ namespace Mandate.Domain
             new List<LuoyangSupplyOrderRuntimeState>();
         public List<LuoyangShipmentRuntimeState> Shipments =
             new List<LuoyangShipmentRuntimeState>();
+        public List<LuoyangMerchantCarrierRuntimeState> MerchantCarriers =
+            new List<LuoyangMerchantCarrierRuntimeState>();
         public List<LuoyangMarketRuntimeState> Markets =
             new List<LuoyangMarketRuntimeState>();
         public List<LuoyangMarketTradeRuntimeState> MarketTrades =
@@ -788,6 +816,7 @@ namespace Mandate.Domain
                 runtime.Inventories == null || runtime.InventoryFlows == null ||
                 runtime.ExternalSuppliers == null ||
                 runtime.SupplyOrders == null || runtime.Shipments == null ||
+                runtime.MerchantCarriers == null ||
                 runtime.Markets == null || runtime.MarketTrades == null ||
                 runtime.IntelligentAgents == null ||
                 runtime.DecisionAudits == null ||
@@ -929,7 +958,17 @@ namespace Mandate.Domain
                     shipment.NaturalLossMilliunits < 0 ||
                     shipment.RiskLossMilliunits < 0 ||
                     shipment.DeliveredQuantityMilliunits < 0 ||
+                    shipment.ReceivedQuantityMilliunits < 0 ||
+                    shipment.RemainingCargoQuantityMilliunits < 0 ||
                     shipment.PurchaseCost < 0 ||
+                    shipment.ReceivedQuantityMilliunits +
+                        shipment.RemainingCargoQuantityMilliunits !=
+                        shipment.DeliveredQuantityMilliunits ||
+                    shipment.Delivered !=
+                        (shipment.RemainingCargoQuantityMilliunits == 0) ||
+                    shipment.AwaitingReceipt && shipment.Delivered ||
+                    shipment.RouteWaiting && shipment.Delivered ||
+                    shipment.PlayerSaleRevenue < 0 ||
                     shipment.ShippedQuantityMilliunits != checked(
                         shipment.CarrierConsumptionMilliunits +
                         shipment.NaturalLossMilliunits +
@@ -937,6 +976,26 @@ namespace Mandate.Domain
                         shipment.DeliveredQuantityMilliunits))
                     throw new InvalidOperationException(
                         "Invalid or unconserved Luoyang shipment state.");
+            }
+            var carrierIds = new HashSet<string>(StringComparer.Ordinal);
+            var carrierPersons = new HashSet<uint>();
+            foreach (var carrier in runtime.MerchantCarriers)
+            {
+                if (carrier == null || string.IsNullOrWhiteSpace(carrier.Id) ||
+                    !carrierIds.Add(carrier.Id) ||
+                    !carrierPersons.Add(carrier.PersonOrdinal) ||
+                    carrier.PersonOrdinal >= runtime.Workforce.Count ||
+                    carrier.CapacityMilliunits <= 0 ||
+                    carrier.KnownRouteIds == null ||
+                    carrier.KnownRouteIds.Any(string.IsNullOrWhiteSpace) ||
+                    carrier.KnownRouteIds.Distinct(StringComparer.Ordinal)
+                        .Count() != carrier.KnownRouteIds.Count ||
+                    !string.IsNullOrWhiteSpace(carrier.CurrentShipmentId) &&
+                    !runtime.Shipments.Exists(item =>
+                        item.Id == carrier.CurrentShipmentId &&
+                        item.PlayerDirected && !item.Delivered))
+                    throw new InvalidOperationException(
+                        "Invalid Luoyang player merchant carrier state.");
             }
             var tradeIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var trade in runtime.MarketTrades)

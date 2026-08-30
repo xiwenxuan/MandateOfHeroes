@@ -645,6 +645,465 @@ namespace Mandate.Tests
                     watch.ElapsedMilliseconds));
         }
 
+        [Test]
+        public void IntegratedGateShockTests_FormalGateBlocksAndRecoversPlayerCargo()
+        {
+            var gate = CreateLivingGateEconomy(43_001UL);
+            var dispatch = DispatchTestPlayerCargo(gate);
+            Assert.That(dispatch.Succeeded, Is.True, dispatch.ReasonId);
+            var shipment = gate.Runtime.Shipments.Single(item =>
+                item.Id == dispatch.ShipmentId);
+            var consumedBefore = gate.Runtime.FormalEconomy
+                .CumulativeConsumedMilliunits;
+            TransitionPassage(gate, gate.GateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.final-economy-close.v1");
+            gate.System.AdvanceTo(gate.Runtime, shipment.ArrivalDay);
+            Assert.That(shipment.RouteWaiting, Is.True);
+            Assert.That(shipment.Delivered, Is.False);
+            Assert.That(shipment.WaitingFormalObjectId,
+                Is.EqualTo(gate.GateId));
+            Assert.That(gate.Runtime.FormalEconomy
+                .CumulativeConsumedMilliunits, Is.GreaterThan(consumedBefore));
+            TransitionPassage(gate, gate.GateId,
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.final-economy-reopen.v1");
+            gate.System.AdvanceTo(gate.Runtime,
+                gate.Runtime.AbsoluteDay + 1);
+            Assert.That(shipment.Delivered, Is.True);
+            Assert.That(shipment.RemainingCargoQuantityMilliunits, Is.Zero);
+            Assert.That(shipment.PlayerSaleSettled, Is.True);
+            Assert.That(shipment.PlayerSaleRevenue, Is.GreaterThan(0));
+            Assert.That(new LuoyangFormalEconomySystem().Audit(gate.Runtime)
+                .ProjectionDifferenceMilliunits, Is.Zero);
+        }
+
+        [Test]
+        public void IntegratedMultiGateRerouteTests_SequentialFormalGatesDoNotCollapseIntoOneBoundary()
+        {
+            var fixture = PrepareCivilianFreightWorld(43_002UL, 12);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var runtime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(runtime);
+            passageSystem.EnsureInitialized(fixture.World, runtime);
+            runtime.ProcessDue(fixture.World);
+            runtime.DispatchPublishedEvents(fixture.World);
+            var gates = fixture.World.LuoyangPassageTraversals.Where(item =>
+                    item.FacilityDefinitionId != "facility.public.bridge")
+                .OrderBy(item => item.FacilityId, StringComparer.Ordinal)
+                .Take(2).Select(item => item.FacilityId).ToArray();
+            var plan = BuildTwoGateSupplyPlan(gates[0], gates[1],
+                out var origin, out var target);
+            const string routeId = "route.test.two-formal-gates.v1";
+            var access = new LuoyangFormalCellSupplyRouteAccess(fixture.World,
+                plan, new[]
+                {
+                    new LuoyangSupplyRouteDefinition(routeId, origin, target,
+                        MovementCapabilityIds.PackAnimal)
+                });
+            Assert.That(access.Assess(routeId).CanTraverse, Is.True);
+            TransitionPassage(fixture.World, runtime, passageSystem, gates[0],
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.multigate-first-close.v1",
+                fixture.Carrier.Id);
+            Assert.That(access.Assess(routeId).BlockingFormalObjectId,
+                Is.EqualTo(gates[0]));
+            TransitionPassage(fixture.World, runtime, passageSystem, gates[0],
+                LuoyangRoadConnectorPassageTraversalIds.OpenStatusId,
+                "passage.reason.multigate-first-open.v1",
+                fixture.Carrier.Id);
+            TransitionPassage(fixture.World, runtime, passageSystem, gates[1],
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.multigate-second-close.v1",
+                fixture.Carrier.Id);
+            Assert.That(access.Assess(routeId).BlockingFormalObjectId,
+                Is.EqualTo(gates[1]));
+        }
+
+        [Test]
+        public void IntegratedStorageBottleneckTests_FullDestinationKeepsCargoInFormalMobileContainer()
+        {
+            var scenario = CreateOpenLivingEconomy(43_003UL);
+            var dispatch = DispatchTestPlayerCargo(scenario);
+            Assert.That(dispatch.Succeeded, Is.True, dispatch.ReasonId);
+            var shipment = scenario.Runtime.Shipments.Single(item =>
+                item.Id == dispatch.ShipmentId);
+            scenario.System.AdvanceTo(scenario.Runtime,
+                shipment.ArrivalDay - 1);
+            var destination = scenario.Runtime.Inventories.Single(item =>
+                item.Id == shipment.DestinationInventoryId);
+            destination.CapacityMilliunits = destination.QuantityMilliunits;
+            scenario.System.AdvanceTo(scenario.Runtime, shipment.ArrivalDay);
+            Assert.That(shipment.AwaitingReceipt, Is.True);
+            Assert.That(shipment.Delivered, Is.False);
+            Assert.That(shipment.ReceivedQuantityMilliunits, Is.Zero);
+            Assert.That(LuoyangFormalEconomySystem.GetAvailableQuantity(
+                    scenario.Runtime,
+                    LuoyangFormalEconomySystem.FreightContainerId(shipment.Id),
+                    shipment.ProductId),
+                Is.EqualTo(shipment.RemainingCargoQuantityMilliunits));
+            destination.CapacityMilliunits = checked(
+                destination.QuantityMilliunits +
+                shipment.RemainingCargoQuantityMilliunits);
+            scenario.System.AdvanceTo(scenario.Runtime,
+                scenario.Runtime.AbsoluteDay + 1);
+            Assert.That(shipment.Delivered, Is.True);
+            Assert.That(shipment.ReceivedQuantityMilliunits,
+                Is.EqualTo(shipment.DeliveredQuantityMilliunits));
+        }
+
+        [Test]
+        public void PlayerSupplyProjectionTests_IsReadOnlyAndLimitsUnknownRouteDetail()
+        {
+            var scenario = CreateOpenLivingEconomy(43_004UL);
+            var dispatch = DispatchTestPlayerCargo(scenario);
+            Assert.That(dispatch.Succeeded, Is.True, dispatch.ReasonId);
+            var carrier = scenario.Runtime.MerchantCarriers.Single();
+            var publicStockBefore = LuoyangPlayerSupplyProjectionSystem.Build(
+                scenario.Runtime, carrier.KnownRouteIds)
+                .CityFoodStockMilliunits;
+            var military = scenario.Runtime.Inventories.FirstOrDefault(item =>
+                item.OwnerKind == LuoyangInventoryOwnerKind.Military &&
+                LuoyangFormalEconomySystem.IsFood(item.ProductId));
+            if (military != null)
+            {
+                new LuoyangFormalEconomySystem().Produce(scenario.Runtime,
+                    military.Id, military.ProductId, 1_234L,
+                    InventoryTransactionType.RecipeSettled,
+                    "test.player-view.hidden-military-stock");
+                Assert.That(LuoyangPlayerSupplyProjectionSystem.Build(
+                        scenario.Runtime, carrier.KnownRouteIds)
+                    .CityFoodStockMilliunits, Is.EqualTo(publicStockBefore));
+            }
+            var before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            var known = LuoyangPlayerSupplyProjectionSystem.Build(
+                scenario.Runtime, carrier.KnownRouteIds);
+            var none = LuoyangPlayerSupplyProjectionSystem.Build(
+                scenario.Runtime, Array.Empty<string>());
+            var after = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            Assert.That(known.CityFoodStockMilliunits, Is.GreaterThan(0));
+            Assert.That(known.StockDays, Is.GreaterThan(0));
+            Assert.That(known.RepresentativeUnitPrice, Is.GreaterThan(0));
+            Assert.That(known.KnownIncomingShipmentCount,
+                Is.GreaterThanOrEqualTo(1));
+            Assert.That(none.KnownIncomingShipmentCount, Is.Zero);
+            Assert.That(none.CityFoodStockMilliunits,
+                Is.EqualTo(known.CityFoodStockMilliunits));
+            Assert.That(after, Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PlayerMerchantFormalInterventionTests_UsesPermanentPersonCashBatchContainerAndMarketSale()
+        {
+            var scenario = CreateOpenLivingEconomy(43_005UL);
+            var person = RegisterTestCarrier(scenario);
+            var household = scenario.Runtime.Households[(int)scenario.Runtime
+                .Workforce[(int)person].HouseholdOrdinal];
+            var wealthBefore = household.Wealth;
+            var dispatch = DispatchTestPlayerCargo(scenario, person, false);
+            Assert.That(dispatch.Succeeded, Is.True, dispatch.ReasonId);
+            var shipment = scenario.Runtime.Shipments.Single(item =>
+                item.Id == dispatch.ShipmentId);
+            Assert.That(shipment.CarrierPersonId, Is.Not.Empty);
+            Assert.That(scenario.Runtime.FormalEconomy.InventoryContainers,
+                Has.Some.Matches<InventoryContainerState>(item => item.Id ==
+                    LuoyangFormalEconomySystem.FreightContainerId(
+                        shipment.Id)));
+            Assert.That(household.Wealth,
+                Is.EqualTo(wealthBefore - dispatch.PurchaseCost));
+            scenario.System.AdvanceTo(scenario.Runtime,
+                shipment.ArrivalDay);
+            Assert.That(shipment.PlayerSaleSettled, Is.True);
+            Assert.That(household.Wealth,
+                Is.EqualTo(wealthBefore - dispatch.PurchaseCost +
+                    shipment.PlayerSaleRevenue));
+            Assert.That(scenario.Runtime.MarketTrades,
+                Has.Some.Matches<LuoyangMarketTradeRuntimeState>(item =>
+                    item.TradeOrderId == shipment.OrderId));
+        }
+
+        [Test]
+        public void PlayerMerchantFailureReasonTests_RejectsWithoutWorldMutation()
+        {
+            var scenario = CreateOpenLivingEconomy(43_006UL);
+            var person = RegisterTestCarrier(scenario);
+            var supplier = TestFoodSupplier(scenario.Runtime);
+            var destination = TestMarketDestination(scenario.Runtime,
+                supplier.ProductId);
+            scenario.Runtime.Markets.Single(item =>
+                item.ProductId == supplier.ProductId).DemandMilliunits =
+                1_000_000L;
+            var carrier = scenario.Runtime.MerchantCarriers.Single(item =>
+                item.PersonOrdinal == person);
+            var before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            var result = scenario.System.DispatchPlayerMerchant(
+                scenario.Runtime, person, supplier.SupplierId,
+                destination.Id, carrier.CapacityMilliunits + 1);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.CarrierCapacityExceeded));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            var household = scenario.Runtime.Households[(int)scenario.Runtime
+                .Workforce[(int)person].HouseholdOrdinal];
+            household.Wealth = 0;
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.InsufficientCash));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            household.Wealth = 1_000_000L;
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, "inventory.missing", 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.InvalidRequest));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            var market = scenario.Runtime.Markets.Single(item =>
+                item.ProductId == supplier.ProductId);
+            market.DemandMilliunits = 0;
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.NoMarketDemand));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            market.DemandMilliunits = 1_000_000L;
+            destination.CapacityMilliunits = destination.QuantityMilliunits;
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.DestinationFull));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            destination.CapacityMilliunits = checked(
+                destination.QuantityMilliunits + 10_000_000_000L);
+            var available = LuoyangFormalEconomySystem.GetAvailableQuantity(
+                scenario.Runtime, supplier.InventoryId,
+                supplier.ProductId);
+            carrier.CapacityMilliunits = checked(available + 1);
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, available + 1);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.InsufficientCargo));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+
+            carrier.KnownRouteIds = new List<string>
+                { "route.player.unknown.v1" };
+            before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            result = scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.UnknownRoute));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void PlayerMerchantFailureReasonTests_ClosedFormalGateDoesNotMutateEconomy()
+        {
+            var scenario = CreateLivingGateEconomy(43_011UL);
+            var person = RegisterTestCarrier(scenario);
+            var supplier = TestFoodSupplier(scenario.Runtime);
+            var destination = TestMarketDestination(scenario.Runtime,
+                supplier.ProductId);
+            scenario.Runtime.Markets.Single(item =>
+                item.ProductId == supplier.ProductId).DemandMilliunits =
+                1_000_000L;
+            TransitionPassage(scenario, scenario.GateId,
+                LuoyangRoadConnectorPassageTraversalIds.ClosedStatusId,
+                "passage.reason.player-merchant-rejected.v1");
+            var before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            var result = scenario.System.DispatchPlayerMerchant(
+                scenario.Runtime, person, supplier.SupplierId,
+                destination.Id, 10_000L);
+            Assert.That(result.Failure, Is.EqualTo(
+                LuoyangMerchantDispatchFailure.RouteBlocked));
+            Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime),
+                Is.EqualTo(before));
+        }
+
+        [Test]
+        public void IntegratedStressSaveLoadTests_V8PreservesWaitingCargoCarrierAndAuthority()
+        {
+            var scenario = CreateOpenLivingEconomy(43_007UL);
+            var dispatch = DispatchTestPlayerCargo(scenario);
+            Assert.That(dispatch.Succeeded, Is.True, dispatch.ReasonId);
+            new LuoyangFormalEconomySystem().RebuildProjection(
+                scenario.Runtime);
+            var before = Luoyang184LivingWorldCheckpointStore
+                .ComputeDeterministicStateSha256(scenario.Runtime);
+            var directory = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(), "mandate-final-economy-" +
+                Guid.NewGuid().ToString("N"));
+            try
+            {
+                var store = new Luoyang184LivingWorldCheckpointStore();
+                var saved = store.Save(scenario.Runtime, directory);
+                var loaded = store.Load(saved.CheckpointPath);
+                Assert.That(loaded.Version, Is.EqualTo(8));
+                Assert.That(loaded.MerchantCarriers, Has.Count.EqualTo(1));
+                Assert.That(loaded.Shipments.Single(item =>
+                        item.Id == dispatch.ShipmentId)
+                    .RemainingCargoQuantityMilliunits,
+                    Is.GreaterThan(0));
+                Assert.That(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(loaded),
+                    Is.EqualTo(before));
+                Assert.That(new LuoyangFormalEconomySystem().Audit(loaded)
+                    .ProjectionDifferenceMilliunits, Is.Zero);
+            }
+            finally
+            {
+                if (System.IO.Directory.Exists(directory))
+                    System.IO.Directory.Delete(directory, true);
+            }
+        }
+
+        [Test]
+        public void IntegratedStressReplayTests_ThreeRunsProduceIdenticalFormalHashes()
+        {
+            var hashes = new List<string>();
+            for (var run = 0; run < 3; run++)
+            {
+                var scenario = CreateOpenLivingEconomy(43_008UL);
+                var dispatch = DispatchTestPlayerCargo(scenario);
+                Assert.That(dispatch.Succeeded, Is.True,
+                    "run=" + run + " " + dispatch.ReasonId);
+                var shipment = scenario.Runtime.Shipments.Single(item =>
+                    item.Id == dispatch.ShipmentId);
+                scenario.System.AdvanceTo(scenario.Runtime,
+                    shipment.ArrivalDay + 2);
+                hashes.Add(Luoyang184LivingWorldCheckpointStore
+                    .ComputeDeterministicStateSha256(scenario.Runtime));
+            }
+            Assert.That(hashes.Distinct(StringComparer.Ordinal).Count(),
+                Is.EqualTo(1));
+        }
+
+        [Test]
+        public void IntegratedEconomyPerformanceTests_PlayerProjectionIsCachedScaleSafeContract()
+        {
+            var scenario = CreateOpenLivingEconomy(43_009UL);
+            var carrierPerson = RegisterTestCarrier(scenario);
+            var carrier = scenario.Runtime.MerchantCarriers.Single(item =>
+                item.PersonOrdinal == carrierPerson);
+            var watch = Stopwatch.StartNew();
+            for (var index = 0; index < 100; index++)
+                LuoyangPlayerSupplyProjectionSystem.Build(scenario.Runtime,
+                    carrier.KnownRouteIds);
+            watch.Stop();
+            Assert.That(scenario.Runtime.Workforce.Count, Is.EqualTo(700_000));
+            Assert.That(watch.ElapsedMilliseconds, Is.LessThan(2_000));
+            Console.WriteLine("EVIDENCE final_player_projection_100_ms=" +
+                watch.ElapsedMilliseconds + " persons=" +
+                scenario.Runtime.Workforce.Count + " batches=" +
+                scenario.Runtime.FormalEconomy.ProductBatches.Count);
+        }
+
+        [Test]
+        public void IntegratedRoadShockTests_FormalRoadRerouteContractRemainsActive() =>
+            RoadBlockSupplyTests_PackAnimalReroutesWithoutDuplicatingCargo();
+
+        [Test]
+        public void IntegratedProductionShockTests_FormalEarlyHarvestContractRemainsActive() =>
+            ProductionShockSupplyTests_EarlyHarvestReducesFormalBatchYield();
+
+        [Test]
+        public void IntegratedCarrierShortageTests_NoCarrierNoPhantomContractRemainsActive() =>
+            CarrierShortageSupplyTests_NoCarrierCreatesNoPhantomFreight();
+
+        [Test]
+        public void IntegratedMarketTighteningTests_FormalQuoteContractRemainsActive() =>
+            LuoyangMarketSupplyPriceTests_FormalQuoteAndTradeExplainShockAndRecovery();
+
+        [Test]
+        public void IntegratedPublicProcurementTests_BudgetSellerBatchContractRemainsActive() =>
+            PublicProcurementIntegratedTests_UsesBudgetSellerBatchAndFormalTrade();
+
+        [Test]
+        public void IntegratedReliefTests_FormalPublicReliefContractRemainsActive() =>
+            ReliefIntegratedTests_TransfersAndConsumesTraceablePublicFood();
+
+        [Test]
+        public void IntegratedDemandStormTests_OneOutstandingDemandContractRemainsActive() =>
+            SupplyDemandStormPreventionTests_RepeatedPlanningKeepsOneDemand();
+
+        [Test]
+        public void IntegratedOutstandingSupplyTests_UncommittedRemainderContractRemainsActive() =>
+            OutstandingFreightDemandTests_OnlyPlansUncommittedOrderRemainder();
+
+        [Test]
+        public void PlayerSupplyCardTests_ViewContractContainsNoWritableAuthority()
+        {
+            var fields = typeof(LuoyangPlayerSupplyProjection).GetFields();
+            Assert.That(fields.Select(item => item.Name),
+                Does.Not.Contain("InventoryContainerId"));
+            Assert.That(fields.Select(item => item.Name),
+                Does.Not.Contain("SupplierId"));
+            Assert.That(fields.Select(item => item.Name),
+                Does.Not.Contain("ProductBatchId"));
+            Assert.That(fields.Select(item => item.Name),
+                Does.Contain("CityFoodStockMilliunits"));
+            Assert.That(fields.Select(item => item.Name),
+                Does.Contain("StockDays"));
+            Assert.That(fields.Select(item => item.Name),
+                Does.Contain("RepresentativeUnitPrice"));
+        }
+
+        [Test]
+        public void IntegratedStressFoodConservationTests_FormalLedgerRemainsBalanced() =>
+            IntegratedFoodConservationTests_DispatchLossReceiptAndConsumptionBalance();
+
+        [Test]
+        public void IntegratedStressCashAuditTests_InternalTransfersRemainNetZero() =>
+            IntegratedCashTransferTests_TradeAndFreightAreNetZeroInternalTransfers();
+
+        [Test]
+        public void IntegratedCombinedStressTests_FoodCashFreightAndDemandRemainCoherent()
+        {
+            var fixture = PrepareCivilianFreightWorld(43_010UL, 12);
+            var cashBefore = FormalCashTotal(fixture.World);
+            fixture.FreightSystem.Dispatch(fixture.World, fixture.Request);
+            new WorldSimulator(fixture.World.MasterSeed, fixture.Content)
+                .AdvanceSegments(fixture.World, 8);
+            AssertFormalFoodBalanced(fixture);
+            Assert.That(FormalCashTotal(fixture.World), Is.EqualTo(cashBefore));
+            Assert.That(fixture.World.CivilianFreights,
+                Has.Count.EqualTo(1));
+        }
+
         private static LuoyangSupplyCatchmentSelection
             IntegratedSupplySelection() =>
             new LuoyangSupplyCatchmentSelection
@@ -673,6 +1132,173 @@ namespace Mandate.Tests
             Assert.That(audit.Balanced, Is.True);
             Assert.That(audit.Difference, Is.Zero);
             fixture.World.Validate();
+        }
+
+        private static LivingEconomyFixture CreateOpenLivingEconomy(
+            ulong seed)
+        {
+            var source = new Luoyang184OuterSupplyRemediationPopulationSource(
+                RemediationRoot);
+            var system = new Luoyang184LivingWorldSystem(source);
+            return new LivingEconomyFixture
+            {
+                Source = source,
+                System = system,
+                Runtime = system.CreateRuntime(seed)
+            };
+        }
+
+        private static LivingEconomyFixture CreateLivingGateEconomy(
+            ulong seed)
+        {
+            var formal = PrepareCivilianFreightWorld(seed + 1, 12);
+            var passagePlan = BuildLuoyangPassagePlan();
+            var commandRuntime = new WorldCommandRuntime();
+            var passageSystem = new LuoyangPassageWorldCommandSystem(
+                passagePlan);
+            passageSystem.RegisterHandlers(commandRuntime);
+            passageSystem.EnsureInitialized(formal.World, commandRuntime);
+            commandRuntime.ProcessDue(formal.World);
+            commandRuntime.DispatchPublishedEvents(formal.World);
+            var gateId = formal.World.LuoyangPassageTraversals.First(item =>
+                item.FacilityDefinitionId != "facility.public.bridge")
+                .FacilityId;
+            var cellPlan = BuildFreightGateCellPlan(gateId,
+                out var origin, out var target);
+            var source = new Luoyang184OuterSupplyRemediationPopulationSource(
+                RemediationRoot);
+            var routeId = source.ExternalSuppliers.Where(item =>
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId))
+                .OrderBy(item => item.DistanceKilometers)
+                .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
+                .First().RouteId;
+            var routeAccess = new LuoyangFormalCellSupplyRouteAccess(
+                formal.World, cellPlan, new[]
+                {
+                    new LuoyangSupplyRouteDefinition(routeId, origin, target,
+                        MovementCapabilityIds.PackAnimal)
+                });
+            var system = new Luoyang184LivingWorldSystem(source, null,
+                routeAccess);
+            return new LivingEconomyFixture
+            {
+                Source = source,
+                System = system,
+                Runtime = system.CreateRuntime(seed),
+                World = formal.World,
+                CommandRuntime = commandRuntime,
+                PassageSystem = passageSystem,
+                GateId = gateId,
+                TransitionActorId = formal.Carrier.Id
+            };
+        }
+
+        private static uint RegisterTestCarrier(LivingEconomyFixture scenario)
+        {
+            var supplier = TestFoodSupplier(scenario.Runtime);
+            var household = scenario.Runtime.Households
+                .OrderByDescending(item => item.Wealth)
+                .ThenBy(item => item.HouseholdOrdinal).First();
+            scenario.System.RegisterPlayerMerchantCarrier(scenario.Runtime,
+                household.HeadPersonOrdinal, 200_000L,
+                new[] { supplier.RouteId });
+            return household.HeadPersonOrdinal;
+        }
+
+        private static LuoyangMerchantDispatchResult DispatchTestPlayerCargo(
+            LivingEconomyFixture scenario, uint? personOrdinal = null,
+            bool register = true)
+        {
+            var person = personOrdinal ?? (register
+                ? RegisterTestCarrier(scenario)
+                : scenario.Runtime.MerchantCarriers.Single().PersonOrdinal);
+            var supplier = TestFoodSupplier(scenario.Runtime);
+            var destination = TestMarketDestination(scenario.Runtime,
+                supplier.ProductId);
+            var market = scenario.Runtime.Markets.Single(item =>
+                item.ProductId == supplier.ProductId);
+            market.DemandMilliunits = Math.Max(1_000_000L,
+                market.DemandMilliunits);
+            return scenario.System.DispatchPlayerMerchant(scenario.Runtime,
+                person, supplier.SupplierId, destination.Id, 10_000L);
+        }
+
+        private static LuoyangExternalSupplierRuntimeState TestFoodSupplier(
+            Luoyang184LivingWorldRuntimeState runtime) =>
+            runtime.ExternalSuppliers.Where(item =>
+                    item.Level != LuoyangSupplierMaterializationLevel
+                        .DeferredExternalTrade &&
+                    LuoyangFormalEconomySystem.IsFood(item.ProductId) &&
+                    LuoyangFormalEconomySystem.GetAvailableQuantity(runtime,
+                        item.InventoryId, item.ProductId) >= 10_000L)
+                .OrderBy(item => item.DistanceKilometers)
+                .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
+                .First();
+
+        private static LuoyangInventoryBalanceState TestMarketDestination(
+            Luoyang184LivingWorldRuntimeState runtime, string productId) =>
+            runtime.Inventories.Where(item =>
+                    item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
+                    item.ProductId == productId)
+                .OrderBy(item => item.Id, StringComparer.Ordinal).First();
+
+        private static void TransitionPassage(LivingEconomyFixture scenario,
+            string gateId, string statusId, string reasonId) =>
+            TransitionPassage(scenario.World, scenario.CommandRuntime,
+                scenario.PassageSystem, gateId, statusId, reasonId,
+                scenario.TransitionActorId);
+
+        private static void TransitionPassage(WorldState world,
+            WorldCommandRuntime commandRuntime,
+            LuoyangPassageWorldCommandSystem passageSystem,
+            string gateId, string statusId, string reasonId, string actorId)
+        {
+            passageSystem.EnqueueTransition(world, commandRuntime, gateId,
+                statusId, reasonId, actorId);
+            commandRuntime.ProcessDue(world);
+            commandRuntime.DispatchPublishedEvents(world);
+        }
+
+        private static CellTraversalPlan BuildTwoGateSupplyPlan(
+            string firstGateId, string secondGateId,
+            out ulong originCellId64, out ulong targetCellId64)
+        {
+            var grid = GlobalSpatialFoundationV1.CreateCellGrid();
+            originCellId64 = grid.ToCellId(1_230, 2_000).Value;
+            var firstGateCell = grid.ToCellId(1_230, 2_001).Value;
+            var middleCell = grid.ToCellId(1_230, 2_002).Value;
+            var secondGateCell = grid.ToCellId(1_230, 2_003).Value;
+            targetCellId64 = grid.ToCellId(1_230, 2_004).Value;
+            var origin = FreightCellProfile(originCellId64, string.Empty,
+                string.Empty);
+            var first = FreightCellProfile(firstGateCell, firstGateId,
+                FacilitySpatialCapabilityIds.Gate);
+            var middle = FreightCellProfile(middleCell, string.Empty,
+                string.Empty);
+            var second = FreightCellProfile(secondGateCell, secondGateId,
+                FacilitySpatialCapabilityIds.Gate);
+            var target = FreightCellProfile(targetCellId64, string.Empty,
+                string.Empty);
+            EnableFreightPort(origin, CellTraversalDirection.East,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            EnableFreightPort(first, CellTraversalDirection.West,
+                CellTraversalIds.FormalPassageConditionId, firstGateId);
+            EnableFreightPort(first, CellTraversalDirection.East,
+                CellTraversalIds.FormalPassageConditionId, firstGateId);
+            EnableFreightPort(middle, CellTraversalDirection.West,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            EnableFreightPort(middle, CellTraversalDirection.East,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            EnableFreightPort(second, CellTraversalDirection.West,
+                CellTraversalIds.FormalPassageConditionId, secondGateId);
+            EnableFreightPort(second, CellTraversalDirection.East,
+                CellTraversalIds.FormalPassageConditionId, secondGateId);
+            EnableFreightPort(target, CellTraversalDirection.West,
+                CellTraversalIds.StaticConditionId, string.Empty);
+            return new CellTraversalPlan(new[]
+            {
+                origin, first, middle, second, target
+            }, new string('c', 64));
         }
 
         private static long FormalCashTotal(WorldState world)
@@ -774,6 +1400,18 @@ namespace Mandate.Tests
             public LuoyangPassageWorldCommandSystem PassageSystem;
             public string GateId;
             public CivilianFreightState Freight;
+        }
+
+        private sealed class LivingEconomyFixture
+        {
+            public ILuoyang184LivingWorldSource Source;
+            public Luoyang184LivingWorldSystem System;
+            public Luoyang184LivingWorldRuntimeState Runtime;
+            public WorldState World;
+            public WorldCommandRuntime CommandRuntime;
+            public LuoyangPassageWorldCommandSystem PassageSystem;
+            public string GateId;
+            public string TransitionActorId;
         }
     }
 }

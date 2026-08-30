@@ -16,6 +16,14 @@ namespace Mandate.Simulation
     {
         public const string SystemId = "mandate.luoyang.184.intelligent_agent.v1";
         private const int AuditLimit = 20_000;
+        private readonly ILuoyangSupplyRouteAccess supplyRouteAccess;
+
+        public Luoyang184IntelligentAgentRuntimeSystem(
+            ILuoyangSupplyRouteAccess supplyRouteAccess = null)
+        {
+            this.supplyRouteAccess = supplyRouteAccess ??
+                LuoyangOpenSupplyRouteAccess.Instance;
+        }
 
         public void BuildAgents(
             Luoyang184LivingWorldRuntimeState runtime,
@@ -484,7 +492,7 @@ namespace Mandate.Simulation
             return Valid("domain_preconditions_met");
         }
 
-        private static bool Execute(
+        private bool Execute(
             Luoyang184LivingWorldRuntimeState runtime,
             RuntimeIndex index,
             LuoyangIntelligentAgentRuntimeState agent,
@@ -715,7 +723,7 @@ namespace Mandate.Simulation
             }
         }
 
-        private static bool ExecuteMerchantTrade(
+        private bool ExecuteMerchantTrade(
             Luoyang184LivingWorldRuntimeState runtime,
             LuoyangIntelligentAgentRuntimeState agent,
             out string resultId)
@@ -730,6 +738,8 @@ namespace Mandate.Simulation
                 .ThenBy(item => item.SupplierId, StringComparer.Ordinal)
                 .FirstOrDefault();
             if (supplier == null) return false;
+            var routeAssessment = supplyRouteAccess.Assess(supplier.RouteId);
+            if (!routeAssessment.CanTraverse) return false;
             var destination = runtime.Inventories.Where(item =>
                     item.OwnerKind == LuoyangInventoryOwnerKind.Market &&
                     item.ProductId == supplier.ProductId)
@@ -802,6 +812,9 @@ namespace Mandate.Simulation
                 NaturalLossMilliunits = natural,
                 RiskLossMilliunits = risk,
                 DeliveredQuantityMilliunits = delivered,
+                RemainingCargoQuantityMilliunits = delivered,
+                PhysicalRouteSignature = routeAssessment
+                    .PhysicalRouteSignature,
                 PurchaseCost = cost
             });
             resultId = shipmentId;

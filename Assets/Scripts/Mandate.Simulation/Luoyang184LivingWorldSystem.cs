@@ -25,6 +25,7 @@ namespace Mandate.Simulation
         private readonly ILuoyang184LivingWorldSource source;
         private readonly LuoyangNormalSupplyCalibrationProfileState
             calibrationProfile;
+        private readonly ILuoyangSupplyRouteAccess supplyRouteAccess;
 
         private static readonly HashSet<string> FoodProducts =
             new HashSet<string>(StringComparer.Ordinal)
@@ -43,7 +44,8 @@ namespace Mandate.Simulation
 
         public Luoyang184LivingWorldSystem(
             ILuoyang184LivingWorldSource source,
-            LuoyangNormalSupplyCalibrationProfileState calibrationProfile = null)
+            LuoyangNormalSupplyCalibrationProfileState calibrationProfile = null,
+            ILuoyangSupplyRouteAccess supplyRouteAccess = null)
         {
             this.source = source ?? throw new ArgumentNullException(nameof(source));
             // The repaired 700k scenario is normal-supply by default. Smaller
@@ -55,6 +57,8 @@ namespace Mandate.Simulation
                     ? new LuoyangNormalSupplyCalibrationProfileState()
                     : LuoyangNormalSupplyCalibrationProfileState
                         .CreateAuthorityOnly());
+            this.supplyRouteAccess = supplyRouteAccess ??
+                LuoyangOpenSupplyRouteAccess.Instance;
         }
 
         public Luoyang184LivingWorldRuntimeState CreateRuntime(
@@ -98,6 +102,210 @@ namespace Mandate.Simulation
             Luoyang184LivingWorldRules.ValidateRuntime(runtime,
                 source.PersonCount, source.HouseholdCount, source.FacilityCount);
             return runtime;
+        }
+
+        public LuoyangMerchantCarrierRuntimeState RegisterPlayerMerchantCarrier(
+            Luoyang184LivingWorldRuntimeState runtime, uint personOrdinal,
+            long capacityMilliunits, IEnumerable<string> knownRouteIds)
+        {
+            if (runtime == null) throw new ArgumentNullException(nameof(runtime));
+            if (personOrdinal >= runtime.Workforce.Count)
+                throw new ArgumentOutOfRangeException(nameof(personOrdinal));
+            if (capacityMilliunits <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(capacityMilliunits));
+            var routes = (knownRouteIds ?? Array.Empty<string>())
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(item => item, StringComparer.Ordinal).ToList();
+            if (routes.Count == 0)
+                throw new ArgumentException(
+                    "A player carrier must know at least one formal route.",
+                    nameof(knownRouteIds));
+            var existing = runtime.MerchantCarriers.Find(item =>
+                item.PersonOrdinal == personOrdinal);
+            if (existing != null)
+            {
+                if (!string.IsNullOrWhiteSpace(existing.CurrentShipmentId))
+                    throw new InvalidOperationException(
+                        "A busy carrier cannot be reconfigured.");
+                existing.CapacityMilliunits = capacityMilliunits;
+                existing.KnownRouteIds = routes;
+                return existing;
+            }
+            var carrier = new LuoyangMerchantCarrierRuntimeState
+            {
+                Id = "merchant.carrier.person." + personOrdinal,
+                PersonOrdinal = personOrdinal,
+                CapacityMilliunits = capacityMilliunits,
+                KnownRouteIds = routes
+            };
+            runtime.MerchantCarriers.Add(carrier);
+            return carrier;
+        }
+
+        public LuoyangMerchantDispatchResult DispatchPlayerMerchant(
+            Luoyang184LivingWorldRuntimeState runtime, uint personOrdinal,
+            string supplierId, string destinationInventoryId,
+            long quantityMilliunits)
+        {
+            if (runtime == null || quantityMilliunits <= 0 ||
+                string.IsNullOrWhiteSpace(supplierId) ||
+                string.IsNullOrWhiteSpace(destinationInventoryId) ||
+                personOrdinal >= (runtime?.Workforce.Count ?? 0))
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InvalidRequest,
+                    "merchant.failure.invalid-request.v1");
+            var carrier = runtime.MerchantCarriers.Find(item =>
+                item.PersonOrdinal == personOrdinal);
+            if (carrier == null)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InvalidRequest,
+                    "merchant.failure.carrier-not-registered.v1");
+            if (!string.IsNullOrWhiteSpace(carrier.CurrentShipmentId))
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.CarrierBusy,
+                    "merchant.failure.carrier-busy.v1");
+            var supplier = runtime.ExternalSuppliers.Find(item =>
+                item.SupplierId == supplierId);
+            var destination = runtime.Inventories.Find(item =>
+                item.Id == destinationInventoryId);
+            if (supplier == null || destination == null ||
+                destination.OwnerKind != LuoyangInventoryOwnerKind.Market ||
+                destination.ProductId != supplier.ProductId)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InvalidRequest,
+                    "merchant.failure.invalid-order.v1");
+            if (!carrier.KnownRouteIds.Contains(supplier.RouteId,
+                    StringComparer.Ordinal))
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.UnknownRoute,
+                    "merchant.failure.unknown-route.v1");
+            var route = supplyRouteAccess.Assess(supplier.RouteId);
+            if (!route.CanTraverse)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.RouteBlocked,
+                    string.IsNullOrWhiteSpace(route.FailureReasonId)
+                        ? "merchant.failure.route-blocked.v1"
+                        : route.FailureReasonId);
+            if (quantityMilliunits > carrier.CapacityMilliunits)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.CarrierCapacityExceeded,
+                    "merchant.failure.carrier-capacity.v1");
+            var available = LuoyangFormalEconomySystem.IsFood(
+                supplier.ProductId)
+                ? LuoyangFormalEconomySystem.GetAvailableQuantity(runtime,
+                    supplier.InventoryId, supplier.ProductId)
+                : supplier.InventoryQuantityMilliunits;
+            if (available < quantityMilliunits)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InsufficientCargo,
+                    "merchant.failure.insufficient-cargo.v1");
+            if (destination.CapacityMilliunits <=
+                destination.QuantityMilliunits)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.DestinationFull,
+                    "merchant.failure.destination-full.v1");
+            var market = runtime.Markets.Find(item =>
+                item.ProductId == supplier.ProductId);
+            if (market == null || market.DemandMilliunits <= 0)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.NoMarketDemand,
+                    "merchant.failure.no-market-demand.v1");
+            var unitPrice = Math.Max(1L,
+                market.BasePrice * 8L * market.CurrentPriceBasisPoints /
+                100_000L);
+            var purchaseCost = checked(
+                (quantityMilliunits * unitPrice + 999L) / 1_000L);
+            var workforce = runtime.Workforce[(int)personOrdinal];
+            var household = runtime.Households[(int)workforce
+                .HouseholdOrdinal];
+            if (household.Wealth < purchaseCost)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InsufficientCash,
+                    "merchant.failure.insufficient-cash.v1");
+            var carrierConsumption = Math.Min(quantityMilliunits,
+                checked((long)Math.Max(1, supplier.TravelDays) * 2_000L));
+            var remaining = quantityMilliunits - carrierConsumption;
+            var naturalLoss = remaining *
+                supplier.NaturalLossBasisPoints / 10_000L;
+            var riskLoss = (remaining - naturalLoss) *
+                supplier.RiskLossBasisPoints / 20_000L;
+            var delivered = quantityMilliunits - carrierConsumption -
+                            naturalLoss - riskLoss;
+            if (delivered <= 0)
+                return MerchantFailure(
+                    LuoyangMerchantDispatchFailure.InvalidRequest,
+                    "merchant.failure.no-deliverable-cargo.v1");
+
+            var orderId = "player_supply_order." + runtime.AbsoluteDay + "." +
+                          runtime.SupplyOrders.Count.ToString("D6");
+            var shipmentId = "player_shipment." + runtime.AbsoluteDay + "." +
+                             runtime.Shipments.Count.ToString("D6");
+            var personId = source.GetPersonId(personOrdinal);
+            if (LuoyangFormalEconomySystem.IsFood(supplier.ProductId))
+                new LuoyangFormalEconomySystem().DispatchFreight(runtime,
+                    supplier.InventoryId, shipmentId, supplier.ProductId,
+                    quantityMilliunits,
+                    checked(carrierConsumption + naturalLoss + riskLoss),
+                    personId);
+            else
+                supplier.InventoryQuantityMilliunits -= quantityMilliunits;
+            household.Wealth -= purchaseCost;
+            household.CumulativeMoneySpent += purchaseCost;
+            supplier.CashBalance += purchaseCost;
+            supplier.CumulativeSalesRevenue += purchaseCost;
+            supplier.CumulativeDispatchedMilliunits += quantityMilliunits;
+            runtime.SupplyOrders.Add(new LuoyangSupplyOrderRuntimeState
+            {
+                Id = orderId,
+                RequestedDay = runtime.AbsoluteDay,
+                ProductId = supplier.ProductId,
+                SupplierId = supplier.SupplierId,
+                DestinationInventoryId = destination.Id,
+                RequestedQuantityMilliunits = quantityMilliunits,
+                DispatchedQuantityMilliunits = quantityMilliunits,
+                UnitPrice = unitPrice,
+                PurchaseCost = purchaseCost,
+                Status = LuoyangSupplyOrderStatus.InTransit,
+                ShipmentId = shipmentId,
+                RequestedByAgentId = "player.person." + personOrdinal,
+                ReasonId = "player.merchant.market-delivery.v1"
+            });
+            runtime.Shipments.Add(new LuoyangShipmentRuntimeState
+            {
+                Id = shipmentId,
+                OrderId = orderId,
+                ProductId = supplier.ProductId,
+                SupplierId = supplier.SupplierId,
+                SourceInventoryId = supplier.InventoryId,
+                DestinationInventoryId = destination.Id,
+                RouteId = supplier.RouteId,
+                CarrierPersonId = personId,
+                DispatchDay = runtime.AbsoluteDay,
+                ArrivalDay = checked(runtime.AbsoluteDay +
+                    Math.Max(1, supplier.TravelDays)),
+                ShippedQuantityMilliunits = quantityMilliunits,
+                CarrierConsumptionMilliunits = carrierConsumption,
+                NaturalLossMilliunits = naturalLoss,
+                RiskLossMilliunits = riskLoss,
+                DeliveredQuantityMilliunits = delivered,
+                RemainingCargoQuantityMilliunits = delivered,
+                PurchaseCost = purchaseCost,
+                PhysicalRouteSignature = route.PhysicalRouteSignature,
+                PlayerDirected = true,
+                BuyerHouseholdOrdinal = workforce.HouseholdOrdinal
+            });
+            carrier.CurrentShipmentId = shipmentId;
+            return new LuoyangMerchantDispatchResult
+            {
+                Succeeded = true,
+                ShipmentId = shipmentId,
+                QuantityMilliunits = quantityMilliunits,
+                PurchaseCost = purchaseCost,
+                ExpectedArrivalDay = checked(runtime.AbsoluteDay +
+                    Math.Max(1, supplier.TravelDays))
+            };
         }
 
         public void AdvanceTo(
@@ -729,26 +937,82 @@ namespace Mandate.Simulation
                          item.ArrivalDay <= runtime.AbsoluteDay).OrderBy(
                          item => item.Id, StringComparer.Ordinal))
             {
+                var route = supplyRouteAccess.Assess(shipment.RouteId);
+                if (!route.CanTraverse)
+                {
+                    shipment.RouteWaiting = true;
+                    shipment.AwaitingReceipt = false;
+                    shipment.WaitingReasonId = string.IsNullOrWhiteSpace(
+                        route.FailureReasonId)
+                        ? "supply.waiting.route-blocked.v1"
+                        : route.FailureReasonId;
+                    shipment.WaitingFormalObjectId =
+                        route.BlockingFormalObjectId ?? string.Empty;
+                    shipment.ArrivalDay = checked(runtime.AbsoluteDay + 1);
+                    continue;
+                }
+                if (!string.Equals(shipment.PhysicalRouteSignature,
+                        route.PhysicalRouteSignature,
+                        StringComparison.Ordinal))
+                {
+                    if (!string.IsNullOrWhiteSpace(
+                            shipment.PhysicalRouteSignature))
+                        shipment.RouteRevision++;
+                    shipment.PhysicalRouteSignature =
+                        route.PhysicalRouteSignature;
+                }
+                shipment.RouteWaiting = false;
+                if (shipment.RemainingCargoQuantityMilliunits == 0 &&
+                    shipment.ReceivedQuantityMilliunits == 0)
+                    shipment.RemainingCargoQuantityMilliunits =
+                        shipment.DeliveredQuantityMilliunits;
                 var destination = runtime.Inventories.Find(item =>
                     item.Id == shipment.DestinationInventoryId);
                 if (destination == null)
                     throw new InvalidOperationException(
                         "Shipment destination inventory disappeared.");
                 var stored = Math.Min(
-                    shipment.DeliveredQuantityMilliunits,
+                    shipment.RemainingCargoQuantityMilliunits,
                     destination.CapacityMilliunits -
                     destination.QuantityMilliunits);
+                if (stored <= 0)
+                {
+                    shipment.AwaitingReceipt = true;
+                    shipment.WaitingReasonId =
+                        "supply.waiting.destination-capacity.v1";
+                    shipment.WaitingFormalObjectId = destination.Id;
+                    shipment.ArrivalDay = checked(runtime.AbsoluteDay + 1);
+                    continue;
+                }
                 if (LuoyangFormalEconomySystem.IsFood(shipment.ProductId))
                     stored = new LuoyangFormalEconomySystem().ReceiveFreight(
                         runtime, shipment.Id, destination.Id,
                         shipment.ProductId, stored);
                 else
                     destination.QuantityMilliunits += stored;
-                shipment.Delivered = true;
+                var firstReceipt =
+                    shipment.ReceivedQuantityMilliunits == 0;
+                shipment.ReceivedQuantityMilliunits = checked(
+                    shipment.ReceivedQuantityMilliunits + stored);
+                shipment.RemainingCargoQuantityMilliunits -= stored;
+                shipment.Delivered =
+                    shipment.RemainingCargoQuantityMilliunits == 0;
+                shipment.AwaitingReceipt = !shipment.Delivered;
+                shipment.WaitingReasonId = shipment.Delivered
+                    ? string.Empty
+                    : "supply.waiting.destination-capacity.v1";
+                shipment.WaitingFormalObjectId = shipment.Delivered
+                    ? string.Empty
+                    : destination.Id;
+                if (!shipment.Delivered)
+                    shipment.ArrivalDay = checked(runtime.AbsoluteDay + 1);
                 var order = runtime.SupplyOrders.Find(item =>
                     item.Id == shipment.OrderId);
-                order.DeliveredQuantityMilliunits = stored;
-                order.Status = LuoyangSupplyOrderStatus.Delivered;
+                order.DeliveredQuantityMilliunits =
+                    shipment.ReceivedQuantityMilliunits;
+                order.Status = shipment.Delivered
+                    ? LuoyangSupplyOrderStatus.Delivered
+                    : LuoyangSupplyOrderStatus.InTransit;
                 runtime.InventoryFlows.Add(new LuoyangInventoryFlowState
                 {
                     Id = "flow.supply.delivery." + runtime.AbsoluteDay + "." +
@@ -759,16 +1023,19 @@ namespace Mandate.Simulation
                     SourceInventoryId = shipment.SourceInventoryId,
                     DestinationInventoryId = destination.Id,
                     QuantityMilliunits = stored,
-                    LossMilliunits = checked(
+                    LossMilliunits = firstReceipt ? checked(
                         shipment.CarrierConsumptionMilliunits +
                         shipment.NaturalLossMilliunits +
-                        shipment.RiskLossMilliunits),
+                        shipment.RiskLossMilliunits) : 0,
                     PersonId = shipment.CarrierPersonId,
                     FacilityId = destination.FacilityId
                 });
+                if (shipment.Delivered && shipment.PlayerDirected)
+                    SettlePlayerMerchantSale(runtime, shipment, destination);
                 if (order.ReasonId != null && order.ReasonId.StartsWith(
                         "blueprint.material_procurement:",
                         StringComparison.Ordinal) &&
+                    shipment.Delivered &&
                     order.RequestedByAgentId != null &&
                     !order.RequestedByAgentId.StartsWith("player.",
                         StringComparison.Ordinal))
@@ -797,7 +1064,7 @@ namespace Mandate.Simulation
                         destination.CapacityMilliunits / 4);
                 var inbound = runtime.Shipments.Where(item =>
                         !item.Delivered && item.ProductId == productGroup.Key)
-                    .Sum(item => item.DeliveredQuantityMilliunits);
+                    .Sum(item => item.RemainingCargoQuantityMilliunits);
                 var shortage = targetStock - destination.QuantityMilliunits -
                                inbound;
                 if (shortage <= 0) continue;
@@ -889,6 +1156,8 @@ namespace Mandate.Simulation
         {
             var shipped = Math.Min(requested,
                 supplier.InventoryQuantityMilliunits);
+            var routeAssessment = supplyRouteAccess.Assess(supplier.RouteId);
+            if (!routeAssessment.CanTraverse) return;
             var market = runtime.Markets.Find(item =>
                 item.ProductId == supplier.ProductId);
             var unitPrice = Math.Max(1L, (market?.BasePrice ?? 1) * 8 / 10);
@@ -966,7 +1235,69 @@ namespace Mandate.Simulation
                 NaturalLossMilliunits = naturalLoss,
                 RiskLossMilliunits = riskLoss,
                 DeliveredQuantityMilliunits = delivered,
+                RemainingCargoQuantityMilliunits = delivered,
+                PhysicalRouteSignature = routeAssessment
+                    .PhysicalRouteSignature,
                 PurchaseCost = purchaseCost
+            });
+        }
+
+        private static LuoyangMerchantDispatchResult MerchantFailure(
+            LuoyangMerchantDispatchFailure failure, string reasonId) =>
+            new LuoyangMerchantDispatchResult
+            {
+                Failure = failure,
+                ReasonId = reasonId ?? string.Empty
+            };
+
+        private static void SettlePlayerMerchantSale(
+            Luoyang184LivingWorldRuntimeState runtime,
+            LuoyangShipmentRuntimeState shipment,
+            LuoyangInventoryBalanceState destination)
+        {
+            if (shipment.PlayerSaleSettled) return;
+            if (shipment.BuyerHouseholdOrdinal >= runtime.Households.Count)
+                throw new InvalidOperationException(
+                    "Player merchant shipment lost its buyer household.");
+            var household = runtime.Households[(int)
+                shipment.BuyerHouseholdOrdinal];
+            var market = runtime.Markets.Find(item =>
+                item.ProductId == shipment.ProductId) ??
+                throw new InvalidOperationException(
+                    "Player merchant destination has no market price state.");
+            var unitPrice = Math.Max(1L,
+                market.BasePrice * (long)market.CurrentPriceBasisPoints /
+                10_000L);
+            var expected = checked((shipment.ReceivedQuantityMilliunits *
+                                    unitPrice + 999L) / 1_000L);
+            var revenue = Math.Min(expected, market.CashBalance);
+            market.CashBalance -= revenue;
+            household.Wealth += revenue;
+            shipment.PlayerSaleRevenue = revenue;
+            shipment.PlayerSaleSettled = true;
+            var carrier = runtime.MerchantCarriers.Find(item =>
+                item.CurrentShipmentId == shipment.Id);
+            if (carrier != null) carrier.CurrentShipmentId = string.Empty;
+            if (revenue <= 0) return;
+            market.RecentTradeQuantityMilliunits = checked(
+                market.RecentTradeQuantityMilliunits +
+                shipment.ReceivedQuantityMilliunits);
+            market.RecentTradeValue = checked(
+                market.RecentTradeValue + revenue);
+            runtime.MarketTrades.Add(new LuoyangMarketTradeRuntimeState
+            {
+                Id = "market_trade.player_delivery." +
+                     runtime.AbsoluteDay + "." +
+                     runtime.MarketTrades.Count.ToString("D6"),
+                Day = runtime.AbsoluteDay,
+                ProductId = shipment.ProductId,
+                BuyerId = destination.OwnerId,
+                SellerId = household.HouseholdId,
+                SourceInventoryId = destination.Id,
+                QuantityMilliunits = shipment.ReceivedQuantityMilliunits,
+                UnitPrice = unitPrice,
+                MoneyTransferred = revenue,
+                TradeOrderId = shipment.OrderId
             });
         }
 
@@ -1069,9 +1400,10 @@ namespace Mandate.Simulation
             new Luoyang184IntelligentAgentRuntimeSystem().BuildAgents(
                 runtime, source);
 
-        private static void ResolveIntelligentAgents(
+        private void ResolveIntelligentAgents(
             Luoyang184LivingWorldRuntimeState runtime) =>
-            new Luoyang184IntelligentAgentRuntimeSystem().AdvanceDay(runtime);
+            new Luoyang184IntelligentAgentRuntimeSystem(supplyRouteAccess)
+                .AdvanceDay(runtime);
 
         private void ResolveProduction(Luoyang184LivingWorldRuntimeState runtime)
         {

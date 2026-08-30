@@ -302,6 +302,7 @@ namespace Mandate.Simulation
                     NaturalLossMilliunits = naturalLoss,
                     RiskLossMilliunits = riskLoss,
                     DeliveredQuantityMilliunits = delivered,
+                    RemainingCargoQuantityMilliunits = delivered,
                     PurchaseCost = purchaseCost
                 });
                 latestArrival = Math.Max(latestArrival, arrivalDay);
