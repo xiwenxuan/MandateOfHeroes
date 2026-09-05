@@ -9,7 +9,9 @@ namespace Mandate.Presentation
         RealisticNatural,
         ChineseSemiRealistic,
         StrategicSandbox,
-        ZhonghuaSanguozhiFusion
+        ZhonghuaSanguozhiFusion,
+        InkLandscapePrototype,
+        HanStrategicDiorama
     }
 
     /// <summary>
@@ -24,6 +26,7 @@ namespace Mandate.Presentation
         public HanWorldArtStyle Style;
         public Color TerrainTint;
         public Color RiverTint;
+        public Color RoadTint;
         public Color ForestTint;
         public Color ShoreTint;
         public Color DeepWaterTint;
@@ -57,6 +60,16 @@ namespace Mandate.Presentation
         public Color FusionForestTint;
         public Color FusionRiverValleyTint;
         public Color FusionPlainTint;
+        public float InkStrength;
+        public float PaperTextureStrength;
+        public float InkMistStrength;
+        public Color PaperTint;
+        public Color InkTint;
+        public float DioramaStrength;
+        public float DioramaLightBands;
+        public float DioramaEdgeStrength;
+        public Color DioramaWarmLightTint;
+        public Color DioramaCoolShadowTint;
         public string VisualIntent;
     }
 
@@ -66,6 +79,10 @@ namespace Mandate.Presentation
         public const string StyleBId = "art.han-world.chinese-semi-realistic.v1";
         public const string StyleCId = "art.han-world.strategic-sandbox.v1";
         public const string StyleDId = "art.han-world.zhonghua-sanguozhi-fusion.v2";
+        public const string InkPrototypeId =
+            "art.han-world.ink-landscape-prototype.v1";
+        public const string StrategicDioramaId =
+            "art.han-world.han-strategic-diorama.v1";
 
         private static readonly IReadOnlyDictionary<HanWorldArtStyle, HanWorldArtProfile> Profiles =
             new Dictionary<HanWorldArtStyle, HanWorldArtProfile>
@@ -76,6 +93,7 @@ namespace Mandate.Presentation
                     ProfileName = "STYLE A | Realistic Natural",
                     Style = HanWorldArtStyle.RealisticNatural,
                     TerrainTint = C(0.91f, 0.96f, 0.88f), RiverTint = C(0.72f, 0.91f, 1.00f),
+                    RoadTint = C(0.63f, 0.45f, 0.26f),
                     ForestTint = C(0.83f, 0.96f, 0.79f), ShoreTint = C(0.90f, 0.86f, 0.70f),
                     DeepWaterTint = C(0.26f, 0.45f, 0.55f), FogColor = C(0.57f, 0.64f, 0.65f),
                     BackgroundColor = C(0.32f, 0.51f, 0.60f), SunColor = C(1.00f, 0.95f, 0.84f),
@@ -96,6 +114,7 @@ namespace Mandate.Presentation
                     ProfileName = "STYLE B | Chinese Semi-realistic",
                     Style = HanWorldArtStyle.ChineseSemiRealistic,
                     TerrainTint = C(0.86f, 0.90f, 0.76f), RiverTint = C(0.61f, 0.82f, 0.88f),
+                    RoadTint = C(0.62f, 0.43f, 0.22f),
                     ForestTint = C(0.66f, 0.79f, 0.61f), ShoreTint = C(0.82f, 0.74f, 0.56f),
                     DeepWaterTint = C(0.22f, 0.36f, 0.42f), FogColor = C(0.50f, 0.58f, 0.57f),
                     BackgroundColor = C(0.28f, 0.43f, 0.47f), SunColor = C(1.00f, 0.86f, 0.66f),
@@ -116,6 +135,7 @@ namespace Mandate.Presentation
                     ProfileName = "STYLE C | Strategic Sandbox",
                     Style = HanWorldArtStyle.StrategicSandbox,
                     TerrainTint = C(0.96f, 0.98f, 0.79f), RiverTint = C(0.64f, 0.91f, 1.00f),
+                    RoadTint = C(0.72f, 0.46f, 0.16f),
                     ForestTint = C(0.70f, 0.92f, 0.61f), ShoreTint = C(0.94f, 0.82f, 0.55f),
                     DeepWaterTint = C(0.18f, 0.43f, 0.59f), FogColor = C(0.58f, 0.65f, 0.62f),
                     BackgroundColor = C(0.31f, 0.50f, 0.58f), SunColor = C(1.00f, 0.91f, 0.74f),
@@ -136,6 +156,7 @@ namespace Mandate.Presentation
                     ProfileName = "STYLE D V2 | Strategic Landscape",
                     Style = HanWorldArtStyle.ZhonghuaSanguozhiFusion,
                     TerrainTint = C(0.92f, 0.88f, 0.70f), RiverTint = C(0.54f, 0.77f, 0.82f),
+                    RoadTint = C(0.61f, 0.40f, 0.19f),
                     ForestTint = C(0.48f, 0.65f, 0.43f), ShoreTint = C(0.82f, 0.70f, 0.49f),
                     DeepWaterTint = C(0.19f, 0.35f, 0.40f), FogColor = C(0.55f, 0.57f, 0.49f),
                     BackgroundColor = C(0.31f, 0.40f, 0.39f), SunColor = C(1.00f, 0.82f, 0.57f),
@@ -154,6 +175,104 @@ namespace Mandate.Presentation
                     FusionRiverValleyTint = C(0.43f, 0.64f, 0.65f),
                     FusionPlainTint = C(0.72f, 0.69f, 0.49f),
                     VisualIntent = "Clean-room Style D V2: readable mountain systems, terrain-conforming rivers, multi-LOD forests and presentation-only terrain detail derived from the authoritative world."
+                },
+                [HanWorldArtStyle.InkLandscapePrototype] =
+                    new HanWorldArtProfile
+                {
+                    ProfileId = InkPrototypeId,
+                    ProfileName = "INK PROTOTYPE | Han Military Gazetteer",
+                    Style = HanWorldArtStyle.InkLandscapePrototype,
+                    TerrainTint = C(0.86f, 0.79f, 0.61f),
+                    RiverTint = C(0.24f, 0.47f, 0.53f),
+                    RoadTint = C(0.55f, 0.34f, 0.16f),
+                    ForestTint = C(0.31f, 0.39f, 0.25f),
+                    ShoreTint = C(0.67f, 0.57f, 0.39f),
+                    DeepWaterTint = C(0.15f, 0.28f, 0.31f),
+                    FogColor = C(0.73f, 0.69f, 0.57f),
+                    BackgroundColor = C(0.74f, 0.68f, 0.53f),
+                    SunColor = C(0.93f, 0.83f, 0.64f),
+                    AmbientColor = C(0.52f, 0.48f, 0.38f),
+                    SunIntensity = 0.92f,
+                    WorldVerticalExaggeration = 2.68f,
+                    RegionVerticalExaggeration = 1.94f,
+                    Saturation = 0.42f,
+                    SlopeStrength = 0.72f,
+                    CurvatureStrength = 0.36f,
+                    RidgeStrength = 0.68f,
+                    ValleyStrength = 0.48f,
+                    MacroNoiseScale = 3.1f,
+                    MacroNoiseStrength = 0.12f,
+                    TerrainNoiseStrength = 0.055f,
+                    RiverNoiseStrength = 0.018f,
+                    ForestNoiseStrength = 0.035f,
+                    WorldFogStart = 1900f,
+                    WorldFogEnd = 4700f,
+                    RegionFogStart = 76f,
+                    RegionFogEnd = 238f,
+                    WorldCameraSizeScale = 1f,
+                    RegionCameraSizeScale = 1f,
+                    RiverWidthScale = 1.18f,
+                    ForestCanopyScale = 0.92f,
+                    FusionStrength = 0.86f,
+                    FusionMountainTint = C(0.33f, 0.30f, 0.24f),
+                    FusionForestTint = C(0.27f, 0.34f, 0.22f),
+                    FusionRiverValleyTint = C(0.39f, 0.53f, 0.52f),
+                    FusionPlainTint = C(0.77f, 0.70f, 0.53f),
+                    InkStrength = 0.86f,
+                    PaperTextureStrength = 0.16f,
+                    InkMistStrength = 0.22f,
+                    PaperTint = C(0.82f, 0.74f, 0.56f),
+                    InkTint = C(0.19f, 0.17f, 0.13f),
+                    VisualIntent = "Original Eastern Han military gazetteer prototype: silk paper, data-derived ink relief, blue-ink rivers, ochre roads and readable administrative seals."
+                },
+                [HanWorldArtStyle.HanStrategicDiorama] =
+                    new HanWorldArtProfile
+                {
+                    ProfileId = StrategicDioramaId,
+                    ProfileName = "STYLE E | Han Strategic Diorama",
+                    Style = HanWorldArtStyle.HanStrategicDiorama,
+                    TerrainTint = C(0.94f, 0.96f, 0.80f),
+                    RiverTint = C(0.42f, 0.78f, 0.88f),
+                    RoadTint = C(0.72f, 0.42f, 0.16f),
+                    ForestTint = C(0.45f, 0.70f, 0.33f),
+                    ShoreTint = C(0.90f, 0.77f, 0.47f),
+                    DeepWaterTint = C(0.16f, 0.42f, 0.55f),
+                    FogColor = C(0.67f, 0.72f, 0.63f),
+                    BackgroundColor = C(0.31f, 0.52f, 0.62f),
+                    SunColor = C(1.00f, 0.88f, 0.65f),
+                    AmbientColor = C(0.40f, 0.43f, 0.34f),
+                    SunIntensity = 1.24f,
+                    WorldVerticalExaggeration = 3.08f,
+                    RegionVerticalExaggeration = 2.18f,
+                    Saturation = 1.02f,
+                    SlopeStrength = 0.78f,
+                    CurvatureStrength = 0.42f,
+                    RidgeStrength = 0.68f,
+                    ValleyStrength = 0.48f,
+                    MacroNoiseScale = 3.8f,
+                    MacroNoiseStrength = 0.075f,
+                    TerrainNoiseStrength = 0.042f,
+                    RiverNoiseStrength = 0.010f,
+                    ForestNoiseStrength = 0.025f,
+                    WorldFogStart = 2350f,
+                    WorldFogEnd = 5500f,
+                    RegionFogStart = 92f,
+                    RegionFogEnd = 278f,
+                    WorldCameraSizeScale = 1f,
+                    RegionCameraSizeScale = 1f,
+                    RiverWidthScale = 1.24f,
+                    ForestCanopyScale = 1.10f,
+                    FusionStrength = 0.94f,
+                    FusionMountainTint = C(0.50f, 0.42f, 0.29f),
+                    FusionForestTint = C(0.28f, 0.47f, 0.25f),
+                    FusionRiverValleyTint = C(0.38f, 0.67f, 0.66f),
+                    FusionPlainTint = C(0.67f, 0.70f, 0.43f),
+                    DioramaStrength = 0.88f,
+                    DioramaLightBands = 5f,
+                    DioramaEdgeStrength = 0.58f,
+                    DioramaWarmLightTint = C(1.00f, 0.91f, 0.69f),
+                    DioramaCoolShadowTint = C(0.52f, 0.66f, 0.58f),
+                    VisualIntent = "Original clean-room Eastern Han coloured 3D strategic diorama: stepped relief, readable rivers and roads, miniature settlements and contextual overlays."
                 }
             };
 
@@ -167,6 +286,8 @@ namespace Mandate.Presentation
                 yield return Profiles[HanWorldArtStyle.ChineseSemiRealistic];
                 yield return Profiles[HanWorldArtStyle.StrategicSandbox];
                 yield return Profiles[HanWorldArtStyle.ZhonghuaSanguozhiFusion];
+                yield return Profiles[HanWorldArtStyle.InkLandscapePrototype];
+                yield return Profiles[HanWorldArtStyle.HanStrategicDiorama];
             }
         }
 
@@ -233,6 +354,41 @@ namespace Mandate.Presentation
                 return VisualTerrainDetailLevel.City;
             if (id == TerrainDetail) return VisualTerrainDetailLevel.ClosePreview;
             return VisualTerrainDetailLevel.Region;
+        }
+    }
+
+    /// <summary>
+    /// Frozen clean-room camera poses for the coloured strategic diorama.
+    /// They are presentation presets only and never redefine world coordinates.
+    /// </summary>
+    public static class HanStrategicDioramaCameraRig
+    {
+        public const string World = "CAM_HAN_DIORAMA_WORLD";
+        public const string WorldMid = "CAM_HAN_DIORAMA_WORLD_MID";
+        public const string WorldNear = "CAM_HAN_DIORAMA_WORLD_NEAR";
+        public const string Region = "CAM_HAN_DIORAMA_REGION";
+
+        public static NaturalMapCameraPreset Get(string id)
+        {
+            switch (id)
+            {
+                case World:
+                    return new NaturalMapCameraPreset(id, 1088, 1657,
+                        1160f, 58f, 0f);
+                case WorldMid:
+                    return new NaturalMapCameraPreset(id, 1247, 1992,
+                        330f, 56f, -5f);
+                case WorldNear:
+                    return new NaturalMapCameraPreset(id, 1247, 1992,
+                        180f, 53f, -8f);
+                case Region:
+                    return new NaturalMapCameraPreset(id, 1247, 1992,
+                        36f, 52f, -16f);
+                default:
+                    throw new ArgumentException(
+                        "Unknown Han strategic diorama camera preset: " + id,
+                        nameof(id));
+            }
         }
     }
 

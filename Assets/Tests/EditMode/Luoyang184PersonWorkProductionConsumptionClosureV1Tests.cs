@@ -153,9 +153,21 @@ namespace Mandate.Tests
             foreach (var group in runtime.Inventories.GroupBy(item => item.FacilityId))
             {
                 var sourceFacility = LuoyangLivingWorldTestFixture.Source.Facilities
-                    .Single(item => item.FacilityId == group.Key);
+                    .SingleOrDefault(item => item.FacilityId == group.Key);
+                var runtimeFacility = runtime.Facilities.SingleOrDefault(item =>
+                    item.FacilityId == group.Key);
+                Assert.That(sourceFacility != null || runtimeFacility != null,
+                    Is.True, "Inventory group references no formal facility: " +
+                    group.Key + "; inventories=" + string.Join(",",
+                        group.Select(item => item.Id)));
+                var facilityCapacityMilliunits = sourceFacility != null
+                    ? sourceFacility.StorageCapacity * 1000L
+                    : group.Max(item => item.CapacityMilliunits);
                 Assert.That(group.Sum(item => item.QuantityMilliunits),
-                    Is.LessThanOrEqualTo(sourceFacility.StorageCapacity * 1000L));
+                    Is.LessThanOrEqualTo(facilityCapacityMilliunits),
+                    "Facility storage exceeded: " + group.Key +
+                    "; inventories=" + string.Join(",", group.Select(item =>
+                        item.Id + "=" + item.QuantityMilliunits)));
             }
         }
 
@@ -229,6 +241,7 @@ namespace Mandate.Tests
                 ProductId = sourceSeedInventory.ProductId,
                 CapacityMilliunits = sourceSeedInventory.CapacityMilliunits
             });
+            new LuoyangFormalEconomySystem().ActivateFromBootstrap(runtime);
             Assert.That(LuoyangLivingWorldTestFixture.System.TryHarvestAtMaturity(
                 runtime, sourceCrop.FieldId, 8_000, out _), Is.False);
             runtime.Crops[0].AssignedWorkers = 1;

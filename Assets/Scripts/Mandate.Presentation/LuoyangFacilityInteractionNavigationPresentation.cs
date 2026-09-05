@@ -583,6 +583,20 @@ namespace Mandate.Presentation
             UsesFormalPlayerMovement && _humanScaleLocalMap != null &&
             _localWorldPositionResolver != null;
 
+        public void SetDeveloperOverlaysVisible(bool visible)
+        {
+            SetChildActive(NavigationOverlayName, visible);
+            SetChildActive(ModeledConnectorOverlayName, visible);
+            SetChildActive(BlockedPassageOverlayName, visible);
+            SetChildActive(DamagedPassageOverlayName, visible);
+        }
+
+        private void SetChildActive(string childName, bool active)
+        {
+            var child = Root == null ? null : Root.transform.Find(childName);
+            if (child != null) child.gameObject.SetActive(active);
+        }
+
         public static LuoyangFacilityInteractionNavigationRuntime Build(
             LuoyangFacilityInteractionNavigationPlan plan,
             LuoyangRoadTraversalRefinementPlan refinementPlan,
@@ -947,12 +961,12 @@ namespace Mandate.Presentation
             return TrySetPedestrianDestination(target.Key);
         }
 
-        public bool StepPedestrian(float deltaSeconds)
+        public bool StepPedestrian(float deltaSeconds,
+            float speedUnitsPerSecond)
         {
             if (_pedestrianInstance == null) return false;
-            const float reviewSpeedUnitsPerSecond = 0.32f;
             return _pedestrianInstance.Step(deltaSeconds,
-                reviewSpeedUnitsPerSecond);
+                speedUnitsPerSecond);
         }
 
         public void BindFormalMovement(WorldState world,
@@ -1539,6 +1553,8 @@ namespace Mandate.Presentation
         {
             _renderer = renderer ?? throw new ArgumentNullException(
                 nameof(renderer));
+            if (_properties == null)
+                _properties = new MaterialPropertyBlock();
         }
 
         public void Apply(CivilianFreightState freight, Vector3 position)

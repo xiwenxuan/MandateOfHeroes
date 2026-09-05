@@ -98,6 +98,12 @@ namespace Mandate.Persistence
         [JsonProperty("display_name")]
         public string DisplayName { get; set; }
 
+        [JsonProperty("admin_reference")]
+        public string AdministrativeRegionId { get; set; }
+
+        [JsonProperty("stable_region_id")]
+        public string StableRegionId { get; set; }
+
         [JsonProperty("cell_id")]
         public long? CellId { get; set; }
 

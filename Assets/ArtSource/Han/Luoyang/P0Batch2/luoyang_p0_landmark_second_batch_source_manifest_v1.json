@@ -48,8 +48,8 @@
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/Biyong.fbx.meta",
-      "length": 2830,
-      "sha256": "f4ea47b97ec73c4107e37ef7fea211f9d46639604e13d13460fd2c2c7b46980a"
+      "length": 2820,
+      "sha256": "eaa97a11f74a946d1d5c0c9d39e4d91561cd5a587e128c13f104a0d8a726f4c4"
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/NorthPalace.fbx",
@@ -58,8 +58,8 @@
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/NorthPalace.fbx.meta",
-      "length": 2830,
-      "sha256": "bf96320cbe8239eca87c77997490af67eb79a4a6a426baf7c1e6df9c702f64c8"
+      "length": 2820,
+      "sha256": "55ffca8b68557ac83f5bc06e6193888f503ffca9cf3dc01047111d201552f11c"
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/Taixue.fbx",
@@ -68,8 +68,8 @@
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/Taixue.fbx.meta",
-      "length": 2830,
-      "sha256": "4c51eb6b2d38c2cff9a4da63372a03cb9074c2dadd3a7b002ce5109b6b9eb2bd"
+      "length": 2820,
+      "sha256": "11c38584e862b8dbf999e2901a4da3b1fcb570d9778d3766e6fab3e5035bfb4a"
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/YonganPalace.fbx",
@@ -78,8 +78,8 @@
     },
     {
       "path": "Assets/ArtSource/Han/Luoyang/P0Batch2/YonganPalace.fbx.meta",
-      "length": 2830,
-      "sha256": "4f4dc659bf3f600bd58722aca330361913dd8291c6831cbb86c72f62e588bcce"
+      "length": 2820,
+      "sha256": "0567bb826d28ccaae96b12a1917549329097fa55292c892cf1757d5c8db00d50"
     },
     {
       "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkSecondBatchArtBuilder.cs",
@@ -88,8 +88,8 @@
     },
     {
       "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkSecondBatchArtBuilder.cs.meta",
-      "length": 243,
-      "sha256": "7db000b3c126a371e267a748a50468468407c677ee31e0b9f0b10995bd5c218a"
+      "length": 240,
+      "sha256": "251a32638c9f09775804913ce7c6238335c02cc41403a38212fb5eb14ea44274"
     },
     {
       "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkSecondBatchFbxExporter.cs",
@@ -98,8 +98,8 @@
     },
     {
       "path": "Assets/Editor/Mandate.Editor/LuoyangP0LandmarkSecondBatchFbxExporter.cs.meta",
-      "length": 243,
-      "sha256": "6bc6d79c0de5ae27613139f1f24026c49466c21ae408cc5134912f2968b2943f"
+      "length": 240,
+      "sha256": "79f5f1cc59e33792263728f0d6d0d3d78c6303c4ceade38eac26d85656253c76"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Biyong.prefab",
@@ -108,58 +108,58 @@
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Biyong.prefab.meta",
-      "length": 154,
-      "sha256": "7ab08112d7269e23313ecead0b1b1818a3e14923e81c0891cbc3f8342a077257"
+      "length": 151,
+      "sha256": "f826f384da3012cdbc1123c57cdf9198008d69538e1b45f16d7ae11d44dab815"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Foliage.mat",
-      "length": 2189,
-      "sha256": "59791e6549ff38e220be0598a7300c60a9ef860afe04cce07128ef1bf300daec"
+      "length": 2271,
+      "sha256": "b7a07c4456fdb6a69504f10c6226fb92a6b9a465fa9396577bf9d8ccdb1a2f4d"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Foliage.mat.meta",
-      "length": 188,
-      "sha256": "33792d3b86bcf0aaec56ff4d63dee700e28a5ceef356e6e801ff45d1e287e7a6"
+      "length": 185,
+      "sha256": "ce9e7af5d6ffefe1c0ad162adf2a0bba10c3c64903db39cd981ab15038494873"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat",
-      "length": 2191,
-      "sha256": "21aff64491290768654429a7363b6126a8b137ba2acc5aadac8bdf53519b12e4"
+      "length": 2273,
+      "sha256": "da2ffce1ed3dffb9e4637561ed80a861e13773b153a0b767485fe935140007b6"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Materials/Water.mat.meta",
-      "length": 188,
-      "sha256": "0c2bfe6a0e0571206770961fd1c4164aa1e3912cd26624e84f9b646bb402c95d"
+      "length": 185,
+      "sha256": "38fcb5a73c1e9d9abb9ceab63b69f1b38e6de8e8ad89419720063f716c2b0d23"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeRitualRing.asset",
-      "length": 12344,
-      "sha256": "cff19a6d064ea1c88b020449f8d39f77d91cbe0fbc23f5ac641320f6e1c9996f"
+      "length": 12329,
+      "sha256": "2f97e59684604d47c6c3979844f3b7018bbb5fb81b1adbdbf4133a1cd3b41f7a"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeRitualRing.asset.meta",
-      "length": 188,
-      "sha256": "7a701ac4dac7bdeca9809e9b6ec4ffc4ff12a5c5ce2eadbda0f1fe54e593cfdd"
+      "length": 185,
+      "sha256": "c80f2951e99841c0523116a51287a22b503fb1b9f0c5c291e50db848a5578fe6"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeTreeCanopy.asset",
-      "length": 70043,
-      "sha256": "4de1ca072107fbe69b91d81459d33f7635b86c674c388769a9b50707e4b4f747"
+      "length": 70028,
+      "sha256": "da758f9407e6bb5ed39ae34e8a7e260b3de35b7d7c75287aaf00a2a96e975754"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeTreeCanopy.asset.meta",
-      "length": 188,
-      "sha256": "482cf283b6fd47b62716b03c15374ee7ed2e6a9c727dd3f3c51dba1fa11819a9"
+      "length": 185,
+      "sha256": "ef5703a49154a18ef7cc5c333e3b27923e866376f771de3e392888dbc3b0c8f4"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeWaterDisc.asset",
-      "length": 14043,
-      "sha256": "dbc05b3ae31eb1b74df45bca68df91f72f3118e695f0a118ec33a89bacf58599"
+      "length": 14028,
+      "sha256": "16e644d025f5a23450a1df144443ee4999edb7feddb2bdd6d986005bea90a9d6"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Meshes/NativeWaterDisc.asset.meta",
-      "length": 188,
-      "sha256": "a14f33d94f11cb290d95a3b0f4a47689a60e4d9ebe4c4700792c7aad05818f11"
+      "length": 185,
+      "sha256": "5de12d54eda557cd98d302ff55cc82fd499ad996616c2ac1c10d8c794798ec16"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/NorthPalace.prefab",
@@ -168,8 +168,8 @@
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/NorthPalace.prefab.meta",
-      "length": 154,
-      "sha256": "cf8798f32beaa01007fa7c16a0bb7256b6a7ae72b01035ce06050956d1574adc"
+      "length": 151,
+      "sha256": "d8017d5e04a587ab2c9e5f21238bbb4cba954074acc3f727636041481adcde9c"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Taixue.prefab",
@@ -178,8 +178,8 @@
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/Taixue.prefab.meta",
-      "length": 154,
-      "sha256": "a85de5259ee3e91641005efeea4b12d1a21675a02b7f891384bbc1fb7161282d"
+      "length": 151,
+      "sha256": "b1ddceb85622e71275a9ed694f98b40f6c473f7b70e4cbc19e1f761ac48db489"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/YonganPalace.prefab",
@@ -188,98 +188,98 @@
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Batch2/YonganPalace.prefab.meta",
-      "length": 154,
-      "sha256": "064bd9f26f6b2231a0ff9fcc34966e5b48d944840431bb6d16d9de9b6fb07627"
+      "length": 151,
+      "sha256": "60c446305a93926f49e3179d8e15a1bf9df345e2e14788bc97eadae15b9871b6"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat",
-      "length": 2192,
-      "sha256": "55febebf346833aeb5dc634a0dab1dbb7c59e0c18f84f72665d80c57c5237a92"
+      "length": 2274,
+      "sha256": "a4426adac3a08267095d2503d20f4e8bc56b4eb65dcb5081795a49d36f124984"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Bronze.mat.meta",
-      "length": 188,
-      "sha256": "b6eb7075b59557ba38dac2ef4126faf74df8fa42c72e8338dda3c88351eb1bc0"
+      "length": 185,
+      "sha256": "b444b0a9bb693037b8fbd9b7b825938147104d63c13e076806d49b1161dd1bee"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat",
-      "length": 2196,
-      "sha256": "e9d3c1fa86ab00664916272c8a47084fd003a07c62852400c71d6e7f99d38783"
+      "length": 2278,
+      "sha256": "4eaaeda84fe69731f91489ad3d858100cb4317cc520d9c15f09b00ae89292e85"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/GreyGreenTile.mat.meta",
-      "length": 188,
-      "sha256": "b00859b22de7bcd74f3bb6b51621060b668b89a8a75c732293739e25d3e3121b"
+      "length": 185,
+      "sha256": "245ccbdc73da5580043019612d46a3c0467245c4ed106997cc6a5ce66013bcb1"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat",
-      "length": 2193,
-      "sha256": "8d8c7182672fc9d548403db8aaa90fd4f7f6126a5652891153f178847e26f4ca"
+      "length": 2275,
+      "sha256": "6be341655a00f1b25976235e8e963d2d3b6ccd10d0346383e621faa57371889c"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/RammedEarth.mat.meta",
-      "length": 188,
-      "sha256": "04b3771f7717aaca65cfe421a42cdf7f5de647a911f65199b0505a5252c47472"
+      "length": 185,
+      "sha256": "4337b04512a7de0da3fee0958f63ba404973433937485d0d66f279c8cdd085e3"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat",
-      "length": 2186,
-      "sha256": "ab5a5157461e29410d92c9a82e209199b7769b531df91d4b0e0a7e349ef6e3bd"
+      "length": 2268,
+      "sha256": "8592ed7bdc3fbbb16e8278ae1202c7a9cb8a2b082fad14ad03edad8a75645053"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Stone.mat.meta",
-      "length": 188,
-      "sha256": "311d4d526b6f927bc11a1f23e078b98c8ecbefd75502e5f7efc4f6da66cd62b7"
+      "length": 185,
+      "sha256": "d783dff5a7a05a39337e40507f6b1574b64238219eacaf86865b05888d28d848"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat",
-      "length": 2188,
-      "sha256": "de0b62cda7f54993966aeb3528339f08798142bb30c68bc9ce67e73bda28a334"
+      "length": 2270,
+      "sha256": "7457fa289264c38cbcf9be9e87b39784bf406a603681b45eb8751998e3b95166"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Timber.mat.meta",
-      "length": 188,
-      "sha256": "72c1e1e09fe1061c1b70c917b5e50ab5414378889230086a3098f1224cf83028"
+      "length": 185,
+      "sha256": "45aa752bda2bed6e421a0395f9fd9b2792ffe1749f6d837a597081927a38a743"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat",
-      "length": 2193,
-      "sha256": "16bbbd5e154f0a97bbad6ba6bf19f0b3583200f4d716b5ab456383cd9384e869"
+      "length": 2275,
+      "sha256": "6df9e676579e710b2afae3aebbeae799c2b22a37332793b1bdde5466541bd015"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Materials/Vermilion.mat.meta",
-      "length": 188,
-      "sha256": "685fb1cc24633454c91c1eab923709ca98a9e3f301b780ace85851f80f39f450"
+      "length": 185,
+      "sha256": "425cba1c17f68e8d3e07b2039bb989eac9a99f9d76cb306f406c21dbf66957b1"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset",
-      "length": 5960,
-      "sha256": "da2e3d353d729814de2463fd546e877d9936aaa259377a8b8f4ff78273029355"
+      "length": 5945,
+      "sha256": "ef7e9b5cdb839cd5f8caedb8461861d8055aa16fffc856908c0a9d2e0bd00f25"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeBox.asset.meta",
-      "length": 188,
-      "sha256": "3c8ba2af91423a152225222dc12bdc55b65fdd2e2ea59ea32b9614fe1d1c49d6"
+      "length": 185,
+      "sha256": "2d701f84a7833386011134ab5ea0e4a649cdaf477d53ee5939619a489c2c3e67"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset",
-      "length": 3512,
-      "sha256": "124fa480d45805e3557d2987785c5eec0da8a76097cd0595433d628030d02a1e"
+      "length": 3497,
+      "sha256": "4f7bc26719ba3bec5262618316414a26c92555cf804cd6af7f8cbaa7901bcc74"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeHanHipRoof.asset.meta",
-      "length": 188,
-      "sha256": "914f2e1f530be89b9edbf64a0b6d728734488c59e334c668d3df2cee7dcd8861"
+      "length": 185,
+      "sha256": "82e36ded0ed261b7e0915ee5d3651a79d01f09894e000759cbf1b89c73034fbb"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset",
-      "length": 14047,
-      "sha256": "6bfa444efae6362f97de88d2869c3cdc7124bc412f54cc7ccd24d35597e0f6ec"
+      "length": 14032,
+      "sha256": "d1ab40a1cb989596171469db61c8212f49e4ecaff5b97af0d2e6901cc4f411c4"
     },
     {
       "path": "Assets/Resources/Art/Han/Luoyang/P0Final/Meshes/NativeOctagonalPost.asset.meta",
-      "length": 188,
-      "sha256": "9edd3e0175c1d42c0c1f887cb4ab50370a96c13f30394924cf4dafe7c56fb09e"
+      "length": 185,
+      "sha256": "469019c9bcedc195b750c2bd6e4a1293dad6a5d399d7a80b20dba14d7b960f39"
     },
     {
       "path": "Assets/Scripts/Mandate.Domain/LuoyangP0LandmarkSecondBatchState.cs",
@@ -288,8 +288,8 @@
     },
     {
       "path": "Assets/Scripts/Mandate.Domain/LuoyangP0LandmarkSecondBatchState.cs.meta",
-      "length": 243,
-      "sha256": "16cc687ec9fb59fbdecab5e7614c479bc4fe4ccc510c203ccb2402c0b2c301f2"
+      "length": 240,
+      "sha256": "1b62a6f230c50ce7d4f421185fc60c5fc6c4c44c94ed078e95aa121eab88c7b4"
     },
     {
       "path": "Assets/Scripts/Mandate.Persistence/LuoyangP0LandmarkSecondBatchSource.cs",
@@ -298,8 +298,8 @@
     },
     {
       "path": "Assets/Scripts/Mandate.Persistence/LuoyangP0LandmarkSecondBatchSource.cs.meta",
-      "length": 243,
-      "sha256": "12f9b8b7d79d5777dc6dde126df228ad3cf24aa5ff9451b0c16888be2d1cf5bd"
+      "length": 240,
+      "sha256": "332f0f87c2bb566da25e59a53546d37cafeaf222c623cdb24691f920f096de36"
     },
     {
       "path": "Assets/StreamingAssets/WorldMap/LuoyangP0LandmarkSecondBatchV1/luoyang_p0_landmark_second_batch_v1.json",

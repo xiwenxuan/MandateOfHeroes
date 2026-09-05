@@ -18,6 +18,19 @@ Shader "Mandate/Natural Terrain V2"
         _FusionRiverValleyTint ("River valley tint", Color) = (0.43,0.64,0.65,1)
         _FusionPlainTint ("Plain tint", Color) = (0.72,0.69,0.49,1)
         _VisualDetail ("Presentation-only detail blend", Range(0,1)) = 0
+        _InkMode ("Ink landscape prototype", Range(0,1)) = 0
+        _InkStrength ("Ink wash strength", Range(0,1)) = 0
+        _PaperStrength ("Silk paper texture strength", Range(0,0.35)) = 0
+        _InkMistStrength ("Ink mist strength", Range(0,0.5)) = 0
+        _PaperTint ("Silk paper tint", Color) = (0.82,0.74,0.56,1)
+        _InkTint ("Ink tint", Color) = (0.19,0.17,0.13,1)
+        _PaperTex ("Original procedural silk texture", 2D) = "white" {}
+        _DioramaMode ("Han strategic diorama mode", Range(0,1)) = 0
+        _DioramaStrength ("Diorama strength", Range(0,1)) = 0
+        _DioramaLightBands ("Diorama light bands", Range(3,8)) = 5
+        _DioramaEdgeStrength ("Diorama landform edge", Range(0,1)) = 0
+        _DioramaWarmLightTint ("Diorama warm light", Color) = (1,0.91,0.69,1)
+        _DioramaCoolShadowTint ("Diorama cool shadow", Color) = (0.52,0.66,0.58,1)
     }
     SubShader
     {
@@ -56,6 +69,19 @@ Shader "Mandate/Natural Terrain V2"
             fixed4 _FusionRiverValleyTint;
             fixed4 _FusionPlainTint;
             half _VisualDetail;
+            half _InkMode;
+            half _InkStrength;
+            half _PaperStrength;
+            half _InkMistStrength;
+            fixed4 _PaperTint;
+            fixed4 _InkTint;
+            sampler2D _PaperTex;
+            half _DioramaMode;
+            half _DioramaStrength;
+            half _DioramaLightBands;
+            half _DioramaEdgeStrength;
+            fixed4 _DioramaWarmLightTint;
+            fixed4 _DioramaCoolShadowTint;
 
             struct appdata
             {
@@ -75,7 +101,8 @@ Shader "Mandate/Natural Terrain V2"
                 float3 worldPos : TEXCOORD2;
                 float4 fusionPrimary : TEXCOORD3;
                 float4 fusionSecondary : TEXCOORD4;
-                UNITY_FOG_COORDS(5)
+                float2 uv : TEXCOORD5;
+                UNITY_FOG_COORDS(6)
             };
 
             float hash21(float2 p)
@@ -140,6 +167,39 @@ Shader "Mandate/Natural Terrain V2"
                 fusionColour *= 1.0 + (valueNoise(v.uv * lerp(15.0, 52.0, _VisualDetail)) - 0.5) *
                     _VisualDetail * 0.055;
                 baseColour = saturate(lerp(baseColour, fusionColour, fusion));
+                float diorama = saturate(_DioramaMode * _DioramaStrength);
+                float lightBands = max(3.0, _DioramaLightBands);
+                float bandedLight = floor(saturate(lambert) * lightBands) /
+                    max(1.0, lightBands - 1.0);
+                float3 strategicLightTint = lerp(
+                    _DioramaCoolShadowTint.rgb,
+                    _DioramaWarmLightTint.rgb, bandedLight);
+                strategicLightTint = lerp(float3(1.0, 1.0, 1.0),
+                    strategicLightTint, 0.30);
+                float reliefContrast = 1.0 +
+                    (featureRidge * 0.18 - featureValley * 0.13 +
+                     mountainMass * 0.06) * diorama;
+                float3 dioramaColour = saturate(baseColour *
+                    lerp(0.90, 1.08, bandedLight) * strategicLightTint *
+                    reliefContrast);
+                baseColour = lerp(baseColour, dioramaColour, diorama);
+                float inkBlend = saturate(_InkMode * _InkStrength);
+                float mountainInk = saturate(mountainMass * 0.58 +
+                    relief * 0.25 + featureRidge * 0.35 +
+                    slope * 0.30 - basin * 0.10);
+                float washBreak = valueNoise(v.uv *
+                    lerp(5.0, 31.0, _VisualDetail) + float2(4.1, 8.7));
+                mountainInk *= lerp(0.72, 1.13, washBreak);
+                float paperNoise = valueNoise(v.uv * 73.0 +
+                    float2(17.0, 3.0)) - 0.5;
+                float3 paperColour = _PaperTint.rgb *
+                    (1.0 + paperNoise * _PaperStrength);
+                float3 inkColour = lerp(paperColour, _InkTint.rgb,
+                    saturate(0.12 + mountainInk * 0.82));
+                float mist = saturate((1.0 - relief) * basin *
+                    _InkMistStrength);
+                inkColour = lerp(inkColour, paperColour, mist);
+                baseColour = lerp(baseColour, inkColour, inkBlend);
                 float luminance = dot(baseColour, float3(0.299, 0.587, 0.114));
                 baseColour = lerp(luminance.xxx, baseColour, _Saturation);
                 o.color = fixed4(saturate(baseColour), v.color.a);
@@ -147,6 +207,7 @@ Shader "Mandate/Natural Terrain V2"
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 o.fusionPrimary = v.fusionPrimary;
                 o.fusionSecondary = v.fusionSecondary;
+                o.uv = v.uv;
                 UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
             }
@@ -155,7 +216,12 @@ Shader "Mandate/Natural Terrain V2"
             {
                 float edgeChange = saturate(length(ddx(i.normal)) + length(ddy(i.normal)));
                 float curvature = (edgeChange - 0.08) * _CurvatureStrength * 0.24;
-                fixed4 colour = fixed4(saturate(i.color.rgb * (1.0 - curvature)), i.color.a);
+                float silk = tex2D(_PaperTex, i.uv * 7.0).r - 0.5;
+                float3 shaded = i.color.rgb * (1.0 - curvature);
+                shaded *= 1.0 - edgeChange * _DioramaMode *
+                    _DioramaEdgeStrength * 0.34;
+                shaded *= 1.0 + silk * _PaperStrength * _InkMode;
+                fixed4 colour = fixed4(saturate(shaded), i.color.a);
                 UNITY_APPLY_FOG(i.fogCoord, colour);
                 return colour;
             }

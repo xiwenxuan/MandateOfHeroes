@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "unityVersion": "2022.3.62f3c1",
+  "operatingSystem": "Windows 11  (10.0.26200) 64bit",
+  "planningCellCount": 6400,
+  "planningCellGameObjects": 0,
+  "planningCellRenderObjects": 2,
+  "chunkCount": 30,
+  "tenViewCaptureMilliseconds": 226.063,
+  "westLoadLevel": "Hot",
+  "eastLoadLevel": "Warm"
+}

@@ -19,14 +19,16 @@ namespace Mandate.Simulation
         private static readonly LuoyangFormalEconomySystem FormalEconomy =
             new LuoyangFormalEconomySystem();
 
-        public void Initialize(Luoyang184LivingWorldRuntimeState runtime)
+        public void Initialize(Luoyang184LivingWorldRuntimeState runtime,
+            ILuoyang184LivingWorldSource source)
         {
+            if (source == null) throw new ArgumentNullException(nameof(source));
             BuildSocialRoles(runtime);
             BuildFamilyAssets(runtime);
             BuildPersonalDevelopment(runtime);
             BuildOffices(runtime);
             BuildGovernmentGranary(runtime);
-            BuildMilitary(runtime);
+            BuildMilitary(runtime, source);
             BuildEvents(runtime);
         }
 
@@ -184,23 +186,50 @@ namespace Mandate.Simulation
                     SocialRoleId = person.SocialRoleId
                 });
             }
-            var educationFacility = runtime.Facilities.OrderBy(item =>
-                    item.DefinitionId.IndexOf("education", StringComparison.OrdinalIgnoreCase) >= 0
-                        ? 0 : 1).ThenBy(item => item.FacilityId,
-                    StringComparer.Ordinal).First();
             var books = runtime.Inventories.Find(item =>
                 item.ProductId == "product.book.classics");
             if (books == null)
             {
+                const long openingBookQuantityMilliunits = 100_000;
+                var bookStorage = runtime.Inventories
+                    .Where(item => !string.IsNullOrEmpty(item.FacilityId))
+                    .GroupBy(item => item.FacilityId)
+                    .Select(group => new
+                    {
+                        Facility = runtime.Facilities.Find(item =>
+                            item.FacilityId == group.Key),
+                        AvailableCapacityMilliunits = Math.Max(0,
+                            group.Max(item => item.CapacityMilliunits) -
+                            group.Sum(item => item.QuantityMilliunits))
+                    })
+                    .Where(item => item.Facility != null &&
+                        item.Facility.OwnerId ==
+                            runtime.GovernmentEconomy.OrganizationId &&
+                        item.AvailableCapacityMilliunits >=
+                            openingBookQuantityMilliunits)
+                    .OrderByDescending(item =>
+                        item.AvailableCapacityMilliunits)
+                    .ThenBy(item => item.Facility.FacilityId,
+                        StringComparer.Ordinal)
+                    .FirstOrDefault();
+                if (bookStorage == null)
+                    throw new InvalidOperationException(
+                        "No government storage has capacity for the opening " +
+                        "classics inventory.");
+
                 books = new LuoyangInventoryBalanceState
                 {
                     Id = "inventory.luoyang.184.imperial_library.classics",
                     OwnerKind = LuoyangInventoryOwnerKind.Government,
                     OwnerId = runtime.GovernmentEconomy.OrganizationId,
-                    FacilityId = educationFacility.FacilityId,
+                    // Taixue has no canonical storage capacity. The books stay
+                    // available to its learners through BookInventoryIds while
+                    // their physical stock uses a real government storehouse.
+                    FacilityId = bookStorage.Facility.FacilityId,
                     ProductId = "product.book.classics",
-                    CapacityMilliunits = 1_000_000,
-                    QuantityMilliunits = 100_000
+                    CapacityMilliunits =
+                        bookStorage.AvailableCapacityMilliunits,
+                    QuantityMilliunits = openingBookQuantityMilliunits
                 };
                 runtime.Inventories.Add(books);
             }
@@ -238,7 +267,9 @@ namespace Mandate.Simulation
                 });
         }
 
-        private static void BuildMilitary(Luoyang184LivingWorldRuntimeState runtime)
+        private static void BuildMilitary(
+            Luoyang184LivingWorldRuntimeState runtime,
+            ILuoyang184LivingWorldSource source)
         {
             var soldiers = runtime.Workforce.Count(item =>
                 item.Status == LuoyangWorkforceStatus.MilitaryDuty);
@@ -252,7 +283,6 @@ namespace Mandate.Simulation
                 Id = "force.han.luoyang.garrison.184",
                 OrganizationId = "organization.military.han.luoyang",
                 BarracksFacilityId = militaryFacilities.FirstOrDefault()?.FacilityId ?? string.Empty,
-                ArsenalFacilityId = militaryFacilities.Skip(1).FirstOrDefault()?.FacilityId ?? string.Empty,
                 PermanentPersonCount = soldiers,
                 DefenseBasisPoints = 7_000
             };
@@ -260,6 +290,34 @@ namespace Mandate.Simulation
                 "product.weapon.general", "product.armor.general", "product.weapon.arrow",
                 "product.textile.plain_cloth", "product.reference.tools",
                 "product.transport.pack_animal" };
+            var arsenal = source.Facilities
+                .Where(item => item.Operational && item.StorageCapacity > 0 &&
+                    item.OwnerId == runtime.GovernmentEconomy.OrganizationId)
+                .Select(item => new
+                {
+                    Facility = item,
+                    AvailableCapacityMilliunits = Math.Max(0,
+                        checked(item.StorageCapacity * 1_000L) -
+                        runtime.Inventories.Where(inventory =>
+                            inventory.FacilityId == item.FacilityId).Sum(
+                                inventory => inventory.QuantityMilliunits))
+                })
+                .Where(item => item.AvailableCapacityMilliunits >=
+                    productIds.Length)
+                .OrderBy(item => item.Facility.FacilityId.IndexOf(
+                    "arsenal", StringComparison.OrdinalIgnoreCase) >= 0
+                        ? 0 : 1)
+                .ThenByDescending(item => item.AvailableCapacityMilliunits)
+                .ThenBy(item => item.Facility.FacilityId,
+                    StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (arsenal == null)
+                throw new InvalidOperationException(
+                    "No government storehouse has capacity for the Luoyang " +
+                    "military inventory.");
+            force.ArsenalFacilityId = arsenal.Facility.FacilityId;
+            var capacityPerProduct = Math.Min(100_000_000L,
+                arsenal.AvailableCapacityMilliunits / productIds.Length);
             foreach (var product in productIds)
             {
                 var inventory = new LuoyangInventoryBalanceState
@@ -270,7 +328,7 @@ namespace Mandate.Simulation
                     FacilityId = string.IsNullOrEmpty(force.ArsenalFacilityId)
                         ? force.BarracksFacilityId : force.ArsenalFacilityId,
                     ProductId = product,
-                    CapacityMilliunits = 100_000_000
+                    CapacityMilliunits = capacityPerProduct
                 };
                 runtime.Inventories.Add(inventory);
                 force.InventoryIds.Add(inventory.Id);

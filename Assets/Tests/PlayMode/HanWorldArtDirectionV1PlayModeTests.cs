@@ -92,7 +92,7 @@ namespace Mandate.Tests
             File.WriteAllText(Path.Combine(EvidenceRoot, "style_performance_comparison.json"),
                 BuildPerformanceJson(snapshots), Encoding.UTF8);
             Assert.That(snapshots, Has.Count.EqualTo(18));
-            Assert.That(snapshots.TrueForAll(value => value.MaterialCount == 3), Is.True);
+            Assert.That(snapshots.TrueForAll(value => value.MaterialCount == 4), Is.True);
             Assert.That(snapshots.TrueForAll(value => value.ShaderVariantCount == 1), Is.True);
             Assert.That(File.ReadAllBytes(Path.Combine(screenshots, "STYLE_A_SAMPLE_A_REGION.png")),
                 Is.Not.EqualTo(File.ReadAllBytes(Path.Combine(screenshots, "STYLE_B_SAMPLE_A_REGION.png"))));

@@ -141,11 +141,44 @@ powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Run-UnityEditModeGroup
 For Codex-controlled work, do not put all groups into one unbounded foreground call. Run one group per bounded
 external invocation, preserve its PID/log/XML, and aggregate only after every group has completed. The manifest
 uses a source fingerprint and exact test-name sets, so stale or mixed group results cannot satisfy aggregation.
+Discovery maps each `[Test]` method to its containing public test class; files with multiple test classes must
+therefore produce their real Unity full names rather than assigning every method to the first class in the file.
 The group runner accepts 1-32 groups. Increase the group count instead of the timeout when suite growth or a
 particular distribution places a group near the absolute 300-second limit. The M25-P21 baseline passed 365/365
 in 16 groups, but groups 14 and 15 took approximately 289 and 291 seconds. M25-P22 therefore uses 24 groups
 after the enlarged 370-test suite caused a 16-group distribution to exceed the same limit. Retain the
 300-second hard limit and never extend it without explicit user approval.
+
+When an exact test still exceeds 300 seconds after it has been isolated from its group, classify it explicitly
+before using the user's approved exception. The safe runners accept `-TimeoutClass SlowDeterminism` with a
+maximum of 900 seconds only for an allowlisted exact long-horizon deterministic replay. Standard runs remain
+capped at 300 seconds, and the JSON summary plus group metadata record the timeout class and matched exact test.
+For the current suite, the classified tests are
+`Mandate.Tests.WorldKernelTests.Simulation_SaveResumeMatchesContinuousRun`, which executes a 730-day continuous
+simulation and a 365-day save/resume path, and
+`Mandate.Tests.WorldKernelTests.FoodRuntime_FormalWorldIsDeterministicForOneYear`, which advances two formal
+food worlds for one year and compares their complete deterministic state, and
+`Mandate.Tests.WorldKernelTests.IntegratedOneYearStabilityTests_FormalWorldHasNoEconomicInvariantFailure`, which
+executes the formal one-year integrated economy invariant gate and was measured just above the ordinary 300-second
+ceiling; `Mandate.Tests.WorldKernelTests.LuoyangLiving_365DayCropAndConservationRemainStable`,
+`Mandate.Tests.WorldKernelTests.LuoyangT4_OneSevenThirtyOneYearThreeYearSixYearRemainValid`, and
+`Mandate.Tests.WorldKernelTests.OuterAgricultureLongRunTests_AllRecordsRunForOneWorldYearWithoutDuplicateHarvest`
+are the explicit 365-day, six-year, and one-year Luoyang long-horizon gates. In the 1102-test / 32-group suite,
+their immutable group was still actively advancing deterministic world time when the standard runner terminated it
+at 300.508 seconds. A grouped rerun may use the exception only when at least one classified exact test is in the
+selected immutable group.
+
+When the maximum 32-way distribution still places a deterministic Unity asset builder together with other
+integration tests just above 300 seconds, use the separate `-TimeoutClass AssetBuildIntegration` exception.
+It is capped at 600 seconds and requires an allowlisted exact Builder test in the immutable group; it must not be
+used for ordinary logic or performance tests. The current classified Builder is
+`Mandate.Tests.EditMode.LuoyangP0NativePrefabArtDeliveryV1Tests.BuildAssets_CreatesFourReplaceableThreeLodPrefabs`.
+
+Use `-TimeoutClass AssetManifestIntegration` only when the maximum distribution combines the complete 240-file,
+38-FBX FinalRemaining manifest validation with other bounded integration tests and exceeds 300 seconds. This
+class is capped at 600 seconds and requires
+`Mandate.Tests.EditMode.LuoyangRemainingFinalAssetV1Tests.SourceManifest_Freezes240FilesAnd38ValidatedFbxSources`
+in the immutable group.
 
 The 2026-08-05 M25-P28 core baseline discovered and passed 401/401 tests in 32 groups. In that distribution,
 group 24 took about 141 seconds and group 27 about 185 seconds; keep these long-running groups in separate

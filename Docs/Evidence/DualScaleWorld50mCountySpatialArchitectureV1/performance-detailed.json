@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "measurementKind": "isolated-managed-probe",
+  "planningCellCount": 6400,
+  "packedAuthoritativeArrayBytes": 76800,
+  "managedScenarioBuildAllocationBytes": 96336,
+  "chunkCount": 30,
+  "connectionBuildMillisecondsP50": 0.107,
+  "connectionBuildMillisecondsP95": 0.1176,
+  "wallBuildMillisecondsP50": 0.0145,
+  "wallBuildMillisecondsP95": 0.0211,
+  "facilityProjectionMillisecondsP50": 0.0016,
+  "facilityProjectionMillisecondsP95": 0.003,
+  "hotLoadMillisecondsP50": 0.1605,
+  "hotLoadMillisecondsP95": 0.255,
+  "warmLoadMillisecondsP50": 0.1526,
+  "warmLoadMillisecondsP95": 0.1696,
+  "unloadToColdMillisecondsP50": 0.1492,
+  "unloadToColdMillisecondsP95": 0.1581,
+  "losQueryMicrosecondsP50": 0.175,
+  "losQueryMicrosecondsP95": 0.394,
+  "planningCellGameObjects": 0,
+  "theoreticalLuoyang": {
+    "executed": false,
+    "planningCellCount": 204800,
+    "packedAuthoritativeArrayBytesEstimate": 2457600,
+    "chunkCountEstimate": 800,
+    "linearHotLoadMillisecondsP50Estimate": 5.136,
+    "linearFacilityProjectionMillisecondsP50Estimate": 0.0512,
+    "note": "Linear planning estimate only; not a passed 204800-cell runtime benchmark."
+  }
+}

@@ -9477,6 +9477,42 @@ namespace Mandate.Tests
         }
 
         [Test]
+        public void Snapshot_V78ToV79ClassifiesExistingFreightWithoutInventingRoutes()
+        {
+            var world = WorldState.Create(25_910);
+            world.SchemaVersion = 78;
+            world.CivilianFreights.Add(new CivilianFreightState
+            {
+                Id = "civilian_freight.migration.market",
+                PurposeId = null,
+                PublicReliefProcurementTradeId = string.Empty,
+                BuyerOrganizationId = string.Empty
+            });
+            world.CivilianFreights.Add(new CivilianFreightState
+            {
+                Id = "civilian_freight.migration.relief",
+                PurposeId = null,
+                PublicReliefProcurementTradeId =
+                    "public_relief_procurement_trade.migration",
+                BuyerOrganizationId = "organization.government.migration"
+            });
+
+            WorldSnapshotMigrator.MigrateToCurrent(world);
+
+            Assert.That(world.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
+            Assert.That(world.CivilianFreights[0].PurposeId,
+                Is.EqualTo(
+                    CivilianFreightPurposeIds.FormalMarketDelivery));
+            Assert.That(world.CivilianFreights[1].PurposeId,
+                Is.EqualTo(
+                    CivilianFreightPurposeIds.PublicReliefProcurement));
+            Assert.That(world.CivilianFreights.All(item =>
+                !item.UsesCellRoute && item.CellRouteSegments.Count == 0),
+                Is.True);
+        }
+
+        [Test]
         public void Agriculture_InsufficientSeedRejectsWithoutChangingWorld()
         {
             var world = VillagePrototypeFactory.Create(200, 20_002);

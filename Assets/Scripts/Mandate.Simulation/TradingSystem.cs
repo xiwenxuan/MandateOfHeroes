@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Mandate.Domain;
 
 namespace Mandate.Simulation
@@ -123,6 +124,10 @@ namespace Mandate.Simulation
             }
 
             var person = FindPerson(world, personId.Value);
+            if (HasActiveMerchantFreight(world, person.Id))
+            {
+                return Failure("正式商旅货物必须通过到站交付结算。");
+            }
             var commodity = FindCommodity(world, commodityId.Value);
             var listing = FindListing(world, person.LocationId, commodityId.Value);
             var stack = FindInventory(world, person.Id, commodity.Id);
@@ -211,6 +216,10 @@ namespace Mandate.Simulation
             }
 
             var person = FindPerson(world, personId);
+            if (HasActiveMerchantFreight(world, person.Id))
+            {
+                return false;
+            }
             if (GetQuantity(world, personId, commodityId) < quantity)
             {
                 return false;
@@ -246,6 +255,92 @@ namespace Mandate.Simulation
 
             world.Validate();
             return true;
+        }
+
+        internal bool LoseMerchantFreightCargo(WorldState world,
+            CivilianFreightState freight, string commodityId, int quantity,
+            out InventoryTransactionState transaction)
+        {
+            transaction = null;
+            if (world == null || freight == null || quantity <= 0 ||
+                freight.PurposeId !=
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage ||
+                freight.RemainingCargoQuantity < quantity)
+                return false;
+            var person = FindPerson(world, freight.CarrierPersonId);
+            var commodity = FindCommodity(world, commodityId);
+            if (!TryGetFormalProductId(commodity, out var productId) ||
+                productId != freight.ProductDefinitionId)
+                return false;
+            transaction = ConsumeFormalCargo(
+                world,
+                person,
+                commodityId,
+                quantity,
+                InventoryTransactionType.CivilianFreightNaturalLoss,
+                "Merchant-owned formal freight was lost during travel.",
+                freight.Id,
+                freight.DispatchInventoryTransactionId);
+            return true;
+        }
+
+        internal TradeResult SellMerchantFreightCargo(WorldState world,
+            CivilianFreightState freight, string commodityId, int quantity,
+            out InventoryTransactionState transaction)
+        {
+            transaction = null;
+            if (world == null || freight == null || quantity <= 0 ||
+                freight.PurposeId !=
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage ||
+                freight.Status != CivilianFreightStatus.AwaitingReceipt ||
+                freight.RemainingCargoQuantity < quantity)
+                return Failure("正式商旅货物尚不可交付。");
+            var person = FindPerson(world, freight.CarrierPersonId);
+            var commodity = FindCommodity(world, commodityId);
+            var listing = FindListing(
+                world, person.LocationId, commodityId);
+            if (!TryGetFormalProductId(commodity, out var productId) ||
+                productId != freight.ProductDefinitionId)
+                return Failure("交付商品与正式商旅货物不一致。");
+            var batches = FindFormalCargoBatches(
+                world,
+                person,
+                productId,
+                freight.DispatchInventoryTransactionId);
+            if (batches.Sum(item => item.Quantity) < quantity)
+                return Failure("正式商旅货物数量不足。");
+
+            var unitPrice = listing.Price;
+            var revenue = checked((long)unitPrice * quantity);
+            var profit = checked(
+                (long)(unitPrice - freight.GoodsUnitPrice) * quantity);
+            person.Wealth = checked(person.Wealth + revenue);
+            listing.Stock = checked(listing.Stock + quantity);
+            transaction = ConsumeFormalCargo(
+                world,
+                person,
+                commodityId,
+                quantity,
+                InventoryTransactionType.MerchantMarketSold,
+                "Merchant-owned formal freight sold into destination market.",
+                freight.Id,
+                freight.DispatchInventoryTransactionId);
+            ApplyImmediatePriceImpact(listing, quantity, false);
+            SyncLegacyGrainPrice(world, listing);
+            AddRecord(
+                world,
+                person,
+                commodity,
+                quantity,
+                unitPrice,
+                false,
+                revenue);
+            return new TradeResult(
+                true,
+                revenue,
+                profit,
+                $"卖出{quantity}单位{commodity.DisplayName}，收入{revenue}钱，" +
+                $"本批盈亏{profit}钱。");
         }
 
         private static TradeResult ValidateCommon(
@@ -403,13 +498,15 @@ namespace Mandate.Simulation
             world.InventoryTransactions.Add(transaction);
         }
 
-        private static void ConsumeFormalCargo(
+        private static InventoryTransactionState ConsumeFormalCargo(
             WorldState world,
             PersonState person,
             string commodityId,
             int quantity,
             InventoryTransactionType type,
-            string summary)
+            string summary,
+            string sourceCivilianFreightId = null,
+            string requiredSourceTransactionId = null)
         {
             var commodity = FindCommodity(world, commodityId);
             if (!TryGetFormalProductId(commodity, out var productId))
@@ -418,7 +515,8 @@ namespace Mandate.Simulation
                     "The commodity has no formal product mapping.");
             }
 
-            var batches = FindFormalCargoBatches(world, person, productId);
+            var batches = FindFormalCargoBatches(
+                world, person, productId, requiredSourceTransactionId);
             var transaction = ProductInventorySystem.NewTransaction(
                 world,
                 type,
@@ -428,6 +526,8 @@ namespace Mandate.Simulation
                 0,
                 0,
                 summary);
+            transaction.SourceCivilianFreightId =
+                sourceCivilianFreightId ?? string.Empty;
             long remaining = quantity;
             for (var i = 0; i < batches.Count && remaining > 0; i++)
             {
@@ -443,6 +543,7 @@ namespace Mandate.Simulation
                     "Formal merchant cargo changed before settlement.");
             }
             world.InventoryTransactions.Add(transaction);
+            return transaction;
         }
 
         private static InventoryContainerState EnsureMerchantContainer(
@@ -504,7 +605,8 @@ namespace Mandate.Simulation
             FindFormalCargoBatches(
                 WorldState world,
                 PersonState person,
-                string productId)
+                string productId,
+                string requiredSourceTransactionId = null)
         {
             var containerIds = new System.Collections.Generic.HashSet<string>(
                 StringComparer.Ordinal);
@@ -527,6 +629,9 @@ namespace Mandate.Simulation
                 if (batch.OwnerFamilyId == person.FamilyId &&
                     batch.ProductDefinitionId == productId &&
                     batch.Quantity > 0 &&
+                    (string.IsNullOrEmpty(requiredSourceTransactionId) ||
+                     batch.SourceTransactionId ==
+                        requiredSourceTransactionId) &&
                     containerIds.Contains(batch.InventoryContainerId))
                 {
                     result.Add(batch);
@@ -574,6 +679,14 @@ namespace Mandate.Simulation
             productId = string.Empty;
             return false;
         }
+
+        private static bool HasActiveMerchantFreight(
+            WorldState world, string personId) =>
+            world.CivilianFreights.Any(item =>
+                item.CarrierPersonId == personId &&
+                item.PurposeId ==
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage &&
+                item.Status != CivilianFreightStatus.Completed);
 
         private static InventoryStackState FindInventory(
             WorldState world,

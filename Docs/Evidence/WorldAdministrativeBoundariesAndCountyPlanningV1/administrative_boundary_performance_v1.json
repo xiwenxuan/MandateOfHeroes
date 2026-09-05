@@ -1,0 +1,13 @@
+{
+  "schema": "mandate.administrative-boundary-performance.v1",
+  "world_map_observed_fps": 576.502,
+  "boundary_build_ms": 3289.425,
+  "county_planning_entry_ms": 648.625,
+  "boundary_cache_bytes": 36966400,
+  "boundary_render_build_ms": 34.45,
+  "boundary_render_gc_delta_bytes": 798720,
+  "boundary_render_objects": 5,
+  "boundary_render_chunks": 4,
+  "rendered_boundary_segments": 2023,
+  "formal_unique_boundary_segments": 105116
+}

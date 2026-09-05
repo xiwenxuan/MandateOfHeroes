@@ -90,7 +90,8 @@ namespace Mandate.Simulation
             new Luoyang184AgricultureDueScheduler().Initialize(runtime);
             BuildMarkets(runtime);
             BuildIntelligentAgents(runtime);
-            new Luoyang184T4IntegratedRuntimeSystem().Initialize(runtime);
+            new Luoyang184T4IntegratedRuntimeSystem().Initialize(runtime,
+                source);
             var formalEconomy = new LuoyangFormalEconomySystem();
             formalEconomy.ApplyCapacityCalibrationBeforeActivation(
                 runtime, calibrationProfile);

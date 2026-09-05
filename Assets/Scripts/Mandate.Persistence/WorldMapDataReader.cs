@@ -81,6 +81,24 @@ namespace Mandate.Persistence
                 Grid.GridSchemaVersion);
         }
 
+        public CellAdministrativeCodes ReadAdministrativeCodes(int row,
+            int column)
+        {
+            if (!Grid.Contains(row, column))
+                throw new ArgumentOutOfRangeException(nameof(row));
+            return new CellAdministrativeCodes(
+                _admin.ReadUInt16(row, column, 0),
+                _admin.ReadUInt16(row, column, 1),
+                _admin.ReadUInt16(row, column, 2));
+        }
+
+        public byte ReadRoadClass(int row, int column)
+        {
+            if (!Grid.Contains(row, column))
+                throw new ArgumentOutOfRangeException(nameof(row));
+            return _roads.ReadByte(row, column, 0);
+        }
+
         public WorldMapCellRecord[] ReadChunk(int chunkRow, int chunkColumn)
         {
             if (chunkRow < 0 || chunkColumn < 0)

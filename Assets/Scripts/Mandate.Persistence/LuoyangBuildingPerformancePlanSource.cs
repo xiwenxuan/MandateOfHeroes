@@ -75,6 +75,12 @@ namespace Mandate.Persistence
                     {
                         FacilityId = facilityId,
                         FacilityDefinitionId = definitionId,
+                        DisplayName = Text(token, "display_name"),
+                        CategoryId = OptionalText(token, "category_id"),
+                        HistoricalConfidenceId = OptionalText(token,
+                            "historical_confidence"),
+                        SpatialPrecisionId = OptionalText(token,
+                            "spatial_precision"),
                         ModelId = modelId,
                         CellId64 = cellId64,
                         GridColumn = gridColumn,
@@ -99,5 +105,8 @@ namespace Mandate.Persistence
                     "Luoyang opening Facility is missing " + property + ".");
             return value;
         }
+
+        private static string OptionalText(JToken token, string property) =>
+            token[property]?.Value<string>()?.Trim() ?? string.Empty;
     }
 }

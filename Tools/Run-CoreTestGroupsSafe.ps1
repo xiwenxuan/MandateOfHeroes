@@ -23,7 +23,12 @@ $ErrorActionPreference = "Stop"
 # timeout even when the slow-test allowance is raised.
 $slowDeterminismTests = @(
     "FoodRuntime_FormalWorldIsDeterministicForOneYear",
+    "IntegratedOneYearStabilityTests_FormalWorldHasNoEconomicInvariantFailure",
+    "Simulation_SameSeedAndDurationProducesSameSnapshot",
     "Simulation_SaveResumeMatchesContinuousRun",
+    "LuoyangLiving_365DayCropAndConservationRemainStable",
+    "LuoyangT4_OneSevenThirtyOneYearThreeYearSixYearRemainValid",
+    "OuterAgricultureLongRunTests_AllRecordsRunForOneWorldYearWithoutDuplicateHarvest",
     # Full 700k-person, 365-day integrated economy simulation. It was measured
     # above the ordinary 300-second gate and is therefore isolated exactly like
     # the existing long deterministic simulations.

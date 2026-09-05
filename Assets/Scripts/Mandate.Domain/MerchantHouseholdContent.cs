@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Mandate.Domain
@@ -12,6 +13,10 @@ namespace Mandate.Domain
         public string OriginLocationId;
         public string TargetLocationId;
         public string RouteId;
+        public string CellRouteAssetRouteId;
+        public ulong CellRouteOriginCellId64;
+        public ulong CellRouteTargetCellId64;
+        public string CellRouteMovementCapabilityId;
         public string CommodityId;
         public int CargoQuantity;
         public int ExpectedOriginUnitPrice;
@@ -134,6 +139,13 @@ namespace Mandate.Domain
                     string.IsNullOrWhiteSpace(item.OriginLocationId) ||
                     string.IsNullOrWhiteSpace(item.TargetLocationId) ||
                     string.IsNullOrWhiteSpace(item.RouteId) ||
+                    string.IsNullOrWhiteSpace(item.CellRouteAssetRouteId) ||
+                    item.CellRouteOriginCellId64 == 0 ||
+                    item.CellRouteTargetCellId64 == 0 ||
+                    item.CellRouteOriginCellId64 ==
+                        item.CellRouteTargetCellId64 ||
+                    !MovementCapabilityIds.All.Contains(
+                        item.CellRouteMovementCapabilityId) ||
                     string.IsNullOrWhiteSpace(item.CommodityId) ||
                     string.IsNullOrWhiteSpace(item.IssuerOrganizationId) ||
                     string.IsNullOrWhiteSpace(item.TravelEventId) ||
@@ -223,6 +235,11 @@ namespace Mandate.Domain
                 OriginLocationId = "location.zhongshan",
                 TargetLocationId = "location.zhuo",
                 RouteId = "route.zhuo_zhongshan",
+                CellRouteAssetRouteId = "R003",
+                CellRouteOriginCellId64 = 3_352_589,
+                CellRouteTargetCellId64 = 3_160_413,
+                CellRouteMovementCapabilityId =
+                    MovementCapabilityIds.PackAnimal,
                 CommodityId = "commodity.cloth",
                 CargoQuantity = 6,
                 ExpectedOriginUnitPrice = 165,

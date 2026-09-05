@@ -288,7 +288,7 @@ namespace Mandate.Domain
     [Serializable]
     public sealed class WorldState
     {
-        public const int CurrentSchemaVersion = 78;
+        public const int CurrentSchemaVersion = 79;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public ulong MasterSeed;
@@ -7569,15 +7569,31 @@ namespace Mandate.Domain
                     transaction.LegacyVillagePublicGranaryDelta == 0 &&
                     transaction.LegacyCountyGranaryDelta == 0 &&
                     (civilianDispatch &&
-                         transaction.SourceFormalMarketOrderId ==
-                            civilianFreight.SellOrderId &&
-                         transaction.SourceCountyGovernanceId ==
-                            civilianFreight.OriginCountyGovernanceId ||
+                         (civilianFreight.PurposeId ==
+                              CivilianFreightPurposeIds
+                                  .MerchantOwnerCarriage &&
+                          string.IsNullOrEmpty(
+                              transaction.SourceFormalMarketOrderId) &&
+                          string.IsNullOrEmpty(
+                              transaction.SourceCountyGovernanceId) ||
+                          civilianFreight.PurposeId !=
+                              CivilianFreightPurposeIds
+                                  .MerchantOwnerCarriage &&
+                          transaction.SourceFormalMarketOrderId ==
+                              civilianFreight.SellOrderId &&
+                          transaction.SourceCountyGovernanceId ==
+                              civilianFreight.OriginCountyGovernanceId) ||
                      !civilianDispatch &&
                          string.IsNullOrEmpty(
                              transaction.SourceFormalMarketOrderId) &&
                          string.IsNullOrEmpty(
                              transaction.SourceCountyGovernanceId));
+                var merchantFreightSettlement = merchantSold &&
+                    hasCivilianFreight &&
+                    civilianFreight.PurposeId ==
+                        CivilianFreightPurposeIds.MerchantOwnerCarriage &&
+                    civilianFreight.CarrierPersonId ==
+                        transaction.ActorPersonId;
                 var validMerchantProvenance = merchantInventory &&
                     !string.IsNullOrEmpty(transaction.ActorPersonId) &&
                     string.IsNullOrEmpty(transaction.SourceWorkOrderId) &&
@@ -7594,8 +7610,9 @@ namespace Mandate.Domain
                         transaction.SourceCountyGovernanceId) &&
                     string.IsNullOrEmpty(
                         transaction.SourceFormalMarketOrderId) &&
-                    string.IsNullOrEmpty(
-                        transaction.SourceCivilianFreightId) &&
+                    (string.IsNullOrEmpty(
+                         transaction.SourceCivilianFreightId) ||
+                     merchantFreightSettlement) &&
                     transaction.LegacyFamilyGrainDelta == 0 &&
                     transaction.LegacyFamilySeedGrainDelta == 0 &&
                     transaction.LegacyVillagePublicGranaryDelta == 0 &&
@@ -7641,7 +7658,7 @@ namespace Mandate.Domain
                     !marketInventory && !civilianDispatch &&
                     !string.IsNullOrEmpty(
                         transaction.SourceFormalMarketOrderId) ||
-                    !civilianInventory &&
+                    !civilianInventory && !merchantFreightSettlement &&
                     !string.IsNullOrEmpty(
                         transaction.SourceCivilianFreightId) ||
                     !formalization && !foodRuntime && !marketInventory &&
@@ -7941,6 +7958,10 @@ namespace Mandate.Domain
                     {
                         var isSource = line.QuantityDelta < 0;
                         var isDestination = line.QuantityDelta > 0;
+                        var merchantOwnedFreight =
+                            civilianFreight.PurposeId ==
+                                CivilianFreightPurposeIds
+                                    .MerchantOwnerCarriage;
                         var publicReliefFreight =
                             !string.IsNullOrEmpty(
                                 civilianFreight.BuyerOrganizationId);
@@ -7954,7 +7975,15 @@ namespace Mandate.Domain
                                   line.OwnerOrganizationId);
                         var validCivilianLine =
                             civilianDispatch &&
-                            (isSource &&
+                            (isSource && merchantOwnedFreight &&
+                                 validCargoOwner &&
+                                 string.IsNullOrEmpty(
+                                     line.StorageFacilityId) &&
+                                 line.InventoryContainerId ==
+                                     civilianFreight
+                                         .TransportInventoryContainerId &&
+                                 line.ReservedQuantityDelta == 0 ||
+                             isSource && !merchantOwnedFreight &&
                                  line.OwnerFamilyId ==
                                      civilianFreight.SellerFamilyId &&
                                  line.StorageFacilityId ==
@@ -9313,6 +9342,9 @@ namespace Mandate.Domain
                     throw new InvalidOperationException(
                         "A civilian freight ledger entry cannot be null.");
                 InventoryTransactionState transaction = null;
+                freights.TryGetValue(
+                    entry.CivilianFreightId ?? string.Empty,
+                    out var ledgerFreight);
                 var hasTransaction = !string.IsNullOrEmpty(
                         entry.InventoryTransactionId) &&
                     transactions.TryGetValue(
@@ -9359,7 +9391,13 @@ namespace Mandate.Domain
                     entry.Type == CivilianFreightLedgerType.Delivered &&
                         (entry.Quantity <= 0 || entry.Money != 0 ||
                          transaction.Type != InventoryTransactionType
-                             .CivilianFreightDelivered) ||
+                             .CivilianFreightDelivered &&
+                         (ledgerFreight == null ||
+                          ledgerFreight.PurposeId !=
+                              CivilianFreightPurposeIds
+                                  .MerchantOwnerCarriage ||
+                          transaction.Type != InventoryTransactionType
+                              .MerchantMarketSold)) ||
                     entry.Type == CivilianFreightLedgerType.FreightFeePaid &&
                         (entry.Quantity != 0 || entry.Money < 0 ||
                          !string.IsNullOrEmpty(entry.InventoryTransactionId)))
@@ -9415,6 +9453,8 @@ namespace Mandate.Domain
                     freight.PublicReliefProcurementTradeId ?? string.Empty,
                     out var publicTrade);
                 var publicRelief = hasPublicTrade;
+                var merchantOwned = freight.PurposeId ==
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage;
                 var hasOrigin = governances.TryGetValue(
                     freight.OriginCountyGovernanceId, out var origin);
                 var hasDestination = governances.TryGetValue(
@@ -9493,7 +9533,9 @@ namespace Mandate.Domain
                     }
                 }
 
-                var validFamilyBuyer = !publicRelief && hasBuy && hasTrade &&
+                var validFamilyBuyer = freight.PurposeId ==
+                        CivilianFreightPurposeIds.FormalMarketDelivery &&
+                    !publicRelief && hasBuy && hasTrade &&
                     hasBuyerFamily && hasBuyerStorage &&
                     string.IsNullOrEmpty(freight.BuyerOrganizationId) &&
                     string.IsNullOrEmpty(
@@ -9531,7 +9573,9 @@ namespace Mandate.Domain
                     trade.SellerProceeds ==
                         freight.GoodsMoneyTransferred &&
                     freight.ProductDefinitionId == buy.ProductDefinitionId;
-                var validPublicBuyer = publicRelief && !hasBuy && !hasTrade &&
+                var validPublicBuyer = freight.PurposeId ==
+                        CivilianFreightPurposeIds.PublicReliefProcurement &&
+                    publicRelief && !hasBuy && !hasTrade &&
                     hasBuyerOrganization && !hasBuyerFamily &&
                     !hasBuyerStorage &&
                     buyerOrganization.Type == OrganizationType.Government &&
@@ -9580,27 +9624,77 @@ namespace Mandate.Domain
                         : string.IsNullOrEmpty(
                             freight.PublicReliefRecoveryId));
 
+                var validMerchantOwned = merchantOwned &&
+                    !hasBuy && !hasSell && !hasTrade && !hasPublicTrade &&
+                    hasBuyerFamily && hasCarrierFamily && hasContainer &&
+                    hasDispatch && carrier != null &&
+                    !hasBuyerOrganization &&
+                    !hasSellerFamily && !hasBuyerStorage &&
+                    !hasSellerStorage &&
+                    freight.BuyerFamilyId == freight.CarrierFamilyId &&
+                    string.IsNullOrEmpty(freight.BuyerOrganizationId) &&
+                    string.IsNullOrEmpty(
+                        freight.DestinationInventoryContainerId) &&
+                    string.IsNullOrEmpty(freight.SellerFamilyId) &&
+                    string.IsNullOrEmpty(freight.BuyerStorageFacilityId) &&
+                    string.IsNullOrEmpty(freight.SellerStorageFacilityId) &&
+                    string.IsNullOrEmpty(
+                        freight.PublicReliefProcurementTradeId) &&
+                    string.IsNullOrEmpty(
+                        freight.SourcePublicReliefEventId) &&
+                    string.IsNullOrEmpty(
+                        freight.SourcePublicReliefCommandId) &&
+                    string.IsNullOrEmpty(freight.PublicReliefRecoveryId) &&
+                    !freight.IsSupplementalPublicReliefFreight &&
+                    string.IsNullOrEmpty(
+                        freight.OriginCountyGovernanceId) &&
+                    string.IsNullOrEmpty(
+                        freight.DestinationCountyGovernanceId) &&
+                    carrierFamily.Id == buyerFamily.Id &&
+                    carrier != null && carrier.FamilyId == buyerFamily.Id &&
+                    container.OwnerFamilyId == buyerFamily.Id &&
+                    string.IsNullOrEmpty(container.OwnerOrganizationId) &&
+                    container.CarrierPersonId == carrier.Id &&
+                    dispatch.Type ==
+                        InventoryTransactionType.CivilianFreightDispatched &&
+                    dispatch.SourceCivilianFreightId == freight.Id &&
+                    string.IsNullOrEmpty(
+                        dispatch.SourceFormalMarketOrderId) &&
+                    string.IsNullOrEmpty(
+                        dispatch.SourceCountyGovernanceId) &&
+                    freight.FreightFee == 0 &&
+                    freight.FreightFeeEscrow == 0 &&
+                    freight.FreightFeePaid == 0;
+
+                var validMarketFreightAuthority = !merchantOwned &&
+                    hasSell && hasOrigin && hasDestination &&
+                    hasSellerFamily && hasSellerStorage &&
+                    FamilyBelongsToCounty(
+                        freight.SellerFamilyId, origin.CountyLocationId) &&
+                    sellerFamily.LocationId == freight.OriginLocationId &&
+                    sellerStorage.Kind ==
+                        VillageFacilityKind.HouseholdGranary &&
+                    sellerStorage.OwnerFamilyId == freight.SellerFamilyId &&
+                    sell.OwnerFamilyId == freight.SellerFamilyId &&
+                    sell.StorageFacilityId ==
+                        freight.SellerStorageFacilityId &&
+                    dispatch.SourceFormalMarketOrderId == sell.Id &&
+                    freight.ProductDefinitionId == sell.ProductDefinitionId &&
+                    freight.OriginCountyGovernanceId !=
+                        freight.DestinationCountyGovernanceId &&
+                    origin.CountyLocationId != destination.CountyLocationId;
+
                 if (!Enum.IsDefined(
                         typeof(CivilianFreightStatus), freight.Status) ||
-                    !hasSell || !hasOrigin ||
-                    !hasDestination || !hasCarrierFamily ||
-                    !hasSellerFamily || !hasSellerStorage || !hasContainer ||
+                    !IsKnownCivilianFreightPurpose(freight.PurposeId) ||
+                    !hasCarrierFamily || !hasContainer ||
                     !hasRoute || !hasDispatch || carrier == null ||
-                    !validFamilyBuyer && !validPublicBuyer ||
+                    !validFamilyBuyer && !validPublicBuyer &&
+                        !validMerchantOwned ||
+                    !validMarketFreightAuthority &&
+                        !validMerchantOwned ||
                     !locationIds.Contains(freight.OriginLocationId) ||
                     !locationIds.Contains(freight.DestinationLocationId) ||
-                    freight.OriginCountyGovernanceId ==
-                        freight.DestinationCountyGovernanceId ||
-                    origin.CountyLocationId == destination.CountyLocationId ||
-                    !FamilyBelongsToCounty(
-                        freight.SellerFamilyId, origin.CountyLocationId) ||
-                    sellerFamily.LocationId != freight.OriginLocationId ||
-                    sellerStorage.Kind !=
-                        VillageFacilityKind.HouseholdGranary ||
-                    sellerStorage.OwnerFamilyId != freight.SellerFamilyId ||
-                    sell.OwnerFamilyId != freight.SellerFamilyId ||
-                    sell.StorageFacilityId !=
-                        freight.SellerStorageFacilityId ||
                     carrier.FamilyId != carrierFamily.Id ||
                     container.CarrierPersonId != carrier.Id ||
                     container.OwnerFamilyId != carrierFamily.Id ||
@@ -9608,8 +9702,6 @@ namespace Mandate.Domain
                     dispatch.Type !=
                         InventoryTransactionType.CivilianFreightDispatched ||
                     dispatch.SourceCivilianFreightId != freight.Id ||
-                    dispatch.SourceFormalMarketOrderId != sell.Id ||
-                    freight.ProductDefinitionId != sell.ProductDefinitionId ||
                     freight.DispatchedQuantity <= 0 ||
                     freight.RemainingCargoQuantity < 0 ||
                     freight.DeliveredQuantity < 0 ||
@@ -9816,6 +9908,19 @@ namespace Mandate.Domain
         {
             for (var i = 0; i < MovementCapabilityIds.All.Count; i++)
                 if (string.Equals(MovementCapabilityIds.All[i], capabilityId,
+                        StringComparison.Ordinal))
+                    return true;
+            return false;
+        }
+
+        private static bool IsKnownCivilianFreightPurpose(string purposeId)
+        {
+            for (var i = 0;
+                 i < CivilianFreightPurposeIds.All.Count;
+                 i++)
+                if (string.Equals(
+                        CivilianFreightPurposeIds.All[i],
+                        purposeId,
                         StringComparison.Ordinal))
                     return true;
             return false;

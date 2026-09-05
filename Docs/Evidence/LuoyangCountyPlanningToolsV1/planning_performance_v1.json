@@ -1,0 +1,16 @@
+{
+  "schema_id": "mandate.luoyang.county-planning-performance.v1",
+  "entry_ms": 3649.701,
+  "cell_pick_p50_ms": 0,
+  "cell_pick_p95_ms": 0,
+  "validator_p50_ms": 0.009,
+  "validator_p95_ms": 0.011,
+  "draft_two_operations_ms": 2.155,
+  "undo_ms": 0.37,
+  "managed_gc_delta_bytes": 20172800,
+  "indexed_facilities": 2084,
+  "last_facility_candidates": 1,
+  "last_road_candidates": 47,
+  "planning_cell_game_objects": 0,
+  "county_map_render_objects": 1
+}

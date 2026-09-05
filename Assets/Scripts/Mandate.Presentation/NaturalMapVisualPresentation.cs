@@ -177,6 +177,7 @@ namespace Mandate.Presentation
         }
     }
 
+    [Serializable]
     public sealed class NaturalMapPerformanceSnapshot
     {
         public string Mode;
@@ -189,6 +190,7 @@ namespace Mandate.Presentation
         public long TerrainMeshBytes;
         public int VegetationDrawBatches;
         public int RiverMeshCount;
+        public int StrategicRoadMeshCount;
         public long ManagedGcDeltaBytes;
         public double WorldRegionTransitionMilliseconds;
         public int DrawCalls;

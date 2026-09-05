@@ -7,8 +7,10 @@ param(
     [int]$GroupCount = 12,
     [ValidateRange(1, 32)]
     [int]$GroupIndex = 1,
-    [ValidateRange(30, 300)]
+    [ValidateRange(30, 900)]
     [int]$TimeoutSeconds = 240,
+    [ValidateSet("Standard", "SlowDeterminism", "AssetBuildIntegration", "AssetManifestIntegration")]
+    [string]$TimeoutClass = "Standard",
     [switch]$UseGraphics,
     [switch]$ListOnly,
     [switch]$AggregateOnly,
@@ -45,21 +47,33 @@ foreach ($file in $testFiles) {
     $namespaceMatch = [regex]::Match(
         $text,
         '(?m)^\s*namespace\s+([A-Za-z_][A-Za-z0-9_.]*)')
-    $classMatch = [regex]::Match(
+    $classMatches = [regex]::Matches(
         $text,
         '(?m)^\s*public\s+(?:(?:sealed|static|partial)\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)')
-    if (-not $namespaceMatch.Success -or -not $classMatch.Success) {
+    if (-not $namespaceMatch.Success -or $classMatches.Count -eq 0) {
         continue
     }
 
     $namespaceName = $namespaceMatch.Groups[1].Value
-    $className = $classMatch.Groups[1].Value
-    $methodMatches = [regex]::Matches(
-        $text,
-        '(?ms)\[Test\]\s*(?:\[[^\]]+\]\s*)*public\s+void\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(')
-    foreach ($methodMatch in $methodMatches) {
-        $testNames.Add(
-            "$namespaceName.$className.$($methodMatch.Groups[1].Value)")
+    for ($classIndex = 0; $classIndex -lt $classMatches.Count;
+         $classIndex++) {
+        $classMatch = $classMatches[$classIndex]
+        $className = $classMatch.Groups[1].Value
+        $classStart = $classMatch.Index
+        $classEnd = if ($classIndex + 1 -lt $classMatches.Count) {
+            $classMatches[$classIndex + 1].Index
+        }
+        else {
+            $text.Length
+        }
+        $classText = $text.Substring($classStart, $classEnd - $classStart)
+        $methodMatches = [regex]::Matches(
+            $classText,
+            '(?ms)\[Test\]\s*(?:\[[^\]]+\]\s*)*public\s+void\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(')
+        foreach ($methodMatch in $methodMatches) {
+            $testNames.Add(
+                "$namespaceName.$className.$($methodMatch.Groups[1].Value)")
+        }
     }
     $sourceFacts.Add([ordered]@{
         path = $file.FullName.Substring($resolvedProject.Length + 1).Replace('\', '/')
@@ -70,6 +84,30 @@ foreach ($file in $testFiles) {
 $orderedTests = @($testNames | Sort-Object -Unique)
 if ($orderedTests.Count -eq 0) {
     throw "No [Test] public void EditMode tests could be discovered."
+}
+
+$slowDeterminismTests = @(
+    "Mandate.Tests.WorldKernelTests.Simulation_SaveResumeMatchesContinuousRun",
+    "Mandate.Tests.WorldKernelTests.FoodRuntime_FormalWorldIsDeterministicForOneYear",
+    "Mandate.Tests.WorldKernelTests.IntegratedOneYearStabilityTests_FormalWorldHasNoEconomicInvariantFailure",
+    "Mandate.Tests.WorldKernelTests.LuoyangLiving_365DayCropAndConservationRemainStable",
+    "Mandate.Tests.WorldKernelTests.LuoyangT4_OneSevenThirtyOneYearThreeYearSixYearRemainValid",
+    "Mandate.Tests.WorldKernelTests.OuterAgricultureLongRunTests_AllRecordsRunForOneWorldYearWithoutDuplicateHarvest"
+)
+$assetBuildIntegrationTests = @(
+    "Mandate.Tests.EditMode.LuoyangP0NativePrefabArtDeliveryV1Tests.BuildAssets_CreatesFourReplaceableThreeLodPrefabs"
+)
+$assetManifestIntegrationTests = @(
+    "Mandate.Tests.EditMode.LuoyangRemainingFinalAssetV1Tests.SourceManifest_Freezes240FilesAnd38ValidatedFbxSources"
+)
+if ($TimeoutSeconds -gt 300 -and $TimeoutClass -eq "Standard") {
+    throw (
+        "TimeoutSeconds above 300 requires the explicit " +
+        "classified timeout class.")
+}
+if ($TimeoutClass -in @("AssetBuildIntegration", "AssetManifestIntegration") -and
+    $TimeoutSeconds -gt 600) {
+    throw "$TimeoutClass is capped at 600 seconds."
 }
 
 $fingerprintText = ($sourceFacts | ForEach-Object {
@@ -128,6 +166,27 @@ if ($ListOnly) {
 }
 
 if (-not $AggregateOnly) {
+    $classifiedTests = if ($TimeoutClass -eq "SlowDeterminism") {
+        $slowDeterminismTests
+    }
+    elseif ($TimeoutClass -eq "AssetBuildIntegration") {
+        $assetBuildIntegrationTests
+    }
+    elseif ($TimeoutClass -eq "AssetManifestIntegration") {
+        $assetManifestIntegrationTests
+    }
+    else {
+        @()
+    }
+    $groupClassifiedTests = @($groups[$GroupIndex] | Where-Object {
+        $_ -in $classifiedTests
+    })
+    if ($TimeoutClass -ne "Standard" -and
+        $groupClassifiedTests.Count -eq 0) {
+        throw (
+            "Group $GroupIndex has no classified $TimeoutClass tests; " +
+            "retain the standard 300-second ceiling.")
+    }
     $groupDirectory = Join-Path $runRoot "group-$GroupIndex"
     New-Item -ItemType Directory -Path $groupDirectory -Force | Out-Null
     $groupMetadataPath = Join-Path $groupDirectory "expected.json"
@@ -136,6 +195,12 @@ if (-not $AggregateOnly) {
         groupIndex = $GroupIndex
         sourceFingerprint = $sourceFingerprint
         createdAt = (Get-Date).ToString('o')
+        timeoutClass = $TimeoutClass
+        timeoutSeconds = $TimeoutSeconds
+        classifiedTests = $groupClassifiedTests
+        slowDeterminismTests = if ($TimeoutClass -eq "SlowDeterminism") {
+            $groupClassifiedTests
+        } else { @() }
         expectedTests = @($groups[$GroupIndex])
     } | ConvertTo-Json -Depth 5 |
         Set-Content -LiteralPath $groupMetadataPath -Encoding UTF8
@@ -155,6 +220,7 @@ if (-not $AggregateOnly) {
         '-Mode', 'EditModeTests',
         '-TestFilter', $filter,
         '-TimeoutSeconds', $TimeoutSeconds,
+        '-TimeoutClass', $TimeoutClass,
         '-StartupTimeoutSeconds', 45,
         '-ResultExitGraceSeconds', 15,
         '-ProjectPath', $resolvedProject,

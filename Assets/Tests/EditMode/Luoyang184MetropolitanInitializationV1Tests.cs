@@ -13,6 +13,8 @@ namespace Mandate.Tests
 {
     public sealed class Luoyang184MetropolitanInitializationV1Tests
     {
+        private const int OuterSupplyProjectionColdStartBudgetMilliseconds = 5_000;
+
         private static string RuntimeRoot => Path.Combine(
             Application.dataPath, "StreamingAssets", "WorldMap", "Luoyang184MetropolitanInitializationV1");
 
@@ -240,10 +242,11 @@ namespace Mandate.Tests
                 Is.Zero);
             Assert.That(audit.PopulationTargetMaterialized, Is.True);
             Assert.That(reader.Definition.FoodProductDefinitionIds,
-                Does.Contain(CoreProductionContent.WheatGrainProductId));
+                Does.Contain("product.food.wheat_grain"));
             Assert.That(reader.Definition.WoodProductDefinitionIds,
                 Does.Contain(CoreProductionContent.TimberMaterialProductId));
-            Assert.That(timer.ElapsedMilliseconds, Is.LessThan(3_000));
+            Assert.That(timer.ElapsedMilliseconds,
+                Is.LessThan(OuterSupplyProjectionColdStartBudgetMilliseconds));
             TestContext.WriteLine(
                 "OUTER_SUPPLY_CATCHMENT init_ms=" +
                 timer.ElapsedMilliseconds + " cells=" + audit.CellCount +

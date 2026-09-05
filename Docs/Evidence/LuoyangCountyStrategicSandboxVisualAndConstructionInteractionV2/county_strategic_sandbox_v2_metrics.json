@@ -1,0 +1,18 @@
+{
+    "presentation_version": "mandate.luoyang.county-worldspace-presentation.v2",
+    "layout_fingerprint": "851858dce31b849166be9dc7e496a9283baf9bc68fc8e25f4a8a14d14ed4a358",
+    "deterministic_signature": "4709540967489090097",
+    "terrain_chunks": 50,
+    "facilities": 2084,
+    "far_landmarks": 158,
+    "far_ordinary_suppressed": 898,
+    "far_aggregates": 606,
+    "far_aggregate_renderers": 30,
+    "far_detail_objects": 0,
+    "renderers": 1162,
+    "cold_build_milliseconds": 93.5783,
+    "warm_enter_milliseconds": 0.0083,
+    "approximate_fps": 79.04852294921875,
+    "world_schema": 79,
+    "derived_presentation_only": true
+}

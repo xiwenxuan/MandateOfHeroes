@@ -1,5 +1,249 @@
 # 游戏系统总纲、当前状态与生产科研设计
 
+## 当前建筑实施：洛阳全城建筑语言与 Presentation LOD 推广 V1（2026-09-05）
+
+正式入口为
+[`TASK_LUOYANG_CITYWIDE_BUILDING_LANGUAGE_AND_PRESENTATION_LOD_ROLLOUT_V1.md`](TASK_LUOYANG_CITYWIDE_BUILDING_LANGUAGE_AND_PRESENTATION_LOD_ROLLOUT_V1.md)，
+实施记录为
+[`REPORT_LUOYANG_CITYWIDE_BUILDING_LANGUAGE_AND_PRESENTATION_LOD_ROLLOUT_V1.md`](REPORT_LUOYANG_CITYWIDE_BUILDING_LANGUAGE_AND_PRESENTATION_LOD_ROLLOUT_V1.md)。
+用户指示继续后，本阶段开始把 Golden Block V2 的住宅、市场、工坊、仓廪、官署五套建筑语言
+推广到全洛阳，但不追认 Golden Block 为 `ACCEPTED`。新增只读计划对2,084项正式Facility中的
+1,056项建筑型Facility稳定分类；158项Major继续保留54类正式模型身份，898项普通建筑进入
+通用上下文，其中Golden Block范围内3项由样板街区接管，Mid实际绘制895项。
+
+Far聚合现在读取五族主体比例和屋顶形状；Mid以最多12组共享Mesh表现院落、台基、墙、门、
+主辅屋、三类屋顶、小品和庭树，并关闭Far普通聚合；Near继续使用既有正式模型和96项局部上限。
+本轮未改变512km²、204,800个50m Cell、2,084项Facility、人口、库存、生产、市场、日期、行政
+归属或World Schema V79。全工程编译、定向Core 2/2、Unity EditMode 1/1和图形化PlayMode 1/1通过；
+因此状态为`IMPLEMENTED_TARGET_VERIFICATION_PASSED_READY_FOR_USER_REVIEW`。首次沙箱内EditMode启动
+因45秒内没有日志而被安全终止，按规则在沙箱外唯一重试后通过；两个正式Unity测试进程均自然退出。
+这仍是目标验证，不是完整回归、用户视觉接受或最终美术完成。
+
+## 当前建筑实施：洛阳 Golden Block 建筑美术定型与 50m Cell 建设模式 V2（2026-09-04）
+
+正式入口为
+[`TASK_LUOYANG_GOLDEN_BLOCK_BUILDING_ART_AND_50M_BUILD_MODE_V2.md`](TASK_LUOYANG_GOLDEN_BLOCK_BUILDING_ART_AND_50M_BUILD_MODE_V2.md)，
+实施记录为
+[`REPORT_LUOYANG_GOLDEN_BLOCK_BUILDING_ART_AND_50M_BUILD_MODE_V2.md`](REPORT_LUOYANG_GOLDEN_BLOCK_BUILDING_ART_AND_50M_BUILD_MODE_V2.md)。
+本轮把 V1 黄金街区收口为五套数据驱动 `BuildingPresentationProfile`：住宅、市场、工坊、仓廪和
+官署拥有不同模块布局、屋顶轮廓、台基、院墙、门楼、地面、道具与树木规则；同一 Profile 同时
+驱动正式样板院落、建设 Ghost 和非持久 Draft。稳定变体只读取 Profile、来源 ID 和 salt。
+
+建设规划继续直接使用 50m `PlanningCell`，没有新增 5m/10m Cell；普通县域隐藏 Grid，建设模式
+显示 Normal/Hover/Selected/Covered 与真实米制 Footprint，并显示 Entrance/道路方向。底部栏仅
+呈现住宅、市场、工坊、仓廪、官署五类，烽燧仅保留权限回归，官署候选不授予正式施工权限。
+400×400m Golden Block 仍为行168—175、列232—239的64个正式Cell和16个只读表现Lot。
+
+本轮没有改变512km²、204,800个PlanningCell、2,084项Facility、正式道路水系城防、人口、库存、
+生产、市场、日期、行政归属或World Schema V79。全工程编译、定向Core 4/4、Unity Project Load、
+EditMode 1/1和PlayMode 1/1均已通过；证据菜单生成02—29共28张当前V2图和指标JSON，完整性复核
+为28/28张1920×1080且重复哈希组为0，并目检关键
+总览、院落、格网、Ghost、跨格、非法态、Draft及退出状态。真实历史V1 Before在仓库中不存在且
+未伪造，因此状态为
+`IMPLEMENTED_AUTOMATION_PASSED_CURRENT_EVIDENCE_READY_HISTORICAL_BASELINE_PENDING_USER_REVIEW`，
+不得写为`ACCEPTED`。只有用户审图确认后，才进入全洛阳Far/Mid/Near建筑规则推广。
+
+## 当前战争设计归档：战争空间、野战、建筑攻坚与战斗结算 V1（2026-09-04）
+
+正式设计记录为
+[`WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md`](WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md)。
+当前状态为 `WARFARE_DESIGN_RECORDED_IMPLEMENTATION_DEFERRED`：已经记录 2000m 战略 Cell / 50m
+县域 PlanningCell、Formation Boundary、真实永久 Person、野战 Combat Frontage、建筑与城防统一
+攻坚、Formation 级大规模结算、Person 级结果回写及性能分层方向；本轮没有实现 Formation、野战、
+攻城、建筑战斗、战场 AI 或任何新战争 Runtime，也没有修改 World Schema。
+
+该文档是未来开发草案，不得写成 `WARFARE IMPLEMENTED`。城墙/城门作为 Facility 还是
+PlanningCell Edge 防御结构等既有设计差异，已在草案的兼容项中列明，必须在未来战争正式开工前
+另行裁决。当前开发重心继续为县域地图 Presentation、Golden Block、建筑模型与模块化院落美化、
+正式 50m PlanningCell 建设模式、Far / Mid / Near 建筑表现和全洛阳推广；战争系统暂停深化。
+
+## 当前建筑实施：洛阳建筑美术生产管线与黄金街区原型 V1（2026-09-04）
+
+正式入口为
+[`TASK_LUOYANG_BUILDING_ART_PIPELINE_AND_GOLDEN_BLOCK_PROTOTYPE_V1.md`](TASK_LUOYANG_BUILDING_ART_PIPELINE_AND_GOLDEN_BLOCK_PROTOTYPE_V1.md)，
+实施记录为
+[`REPORT_LUOYANG_BUILDING_ART_PIPELINE_AND_GOLDEN_BLOCK_PROTOTYPE_V1.md`](REPORT_LUOYANG_BUILDING_ART_PIPELINE_AND_GOLDEN_BLOCK_PROTOTYPE_V1.md)。
+本轮不再把“54/54 Facility有模型”解释为城市美术已经完成，而是在既有县域V2上建立一个
+400×400m黄金街区：从UrbanArea正式Facility确定性选址，以16个只读表现Lot构成住宅、市场、
+工坊、仓廪、官署/公共五类模块化院落，并合批加入巷道、院墙、门架、屋脊、三套屋顶色阶、
+类别小品和树木。县域导航新增“样板街区”聚焦入口。
+
+黄金街区及其巷道、配房均为`derived presentation only`，不新增Facility/Road ID，不改变
+2,084项Facility、人口、库存、生产、市场、日期、行政归属或World Schema V79。当前全工程
+编译及定向Core 4/4通过；Unity因用户编辑器仍在运行而未受控执行，状态为
+`IMPLEMENTED_COMPILE_AND_TARGETED_CORE_PASSED_UNITY_BLOCKED_BY_OPEN_EDITOR`。这不是最终PBR、
+考古复原、室内、碰撞、导航或全洛阳量产完成状态。
+
+## 当前空间实施：洛阳县域战略沙盘视觉与建设交互 V2（2026-09-04）
+
+正式入口为
+[`TASK_LUOYANG_COUNTY_STRATEGIC_SANDBOX_VISUAL_AND_CONSTRUCTION_INTERACTION_V2.md`](TASK_LUOYANG_COUNTY_STRATEGIC_SANDBOX_VISUAL_AND_CONSTRUCTION_INTERACTION_V2.md)，
+实施记录为
+[`REPORT_LUOYANG_COUNTY_STRATEGIC_SANDBOX_VISUAL_AND_CONSTRUCTION_INTERACTION_V2.md`](REPORT_LUOYANG_COUNTY_STRATEGIC_SANDBOX_VISUAL_AND_CONSTRUCTION_INTERACTION_V2.md)。
+本轮修正县域地形反向法线，以8×8个50m PlanningCell将898个普通Facility确定性归入606个
+Far街坊Aggregate，并按64×64 Cell Chunk与功能类别合批；158个Major Facility继续使用既有
+模型解析器作为Far地标。Far普通Facility Detail对象为0，Mid改用既有聚合代表与Major，Near
+继续以局部24×48镜头展开具体Facility。建设Ghost改用Placement Profile的正式ModelId，右侧面板
+增加现有Facility只读信息和Footprint高亮。
+
+本轮不改变512km²、204,800个PlanningCell、2,084项Facility、人口、库存、日期、行政归属或
+World Schema V79。全工程编译、既有County World-Space Core 2/2和新增V2 Core 2/2通过；全量
+Core按900秒分类门禁复跑至178项通过后停在既有整年食品世界模拟，仍未形成全量汇总。Unity因
+开工前用户编辑器正在Play Mode而未执行。27图正式菜单
+已经建立，但当前只有Before图落盘。因此状态为
+`IMPLEMENTED_COMPILE_AND_TARGETED_CORE_PASSED_UNITY_REVIEW_PENDING_ACTIVE_EDITOR`，不得写为
+`ACCEPTED`，也不得把非持久Draft解释为正式施工。
+
+## 当前空间实施：洛阳县域可视化建设交互重构 V1（2026-09-03）
+
+正式入口为
+[`TASK_LUOYANG_COUNTY_VISUAL_CONSTRUCTION_INTERACTION_REWORK_V1.md`](TASK_LUOYANG_COUNTY_VISUAL_CONSTRUCTION_INTERACTION_REWORK_V1.md)，
+实施记录为
+[`REPORT_LUOYANG_COUNTY_VISUAL_CONSTRUCTION_INTERACTION_REWORK_V1.md`](REPORT_LUOYANG_COUNTY_VISUAL_CONSTRUCTION_INTERACTION_REWORK_V1.md)。
+洛阳县域规划已从工程面板重构为底部分类建设栏，支持建筑 Ghost 和连续放置、道路/墙边/
+水渠拖拽、四类分区刷、草案选择/移动/复制/吸管/删除、Undo/Redo，以及行政/道路/河流/
+格网/地形图层。县域建设相机使用中键平移、`Alt+右键`旋转、滚轮缩放，普通右键只取消
+当前规划动作。
+
+本任务继续使用512km²、320×640、204,800个50m PlanningCell和2,084项正式Facility；
+所有新增内容均为非持久化草案，日期、人口、人物、库存、正式道路水系城防、行政归属和
+World Schema V79均不改变。当前状态为
+`IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`：全工程编译、定向 Core、
+953/953 冻结清单 Core、Unity Project Load、EditMode、PlayMode，以及 18 张 1280×720 与
+1 张 1920×1080 真实 Game View 证据均已通过并完成目检。Unity 已保持打开供用户操作；
+只有用户明确确认后才可写成 `ACCEPTED`。后续状态以本节和实施报告为准。
+
+## 当前地图实施：天下彩色立体战略沙盘视觉原型 V1（2026-09-03）
+
+正式入口为
+[`TASK_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md`](TASK_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md)，
+实施记录为
+[`REPORT_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md`](REPORT_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md)。
+用户已明确否决水墨舆图作为普通玩家天下地图的方向；`M 天下` 现以原创汉末彩色立体
+战略沙盘为正式视觉原型，使用分层彩色地形、斜俯视镜头、上下文格网、行政 LOD 和
+正式地点数据驱动的合批微缩城邑。普通 UI 只提供“战略沙盘 / 自然地形”对照，旧水墨
+Profile 仅作开发兼容。
+
+本轮不改变 7,211,264 个 2 km Cell、洛阳县域 204,800 个 50m PlanningCell、2,084 项
+Facility、行政归属、人物、人口、库存、市场或日期；World Schema 保持 V79。当前状态为
+`IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`。全工程编译、定向 Core
+2/2、Unity EditMode 5/5 和图形化正式 PlayMode 1/1 已通过；6 张非空图形证据及性能
+JSON 已生成并目检。该状态不等于最终美术 `ACCEPTED`，仍需用户审图。
+
+## 当前地图实施：三视角路由与天下水墨原型 V1（2026-09-03）
+
+正式入口为
+[`TASK_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md`](TASK_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md)，
+实施记录为
+[`REPORT_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md`](REPORT_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md)。
+正式玩家主视角现统一为`M 天下 / C 县域 / F 人物`；“城市”降为县域内部
+`UrbanArea`子视图。县域总览、城区聚焦和建设规划复用同一个洛阳512km²、320×640、
+204,800个50m PlanningCell和2,084项Facility布局包，只改变相机、LOD、标签和高亮。
+
+该任务的三视角和县域命名成果继续有效；水墨实现曾完成自动验收，但已于
+2026-09-03 被用户明确否决为正式美术方向。其 Profile、证据和测试仅保留作开发兼容，
+不再作为普通玩家默认或可见切换项。当前天下视觉状态以上一节的彩色立体战略沙盘为准。
+
+## 当前空间实施：洛阳县域规划建设工具 V1（2026-09-03）
+
+正式入口为
+[`TASK_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md`](TASK_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md)，
+实施报告为
+[`REPORT_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md`](REPORT_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md)。
+正式 `PlayableDemo → M 天下 → 洛阳｜县域规划` 已接入可操作建设工具：五类现有
+Facility 候选、实体Footprint、四向旋转入口、道路接入、地形/坡度/水体/城防/Portal/
+既有Facility/草案/县界校验、多草案及Undo/Redo均已实现。县域仍复用512km²、320×640、
+204,800个50m PlanningCell和2,084项现有Facility；表现使用一张纹理与48×24局部规划窗，
+逐Cell GameObject为0。
+
+本阶段只创建非持久化`DraftBuildingBlueprint`，没有正式施工、扣除钱粮材料劳力、推进
+日期、改变人口家户产权库存道路水系城防导航或新增Facility。军用烽燧只生成带权限提示
+的条件性草案。World Schema保持V79。全工程编译、定向Core 10/10、Unity EditMode 1/1
+和正式PlayMode 1/1通过，12张状态图与性能JSON已经生成；任务范围差异检查通过，全工作区
+仍有本任务开始前四个P0Final `.fbx.meta`尾随空格。当前状态为
+`IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`，只有用户明确确认后才可
+标记`ACCEPTED`。下一阶段必须另立正式建设事务与存档兼容任务，不得把草案直接提升为
+Facility。
+
+## 当前空间实施：洛阳权威50m布局数据包与县域空间闭环 V1（2026-09-03）
+
+正式入口为
+[`TASK_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md`](TASK_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md)，
+实施报告为
+[`REPORT_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md`](REPORT_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md)。
+当前已把P1的即时坐标缩放改为版本化运行时布局包：2,084项Facility候选、359/334个
+道路节点/边、19/17个水渠节点/边、144条城防边、4个Portal、6个分区凸包和1个全城
+凸包均由同一JSON读取。两个Facility源文件保存并校验SHA-256，任一源漂移会显式失败。
+
+这里的“权威”只表示Runtime唯一布局输入；`historically_exact=false`。2,083项位置、城防
+方向、入口朝向、分区凸包与Portal仍是GameplayReconstruction/Provisional，不得写成东汉
+洛阳精确测绘。World Schema保持V79，不改变人口、家户、设施账、库存或结算。编译与定向
+Core 8/8通过；新增Unity定向验收在启动日志前被环境门禁阻塞，状态为
+`IMPLEMENTED_CORE_ACCEPTED_UNITY_STARTUP_GATE_BLOCKED`。其下一步“洛阳县域规划建设工具
+V1”现已完成自动验收；该旧段只保留上游交付事实，当前状态以上一节为准。
+
+## 当前空间实施：洛阳50m县域真实规模与Facility迁移 P1（2026-09-03）
+
+正式入口为
+[`TASK_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md`](TASK_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md)，
+实施报告为
+[`REPORT_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md`](REPORT_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md)。
+当前已实际构建洛阳512km²、320×640共204,800个50m PlanningCell、800个Chunk，
+并把2,084项既有Facility以保留源锚点的非持久候选方式完整投影；Unity以1张数据纹理和
+1个Renderer显示全县域，逐格GameObject为0。技术容量门为Decision A；历史定位门为
+Decision B，因为旧设施操作布局横跨92×65个2km Cell，2,083项候选位置仍是明确的
+GameplayReconstruction，而非史实坐标。
+
+所选128个HanWorldV1父Cell含21个道路格、0个正式水格；19项正式沟渠Facility另派生
+122个候选局部水格，二者不可混写。正式World Schema保持V79，本阶段没有改人物、人口、
+家庭、库存、生产、Facility所有权或世界结算。当前状态为
+`IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`；下一步是建立可审阅的
+洛阳权威50m布局数据包、UrbanArea、河渠/道路/墙门/Portal几何和逐Facility尺寸来源，
+不直接进入存档迁移或建设玩法。
+
+## 当前空间架构决策：2km战略层＋50m县域层 P0（2026-09-02）
+
+正式入口为
+[`TASK_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md`](TASK_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md)，
+实施证据见
+[`REPORT_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md`](REPORT_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md)。
+本轮已完成2×2个2km `StrategicTile2Km`、80×80共6400个50m
+`PlanningCell50m` 的小规模技术验证，并确认统一全局坐标、Cell四向连接、Facility真实
+Footprint/Entrance、CountyPortal、墙体Edge、Gate/Breach、高度/LOS、人物与军队互斥空间状态，
+以及HOT/WARM/COLD只改变缓存和表现、不改变世界账的架构可以共同工作。最终选择
+**Decision A**；用户已授权进入P1，状态为
+`DECISION_A_CONFIRMED_AND_P1_AUTHORIZED_2026_09_03`。
+
+50m格使用紧凑数组和Chunk，不采用一格一GameObject。6400格权威数组为76800 bytes，
+Unity中只使用2个格网渲染对象；全工程编译、Core 928/928、Unity EditMode 7/7和
+PlayMode 1/1已通过。正式World Schema仍为V79，没有执行旧存档迁移。该结论只批准
+下一阶段“洛阳50m县域空间原型与Facility迁移验证 V1”，不表示洛阳约204800格、
+2084项Facility、全国50m数据、建设工具、攻城系统或永久存档协议已经完成或冻结。
+
+## 当前地图实施：统一世界行政边界与县域规划视角 V1（2026-09-02）
+
+正式入口为 `TASK_WORLD_ADMINISTRATIVE_BOUNDARIES_AND_COUNTY_PLANNING_VIEW_V1.md`。
+当前实现直接复用 `HanWorldV1/admin.bin` 的州、郡国等价区、县三个 Cell 归属通道，
+建立13州、105郡国等价区、1182县的稳定 Region 目录、父级校验、边界拓扑、
+州/郡国/县 LOD、Cell 内点选区和县域规划入口。玩家仍在同一张世界地图上滚轮
+缩放、中键平移、右键旋转；县域规划不加载第二套县/城市地图，不改变人物位置、
+时间、人口、Facility、库存或市场。城市正式定义为县域内部动态 `UrbanArea`，
+不是新的行政或规划地图层级。
+
+当前状态为
+`IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`：
+全工程编译、新增 Core 5/5、适用 Core 全量899/899、Unity Project Load、
+EditMode 5/5和正式 PlayMode 1/1均已通过。正式拓扑实测4,647,051个已映射 Cell、
+105,116条唯一边界段、650个非空边界 Chunk；1300个目录 Region 均可解析，
+其中1273个已有 Cell 几何，27个明确保留为未解析几何。全部运行时边界均标为
+approximate/provisional，verified=0，不得写成1182县历史精确县界完成。六张
+Unity Main Camera 图形验收图与性能 JSON 已生成并检查；Unity 必须由安全脚本在
+Codex 受限沙箱外启动，沙箱内会在首行启动日志前被宿主隔离阻塞。
+
+本任务没有完成县域建设工具、洛阳县域空间恢复、城市/聚落建筑群、人物近景、
+Facility完整交互、正式市场 UI 或城市生活表现。下一项是“洛阳县域空间恢复与
+规划基底 V1”，之后才是“县域规划建设工具 V1”。
+
 > 2026-08-12：`LUOYANG-PLAYABLE-VERTICAL-SLICE-MAP-PRESENTATION-AND-CONSTRUCTION-ASSET-LIBRARY-V1` 已建立同一洛阳Runtime上的Golden Slice表现投影、正式BuildBlueprint/VisualProfile/VisualAnchor合同、四类玩家/AI/历史初始化复用建设资产、真实Person/Shipment/Crop/Lifecycle视觉绑定及默认可玩场景。当前状态为`LUOYANG_GOLDEN_SLICE_V1_PLAYABLE_WITH_PROCEDURAL_ART_LIMITS`；全国DEM Chunk Terrain、最终3D汉代Prefab、全洛阳A-Tier Composition和完整Force近景仍不得写成已完成。
 
 ## Document Governance
@@ -287,6 +531,7 @@ Unity FBX Exporter；因此没有伪造源文件，`FinalArtApproved` 仍全为 
 | [`PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md`](PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md) | 数据驱动作物、产品、配方、生产执行、产业经济与职业成长专项设计 |
 | [`CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md`](CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md) | 人物禀赋、能力、性格、志向、词条、教育和家族培养 |
 | [`UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md`](UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md) | 个人战、军队、装备、兵种、阵法、权限、战役和世界回写 |
+| [`WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md`](WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md) | 2000m/50m同世界战争空间、Formation Boundary、Combat Frontage、建筑攻坚与性能分层草案；Implementation Deferred |
 | [`TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md`](TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md) | 全员永久身份、分级模拟、关注演出和超大人口压力验证 |
 | [`TASK_LUOYANG_POPULATION_STRESS_V1.md`](TASK_LUOYANG_POPULATION_STRESS_V1.md) | 洛阳20K—500K永久人物、固定设施与AI真实扩建、2,000米Cell容量压力证据 |
 | [`TASK_LUOYANG_184_URBAN_INITIALIZATION_V1.md`](TASK_LUOYANG_184_URBAN_INITIALIZATION_V1.md) | 184年洛阳27万正式永久人物、家户、设施容量、岗位、家族、军队与运行事件初始化 |
@@ -441,7 +686,7 @@ Unity FBX Exporter；因此没有伪造源文件，`FinalArtApproved` 仍全为 
 | 系统 | 当前状态 | 核心内容 |
 |---|---|---|
 | 时间与历法 | 已有底座 | 日、旬、月、季、年和多频率结算 |
-| 地图与地点 | 已有原型 | MASTER-MAP-V0 已建立开放物理地理母版、77城、1182县目录、战略节点、路线与7211264个稳定方格Cell；MASTER-MAP-V1进一步发布统一对齐的HanWorldV1、洛阳三档共71897个永久人物与家庭、42类Facility容量母表、1057个推荐档真实Facility Cell、动态城市Footprint、洛阳—虎牢战争走廊和人口/设施Unity专题验证场景。LUOYANG-184-URBAN-INITIALIZATION-V1 已在同一世界上正式物化洛阳连续城市区270000名永久人物、53992户、1230项设施审计、7个家族组织、5支军队与10个运行事件；LUOYANG-184-METROPOLITAN-INITIALIZATION-V1 又以不改写旧包的增量合同新增130000名永久人物、26907户、854项近郊设施、33条聚落—城门路线、135个农业/畜牧单元与5类供应链，使都市圈达到400000人。HAN-135-260全国人口母盘已确认该400K为PASS，并将700K供给区判定为可保留的包含式包络；700K仍未物化，不得解释成400K+700K。M26-P5B另有中山世界节点—城镇空间—建筑切片；全国Facility填充、认知地图和完整层级场景衔接仍未实现 |
+| 地图与地点 | 已有原型；行政边界/县域规划V1自动验收通过 | MASTER-MAP-V0 已建立开放物理地理母版、77城、1182县目录、战略节点、路线与7211264个稳定方格Cell；MASTER-MAP-V1进一步发布统一对齐的HanWorldV1、洛阳三档共71897个永久人物与家庭、42类Facility容量母表、1057个推荐档真实Facility Cell、动态城市Footprint、洛阳—虎牢战争走廊和人口/设施Unity专题验证场景。LUOYANG-184-URBAN-INITIALIZATION-V1 已在同一世界上正式物化洛阳连续城市区270000名永久人物、53992户、1230项设施审计、7个家族组织、5支军队与10个运行事件；LUOYANG-184-METROPOLITAN-INITIALIZATION-V1 又以不改写旧包的增量合同新增130000名永久人物、26907户、854项近郊设施、33条聚落—城门路线、135个农业/畜牧单元与5类供应链，使都市圈达到400000人。HAN-135-260全国人口母盘已确认该400K为PASS，并将700K供给区判定为可保留的包含式包络；700K仍未物化，不得解释成400K+700K。统一世界行政边界V1已实现13州/105郡国等价区/1182县的Region解析、Cell边界LOD与县域规划入口，并通过编译、Core 899/899、Unity EditMode/PlayMode、六图和性能基线；27个Region仍无Cell几何，全部运行时边界均为approximate/provisional，不能描述为历史精确县界或县域建设完成。M26-P5B另有中山世界节点—城镇空间—建筑切片；全国Facility填充、认知地图和完整层级场景衔接仍未实现 |
 | Cell产权与占用 | 已有底座 | HanWorldV1保持2000米Cell；领域规则已限制一Cell一个Owner、一个基础Facility槽和一个独立Force槽。Facility与Force为不同占用槽；产权事务、全国运行时接入和完整UI仍待扩展 |
 | 世界创世与资源配置 | 已定方案 | 史料锚点、合理推定、地质生态生成、资源丰度、世界种子和来源审计 |
 | 认知地图与专题视图 | 已定方案 | 个人/组织知识、比例尺聚合、建设/资源/战争等视图和信息防泄露 |
@@ -1052,6 +1297,31 @@ M26-P0 已于 2026-08-06 完成首个可玩主循环竖切片，任务与证据�
 20—30分钟可玩性冒烟与交互修正，再按本总纲选择下一项世界系统建设。
 
 ## 0E. 推荐后续建设顺序
+
+2026-09-04，战争空间、野战、建筑攻坚与战斗结算架构已经完成设计归档，但实现明确暂缓。
+当前后续建设顺序更新为：
+
+```text
+洛阳县域地图 Presentation
+→ Golden Block 建筑美术升级
+→ 建筑轮廓 / 屋顶 / 院落 / 地面 / 道具模块
+→ Far / Mid / Near 建筑表现
+→ 建设模式显示正式 50m PlanningCell
+→ 建筑 Ghost 与县域建设交互
+→ 全洛阳建筑美术规则推广
+→ 正式 ConstructionProject、材料、劳力、工期与施工
+→ 以后另行批准的战争性能原型与实现
+```
+
+不得从本次设计归档直接进入野战 V1、攻城 V1、Formation V1 或 Combat V1。下文各历史阶段的
+“下一步”只保留当时记录，不覆盖本段最新全局顺序。
+
+2026-09-02，“统一世界行政边界与县域规划视角 V1”已完成 Project Load、Core
+899/899、EditMode 5/5、PlayMode 1/1、六张图形验收图和性能基线。当前固定进入
+“洛阳县域空间恢复与规划基底 V1”，再进入“县域规划建设工具 V1”。不得继续把
+独立城市 Scene 当作建设权威，也不得把当前近似 Cell 边界描述为1182县历史考证
+完成。下文较早的“固定下一阶段”记录仅保留各专项当时的历史顺序，不覆盖本段
+最新全局顺序。
 
 2026-08-29，`TASK_LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1` 已达到
 `LUOYANG_CELL_TRAVERSAL_PORT_AND_HUMAN_SCALE_MOVEMENT_V1_ACCEPTED`。同一正式洛阳的5,980个Cell
@@ -2397,3 +2667,114 @@ Unity初始化6,291ms，20帧平均6.328ms；性能结论为`ACCEPTABLE FOR V1`�
 下一正式阶段是 M26 商旅/商号玩法收口、Product Readiness 与20—30分钟独立人工盲玩V1。
 该阶段聚焦行情信息、货物准备、岗位、路线成本/风险、交易反馈、商号经营、账本、失败恢复、
 教程和人类盲玩缺陷，不再重建经济Authority。
+
+## 51. M26 商旅 / 商号玩法收口、Product Readiness 与独立人工盲玩 V1（2026-09-01）
+
+当前报告见
+[`M26_MERCHANT_CARAVAN_BUSINESS_PRODUCT_READINESS_AND_BLIND_PLAY_V1_ACCEPTANCE_REPORT.md`](M26_MERCHANT_CARAVAN_BUSINESS_PRODUCT_READINESS_AND_BLIND_PLAY_V1_ACCEPTANCE_REPORT.md)，
+证据目录为
+[`Evidence/M26MerchantProductReadinessV1/`](Evidence/M26MerchantProductReadinessV1/)。
+
+普通玩家商旅入口现已把家庭压力、行情来源/时效/可信度、实时采购价格与载重、同行者、路线距离、
+口粮和已知风险、途中事件、到达销售、实际盈亏、市场影响、商号资金/仓库/成员/岗位以及长期目标
+压缩成可重建的只读玩家投影；购买、旅行、事件、交付和家庭选择仍写入既有Person、Household、
+Organization、ProductBatch、InventoryTransaction、Market、Journey、CivilianFreight、CellRoute、WorldTime
+与Save账，不建立玩家专属经济。中山—涿县主线现由全国`R003`生成连续四向CellRoute，玩家自有货物
+经守恒调度事务进入正式民运，途中损失与到站销售引用同一货运单。关键失败路径给出原因和恢复提示，
+失败不推进世界或重复结算。
+
+2026-09-01最终源码指纹`774FF1E1…C88096EE`的全工程编译通过，完整Core为883/883；2026-08-31
+完整Unity EditMode基线为1087/1087，最终Gate F与玩家文案专项EditMode为4/4，M26目标PlayMode为
+1/1，三次重放一致，`git diff --check`和范围审阅通过。沙箱内Project Load在启动日志产生前被安全
+门禁阻断，而同一安全入口在沙箱外8.195秒通过，因此项目、许可证和Unity入口有效，阻断归因于
+Codex沙箱启动边界。
+
+当前最终状态必须保持`NOT ACCEPTED / BLOCKED`：合格独立人类尚未完成20—30分钟无提示盲玩，
+盲玩包仍为`NOT_RUN`。Acceptance Gate F的正式CellRoute自动化整改已经闭合；涿县端点仍是低置信
+临时玩法代理，不得解释为精确历史县城坐标。自动测试、开发者自测或AI模拟均不能替代人工门禁。
+在独立盲玩封存及其S0/S1修复复验前，不得进入HOT/WARM/COLD正式迁移，也不得把本阶段或M26-P1
+标记为最终完成。
+
+## 52. PlayableDemo 正式全国格子地图替换与商旅路线可视化 V1（2026-09-01）
+
+任务合同见
+[`TASK_PLAYABLE_DEMO_FORMAL_WORLD_CELL_MAP_AND_CARAVAN_ROUTE_V1.md`](TASK_PLAYABLE_DEMO_FORMAL_WORLD_CELL_MAP_AND_CARAVAN_ROUTE_V1.md)，
+当前验收报告见
+[`PLAYABLE_DEMO_FORMAL_WORLD_CELL_MAP_AND_CARAVAN_ROUTE_V1_ACCEPTANCE_REPORT.md`](PLAYABLE_DEMO_FORMAL_WORLD_CELL_MAP_AND_CARAVAN_ROUTE_V1_ACCEPTANCE_REPORT.md)，
+验证摘要见
+[`Evidence/PlayableFormalWorldMapV1/verification-summary.md`](Evidence/PlayableFormalWorldMapV1/verification-summary.md)。
+
+普通玩家“地图”页已经从旧`ProceduralSilkMapArt`示意图切换到既有`HanWorldV1`正式全国自然地图。
+全国层使用32×32 Cell引导LOD，跟随玩家/商队后使用相机附近精确2km Cell；启程前只读投影正式
+`R003`计划路线，启程后读取同一`CivilianFreight.CellRouteSegments`及当前进度。路线、人物标记、
+Camera和RenderTexture均为可丢弃Presentation派生物，不保存、不改World Revision，也不建立第二套
+路线、人物位置或经济权威。旧地图代码暂留兼容，但普通玩家入口不再调用。
+
+当前状态为`IMPLEMENTED / AUTOMATED UNITY RE-RUN BLOCKED BY OPEN EDITOR`：全工程编译、目标Core
+2/2和差异检查通过；受控图形PlayMode由安全入口检测到Unity PID 21736正打开项目而返回稳定门禁
+`blocked/120`，未关闭用户程序。关闭编辑器并取得明确PlayMode结果前不得标记本任务最终
+`ACCEPTED`。本任务也不改变M26仍需20—30分钟独立人工盲玩的最终门禁。
+
+## 53. PlayableDemo 洛阳直接可玩场景与玩家 HUD V1（2026-09-01）
+
+任务合同见
+[`TASK_PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1.md`](TASK_PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1.md)，
+验收报告见
+[`PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1_ACCEPTANCE_REPORT.md`](PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1_ACCEPTANCE_REPORT.md)，
+验证摘要见
+[`Evidence/PlayableDirectLuoyangGameV1/verification-summary.md`](Evidence/PlayableDirectLuoyangGameV1/verification-summary.md)。
+
+本任务明确把原`SimulationDashboard`重新分类为开发/旧系统原型，而不是普通玩家游戏画面。
+`PlayableDemo`在Player Demo Mode下默认进入洛阳人物尺度近景：一个稳定永久玩家、同一正式洛阳地点
+和人物尺度计划中的2,084个Facility进入WorldState，随后绑定既有门桥世界状态、四向Cell路线、
+正式Player Movement、世界命令结算与3×3 Cell Streaming。Unity人物只播放已经提交的世界路线，
+没有第二套人物、Facility、路径、库存或经济权威，也没有升级存档版本。
+
+普通玩家HUD现只显示人物、时间、地点、钱财、口粮、体力、移动和建筑目标。左键选建筑、右键或E
+前往、WASD镜头、滚轮缩放、F跟随、R正式休息、S内存保存、Esc暂停；M键把全国正式Cell格网作为
+战略层打开，再返回同一洛阳人物近景。旧自建人物和商旅面板继续兼容，但进入时会停用近景游戏壳，
+避免双UI/双输入。
+
+当前状态为`IMPLEMENTED / AUTOMATED PLAYMODE RE-RUN BLOCKED BY OPEN EDITOR`。全工程编译、新增Core
+2/2与`git diff --check`通过；用户已打开编辑器完成脚本导入和程序集重载，但安全测试入口检测到
+Unity PID 21736而拒绝启动第二个编辑器，未关闭用户程序。目标PlayMode和Game View人工操作确认尚未
+取得，因此本任务不能标记最终`ACCEPTED`。最终角色FBX、NPC人群、室内和完整职业/战斗近景交互仍
+明确不属于本V1，也不解除M26独立20—30分钟盲玩门禁。
+
+## 54. PlayableDemo 洛阳玩家镜头、建筑交互与首条玩法闭环整改 V1（2026-09-01）
+
+人工检查否决了第53节“可运行候选即足够”的体验假设：原候选缺少中键平移、右键旋转、建筑信息，
+人物在审图尺度下不可辨认，且直接洛阳世界只有移动与休息。当前整改改为中键拖动平移、右键拖动
+旋转，右键不再发出移动命令；本地正交镜头设为8，直接场景人物使用2.4倍纯表现缩放及“◆我”标记。
+
+建筑卡读取2,084项正式开局Facility的名称、类型、运作/完好度、史料置信度、空间精度、Cell和
+Access；“前往此处”仍通过同一正式CellRoute、MovePersonCommand和WorldState结算，24单位/秒只压缩
+Unity移动回放。首条玩法目标为洛阳市集交易后在市场市曹接受并推进本地差事，资金、随身货物、市场库存、交易记录、任务、奖励
+和世界时间全部使用既有PlayerAction/交易/任务账，没有第二套经济或存档字段。
+
+当前状态为`IMPLEMENTED / CORE VERIFIED / LIVE EDITOR VERIFIED / AUTOMATED PLAYMODE RE-RUN BLOCKED BY OPEN EDITOR`：
+全工程编译、目标Core 4/4与差异检查通过。Game View已确认建筑资料、行走中标记/路线、到达后的玩法
+按钮及一次正式买入结算；钱财200→40，世界第1日→第2日，Console 0 Error。人物尺度场景现与战略
+地形分层，建筑、人物、路线统一Floating Origin，关闭了普通玩家画面的Footprint调试面。Unity PID
+21736仍打开项目，安全入口返回blocked/120，未关闭用户程序，目标PlayMode结果文件仍待补。
+本整改不等于完整商号、正式食品批次交易、室内、全部职业或战斗近景完成，也不解除M26独立人类
+20—30分钟盲玩门禁。
+
+## 55. M/C/F 三主视角尺度收口与县域主沙盘 Presentation LOD 重构 V1（2026-09-04）
+
+任务合同见
+[`TASK_MCF_VIEW_SCALE_AND_COUNTY_SANDBOX_PRESENTATION_LOD_V1.md`](TASK_MCF_VIEW_SCALE_AND_COUNTY_SANDBOX_PRESENTATION_LOD_V1.md)，
+实施报告见
+[`REPORT_MCF_VIEW_SCALE_AND_COUNTY_SANDBOX_PRESENTATION_LOD_V1.md`](REPORT_MCF_VIEW_SCALE_AND_COUNTY_SANDBOX_PRESENTATION_LOD_V1.md)。
+
+普通玩家地图职责固定为`M 天下 / C 县域 / F 人物`；城区和建设不是额外主地图，而是同一县域
+50m空间的子视图。洛阳县域新增只读Far/Mid/Near Presentation LOD：道路按R0—R3分级，Facility
+按地标/聚合/实体占地展开，城防按轮廓/墙边展开，50m格只在Planning Near显示。天下默认关闭2km
+战略格并仅显示跨县道路骨架，交通详图才展开全部正式路线。所有LOD、聚合、Overlay和裁剪均不写
+WorldState，Schema保持V79，2,084个Facility、334条道路边和144条城防边均未删除或改权威。
+
+当前状态为`IMPLEMENTED / TARGET CORE PASSED / UNITY RE-ACCEPTANCE PENDING`：代码编译和首轮定向
+Core 3/3通过，本任务差异检查通过；新增真实布局索引断言、完整Core分组和Unity门禁仍需最终复跑。
+当前用户Unity实例仍打开项目，禁止为测试擅自关闭。正式接受前还必须生成16张Game View证据，停留
+`C 县域｜洛阳｜县域全览`并由用户现场检查Far/Mid/Near和六类Overlay。本阶段不改变M26独立人类
+20—30分钟盲玩门禁。

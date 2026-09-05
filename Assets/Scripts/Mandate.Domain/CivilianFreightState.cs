@@ -11,6 +11,23 @@ namespace Mandate.Domain
         Completed
     }
 
+    public static class CivilianFreightPurposeIds
+    {
+        public const string FormalMarketDelivery =
+            "civilian-freight.purpose.formal-market-delivery.v1";
+        public const string PublicReliefProcurement =
+            "civilian-freight.purpose.public-relief-procurement.v1";
+        public const string MerchantOwnerCarriage =
+            "civilian-freight.purpose.merchant-owner-carriage.v1";
+
+        public static readonly IReadOnlyList<string> All = new[]
+        {
+            FormalMarketDelivery,
+            PublicReliefProcurement,
+            MerchantOwnerCarriage
+        };
+    }
+
     public enum CivilianFreightDemandStatus : byte
     {
         Active,
@@ -65,6 +82,7 @@ namespace Mandate.Domain
     public sealed class CivilianFreightState
     {
         public string Id;
+        public string PurposeId = string.Empty;
         public CivilianFreightStatus Status;
         public string BuyOrderId;
         public string SellOrderId;

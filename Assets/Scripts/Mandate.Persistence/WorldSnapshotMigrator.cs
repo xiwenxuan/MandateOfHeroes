@@ -260,6 +260,9 @@ namespace Mandate.Persistence
                     case 77:
                         MigrateVersionSeventySevenToSeventyEight(world);
                         break;
+                    case 78:
+                        MigrateVersionSeventyEightToSeventyNine(world);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"No migration path from schema {world.SchemaVersion}.");
@@ -2403,6 +2406,24 @@ namespace Mandate.Persistence
                 freight.CellRouteRevision = 0;
             }
             world.SchemaVersion = 78;
+        }
+
+        private static void MigrateVersionSeventyEightToSeventyNine(
+            WorldState world)
+        {
+            if (world.CivilianFreights != null)
+            {
+                foreach (var freight in world.CivilianFreights)
+                {
+                    if (freight == null) continue;
+                    freight.PurposeId = !string.IsNullOrEmpty(
+                            freight.PublicReliefProcurementTradeId) ||
+                        !string.IsNullOrEmpty(freight.BuyerOrganizationId)
+                        ? CivilianFreightPurposeIds.PublicReliefProcurement
+                        : CivilianFreightPurposeIds.FormalMarketDelivery;
+                }
+            }
+            world.SchemaVersion = 79;
         }
 
         private static MilitaryLogisticsOrderState FindLogisticsOrder(

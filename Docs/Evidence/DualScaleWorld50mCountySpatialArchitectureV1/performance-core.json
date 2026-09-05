@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "fixturePlanningCellCount": 6400,
+  "fixtureChunkCount": 30,
+  "buildMilliseconds": 0.570,
+  "managedAllocationBytes": 101912,
+  "packedAuthoritativeArrayBytes": 76800,
+  "packedBytesPerCell": 12.000,
+  "planningCellGameObjects": 0,
+  "hotBuildMilliseconds": 0.092,
+  "hotManagedAllocationBytes": 0,
+  "warmBuildMilliseconds": 0.367,
+  "warmManagedAllocationBytes": 24,
+  "coldBuildMilliseconds": 0.000,
+  "coldManagedAllocationBytes": 0,
+  "theoreticalLuoyangPlanningCellCount": 204800,
+  "theoreticalPackedArrayBytesEstimate": 2457600,
+  "theoreticalEstimateWasExecuted": false,
+  "note": "204800 is a linear packed-array estimate, not a passed runtime benchmark."
+}

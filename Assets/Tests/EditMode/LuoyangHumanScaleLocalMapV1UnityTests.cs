@@ -5,6 +5,7 @@ using System.Linq;
 using Mandate.Domain;
 using Mandate.Persistence;
 using Mandate.Presentation;
+using Mandate.Simulation;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -45,6 +46,10 @@ namespace Mandate.Tests
                 Assert.That(runtime.ResidentMeshCount, Is.GreaterThan(0));
                 Assert.That(runtime.ResidentColliderCount,
                     Is.GreaterThanOrEqualTo(9));
+                Assert.That(runtime.DebugCellGroundVisible, Is.True);
+                Assert.That(runtime.Root.GetComponentsInChildren<Transform>()
+                    .Any(item => item.name.StartsWith("LOCAL_TERRAIN_",
+                        StringComparison.Ordinal)), Is.True);
                 Assert.That(runtime.MapAssetHash,
                     Is.EqualTo(source.Plan.AssetHash));
                 var next = source.Plan.LocalSpaces.Single(item =>
@@ -101,10 +106,62 @@ namespace Mandate.Tests
                 Assert.That(proxies, Is.Not.Empty);
                 Assert.That(proxies.Any(item => item.FacilityId ==
                     access.FacilityId), Is.True);
-                var proxy = proxies.First();
-                Assert.That(runtime.TryResolveProxy(
-                    proxy.GetComponent<Collider>(), out var target), Is.True);
+                var proxy = proxies.First(item =>
+                    item.GetComponentInChildren<Collider>(true) != null);
+                var collider = proxy.GetComponentInChildren<Collider>(true);
+                Assert.That(runtime.TryResolveProxy(collider, out var target),
+                    Is.True);
                 Assert.That(target.FacilityId, Is.EqualTo(proxy.FacilityId));
+            }
+            finally
+            {
+                runtime.Dispose();
+            }
+        }
+
+        [Test]
+        public void PlayerNearfield_BuildsCompactStreetContextWithoutDebugCells()
+        {
+            var source = Load();
+            const string focusFacilityId =
+                PlayableLuoyangWorldContractIds.MarketFacilityId;
+            var footprint = source.Plan.FootprintsByFacilityId[
+                focusFacilityId];
+            var space = source.Plan.LocalSpacesByCellId[footprint.CellId64];
+            var origin = new GlobalProjectedCoordinate(
+                space.OriginEastingMetres + footprint.CenterEastMetres,
+                space.OriginNorthingMetres + footprint.CenterNorthMetres);
+            Vector3 Resolve(double east, double north)
+            {
+                var value = source.Plan.WorldScale.WorldToUnity(
+                    new GlobalProjectedCoordinate(east, north), 0d, origin);
+                return new Vector3((float)value.XMetres, 0f,
+                    (float)value.ZMetres);
+            }
+
+            var runtime = LuoyangHumanScaleStreamingRuntime.Build(source.Plan,
+                Resolve, footprint.CellId64, null, false,
+                LuoyangNearfieldVisualOptions.PlayerDefault(),
+                focusFacilityId);
+            try
+            {
+                Assert.That(runtime.DebugCellGroundVisible, Is.False);
+                Assert.That(runtime.NearfieldContextFacilityCount,
+                    Is.EqualTo(9));
+                Assert.That(runtime.NearfieldContextStableSummary,
+                    Is.Not.EqualTo(0UL));
+                Assert.That(GameObject.Find(
+                    "LUOYANG_NEARFIELD_URBAN_CONTEXT_V1"), Is.Not.Null);
+                Assert.That(runtime.Root.GetComponentsInChildren<Transform>()
+                    .Count(item => item.name.StartsWith(
+                        "NEARFIELD_CONTEXT_FACILITY_",
+                        StringComparison.Ordinal)), Is.GreaterThanOrEqualTo(8));
+                Assert.That(runtime.Root.GetComponentsInChildren<Transform>()
+                    .Any(item => item.name ==
+                        "NEARFIELD_STREET_EAST_WEST"), Is.True);
+                Assert.That(runtime.Root.GetComponentsInChildren<Transform>()
+                    .Any(item => item.name.StartsWith("LOCAL_TERRAIN_",
+                        StringComparison.Ordinal)), Is.False);
             }
             finally
             {

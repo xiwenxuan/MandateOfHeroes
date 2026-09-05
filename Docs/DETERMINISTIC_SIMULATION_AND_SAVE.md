@@ -862,3 +862,19 @@ V70→V71是顺序迁移：旧档初始化空的`WorldDecisionAgents`与`WorldSi
   标记Delivered；部分收货和玩家出售必须幂等，Save/Load不得重复收货或重复付款。
 - 相同v8初始检查点、Seed、正式路线状态和玩家指令必须得到相同批次、现金、
   运输/等待/到货状态和确定性状态摘要。
+
+## 23. V79 民运用途与商人自有货物正式承运合同
+
+- `CivilianFreightState.PurposeId`明确区分正式市场交货、公共救济采购与商人自有货物随行；三者
+  继续共用同一货运、Journey、CellRoute、库存事务和货运流水，不建立平行经济或旅行状态。
+- 商人自有货物启程时以一笔`CivilianFreightDispatched`事务在同一家庭、同一移动容器内重新溯源；
+  事务必须同时包含等量负行和正行，货物所有权、产品ID和重量净变化为零。流水中的Money只保存
+  已支付购货成本基准，不触发第二次现金转移。
+- 途中事件货损使用`CivilianFreightNaturalLoss`并引用同一货运单；到站市场出售使用
+  `MerchantMarketSold`并引用同一货运单。货运守恒始终为
+  `Dispatched = Remaining + NaturalLoss + Delivered`，出售后不得重复交货或重复付款。
+- 全国战略道路资产生成的CellRoute保存计划版本、SHA-256、移动能力、起终/当前Cell、四向连续
+  路段和段内厘米进度；每段引用正式`RouteState`，道路事实缺失时原格等待，不回退到公里倒计时。
+- V78→V79顺序迁移只按已有公共采购/组织买方引用分类旧货运：公共采购归公共救济，其余归正式
+  市场交货；不把旧货运分类为商人自有承运，不生成CellRoute、不移动人物或货物、不改写交易历史。
+- 洛阳派生检查点继续为v8；V79只升级正式World Save，不改变派生检查点格式。

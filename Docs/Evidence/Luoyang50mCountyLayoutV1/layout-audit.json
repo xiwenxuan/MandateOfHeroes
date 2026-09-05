@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "packageId": "mandate.luoyang.county-layout-50m.runtime-authority.v1",
+  "statusId": "gameplay-reconstruction-review-candidate",
+  "runtimeAuthoritative": true,
+  "historicallyExact": false,
+  "changesSaveSchema": false,
+  "worldSchemaVersion": 79,
+  "fileBytes": 4422872,
+  "fileSha256": "c486af5cfa75335cceef4c0738357cf4de0a6f24ed8e8a34c76e5ea1f1a63a58",
+  "layoutFingerprintSha256": "851858dce31b849166be9dc7e496a9283baf9bc68fc8e25f4a8a14d14ed4a358",
+  "facilityCount": 2084,
+  "sourceAnchorPreservedCount": 1,
+  "roadNodeCount": 359,
+  "roadEdgeCount": 334,
+  "canalNodeCount": 19,
+  "canalEdgeCount": 17,
+  "fortificationEdgeCount": 144,
+  "gateEdgeCount": 14,
+  "wallEdgeCount": 130,
+  "portalCount": 4,
+  "districtAreaCount": 6,
+  "unityVerification": {
+    "status": "blocked",
+    "resultCode": 125,
+    "reason": "Unity did not create a non-empty startup log within 45 seconds."
+  }
+}

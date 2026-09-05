@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using Mandate.Domain;
 using Mandate.Persistence;
@@ -283,7 +284,18 @@ namespace Mandate.Tests
             AssertSuccess(actions, world, PlayerActionIds.MerchantEventGuard);
             AdvanceM26P1ToArrival(actions, world);
             Assert.That(container.LocationId, Is.EqualTo("location.zhuo"));
-            Assert.That(batch.Quantity, Is.EqualTo(6));
+            Assert.That(batch.Quantity, Is.Zero);
+            var freight = world.CivilianFreights.Single(item =>
+                item.CarrierPersonId == player.Id &&
+                item.PurposeId ==
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage);
+            Assert.That(world.ProductBatches.Where(item =>
+                    item.InventoryContainerId == container.Id &&
+                    item.ProductDefinitionId ==
+                        CoreProductionContent.PlainClothProductId &&
+                    item.SourceTransactionId ==
+                        freight.DispatchInventoryTransactionId)
+                .Sum(item => item.Quantity), Is.EqualTo(6));
             world.Validate();
         }
 
@@ -301,12 +313,15 @@ namespace Mandate.Tests
             actions = CreateM26P1Actions(world, content);
             AssertSuccess(actions, world, PlayerActionIds.MerchantStartJourney);
             var trading = new TradingSystem();
-            Assert.That(trading.LoseCargo(
+            var simulator = CreateM26Simulator(world);
+            Assert.That(simulator.RecordMerchantOwnedFreightCargoLoss(
                 world, world.PlayerPersonId, "commodity.cloth", 1), Is.True);
             Assert.That(trading.GetQuantity(
                 world, world.PlayerPersonId, "commodity.cloth"), Is.EqualTo(5));
             Assert.That(world.InventoryTransactions.Any(item =>
-                item.Type == InventoryTransactionType.MerchantCargoDamaged &&
+                item.Type ==
+                    InventoryTransactionType.CivilianFreightNaturalLoss &&
+                !string.IsNullOrEmpty(item.SourceCivilianFreightId) &&
                 item.Lines.Sum(line => line.QuantityDelta) == -1), Is.True);
 
             var player = world.People.Find(item =>
@@ -317,11 +332,8 @@ namespace Mandate.Tests
             var stockBefore = world.MarketListings.Find(item =>
                 item.LocationId == "location.zhuo" &&
                 item.CommodityId == "commodity.cloth").Stock;
-            var sale = trading.Sell(
-                world,
-                new StableId(player.Id),
-                new StableId("commodity.cloth"),
-                5);
+            var sale = simulator.SettleMerchantOwnedFreightCargoSale(
+                world, player.Id, "commodity.cloth", 5);
 
             Assert.That(sale.Success, Is.True, sale.Message);
             Assert.That(trading.GetQuantity(
@@ -332,6 +344,7 @@ namespace Mandate.Tests
                 Is.EqualTo(stockBefore + 5));
             Assert.That(world.InventoryTransactions.Any(item =>
                 item.Type == InventoryTransactionType.MerchantMarketSold &&
+                !string.IsNullOrEmpty(item.SourceCivilianFreightId) &&
                 item.Lines.Sum(line => line.QuantityDelta) == -5), Is.True);
             WorldSnapshotSerializer.Deserialize(
                 WorldSnapshotSerializer.Serialize(world)).Validate();
@@ -450,8 +463,27 @@ namespace Mandate.Tests
             WorldState world,
             MerchantHouseholdContentRegistry content) =>
             new PlayerActionService(
-                new WorldSimulator(world.MasterSeed),
+                new WorldSimulator(
+                    world.MasterSeed,
+                    strategicCellRouteProvider:
+                        new HanWorldStrategicCellRouteProvider(Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "Assets",
+                            "StreamingAssets",
+                            "WorldMap",
+                            "HanWorldV1"))),
                 content);
+
+        private static WorldSimulator CreateM26Simulator(WorldState world) =>
+            new WorldSimulator(
+                world.MasterSeed,
+                strategicCellRouteProvider:
+                    new HanWorldStrategicCellRouteProvider(Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "Assets",
+                        "StreamingAssets",
+                        "WorldMap",
+                        "HanWorldV1")));
 
         private static WorldState CreateM26P1MerchantWorld(
             MerchantHouseholdContentRegistry content,

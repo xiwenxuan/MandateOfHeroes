@@ -1,0 +1,1 @@
+DefectId,RunId,Timestamp,Severity,Category,PlayerIntent,ExpectedUnderstanding,ObservedBehavior,VisibleUI,Problem,Recovery,ScreenshotOrVideoRef,RootCause,Fix,RetestResult

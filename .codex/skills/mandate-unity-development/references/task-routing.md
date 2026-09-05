@@ -20,7 +20,7 @@ Use this index to select the smallest relevant set of project documents. Do not 
 | Overall vision and gameplay | `Docs/GAME_VISION_AND_GAMEPLAY.md` | `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` for current status and cross-system scope |
 | System inventory, implementation status, technical debt, or next-milestone planning | `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` | The governing domain design; use `Docs/DEVELOPMENT_PLAN.md` and `Docs/PREPRODUCTION_BACKLOG.md` only when auditing historical plans |
 | Cell ownership/occupancy, unified Facilities, Facility catalog or growth, organization offices, civil/military/title boundaries, imperial household, kingdoms, polities, self-establishment, or political AI | `Docs/UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md` | `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` for current status and priority; add `Docs/WORLD_SIMULATION_FOUNDATION.md` for geography/economy, `Docs/PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md` for recipes/work orders, `Docs/UNIFIED_COMBAT_WARFARE_AND_AUTHORITY.md` for combat resolution, `Docs/SANDBOX_NPC_AI.md` for generic AI scheduling, and `Docs/TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md` whenever person residency or population scheduling is affected |
-| Playable Demo, player session, character selection, identity action loop, or cross-system player integration | `Docs/TASK_M26_P0_PLAYABLE_DEMO_MAIN_LOOP_INTEGRATION.md` | Read `Docs/TASK_M26_P1_MERCHANT_HOUSEHOLD_GAMEPLAY_VERTICAL_SLICE.md` for the current merchant-household goals, feedback, text, animation and long-term consequence slice; add `Docs/GAME_VISION_AND_GAMEPLAY.md`, `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md`, and the affected map, profession, production, combat, population, persistence, or content design only when that slice is changed |
+| Playable Demo, direct player scene, player HUD, player session, character selection, identity action loop, or cross-system player integration | `Docs/TASK_PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1.md` | Read `Docs/TASK_M26_P0_PLAYABLE_DEMO_MAIN_LOOP_INTEGRATION.md` for the original integration contract and `Docs/TASK_M26_P1_MERCHANT_HOUSEHOLD_GAMEPLAY_VERTICAL_SLICE.md` for merchant-household goals; add `Docs/GAME_VISION_AND_GAMEPLAY.md`, `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md`, and the affected map, movement, profession, production, combat, population, persistence, or content design only when that slice is changed |
 | Production, construction, agriculture, industry, technology, or research | `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` | `Docs/PRODUCTION_AGRICULTURE_INDUSTRY_AND_PROGRESSION_DESIGN.md` for data-driven crops, products, recipes, production execution, regional economy, and profession progression; `Docs/TASK_M17_P0_DATA_DRIVEN_PRODUCTION_CONTENT_CONTRACT.md` for the completed M17 content-contract foundation; `Docs/TASK_M18_P0_CHARACTER_SKILL_KNOWLEDGE_RESEARCH_RECIPE_BRIDGE.md` for the V9 skill, knowledge, research, local technology application, and production-order snapshot bridge; `Docs/TASK_M19_P0_PRODUCT_BATCH_INVENTORY_AND_PROCESSING_CHAIN.md` for the V10 product/seed batches, inventory transactions, legacy grain adapter and first processing chain; `Docs/TASK_M23_P0_MILITARY_PROCUREMENT_TRANSPORT_AND_ARMORY_RECEIPT.md` for the V14 procurement slice; `Docs/TASK_M23_P1_EQUIPMENT_MANUFACTURING_REPAIR_AND_WORKSHOP.md` for V15 organization workshops, equipment manufacturing, static-store loading and repair orders; `Docs/TASK_M23_P2_UPSTREAM_RESOURCE_EXTRACTION_AND_PRIMARY_PROCESSING.md` for V16 resource bodies, real-worker extraction, charcoal and bloomery processing; `Docs/TASK_M23_P3_LIVESTOCK_SLAUGHTER_TANNING_AND_HORN.md` for V17 ordinary livestock batches, husbandry, slaughter, tanning and horn byproducts; `Docs/TASK_M23_P4_MULTIDIMENSIONAL_QUALITY_AND_ARTISAN_GROWTH.md` for V18 data-driven quality dimensions, production skill snapshots, artisan practice growth and audit ledger; `Docs/TASK_M23_P5_MILITARY_LOGISTICS_ACQUISITION_PROVISIONS_AND_LOSS.md` for V19 supply acquisition methods, carrier responsibility, separate convoy provisions, natural transit loss and military freight audit; `Docs/TASK_M23_P6_MULTI_LEG_LOGISTICS_HANDOFF_AND_PARTIAL_RECEIPT.md` for V20 persisted route legs, co-located custody handoff, downstream provision reservations and partial final receipt; `Docs/TASK_M23_P7_ESCORT_TRANSIT_RISK_AND_CARGO_SEIZURE.md` for V21 real escorts, deterministic transit incidents, hostile cargo seizure custody and audit; `Docs/TASK_M23_P8_LOGISTICS_CLASH_INJURY_AND_CARGO_RECOVERY.md` for V22 real-person logistics clashes, injuries and same-route army cargo recovery; `Docs/TASK_M23_P9_MILITARY_LOGISTICS_DELEGATION_AND_EXCEPTION_REPORTING.md` for V23 military supply goals, carrier offers, deterministic preference selection, budget limits and exception reports; `Docs/TASK_M23_P10_MILITARY_LOGISTICS_SCHEDULING_OFFER_LIFECYCLE_AND_REPORTING.md` for V24 due scheduling, offer withdrawal/expiry and freight progress/completion reports; `Docs/TASK_M23_P11_BOUNDED_HIERARCHICAL_MILITARY_LOGISTICS_DELEGATION.md` for V25 bounded parent-child goal decomposition, inherited budgets and bottom-up completion; `Docs/TASK_M23_P12_FAILED_SUBGOAL_CANCELLATION_REALLOCATION_AND_REASSIGNMENT.md` for V26 uncommitted subgoal cancellation, allocation recovery, offer closure and replacement history; `Docs/TASK_M23_P13_ACTUAL_RECEIPT_SHORTFALL_AND_SUPPLEMENTAL_FREIGHT.md` for V27 actual receipt, outstanding demand, sequential supplemental freight and cumulative budget audit; `Docs/TASK_M23_P14_CARRIER_LIABILITY_COMPENSATION_AND_REPLACEMENT_AUTHORIZATION.md` for V28 carrier liability settlement, real compensation/arrears, net-budget restoration and seized-cargo replacement authorization; add `Docs/WORLD_SIMULATION_FOUNDATION.md`, then the affected profession or content design |
 | World simulation, economy, governance, facilities, finance, or local conflict | `Docs/WORLD_SIMULATION_FOUNDATION.md` | `Docs/GAME_SYSTEMS_MASTER_AND_STATUS.md` for current status; `Docs/TASK_M22_P0_COUNTY_FISCAL_GENTRY_MARKET_GOVERNANCE.md` for the V12 county fiscal ledger, gentry compliance, market pressure, relief and public-order foundation; `Docs/TASK_M16_LIVING_WORLD_MAP_INFORMATION_AND_DELEGATION_DESIGN.md` for the accepted cross-system map, information, resource-creation, construction, and delegation contract; `Docs/DATA_AND_CONTENT_FOUNDATION.md` for authored data |
 | Population, households, permanent identity, attention, event scheduling, partitioned storage | `Docs/TASK_M12_PERMANENT_POPULATION_AND_ATTENTION.md` | `Docs/TASK_M15_P6_FORMAL_PARTITIONED_POPULATION_ADAPTER_AND_RESIDENCY_CONTRACT.md` for the V7 formal adapter and hot/cold extension contract; `Docs/TASK_M20_P0_ATTENTION_LOCAL_RELATIONSHIP_AND_RESIDENCY.md` for the V11 attention ledger, bounded local relationship network and residency reconciliation; `Docs/TASK_M21_P0_PERSON_REPOSITORY_AND_INCREMENTAL_CHECKPOINT.md` for the first simulation access-layer migration and partition-level incremental checkpoint; `Docs/TASK_M21_P1_POPULATION_HOUSEHOLD_AND_BIRTH_INCREMENT.md` for life/household access migration and newborn incremental persistence; `Docs/TASK_M21_P2_VILLAGE_LIFE_AND_POPULATION_LEDGER_REPOSITORY.md` for village-life and population-ledger repository migration; `Docs/TASK_M21_P3_AGRICULTURE_PRODUCTION_PERSON_REPOSITORY.md` for agriculture read access; `Docs/TASK_M21_P4_EDUCATION_PERSON_REPOSITORY.md` for education read/write tracking; `Docs/TASK_M21_P5_MEDICAL_PERSON_REPOSITORY.md` for military medicine and recovered-patient updates; `Docs/TASK_M21_P6_MILITARY_PERSON_REPOSITORY.md` for prototype enlistment, casualties, desertion and army-march person access; `Docs/TASK_M24_P0_ONE_MILLION_FIFTY_YEAR_DEMOGRAPHIC_WORLD.md` and its report for the one-million-person demographic baseline; `Docs/TASK_M24_P1_MILLION_SUBSISTENCE_LAND_AND_PRESSURE_LOOP.md` and its report for household food need, fixed county land, agricultural labor, food conservation and traceable pressure-death evidence; `Docs/TASK_M24_P2_HOUSEHOLD_STOCK_MARKET_GRANARY_AND_RELIEF_TRANSPORT.md` and its report for household ownership, county markets, granaries and bounded relief transport; `Docs/TASK_M24_P3_HOUSEHOLD_LAND_SEED_PRODUCT_BATCH_AND_FARM_WORK_ORDER.md` and its report for specific household land, stable-ID agricultural bindings, seed inventories and streamed annual farm work orders; `Docs/TASK_M24_P4_POPULATION_RESOURCE_FEEDBACK_DIAGNOSIS_AND_CALIBRATION.md` and its report for annual bottleneck diagnosis, explicit failed candidates, seasonal public-land reuse and the accepted no-scripted-war calibration envelope; `Docs/TASK_M24_P5_FORMAL_PRODUCT_BATCH_AND_INVENTORY_TRANSACTION_BRIDGE.md` and its report for the formal V10-compatible compact-balance checkpoint bridge and completed-agriculture-order materialization entry; `Docs/TASK_M24_P6_MULTI_PRODUCT_FOOD_PROVENANCE_AND_FLOW_LEDGER.md` and its report for stable product-ID food vectors, full-flow provenance, per-product conservation and product-split formal checkpoints; `Docs/TASK_M15_PERMANENT_POPULATION_STORAGE_BENCHMARK.md` for the preceding storage evidence; `Docs/WORLD_SIMULATION_FOUNDATION.md`, `Docs/DETERMINISTIC_SIMULATION_AND_SAVE.md`, `Docs/HISTORICAL_POPULATION_135_260.md`; treat `Docs/TASK_M7_POPULATION_LEDGER.md` as an earlier implementation record |
@@ -30,9 +30,32 @@ Use this index to select the smallest relevant set of project documents. Do not 
 | Character attributes, traits, family and growth | `Docs/CHARACTER_ATTRIBUTES_TRAITS_AND_GROWTH.md` | `Docs/TASK_M8_CHARACTER_ABILITY_FOUNDATION.md`, `Docs/TASK_M9_EDUCATION_AND_PRACTICE.md`; add `Docs/TASK_M18_P0_CHARACTER_SKILL_KNOWLEDGE_RESEARCH_RECIPE_BRIDGE.md` when stable-ID skills, knowledge mastery, research, or technology application is affected |
 | Sandbox NPC AI | `Docs/SANDBOX_NPC_AI.md` | The M12 document whenever attention, scheduling, permanent population, or storage is affected; add `Docs/TASK_M16_LIVING_WORLD_MAP_INFORMATION_AND_DELEGATION_DESIGN.md` for limited knowledge, information work, autonomous site selection, or recursive delegation; add `Docs/UNIFIED_WORLD_FACILITY_AUTHORITY_AND_POLITICAL_AI.md` for offices, titles, imperial politics, allegiance, polity creation, self-establishment, or follower reevaluation |
 | Maps, cities and geography | `Docs/TASK_MASTER_MAP_V1_LUOYANG_POPULATION_FACILITY_CELL_CAPACITY.md` | Read `Docs/TASK_MASTER_MAP_V0_HISTORICAL_GEOGRAPHY_CELL_UNITY_PIPELINE.md` for the source geography pipeline; use `Docs/PROTOTYPE_MAP_184_ZHUO_GUANGZONG.md`, `Docs/WORLD_SIMULATION_FOUNDATION.md` and `Docs/TASK_M16_LIVING_WORLD_MAP_INFORMATION_AND_DELEGATION_DESIGN.md` for prototype routes, continuous scale, semantic views, knowledge gating, resource creation, or dynamic facilities; `Docs/MAP_ART_RESOURCE_PLAN.md`, `Docs/HISTORICAL_CITY_LIST.md`, `Docs/CITY_UNION_MASTER.md` for visual and authored geography |
+| Administrative Region hierarchy, Province/Commandery/County boundaries, administrative map LOD, County picking, or County Planning | `Docs/TASK_WORLD_ADMINISTRATIVE_BOUNDARIES_AND_COUNTY_PLANNING_VIEW_V1.md` | Add `Docs/WORLD_SIMULATION_FOUNDATION.md` for the one-world/county-planning contract, `Docs/TASK_MASTER_MAP_V1_LUOYANG_POPULATION_FACILITY_CELL_CAPACITY.md` for the formal Cell package, and `Docs/HISTORICAL_POPULATION_135_260.md` only when historical administrative evidence changes; never replace administrative identity with control, ownership or a separate city map |
+| Luoyang county Far/Mid/Near strategic sandbox, terrain normals/lighting, Facility aggregation, landmark priority, construction toolbar, planning Ghost, road/wall/canal/zone draft tools, planning overlays, draft editing, or construction-mode camera input | `Docs/TASK_LUOYANG_COUNTY_STRATEGIC_SANDBOX_VISUAL_AND_CONSTRUCTION_INTERACTION_V2.md` | Add its implementation report and `Docs/TASK_LUOYANG_COUNTY_VISUAL_CONSTRUCTION_INTERACTION_REWORK_V1.md` for the V1 interaction base, `Docs/TASK_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md` for placement validation foundations, `Docs/TASK_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md` for layout authority, and `Docs/TASK_WORLD_ADMINISTRATIVE_BOUNDARIES_AND_COUNTY_PLANNING_VIEW_V1.md` for administrative LOD; Far/Mid/Near are Presentation only, and drafts are non-persistent and must not mutate formal facilities, roads, water, fortifications, economy or time |
+| Luoyang citywide five-family building language, Golden Block rule rollout, Far profile silhouettes, Mid shared courtyard fabric, or preservation of formal landmark models across county LOD | `Docs/TASK_LUOYANG_CITYWIDE_BUILDING_LANGUAGE_AND_PRESENTATION_LOD_ROLLOUT_V1.md` | Add its report, the Golden Block V2 task/report for the profile source, the county strategic-sandbox V2 task/report for Far/Mid/Near ownership, and the whole-city composition/performance tasks when 2,084-Facility coverage or batching budgets change; this route is Presentation only and must preserve the 54 formal asset identities, 50m PlanningCells, formal Facility facts and World Schema V79 |
 | Historical people, clans, branches, kinship, marriage, person timelines, or historical-person scenario snapshots | `Docs/TASK_HAN_135_260_HISTORICAL_PERSON_CLAN_MASTER_V1.md` | Read `Docs/HISTORICAL_SCENARIOS_TIMELINE_AND_FATE_DECISIONS.md` for Scenario/HistoricalTimePoint/StartPoint/FateDecision boundaries and `Docs/HISTORICAL_INPUT_INTEGRATION_AUDIT_V1.md` for imported-source decisions; add `Docs/TASK_HAN_135_260_NATIONAL_POPULATION_DISTRIBUTION_V1.md` when joining historical people to national population, and the relevant `Docs/HISTORICAL_*.md` research document when extending evidence |
 | Historical events and general authored history content | `Docs/DATA_AND_CONTENT_FOUNDATION.md` | The matching `Docs/HISTORICAL_*.md` documents; use the historical-person route above whenever stable Person, Clan, timeline, or scenario-snapshot data is affected |
 | External assets and licenses | `Docs/LEGAL_AND_ASSETS.md` | [content-and-data.md](content-and-data.md) |
+
+### Current Luoyang golden-block art-pipeline prototype
+
+For work that changes the 400x400 m Luoyang golden-block prototype, its
+deterministic 8x8 PlanningCell selection, five presentation-only courtyard
+archetypes, 16 derived lots, data-driven `BuildingPresentationProfile`,
+formal 50 m Build Mode grid, compound Ghost, footprint/entrance display, or
+the player `Golden Block` focus entry, read
+`Docs/TASK_LUOYANG_GOLDEN_BLOCK_BUILDING_ART_AND_50M_BUILD_MODE_V2.md`
+and its report first. Add
+`Docs/TASK_LUOYANG_BUILDING_ART_PIPELINE_AND_GOLDEN_BLOCK_PROTOTYPE_V1.md`
+for the original prototype, the county strategic-sandbox V2 task/report for
+Far/Mid/Near and construction interaction, and the production-building-kit
+route below when model coverage changes. Golden-block lots, alleys and annex
+buildings are presentation-only context: they do not create Facilities, Roads,
+population, capacity, inventory or production and do not change World Schema
+V79. Build Mode reuses the formal 50 m PlanningCell and must not introduce a
+5 m/10 m micro-cell authority. The prototype freezes a production direction;
+it does not claim final PBR materials, archaeological reconstruction,
+interiors, collision, navigation or whole-Luoyang art completion.
 
 ### Current Luoyang production building kit
 
@@ -435,6 +458,33 @@ For the read-only opening audit, minute-by-minute blind-play timeline, evidence 
 classification, severity ranking and first-route freeze, also read
 `Docs/TASK_M26_P1A_PLAYABILITY_BASELINE_AUDIT.md`. M26-P1A records the baseline and must not mix fixes into
 the same run or use developer guidance to overwrite first-player evidence.
+
+### Current M26 merchant/caravan Product Readiness and blind-play closure
+
+For work that changes the ordinary merchant entry, family-pressure and market-intelligence presentation,
+purchase/capacity preview, caravan preparation, route/time/risk explanation, arrival/sale/profit feedback,
+merchant-organization summary, failure recovery, player-facing copy audit, Product Readiness tests or the
+independent 20—30 minute blind-play package, read
+`Docs/M26_MERCHANT_CARAVAN_BUSINESS_PRODUCT_READINESS_AND_BLIND_PLAY_V1_ACCEPTANCE_REPORT.md` and start from
+`Docs/Evidence/M26MerchantProductReadinessV1/` together with the M26-P1/P2/P5A/P5B routes above.
+
+The current automated candidate passed whole-project compilation, complete Core 880/880, complete Unity EditMode
+1087/1087, the exact merchant PlayMode 1/1 and three deterministic replays. It remains
+`NOT ACCEPTED / BLOCKED`: no qualified independent human blind run exists, and the Zhongshan—Zhuo route still
+uses formal `RouteState/JourneyState` rather than the nationwide `CellRoute`, so Gate F is `PARTIAL`. Do not use
+developer testing or AI-simulated reactions as blind-play evidence, do not start HOT/WARM/COLD migration from this
+blocked state, and do not invent a second route or economy authority. The only valid next product action is the
+qualified no-hint blind run followed by evidence-backed S0/S1 remediation; Gate F needs an explicit product decision.
+
+### Current PlayableDemo direct Luoyang player scene
+
+For work that changes the default PlayableDemo scene, ordinary player HUD, direct Luoyang camera/input, the
+near-view/strategic-map switch, or the playable Luoyang opening world, read
+`Docs/TASK_PLAYABLE_DEMO_DIRECT_LUOYANG_GAME_SCENE_AND_HUD_V1.md` and its acceptance report. The scene must
+reuse `WorldState.PlayerPersonId`, the existing 2,084 formal Luoyang Facilities, Global Cell four-port traversal,
+formal player-movement commands and 3x3 human-scale streaming. Do not restore the developer dashboard as the
+ordinary player screen, directly mutate Person location from Presentation, or invent a second map/movement
+authority. Final character art, crowds, interiors and full profession/combat interactions remain later work.
 
 ### Current formal Han food and inventory contract
 
@@ -1448,3 +1498,123 @@ segment fields already preserve formal-object conditions, Cells and centimetre c
 targeted core 8/8 and 17/17, frozen complete core 774/774, Unity EditMode 3/3 and graphical PlayMode 1/1 with zero
 introduced regressions. The fixed next order is food-inventory conservation RCA/fix, followed by Luoyang external
 supply area and city logistics V1; do not continue by creating a second local spatial authority.
+
+### Current PlayableDemo Luoyang player-control, building-interaction and gameplay remediation route
+
+For work that changes the direct Luoyang player's middle-drag camera pan, right-drag camera rotation, local camera
+framing, player visual readability, selected-building information card, building-context actions, guided market/
+office objective or the boundary between the direct scene and the existing M26 gameplay world, read
+`Docs/TASK_PLAYABLE_DEMO_LUOYANG_PLAYER_CONTROLS_BUILDING_INTERACTION_AND_GAMEPLAY_REMEDIATION_V1.md`,
+`Docs/PLAYABLE_DEMO_LUOYANG_PLAYER_CONTROLS_BUILDING_INTERACTION_AND_GAMEPLAY_REMEDIATION_V1_ACCEPTANCE_REPORT.md`
+and the direct-Luoyang V1 task/report together with M26-P0 and M26-P1.
+
+The current status is `IMPLEMENTED_CORE_AND_LIVE_EDITOR_VERIFIED_AUTOMATED_PLAYMODE_BLOCKED_BY_OPEN_EDITOR`.
+Right drag owns rotation
+and no longer sends movement; travel begins from the selected-building or guided-objective button. The first local
+loop uses existing Person, Family, Organization, MarketListing, InventoryStack, TradeRecord, TaskInstance and
+PlayerAction contracts for a market trade followed by an office task. Camera and UI remain rebuildable Presentation
+state. Live Game View verification covers selected-building facts, visible travel state/route/player marker, arrival,
+market action availability and one settled cloth purchase; strategic terrain is separated from the local human-scale
+layer and all direct-scene objects share its Floating Origin. This route creates no second movement/economy authority, no new Save Schema, no interiors, no final character
+animation and does not satisfy the independent M26 20—30 minute human blind-play gate.
+
+### Current dual-scale 2km world / candidate 50m county spatial architecture route
+
+For work that changes the relationship between the published 2km world grid and county-detail space, candidate
+`PlanningCell50m`, four-way planning-cell connections, Facility footprint/entrance projection, CountyPortal,
+fortification edges, spatial height/LOS, HOT/WARM/COLD county caches, or mutually exclusive Person/Army spatial
+states, read `Docs/TASK_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md` and
+`Docs/REPORT_DUAL_SCALE_WORLD_50M_COUNTY_SPATIAL_ARCHITECTURE_VALIDATION_V1.md` together with
+`Docs/WORLD_SIMULATION_FOUNDATION.md`.
+
+The P0 decision is `Decision A` and its status is
+`DECISION_A_CONFIRMED_AND_P1_AUTHORIZED_2026_09_03`. This proves only a 2x2 strategic-tile,
+6400-cell isolated technical prototype. `PlanningCell50m` remains a candidate spatial partition and index over the
+one formal world ledger; it is not a second world, does not replace published 2km Cell IDs, and is not persisted in
+World Schema V79. It does not claim that Luoyang's estimated 204800 cells, 2084 Facilities, nationwide 50m data,
+construction tools, siege gameplay, or save migration are complete. The next permitted stage is the real-scale,
+non-persistent Luoyang 50m county-space and Facility migration validation.
+
+### Current real-scale Luoyang 50m county prototype and Facility migration route
+
+For work that changes Luoyang's 512 square-kilometre candidate county partition, 320x640 PlanningCells,
+the dual-coordinate migration record for all 2084 Facilities, category-default candidate footprints,
+facility-derived canal candidates, four provisional county Portals, or full-scale HOT/WARM/COLD measurements,
+read `Docs/TASK_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md` and
+`Docs/REPORT_LUOYANG_50M_COUNTY_SPATIAL_PROTOTYPE_AND_FACILITY_MIGRATION_VALIDATION_V1.md` together with
+the P0 task/report and `Docs/WORLD_SIMULATION_FOUNDATION.md`.
+
+The technical capacity decision is A, while historical placement remains B. The prototype has 204800 cells,
+800 chunks, all 2084 stable Facility IDs, zero per-cell GameObjects and one map renderer. It does not authorize
+writing the 2083 gameplay-reconstructed locations back to the formal world, treating the selected HanWorldV1
+window's zero authored water cells as a completed Luoyang water system, freezing an UrbanArea, changing World
+Schema V79, or implementing construction. The next route is an authoritative reviewable Luoyang 50m layout data
+package covering Facility coordinates/footprints/entrances, UrbanArea, roads, waterways, walls and Portals.
+
+### Current authoritative Luoyang 50m layout package and spatial closure route
+
+For work that changes the versioned runtime layout package, all 2084 candidate Facility cells/footprints/entrances,
+source-file fingerprints, 359/334 road nodes/edges, 19/17 canal nodes/edges, 144 fortification edges, four provisional
+county Portals, the six district hulls, the overall UrbanArea candidate, or the package-backed P1 loader, read
+`Docs/TASK_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md` and
+`Docs/REPORT_LUOYANG_AUTHORITATIVE_50M_LAYOUT_PACKAGE_AND_SPATIAL_CLOSURE_V1.md` together with the P1 task/report
+and `Docs/WORLD_SIMULATION_FOUNDATION.md`.
+
+The package is authoritative only as deterministic runtime layout input. Its status remains
+`gameplay-reconstruction-review-candidate`, `historically_exact=false`, and it does not change World Schema V79 or
+write candidate coordinates back to formal Facility source anchors. Compilation and targeted Core 8/8 passed;
+the target Unity run was blocked before creating a startup log and is not reported as a Unity pass. The
+next candidate route is Luoyang County Planning and Construction Tools V1, which must reuse this package and keep
+construction transactions, ownership, cancellation and save compatibility behind a separate decision gate.
+
+### Current Luoyang county planning and construction tools V1 route
+
+For work that changes the formal `PlayableDemo -> World -> Luoyang County Planning` build-planning route,
+`FacilityPlacementProfile`, physical preview footprints and rotated entrances, road-access outcomes, placement
+reasons, existing-Facility/water/fortification/Portal/county-boundary checks, draft blueprints, Undo/Redo, or the
+single-texture 50m planning presentation, read
+`Docs/TASK_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md` and
+`Docs/REPORT_LUOYANG_COUNTY_PLANNING_CONSTRUCTION_TOOLS_V1.md` together with the authoritative 50m layout package
+task/report and `Docs/WORLD_SIMULATION_FOUNDATION.md`.
+
+The current status is `IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`. Five profiles reuse the
+existing residence, warehouse, workshop, military beacon and market Facility/model contracts. The central validator
+uses occupancy, road, water, wall, Portal and draft indices; a preview does not scan all 2084 Facilities. The player
+presentation uses one 640x320 runtime texture, zero per-PlanningCell GameObjects and a 48x24 Cell local planning
+window. Drafts are session-only and do not create Facilities, affect navigation or enter saves. World Schema remains
+V79. Targeted Core 10/10, Unity EditMode 1/1 and formal PlayMode 1/1 passed; user acceptance is still pending. Do not
+extend this route into construction payments, materials, labor, land rights, approval, build time, cancellation,
+AI construction, road/wall/water planning or a save migration without a separate authorized task.
+
+### Current M / C / F view routing and ink-world prototype route
+
+For work that changes the formal `M World / C County / F Person` player views, the County Overview / UrbanArea /
+Planning subviews, current-or-selected county resolution, deprecated City-route redirects, world-map runtime
+reference recovery, settlement seals, batched strategic roads, or the presentation-only silk-and-ink world style,
+read `Docs/TASK_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md` and
+`Docs/REPORT_MAP_VIEW_ROUTING_COUNTY_RENAME_AND_INK_WORLD_MAP_PROTOTYPE_V1.md` together with the administrative
+boundary, authoritative 50m layout and county-planning task/report pairs.
+
+The current status is `IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`. City is no longer a main spatial
+level; it is the County UrbanArea subview over the same 320x640 layout package. View and art switches must remain
+Presentation-only, must not teleport the player or mutate World Schema V79, and must not reintroduce the old 2km
+abstract Luoyang city projection as a formal player route. Automated Unity evidence for the original ink prototype
+passed historically, but the user subsequently rejected that player-facing art direction; keep it only as a
+development comparison profile.
+
+### Current coloured 3D strategic-diorama world route
+
+For work that changes the ordinary player's `M World` art direction, coloured stepped terrain lighting, tilted
+strategic cameras, contextual 2km-grid visibility, batched 3D settlement symbols, or the visible world-style toggle,
+read `Docs/TASK_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md` and
+`Docs/REPORT_HAN_WORLD_COLORED_3D_STRATEGIC_DIORAMA_PROTOTYPE_V1.md` together with the M/C/F routing and
+administrative-boundary task/report pairs.
+
+The user rejected the ink prototype as the ordinary player-facing world-map direction on 2026-09-03. Preserve it
+only as a development/reference compatibility profile. The player-facing default is the clean-room original Han
+coloured 3D strategic diorama. This route is Presentation-only: it must preserve the 2km square grid, the 50m county
+package, authoritative geography and World Schema V79. Distant grid lines are hidden; exact 2km cells appear only in
+the near strategic interaction window. Settlement symbols must remain batched rather than one GameObject per place.
+The current status is `IMPLEMENTED_AND_AUTOMATED_ACCEPTANCE_PASSED_READY_FOR_USER_REVIEW`: targeted Core 2/2,
+Unity EditMode 5/5 and the graphics-enabled formal PlayMode 1/1 passed, with six non-blank screenshots and one
+performance comparison JSON. User visual acceptance is still pending.

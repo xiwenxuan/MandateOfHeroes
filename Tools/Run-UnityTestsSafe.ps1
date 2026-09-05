@@ -3,8 +3,10 @@ param(
     [string]$Mode = "Auto",
     [ValidateSet("EditMode", "PlayMode")]
     [string]$TestPlatform = "EditMode",
-    [ValidateRange(30, 300)]
+    [ValidateRange(30, 900)]
     [int]$TimeoutSeconds = 300,
+    [ValidateSet("Standard", "SlowDeterminism", "AssetBuildIntegration", "AssetManifestIntegration")]
+    [string]$TimeoutClass = "Standard",
     [ValidateRange(10, 120)]
     [int]$StartupTimeoutSeconds = 45,
     [ValidateRange(5, 60)]
@@ -50,6 +52,65 @@ if ($Mode -eq "EditModeTests") {
 }
 elseif ($Mode -eq "PlayModeTests") {
     $TestPlatform = "PlayMode"
+}
+
+$slowDeterminismTests = @(
+    "Mandate.Tests.WorldKernelTests.Simulation_SaveResumeMatchesContinuousRun",
+    "Mandate.Tests.WorldKernelTests.FoodRuntime_FormalWorldIsDeterministicForOneYear",
+    "Mandate.Tests.WorldKernelTests.IntegratedOneYearStabilityTests_FormalWorldHasNoEconomicInvariantFailure",
+    "Mandate.Tests.WorldKernelTests.LuoyangLiving_365DayCropAndConservationRemainStable",
+    "Mandate.Tests.WorldKernelTests.LuoyangT4_OneSevenThirtyOneYearThreeYearSixYearRemainValid",
+    "Mandate.Tests.WorldKernelTests.OuterAgricultureLongRunTests_AllRecordsRunForOneWorldYearWithoutDuplicateHarvest"
+)
+$assetBuildIntegrationTests = @(
+    "Mandate.Tests.EditMode.LuoyangP0NativePrefabArtDeliveryV1Tests.BuildAssets_CreatesFourReplaceableThreeLodPrefabs"
+)
+$assetManifestIntegrationTests = @(
+    "Mandate.Tests.EditMode.LuoyangRemainingFinalAssetV1Tests.SourceManifest_Freezes240FilesAnd38ValidatedFbxSources"
+)
+$matchedSlowDeterminismTests = @()
+$matchedTimeoutClassTests = @()
+if ($TimeoutSeconds -gt 300) {
+    if ($TimeoutClass -eq "Standard") {
+        throw (
+            "TimeoutSeconds above 300 requires the explicit " +
+            "classified timeout class.")
+    }
+    if ($Mode -ne "EditModeTests" -or
+        [string]::IsNullOrWhiteSpace($TestFilter)) {
+        throw (
+            "$TimeoutClass is only valid for explicitly filtered " +
+            "EditMode tests.")
+    }
+    $requestedTests = @($TestFilter.Split(';') | ForEach-Object {
+        $_.Trim()
+    } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    if ($TimeoutClass -eq "SlowDeterminism") {
+        $classifiedTests = $slowDeterminismTests
+    }
+    elseif ($TimeoutClass -eq "AssetBuildIntegration") {
+        if ($TimeoutSeconds -gt 600) {
+            throw "AssetBuildIntegration is capped at 600 seconds."
+        }
+        $classifiedTests = $assetBuildIntegrationTests
+    }
+    else {
+        if ($TimeoutSeconds -gt 600) {
+            throw "AssetManifestIntegration is capped at 600 seconds."
+        }
+        $classifiedTests = $assetManifestIntegrationTests
+    }
+    $matchedTimeoutClassTests = @($requestedTests | Where-Object {
+        $_ -in $classifiedTests
+    })
+    if ($TimeoutClass -eq "SlowDeterminism") {
+        $matchedSlowDeterminismTests = $matchedTimeoutClassTests
+    }
+    if ($matchedTimeoutClassTests.Count -eq 0) {
+        throw (
+            "$TimeoutClass requires at least one classified exact test: " +
+            ($classifiedTests -join ', '))
+    }
 }
 
 $resolvedProject = (Resolve-Path -LiteralPath $ProjectPath).Path
@@ -160,6 +221,9 @@ function Write-RunSummary {
         projectPath = if ($script:Mode -eq "EngineSmoke") { $null } else { $script:resolvedProject }
         useGraphics = [bool]$script:UseGraphics
         timeoutSeconds = $script:TimeoutSeconds
+        timeoutClass = $script:TimeoutClass
+        matchedTimeoutClassTests = @($script:matchedTimeoutClassTests)
+        matchedSlowDeterminismTests = @($script:matchedSlowDeterminismTests)
         startupTimeoutSeconds = $script:StartupTimeoutSeconds
         resultExitGraceSeconds = $script:ResultExitGraceSeconds
         forcedCleanupAfterResult = $script:forcedCleanupAfterResult

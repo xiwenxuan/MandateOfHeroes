@@ -26,7 +26,7 @@ namespace Mandate.Tests
             Assert.That(controller.ProductionStatus,
                 Is.EqualTo("HAN_WORLD_ART_DIRECTION_V1_CANDIDATES_READY"));
             Assert.That(controller.UsesLegacyBackground, Is.False);
-            Assert.That(controller.UsesAdministrativeOverlay, Is.False);
+            Assert.That(controller.UsesAdministrativeOverlay, Is.True);
             Assert.That(controller.CellOverlayVisible, Is.False);
             Assert.That(controller.RuntimeTerrainObjectCount, Is.EqualTo(1));
             Assert.That(controller.IndexedTerrainTileCount, Is.EqualTo(112880));

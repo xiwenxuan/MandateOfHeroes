@@ -7,12 +7,12 @@ FBXHeaderExtension:  {
 	CreationTimeStamp:  {
 		Version: 1000
 		Year: 2026
-		Month: 8
-		Day: 27
-		Hour: 15
-		Minute: 51
-		Second: 45
-		Millisecond: 725
+		Month: 9
+		Day: 2
+		Hour: 0
+		Minute: 31
+		Second: 8
+		Millisecond: 677
 	}
 	Creator: "FBX SDK/FBX Plugins version 2020.3.2"
 	OtherFlags:  {
@@ -31,8 +31,8 @@ FBXHeaderExtension:  {
 			Comment: ""
 		}
 		Properties70:  {
-			P: "DocumentUrl", "KString", "Url", "", "E:\project\MandateOfHeroes\Assets\ArtSource\Han\Luoyang\P0Final\lwesqvlq_Guangyangmen.fbx"
-			P: "SrcDocumentUrl", "KString", "Url", "", "E:\project\MandateOfHeroes\Assets\ArtSource\Han\Luoyang\P0Final\lwesqvlq_Guangyangmen.fbx"
+			P: "DocumentUrl", "KString", "Url", "", "E:\project\MandateOfHeroes\Assets\ArtSource\Han\Luoyang\P0Final\z0pdjrcx_Guangyangmen.fbx"
+			P: "SrcDocumentUrl", "KString", "Url", "", "E:\project\MandateOfHeroes\Assets\ArtSource\Han\Luoyang\P0Final\z0pdjrcx_Guangyangmen.fbx"
 			P: "Original", "Compound", "", ""
 			P: "Original|ApplicationVendor", "KString", "", "", ""
 			P: "Original|ApplicationName", "KString", "", "", "Unity FBX Exporter"
@@ -78,7 +78,7 @@ GlobalSettings:  {
 
 Documents:  {
 	Count: 1
-	Document: 1835413585504, "Scene", "Scene" {
+	Document: 2753755191136, "Scene", "Scene" {
 		Properties70:  {
 			P: "SourceObject", "object", "", ""
 			P: "ActiveAnimStackName", "KString", "", "", ""
@@ -223,7 +223,7 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Geometry: 1835419671264, "Geometry::Scene", "Mesh" {
+	Geometry: 2753657430512, "Geometry::Scene", "Mesh" {
 		Vertices: *9 {
 			a: -0,0,0,-0.100000004749745,0,0,-0,0.100000004749745,0
 		} 
@@ -264,7 +264,7 @@ Objects:  {
 			}
 		}
 	}
-	Geometry: 1835419676192, "Geometry::Scene", "Mesh" {
+	Geometry: 2753657429616, "Geometry::Scene", "Mesh" {
 		Vertices: *30 {
 			a: 50,0,-50,-0,18.0000007152557,-50,-50,0,-50,50,0,50,-0,18.0000007152557,50,-50,0,50,50,-7.99999982118607,-50,-50,-7.99999982118607,-50,50,-7.99999982118607,50,-50,-7.99999982118607,50
 		} 
@@ -306,7 +306,7 @@ Objects:  {
 			}
 		}
 	}
-	Geometry: 1835419672608, "Geometry::Scene", "Mesh" {
+	Geometry: 2753657432752, "Geometry::Scene", "Mesh" {
 		Vertices: *24 {
 			a: -50,-50,50,50,-50,50,-50,50,50,50,50,50,-50,50,-50,50,50,-50,-50,-50,-50,50,-50,-50
 		} 
@@ -415,7 +415,7 @@ Objects:  {
 			}
 		}
 	}
-	Geometry: 1835419673504, "Geometry::Scene", "Mesh" {
+	Geometry: 2753657427824, "Geometry::Scene", "Mesh" {
 		Vertices: *18 {
 			a: 50,0,-50,-50,0,-50,-50,0,50,50,0,50,28.0000001192093,50,0,-28.0000001192093,50,0
 		} 
@@ -456,7 +456,7 @@ Objects:  {
 			}
 		}
 	}
-	Geometry: 1835419675296, "Geometry::Scene", "Mesh" {
+	Geometry: 2753657433648, "Geometry::Scene", "Mesh" {
 		Vertices: *126 {
 			a: 47.5528568029404,-100,-15.4508590698242,40.4508769512177,-100,-29.3892800807953,29.3892800807953,-100,-40.4508739709854,15.4508575797081,-100,-47.5528508424759,-0,-100,-50.0000238418579,-15.4508575797081,-100,-47.5528478622437,-29.3892741203308,-100,-40.4508650302887,-40.4508620500565,-100,-29.3892711400986,-47.5528389215469,-100,-15.4508531093597,-50.000011920929,-100,0,-47.5528389215469,-100,15.4508531093597,-40.4508590698242,-100,29.3892681598663,-29.3892681598663,-100,40.450856089592,-15.4508531093597,-100,47.5528329610825,-1.49011611938477e-06,-100,50.0000059604645,15.4508486390114,-100,47.5528299808502,29.3892621994019,-100,40.4508531093597,40.4508501291275,-100,29.3892651796341,47.552827000618,-100,15.4508501291275,50,-100,0,47.5528568029404,100,-15.4508590698242,40.4508769512177,100,-29.3892800807953,29.3892800807953,100,-40.4508739709854,15.4508575797081,100,-47.5528508424759,-0,100,-50.0000238418579,-15.4508575797081,100,-47.5528478622437,-29.3892741203308,100,-40.4508650302887,-40.4508620500565,100,-29.3892711400986,-47.5528389215469,100,-15.4508531093597,-50.000011920929,100,0,-47.5528389215469,100,15.4508531093597,-40.4508590698242,100,29.3892681598663,-29.3892681598663,100,40.450856089592,-15.4508531093597,100,47.5528329610825,-1.49011611938477e-06,100,50.0000059604645,15.4508486390114,100,47.5528299808502,29.3892621994019,100,40.4508531093597,40.4508501291275,100,29.3892651796341,47.552827000618,100,15.4508501291275,50,100,0,-0,-100,0,-0,100,0
 		} 
@@ -574,7 +574,7 @@ Objects:  {
 			}
 		}
 	}
-	Model: 1835419696992, "Model::Guangyangmen", "Null" {
+	Model: 2753757690464, "Model::Guangyangmen", "Null" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -585,7 +585,7 @@ Objects:  {
 		Shading: Y
 		Culling: "CullingOff"
 	}
-	Model: 1835419698992, "Model::anchor_p0_guangyangmen_placement", "Mesh" {
+	Model: 2753757684464, "Model::anchor_p0_guangyangmen_placement", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -597,7 +597,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419684992, "Model::anchor_p0_guangyangmen_outer", "Mesh" {
+	Model: 2753757692464, "Model::anchor_p0_guangyangmen_outer", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -610,7 +610,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419700992, "Model::anchor_p0_guangyangmen_inner", "Mesh" {
+	Model: 2753757682464, "Model::anchor_p0_guangyangmen_inner", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -623,7 +623,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419686992, "Model::LOD0", "Null" {
+	Model: 2753757688464, "Model::LOD0", "Null" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -634,7 +634,7 @@ Objects:  {
 		Shading: Y
 		Culling: "CullingOff"
 	}
-	Model: 1835419708992, "Model::road", "Mesh" {
+	Model: 2753757678464, "Model::road", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -648,7 +648,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419712992, "Model::west_wall", "Mesh" {
+	Model: 2753757680464, "Model::west_wall", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -662,7 +662,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419702992, "Model::east_wall", "Mesh" {
+	Model: 2753757706464, "Model::east_wall", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -676,7 +676,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419714992, "Model::west_coping", "Mesh" {
+	Model: 2753757694464, "Model::west_coping", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -690,7 +690,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419704992, "Model::east_coping", "Mesh" {
+	Model: 2753757704464, "Model::east_coping", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -704,7 +704,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419706992, "Model::gate_pier_west", "Mesh" {
+	Model: 2753757708464, "Model::gate_pier_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -718,7 +718,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419710992, "Model::gate_pier_east", "Mesh" {
+	Model: 2753757702464, "Model::gate_pier_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -732,7 +732,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418575664, "Model::gate_lintel", "Mesh" {
+	Model: 2753757710464, "Model::gate_lintel", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -746,7 +746,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418569664, "Model::gate_roof", "Mesh" {
+	Model: 2753757696464, "Model::gate_roof", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -760,7 +760,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418571664, "Model::gatehouse_eave_belt", "Mesh" {
+	Model: 2753757712464, "Model::gatehouse_eave_belt", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -774,7 +774,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418573664, "Model::gatehouse_ridge", "Mesh" {
+	Model: 2753757698464, "Model::gatehouse_ridge", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -788,7 +788,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418577664, "Model::gatehouse_ridge_cap_west", "Mesh" {
+	Model: 2753757714464, "Model::gatehouse_ridge_cap_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -802,7 +802,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418565664, "Model::gatehouse_ridge_cap_east", "Mesh" {
+	Model: 2753757700464, "Model::gatehouse_ridge_cap_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -816,7 +816,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418579664, "Model::barbican_west", "Mesh" {
+	Model: 2753757728464, "Model::barbican_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -830,7 +830,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418581664, "Model::barbican_east", "Mesh" {
+	Model: 2753757730464, "Model::barbican_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -844,7 +844,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418567664, "Model::barbican_west_roof", "Mesh" {
+	Model: 2753757722464, "Model::barbican_west_roof", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -858,7 +858,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418591664, "Model::barbican_east_roof", "Mesh" {
+	Model: 2753757718464, "Model::barbican_east_roof", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -872,7 +872,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418587664, "Model::barbican_tower_west", "Mesh" {
+	Model: 2753757720464, "Model::barbican_tower_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -886,7 +886,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418589664, "Model::barbican_tower_east", "Mesh" {
+	Model: 2753757716464, "Model::barbican_tower_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -900,7 +900,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418593664, "Model::barbican_tower_west_roof", "Mesh" {
+	Model: 2753757734464, "Model::barbican_tower_west_roof", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -914,7 +914,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418595664, "Model::barbican_tower_east_roof", "Mesh" {
+	Model: 2753757736464, "Model::barbican_tower_east_roof", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -928,7 +928,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418583664, "Model::barbican_tower_west_eave_belt", "Mesh" {
+	Model: 2753757738464, "Model::barbican_tower_west_eave_belt", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -942,7 +942,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835418585664, "Model::barbican_tower_west_ridge", "Mesh" {
+	Model: 2753757724464, "Model::barbican_tower_west_ridge", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -956,7 +956,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419928768, "Model::barbican_tower_west_ridge_cap_west", "Mesh" {
+	Model: 2753757740464, "Model::barbican_tower_west_ridge_cap_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -970,7 +970,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419926768, "Model::barbican_tower_west_ridge_cap_east", "Mesh" {
+	Model: 2753757732464, "Model::barbican_tower_west_ridge_cap_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -984,7 +984,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419944768, "Model::barbican_tower_east_eave_belt", "Mesh" {
+	Model: 2753757726464, "Model::barbican_tower_east_eave_belt", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -998,7 +998,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419936768, "Model::barbican_tower_east_ridge", "Mesh" {
+	Model: 2753758314768, "Model::barbican_tower_east_ridge", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1012,7 +1012,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419938768, "Model::barbican_tower_east_ridge_cap_west", "Mesh" {
+	Model: 2753758320768, "Model::barbican_tower_east_ridge_cap_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1026,7 +1026,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419940768, "Model::barbican_tower_east_ridge_cap_east", "Mesh" {
+	Model: 2753758326768, "Model::barbican_tower_east_ridge_cap_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1040,7 +1040,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419942768, "Model::gate_leaf_west", "Mesh" {
+	Model: 2753758322768, "Model::gate_leaf_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1054,7 +1054,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419930768, "Model::gate_leaf_east", "Mesh" {
+	Model: 2753758328768, "Model::gate_leaf_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1068,7 +1068,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419946768, "Model::barbican_crossbeam", "Mesh" {
+	Model: 2753758316768, "Model::barbican_crossbeam", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1082,7 +1082,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419932768, "Model::gate_post_west", "Mesh" {
+	Model: 2753758330768, "Model::gate_post_west", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1096,7 +1096,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419948768, "Model::gate_post_east", "Mesh" {
+	Model: 2753758332768, "Model::gate_post_east", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1110,7 +1110,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419934768, "Model::bronze_marker", "Mesh" {
+	Model: 2753758324768, "Model::bronze_marker", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1124,7 +1124,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419962768, "Model::LOD1", "Null" {
+	Model: 2753758318768, "Model::LOD1", "Null" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1135,7 +1135,7 @@ Objects:  {
 		Shading: Y
 		Culling: "CullingOff"
 	}
-	Model: 1835419956768, "Model::road_1", "Mesh" {
+	Model: 2753758334768, "Model::road_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1149,7 +1149,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419964768, "Model::west_wall_1", "Mesh" {
+	Model: 2753758350768, "Model::west_wall_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1163,7 +1163,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419950768, "Model::east_wall_1", "Mesh" {
+	Model: 2753758336768, "Model::east_wall_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1177,7 +1177,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419958768, "Model::gate_pier_west_1", "Mesh" {
+	Model: 2753758348768, "Model::gate_pier_west_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1191,7 +1191,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419966768, "Model::gate_pier_east_1", "Mesh" {
+	Model: 2753758338768, "Model::gate_pier_east_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1205,7 +1205,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419952768, "Model::gate_lintel_1", "Mesh" {
+	Model: 2753758352768, "Model::gate_lintel_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1219,7 +1219,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419960768, "Model::gate_roof_1", "Mesh" {
+	Model: 2753758346768, "Model::gate_roof_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1233,7 +1233,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419968768, "Model::barbican_west_1", "Mesh" {
+	Model: 2753758354768, "Model::barbican_west_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1247,7 +1247,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419954768, "Model::barbican_east_1", "Mesh" {
+	Model: 2753758342768, "Model::barbican_east_1", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1261,7 +1261,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419972768, "Model::LOD2", "Null" {
+	Model: 2753758340768, "Model::LOD2", "Null" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1272,7 +1272,7 @@ Objects:  {
 		Shading: Y
 		Culling: "CullingOff"
 	}
-	Model: 1835419978768, "Model::road_2", "Mesh" {
+	Model: 2753758356768, "Model::road_2", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1286,7 +1286,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419982768, "Model::west_wall_2", "Mesh" {
+	Model: 2753758358768, "Model::west_wall_2", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1300,7 +1300,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419980768, "Model::east_wall_2", "Mesh" {
+	Model: 2753758344768, "Model::east_wall_2", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1314,7 +1314,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419984768, "Model::gate_mass", "Mesh" {
+	Model: 2753758368768, "Model::gate_mass", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1328,7 +1328,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Model: 1835419974768, "Model::gate_roof_2", "Mesh" {
+	Model: 2753758364768, "Model::gate_roof_2", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "RotationOrder", "enum", "", "",4
@@ -1342,7 +1342,7 @@ Objects:  {
 		Shading: W
 		Culling: "CullingOff"
 	}
-	Material: 1835419905248, "Material::__P0_ANCHOR_MARKER", "" {
+	Material: 2753751150336, "Material::__P0_ANCHOR_MARKER", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1355,7 +1355,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419900848, "Material::Stone", "" {
+	Material: 2753751147136, "Material::Stone", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1368,7 +1368,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419903248, "Material::RammedEarth", "" {
+	Material: 2753751151136, "Material::RammedEarth", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1381,7 +1381,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419899648, "Material::GreyGreenTile", "" {
+	Material: 2753751151536, "Material::GreyGreenTile", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1394,7 +1394,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419900448, "Material::Vermilion", "" {
+	Material: 2753751146336, "Material::Vermilion", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1407,7 +1407,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419898448, "Material::Timber", "" {
+	Material: 2753751147536, "Material::Timber", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1420,7 +1420,7 @@ Objects:  {
 			P: "Opacity", "double", "Number", "",1
 		}
 	}
-	Material: 1835419903648, "Material::Bronze", "" {
+	Material: 2753759027808, "Material::Bronze", "" {
 		Version: 102
 		ShadingModel: "lambert"
 		MultiLayer: 0
@@ -1441,484 +1441,484 @@ Objects:  {
 Connections:  {
 	
 	;Model::Guangyangmen, Model::RootNode
-	C: "OO",1835419696992,0
+	C: "OO",2753757690464,0
 	
 	;Model::anchor_p0_guangyangmen_placement, Model::Guangyangmen
-	C: "OO",1835419698992,1835419696992
+	C: "OO",2753757684464,2753757690464
 	
 	;Model::anchor_p0_guangyangmen_outer, Model::Guangyangmen
-	C: "OO",1835419684992,1835419696992
+	C: "OO",2753757692464,2753757690464
 	
 	;Model::anchor_p0_guangyangmen_inner, Model::Guangyangmen
-	C: "OO",1835419700992,1835419696992
+	C: "OO",2753757682464,2753757690464
 	
 	;Model::LOD0, Model::Guangyangmen
-	C: "OO",1835419686992,1835419696992
+	C: "OO",2753757688464,2753757690464
 	
 	;Model::LOD1, Model::Guangyangmen
-	C: "OO",1835419962768,1835419696992
+	C: "OO",2753758318768,2753757690464
 	
 	;Model::LOD2, Model::Guangyangmen
-	C: "OO",1835419972768,1835419696992
+	C: "OO",2753758340768,2753757690464
 	
 	;Material::__P0_ANCHOR_MARKER, Model::anchor_p0_guangyangmen_placement
-	C: "OO",1835419905248,1835419698992
+	C: "OO",2753751150336,2753757684464
 	
 	;Geometry::Scene, Model::anchor_p0_guangyangmen_placement
-	C: "OO",1835419671264,1835419698992
+	C: "OO",2753657430512,2753757684464
 	
 	;Material::__P0_ANCHOR_MARKER, Model::anchor_p0_guangyangmen_outer
-	C: "OO",1835419905248,1835419684992
+	C: "OO",2753751150336,2753757692464
 	
 	;Geometry::Scene, Model::anchor_p0_guangyangmen_outer
-	C: "OO",1835419671264,1835419684992
+	C: "OO",2753657430512,2753757692464
 	
 	;Material::__P0_ANCHOR_MARKER, Model::anchor_p0_guangyangmen_inner
-	C: "OO",1835419905248,1835419700992
+	C: "OO",2753751150336,2753757682464
 	
 	;Geometry::Scene, Model::anchor_p0_guangyangmen_inner
-	C: "OO",1835419671264,1835419700992
+	C: "OO",2753657430512,2753757682464
 	
 	;Model::road, Model::LOD0
-	C: "OO",1835419708992,1835419686992
+	C: "OO",2753757678464,2753757688464
 	
 	;Model::west_wall, Model::LOD0
-	C: "OO",1835419712992,1835419686992
+	C: "OO",2753757680464,2753757688464
 	
 	;Model::east_wall, Model::LOD0
-	C: "OO",1835419702992,1835419686992
+	C: "OO",2753757706464,2753757688464
 	
 	;Model::west_coping, Model::LOD0
-	C: "OO",1835419714992,1835419686992
+	C: "OO",2753757694464,2753757688464
 	
 	;Model::east_coping, Model::LOD0
-	C: "OO",1835419704992,1835419686992
+	C: "OO",2753757704464,2753757688464
 	
 	;Model::gate_pier_west, Model::LOD0
-	C: "OO",1835419706992,1835419686992
+	C: "OO",2753757708464,2753757688464
 	
 	;Model::gate_pier_east, Model::LOD0
-	C: "OO",1835419710992,1835419686992
+	C: "OO",2753757702464,2753757688464
 	
 	;Model::gate_lintel, Model::LOD0
-	C: "OO",1835418575664,1835419686992
+	C: "OO",2753757710464,2753757688464
 	
 	;Model::gate_roof, Model::LOD0
-	C: "OO",1835418569664,1835419686992
+	C: "OO",2753757696464,2753757688464
 	
 	;Model::gatehouse_eave_belt, Model::LOD0
-	C: "OO",1835418571664,1835419686992
+	C: "OO",2753757712464,2753757688464
 	
 	;Model::gatehouse_ridge, Model::LOD0
-	C: "OO",1835418573664,1835419686992
+	C: "OO",2753757698464,2753757688464
 	
 	;Model::gatehouse_ridge_cap_west, Model::LOD0
-	C: "OO",1835418577664,1835419686992
+	C: "OO",2753757714464,2753757688464
 	
 	;Model::gatehouse_ridge_cap_east, Model::LOD0
-	C: "OO",1835418565664,1835419686992
+	C: "OO",2753757700464,2753757688464
 	
 	;Model::barbican_west, Model::LOD0
-	C: "OO",1835418579664,1835419686992
+	C: "OO",2753757728464,2753757688464
 	
 	;Model::barbican_east, Model::LOD0
-	C: "OO",1835418581664,1835419686992
+	C: "OO",2753757730464,2753757688464
 	
 	;Model::barbican_west_roof, Model::LOD0
-	C: "OO",1835418567664,1835419686992
+	C: "OO",2753757722464,2753757688464
 	
 	;Model::barbican_east_roof, Model::LOD0
-	C: "OO",1835418591664,1835419686992
+	C: "OO",2753757718464,2753757688464
 	
 	;Model::barbican_tower_west, Model::LOD0
-	C: "OO",1835418587664,1835419686992
+	C: "OO",2753757720464,2753757688464
 	
 	;Model::barbican_tower_east, Model::LOD0
-	C: "OO",1835418589664,1835419686992
+	C: "OO",2753757716464,2753757688464
 	
 	;Model::barbican_tower_west_roof, Model::LOD0
-	C: "OO",1835418593664,1835419686992
+	C: "OO",2753757734464,2753757688464
 	
 	;Model::barbican_tower_east_roof, Model::LOD0
-	C: "OO",1835418595664,1835419686992
+	C: "OO",2753757736464,2753757688464
 	
 	;Model::barbican_tower_west_eave_belt, Model::LOD0
-	C: "OO",1835418583664,1835419686992
+	C: "OO",2753757738464,2753757688464
 	
 	;Model::barbican_tower_west_ridge, Model::LOD0
-	C: "OO",1835418585664,1835419686992
+	C: "OO",2753757724464,2753757688464
 	
 	;Model::barbican_tower_west_ridge_cap_west, Model::LOD0
-	C: "OO",1835419928768,1835419686992
+	C: "OO",2753757740464,2753757688464
 	
 	;Model::barbican_tower_west_ridge_cap_east, Model::LOD0
-	C: "OO",1835419926768,1835419686992
+	C: "OO",2753757732464,2753757688464
 	
 	;Model::barbican_tower_east_eave_belt, Model::LOD0
-	C: "OO",1835419944768,1835419686992
+	C: "OO",2753757726464,2753757688464
 	
 	;Model::barbican_tower_east_ridge, Model::LOD0
-	C: "OO",1835419936768,1835419686992
+	C: "OO",2753758314768,2753757688464
 	
 	;Model::barbican_tower_east_ridge_cap_west, Model::LOD0
-	C: "OO",1835419938768,1835419686992
+	C: "OO",2753758320768,2753757688464
 	
 	;Model::barbican_tower_east_ridge_cap_east, Model::LOD0
-	C: "OO",1835419940768,1835419686992
+	C: "OO",2753758326768,2753757688464
 	
 	;Model::gate_leaf_west, Model::LOD0
-	C: "OO",1835419942768,1835419686992
+	C: "OO",2753758322768,2753757688464
 	
 	;Model::gate_leaf_east, Model::LOD0
-	C: "OO",1835419930768,1835419686992
+	C: "OO",2753758328768,2753757688464
 	
 	;Model::barbican_crossbeam, Model::LOD0
-	C: "OO",1835419946768,1835419686992
+	C: "OO",2753758316768,2753757688464
 	
 	;Model::gate_post_west, Model::LOD0
-	C: "OO",1835419932768,1835419686992
+	C: "OO",2753758330768,2753757688464
 	
 	;Model::gate_post_east, Model::LOD0
-	C: "OO",1835419948768,1835419686992
+	C: "OO",2753758332768,2753757688464
 	
 	;Model::bronze_marker, Model::LOD0
-	C: "OO",1835419934768,1835419686992
+	C: "OO",2753758324768,2753757688464
 	
 	;Material::Stone, Model::road
-	C: "OO",1835419900848,1835419708992
+	C: "OO",2753751147136,2753757678464
 	
 	;Geometry::Scene, Model::road
-	C: "OO",1835419676192,1835419708992
+	C: "OO",2753657429616,2753757678464
 	
 	;Material::RammedEarth, Model::west_wall
-	C: "OO",1835419903248,1835419712992
+	C: "OO",2753751151136,2753757680464
 	
 	;Geometry::Scene, Model::west_wall
-	C: "OO",1835419672608,1835419712992
+	C: "OO",2753657432752,2753757680464
 	
 	;Material::RammedEarth, Model::east_wall
-	C: "OO",1835419903248,1835419702992
+	C: "OO",2753751151136,2753757706464
 	
 	;Geometry::Scene, Model::east_wall
-	C: "OO",1835419672608,1835419702992
+	C: "OO",2753657432752,2753757706464
 	
 	;Material::GreyGreenTile, Model::west_coping
-	C: "OO",1835419899648,1835419714992
+	C: "OO",2753751151536,2753757694464
 	
 	;Geometry::Scene, Model::west_coping
-	C: "OO",1835419672608,1835419714992
+	C: "OO",2753657432752,2753757694464
 	
 	;Material::GreyGreenTile, Model::east_coping
-	C: "OO",1835419899648,1835419704992
+	C: "OO",2753751151536,2753757704464
 	
 	;Geometry::Scene, Model::east_coping
-	C: "OO",1835419672608,1835419704992
+	C: "OO",2753657432752,2753757704464
 	
 	;Material::Vermilion, Model::gate_pier_west
-	C: "OO",1835419900448,1835419706992
+	C: "OO",2753751146336,2753757708464
 	
 	;Geometry::Scene, Model::gate_pier_west
-	C: "OO",1835419672608,1835419706992
+	C: "OO",2753657432752,2753757708464
 	
 	;Material::Vermilion, Model::gate_pier_east
-	C: "OO",1835419900448,1835419710992
+	C: "OO",2753751146336,2753757702464
 	
 	;Geometry::Scene, Model::gate_pier_east
-	C: "OO",1835419672608,1835419710992
+	C: "OO",2753657432752,2753757702464
 	
 	;Material::Timber, Model::gate_lintel
-	C: "OO",1835419898448,1835418575664
+	C: "OO",2753751147536,2753757710464
 	
 	;Geometry::Scene, Model::gate_lintel
-	C: "OO",1835419672608,1835418575664
+	C: "OO",2753657432752,2753757710464
 	
 	;Material::GreyGreenTile, Model::gate_roof
-	C: "OO",1835419899648,1835418569664
+	C: "OO",2753751151536,2753757696464
 	
 	;Geometry::Scene, Model::gate_roof
-	C: "OO",1835419673504,1835418569664
+	C: "OO",2753657427824,2753757696464
 	
 	;Material::Timber, Model::gatehouse_eave_belt
-	C: "OO",1835419898448,1835418571664
+	C: "OO",2753751147536,2753757712464
 	
 	;Geometry::Scene, Model::gatehouse_eave_belt
-	C: "OO",1835419672608,1835418571664
+	C: "OO",2753657432752,2753757712464
 	
 	;Material::Bronze, Model::gatehouse_ridge
-	C: "OO",1835419903648,1835418573664
+	C: "OO",2753759027808,2753757698464
 	
 	;Geometry::Scene, Model::gatehouse_ridge
-	C: "OO",1835419672608,1835418573664
+	C: "OO",2753657432752,2753757698464
 	
 	;Material::Bronze, Model::gatehouse_ridge_cap_west
-	C: "OO",1835419903648,1835418577664
+	C: "OO",2753759027808,2753757714464
 	
 	;Geometry::Scene, Model::gatehouse_ridge_cap_west
-	C: "OO",1835419675296,1835418577664
+	C: "OO",2753657433648,2753757714464
 	
 	;Material::Bronze, Model::gatehouse_ridge_cap_east
-	C: "OO",1835419903648,1835418565664
+	C: "OO",2753759027808,2753757700464
 	
 	;Geometry::Scene, Model::gatehouse_ridge_cap_east
-	C: "OO",1835419675296,1835418565664
+	C: "OO",2753657433648,2753757700464
 	
 	;Material::RammedEarth, Model::barbican_west
-	C: "OO",1835419903248,1835418579664
+	C: "OO",2753751151136,2753757728464
 	
 	;Geometry::Scene, Model::barbican_west
-	C: "OO",1835419672608,1835418579664
+	C: "OO",2753657432752,2753757728464
 	
 	;Material::RammedEarth, Model::barbican_east
-	C: "OO",1835419903248,1835418581664
+	C: "OO",2753751151136,2753757730464
 	
 	;Geometry::Scene, Model::barbican_east
-	C: "OO",1835419672608,1835418581664
+	C: "OO",2753657432752,2753757730464
 	
 	;Material::GreyGreenTile, Model::barbican_west_roof
-	C: "OO",1835419899648,1835418567664
+	C: "OO",2753751151536,2753757722464
 	
 	;Geometry::Scene, Model::barbican_west_roof
-	C: "OO",1835419672608,1835418567664
+	C: "OO",2753657432752,2753757722464
 	
 	;Material::GreyGreenTile, Model::barbican_east_roof
-	C: "OO",1835419899648,1835418591664
+	C: "OO",2753751151536,2753757718464
 	
 	;Geometry::Scene, Model::barbican_east_roof
-	C: "OO",1835419672608,1835418591664
+	C: "OO",2753657432752,2753757718464
 	
 	;Material::RammedEarth, Model::barbican_tower_west
-	C: "OO",1835419903248,1835418587664
+	C: "OO",2753751151136,2753757720464
 	
 	;Geometry::Scene, Model::barbican_tower_west
-	C: "OO",1835419672608,1835418587664
+	C: "OO",2753657432752,2753757720464
 	
 	;Material::RammedEarth, Model::barbican_tower_east
-	C: "OO",1835419903248,1835418589664
+	C: "OO",2753751151136,2753757716464
 	
 	;Geometry::Scene, Model::barbican_tower_east
-	C: "OO",1835419672608,1835418589664
+	C: "OO",2753657432752,2753757716464
 	
 	;Material::GreyGreenTile, Model::barbican_tower_west_roof
-	C: "OO",1835419899648,1835418593664
+	C: "OO",2753751151536,2753757734464
 	
 	;Geometry::Scene, Model::barbican_tower_west_roof
-	C: "OO",1835419673504,1835418593664
+	C: "OO",2753657427824,2753757734464
 	
 	;Material::GreyGreenTile, Model::barbican_tower_east_roof
-	C: "OO",1835419899648,1835418595664
+	C: "OO",2753751151536,2753757736464
 	
 	;Geometry::Scene, Model::barbican_tower_east_roof
-	C: "OO",1835419673504,1835418595664
+	C: "OO",2753657427824,2753757736464
 	
 	;Material::Timber, Model::barbican_tower_west_eave_belt
-	C: "OO",1835419898448,1835418583664
+	C: "OO",2753751147536,2753757738464
 	
 	;Geometry::Scene, Model::barbican_tower_west_eave_belt
-	C: "OO",1835419672608,1835418583664
+	C: "OO",2753657432752,2753757738464
 	
 	;Material::Bronze, Model::barbican_tower_west_ridge
-	C: "OO",1835419903648,1835418585664
+	C: "OO",2753759027808,2753757724464
 	
 	;Geometry::Scene, Model::barbican_tower_west_ridge
-	C: "OO",1835419672608,1835418585664
+	C: "OO",2753657432752,2753757724464
 	
 	;Material::Bronze, Model::barbican_tower_west_ridge_cap_west
-	C: "OO",1835419903648,1835419928768
+	C: "OO",2753759027808,2753757740464
 	
 	;Geometry::Scene, Model::barbican_tower_west_ridge_cap_west
-	C: "OO",1835419675296,1835419928768
+	C: "OO",2753657433648,2753757740464
 	
 	;Material::Bronze, Model::barbican_tower_west_ridge_cap_east
-	C: "OO",1835419903648,1835419926768
+	C: "OO",2753759027808,2753757732464
 	
 	;Geometry::Scene, Model::barbican_tower_west_ridge_cap_east
-	C: "OO",1835419675296,1835419926768
+	C: "OO",2753657433648,2753757732464
 	
 	;Material::Timber, Model::barbican_tower_east_eave_belt
-	C: "OO",1835419898448,1835419944768
+	C: "OO",2753751147536,2753757726464
 	
 	;Geometry::Scene, Model::barbican_tower_east_eave_belt
-	C: "OO",1835419672608,1835419944768
+	C: "OO",2753657432752,2753757726464
 	
 	;Material::Bronze, Model::barbican_tower_east_ridge
-	C: "OO",1835419903648,1835419936768
+	C: "OO",2753759027808,2753758314768
 	
 	;Geometry::Scene, Model::barbican_tower_east_ridge
-	C: "OO",1835419672608,1835419936768
+	C: "OO",2753657432752,2753758314768
 	
 	;Material::Bronze, Model::barbican_tower_east_ridge_cap_west
-	C: "OO",1835419903648,1835419938768
+	C: "OO",2753759027808,2753758320768
 	
 	;Geometry::Scene, Model::barbican_tower_east_ridge_cap_west
-	C: "OO",1835419675296,1835419938768
+	C: "OO",2753657433648,2753758320768
 	
 	;Material::Bronze, Model::barbican_tower_east_ridge_cap_east
-	C: "OO",1835419903648,1835419940768
+	C: "OO",2753759027808,2753758326768
 	
 	;Geometry::Scene, Model::barbican_tower_east_ridge_cap_east
-	C: "OO",1835419675296,1835419940768
+	C: "OO",2753657433648,2753758326768
 	
 	;Material::Vermilion, Model::gate_leaf_west
-	C: "OO",1835419900448,1835419942768
+	C: "OO",2753751146336,2753758322768
 	
 	;Geometry::Scene, Model::gate_leaf_west
-	C: "OO",1835419672608,1835419942768
+	C: "OO",2753657432752,2753758322768
 	
 	;Material::Vermilion, Model::gate_leaf_east
-	C: "OO",1835419900448,1835419930768
+	C: "OO",2753751146336,2753758328768
 	
 	;Geometry::Scene, Model::gate_leaf_east
-	C: "OO",1835419672608,1835419930768
+	C: "OO",2753657432752,2753758328768
 	
 	;Material::Timber, Model::barbican_crossbeam
-	C: "OO",1835419898448,1835419946768
+	C: "OO",2753751147536,2753758316768
 	
 	;Geometry::Scene, Model::barbican_crossbeam
-	C: "OO",1835419672608,1835419946768
+	C: "OO",2753657432752,2753758316768
 	
 	;Material::Timber, Model::gate_post_west
-	C: "OO",1835419898448,1835419932768
+	C: "OO",2753751147536,2753758330768
 	
 	;Geometry::Scene, Model::gate_post_west
-	C: "OO",1835419675296,1835419932768
+	C: "OO",2753657433648,2753758330768
 	
 	;Material::Timber, Model::gate_post_east
-	C: "OO",1835419898448,1835419948768
+	C: "OO",2753751147536,2753758332768
 	
 	;Geometry::Scene, Model::gate_post_east
-	C: "OO",1835419675296,1835419948768
+	C: "OO",2753657433648,2753758332768
 	
 	;Material::Bronze, Model::bronze_marker
-	C: "OO",1835419903648,1835419934768
+	C: "OO",2753759027808,2753758324768
 	
 	;Geometry::Scene, Model::bronze_marker
-	C: "OO",1835419675296,1835419934768
+	C: "OO",2753657433648,2753758324768
 	
 	;Model::road_1, Model::LOD1
-	C: "OO",1835419956768,1835419962768
+	C: "OO",2753758334768,2753758318768
 	
 	;Model::west_wall_1, Model::LOD1
-	C: "OO",1835419964768,1835419962768
+	C: "OO",2753758350768,2753758318768
 	
 	;Model::east_wall_1, Model::LOD1
-	C: "OO",1835419950768,1835419962768
+	C: "OO",2753758336768,2753758318768
 	
 	;Model::gate_pier_west_1, Model::LOD1
-	C: "OO",1835419958768,1835419962768
+	C: "OO",2753758348768,2753758318768
 	
 	;Model::gate_pier_east_1, Model::LOD1
-	C: "OO",1835419966768,1835419962768
+	C: "OO",2753758338768,2753758318768
 	
 	;Model::gate_lintel_1, Model::LOD1
-	C: "OO",1835419952768,1835419962768
+	C: "OO",2753758352768,2753758318768
 	
 	;Model::gate_roof_1, Model::LOD1
-	C: "OO",1835419960768,1835419962768
+	C: "OO",2753758346768,2753758318768
 	
 	;Model::barbican_west_1, Model::LOD1
-	C: "OO",1835419968768,1835419962768
+	C: "OO",2753758354768,2753758318768
 	
 	;Model::barbican_east_1, Model::LOD1
-	C: "OO",1835419954768,1835419962768
+	C: "OO",2753758342768,2753758318768
 	
 	;Material::Stone, Model::road_1
-	C: "OO",1835419900848,1835419956768
+	C: "OO",2753751147136,2753758334768
 	
 	;Geometry::Scene, Model::road_1
-	C: "OO",1835419676192,1835419956768
+	C: "OO",2753657429616,2753758334768
 	
 	;Material::RammedEarth, Model::west_wall_1
-	C: "OO",1835419903248,1835419964768
+	C: "OO",2753751151136,2753758350768
 	
 	;Geometry::Scene, Model::west_wall_1
-	C: "OO",1835419672608,1835419964768
+	C: "OO",2753657432752,2753758350768
 	
 	;Material::RammedEarth, Model::east_wall_1
-	C: "OO",1835419903248,1835419950768
+	C: "OO",2753751151136,2753758336768
 	
 	;Geometry::Scene, Model::east_wall_1
-	C: "OO",1835419672608,1835419950768
+	C: "OO",2753657432752,2753758336768
 	
 	;Material::Vermilion, Model::gate_pier_west_1
-	C: "OO",1835419900448,1835419958768
+	C: "OO",2753751146336,2753758348768
 	
 	;Geometry::Scene, Model::gate_pier_west_1
-	C: "OO",1835419672608,1835419958768
+	C: "OO",2753657432752,2753758348768
 	
 	;Material::Vermilion, Model::gate_pier_east_1
-	C: "OO",1835419900448,1835419966768
+	C: "OO",2753751146336,2753758338768
 	
 	;Geometry::Scene, Model::gate_pier_east_1
-	C: "OO",1835419672608,1835419966768
+	C: "OO",2753657432752,2753758338768
 	
 	;Material::Timber, Model::gate_lintel_1
-	C: "OO",1835419898448,1835419952768
+	C: "OO",2753751147536,2753758352768
 	
 	;Geometry::Scene, Model::gate_lintel_1
-	C: "OO",1835419672608,1835419952768
+	C: "OO",2753657432752,2753758352768
 	
 	;Material::GreyGreenTile, Model::gate_roof_1
-	C: "OO",1835419899648,1835419960768
+	C: "OO",2753751151536,2753758346768
 	
 	;Geometry::Scene, Model::gate_roof_1
-	C: "OO",1835419673504,1835419960768
+	C: "OO",2753657427824,2753758346768
 	
 	;Material::RammedEarth, Model::barbican_west_1
-	C: "OO",1835419903248,1835419968768
+	C: "OO",2753751151136,2753758354768
 	
 	;Geometry::Scene, Model::barbican_west_1
-	C: "OO",1835419672608,1835419968768
+	C: "OO",2753657432752,2753758354768
 	
 	;Material::RammedEarth, Model::barbican_east_1
-	C: "OO",1835419903248,1835419954768
+	C: "OO",2753751151136,2753758342768
 	
 	;Geometry::Scene, Model::barbican_east_1
-	C: "OO",1835419672608,1835419954768
+	C: "OO",2753657432752,2753758342768
 	
 	;Model::road_2, Model::LOD2
-	C: "OO",1835419978768,1835419972768
+	C: "OO",2753758356768,2753758340768
 	
 	;Model::west_wall_2, Model::LOD2
-	C: "OO",1835419982768,1835419972768
+	C: "OO",2753758358768,2753758340768
 	
 	;Model::east_wall_2, Model::LOD2
-	C: "OO",1835419980768,1835419972768
+	C: "OO",2753758344768,2753758340768
 	
 	;Model::gate_mass, Model::LOD2
-	C: "OO",1835419984768,1835419972768
+	C: "OO",2753758368768,2753758340768
 	
 	;Model::gate_roof_2, Model::LOD2
-	C: "OO",1835419974768,1835419972768
+	C: "OO",2753758364768,2753758340768
 	
 	;Material::Stone, Model::road_2
-	C: "OO",1835419900848,1835419978768
+	C: "OO",2753751147136,2753758356768
 	
 	;Geometry::Scene, Model::road_2
-	C: "OO",1835419676192,1835419978768
+	C: "OO",2753657429616,2753758356768
 	
 	;Material::RammedEarth, Model::west_wall_2
-	C: "OO",1835419903248,1835419982768
+	C: "OO",2753751151136,2753758358768
 	
 	;Geometry::Scene, Model::west_wall_2
-	C: "OO",1835419672608,1835419982768
+	C: "OO",2753657432752,2753758358768
 	
 	;Material::RammedEarth, Model::east_wall_2
-	C: "OO",1835419903248,1835419980768
+	C: "OO",2753751151136,2753758344768
 	
 	;Geometry::Scene, Model::east_wall_2
-	C: "OO",1835419672608,1835419980768
+	C: "OO",2753657432752,2753758344768
 	
 	;Material::Vermilion, Model::gate_mass
-	C: "OO",1835419900448,1835419984768
+	C: "OO",2753751146336,2753758368768
 	
 	;Geometry::Scene, Model::gate_mass
-	C: "OO",1835419672608,1835419984768
+	C: "OO",2753657432752,2753758368768
 	
 	;Material::GreyGreenTile, Model::gate_roof_2
-	C: "OO",1835419899648,1835419974768
+	C: "OO",2753751151536,2753758364768
 	
 	;Geometry::Scene, Model::gate_roof_2
-	C: "OO",1835419673504,1835419974768
+	C: "OO",2753657427824,2753758364768
 }
 ;Takes section
 ;----------------------------------------------------

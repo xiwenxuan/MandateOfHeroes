@@ -287,6 +287,30 @@ namespace Mandate.Domain
             FormalWorldObjectId = formalWorldObjectId;
         }
 
+        public CellRouteSegment(int sequence, string id, string kindId,
+            ulong fromCellId64, ulong toCellId64,
+            int distanceCentimetres, int traversalCostPermille,
+            string traversalConditionId, string formalWorldObjectId)
+        {
+            if (sequence < 0 || string.IsNullOrWhiteSpace(id) ||
+                string.IsNullOrWhiteSpace(kindId) || fromCellId64 == 0 ||
+                toCellId64 == 0 || fromCellId64 == toCellId64 ||
+                distanceCentimetres <= 0 || traversalCostPermille < 1_000 ||
+                traversalCostPermille > 10_000 ||
+                string.IsNullOrWhiteSpace(traversalConditionId))
+                throw new ArgumentException(
+                    "A formal CellRoute segment is invalid.");
+            Sequence = sequence;
+            Id = id;
+            KindId = kindId;
+            FromCellId64 = fromCellId64;
+            ToCellId64 = toCellId64;
+            DistanceCentimetres = distanceCentimetres;
+            TraversalCostPermille = traversalCostPermille;
+            TraversalConditionId = traversalConditionId;
+            FormalWorldObjectId = formalWorldObjectId ?? string.Empty;
+        }
+
         public int Sequence { get; internal set; }
         public string Id { get; internal set; }
         public string KindId { get; internal set; }
@@ -306,10 +330,28 @@ namespace Mandate.Domain
 
     public sealed class CellRoute
     {
-        internal CellRoute(ulong originCellId64, ulong targetCellId64,
+        public CellRoute(ulong originCellId64, ulong targetCellId64,
             string movementCapabilityId,
             IReadOnlyList<CellRouteSegment> segments)
         {
+            if (originCellId64 == 0 || targetCellId64 == 0 ||
+                originCellId64 == targetCellId64 ||
+                !MovementCapabilityIds.All.Contains(
+                    movementCapabilityId, StringComparer.Ordinal) ||
+                segments == null || segments.Count == 0)
+                throw new ArgumentException("A formal CellRoute is invalid.");
+            for (var i = 0; i < segments.Count; i++)
+            {
+                var segment = segments[i];
+                if (segment == null || segment.Sequence != i ||
+                    i == 0 && segment.FromCellId64 != originCellId64 ||
+                    i > 0 && segments[i - 1].ToCellId64 !=
+                        segment.FromCellId64 ||
+                    i == segments.Count - 1 && segment.ToCellId64 !=
+                        targetCellId64)
+                    throw new ArgumentException(
+                        "CellRoute segments are not one continuous chain.");
+            }
             OriginCellId64 = originCellId64;
             TargetCellId64 = targetCellId64;
             MovementCapabilityId = movementCapabilityId;
@@ -327,6 +369,41 @@ namespace Mandate.Domain
         public IReadOnlyList<CellRouteSegment> Segments { get; }
         public long DistanceCentimetres { get; }
         public long WeightedDistanceCentimetres { get; }
+    }
+
+    public sealed class StrategicCellRoutePlan
+    {
+        public StrategicCellRoutePlan(string versionId, string assetHash,
+            string assetRouteId, string formalWorldRouteId, CellRoute route)
+        {
+            if (string.IsNullOrWhiteSpace(versionId) ||
+                string.IsNullOrWhiteSpace(assetHash) ||
+                assetHash.Length != 64 ||
+                string.IsNullOrWhiteSpace(assetRouteId) ||
+                string.IsNullOrWhiteSpace(formalWorldRouteId) ||
+                route == null)
+                throw new ArgumentException(
+                    "A strategic CellRoute plan is incomplete.");
+            VersionId = versionId;
+            AssetHash = assetHash;
+            AssetRouteId = assetRouteId;
+            FormalWorldRouteId = formalWorldRouteId;
+            Route = route;
+        }
+
+        public string VersionId { get; }
+        public string AssetHash { get; }
+        public string AssetRouteId { get; }
+        public string FormalWorldRouteId { get; }
+        public CellRoute Route { get; }
+    }
+
+    public interface IStrategicCellRouteProvider
+    {
+        bool TryBuildRoute(string assetRouteId, string formalWorldRouteId,
+            ulong originCellId64, ulong targetCellId64,
+            string movementCapabilityId, out StrategicCellRoutePlan plan,
+            out string failureReasonId);
     }
 
     public sealed class CellTraversalPlanner
@@ -678,9 +755,11 @@ namespace Mandate.Domain
             if (string.Equals(port.TraversalConditionId,
                     CellTraversalIds.FormalRoadConditionId,
                     StringComparison.Ordinal))
-                return LuoyangHumanScaleWorldTraversalRules
-                    .CanTraverseStrategicEdge(world,
-                        port.FormalWorldObjectId);
+                return HasFormalWorldRoute(
+                           world, port.FormalWorldObjectId) ||
+                    LuoyangHumanScaleWorldTraversalRules
+                        .CanTraverseStrategicEdge(world,
+                            port.FormalWorldObjectId);
             if (string.Equals(port.TraversalConditionId,
                     CellTraversalIds.FormalPassageConditionId,
                     StringComparison.Ordinal))
@@ -700,9 +779,11 @@ namespace Mandate.Domain
             if (string.Equals(segment.TraversalConditionId,
                     CellTraversalIds.FormalRoadConditionId,
                     StringComparison.Ordinal))
-                return LuoyangHumanScaleWorldTraversalRules
-                    .CanTraverseStrategicEdge(world,
-                        segment.FormalWorldObjectId);
+                return HasFormalWorldRoute(
+                           world, segment.FormalWorldObjectId) ||
+                    LuoyangHumanScaleWorldTraversalRules
+                        .CanTraverseStrategicEdge(world,
+                            segment.FormalWorldObjectId);
             if (string.Equals(segment.TraversalConditionId,
                     CellTraversalIds.FormalPassageConditionId,
                     StringComparison.Ordinal))
@@ -728,8 +809,10 @@ namespace Mandate.Domain
             if (string.Equals(traversalConditionId,
                     CellTraversalIds.FormalRoadConditionId,
                     StringComparison.Ordinal))
-                return LuoyangHumanScaleWorldTraversalRules
-                    .CanTraverseStrategicEdge(world, formalWorldObjectId);
+                return HasFormalWorldRoute(world, formalWorldObjectId) ||
+                    LuoyangHumanScaleWorldTraversalRules
+                        .CanTraverseStrategicEdge(
+                            world, formalWorldObjectId);
             if (string.Equals(traversalConditionId,
                     CellTraversalIds.FormalPassageConditionId,
                     StringComparison.Ordinal))
@@ -742,6 +825,13 @@ namespace Mandate.Domain
                     .IsFacilityAccessible(world, formalWorldObjectId);
             return false;
         }
+
+        private static bool HasFormalWorldRoute(
+            WorldState world, string routeId) =>
+            !string.IsNullOrWhiteSpace(routeId) &&
+            world.Routes != null && world.Routes.Any(item =>
+                item != null && string.Equals(
+                    item.Id, routeId, StringComparison.Ordinal));
 
         private static CellTraversalProfile CreateProfile(ulong cellId64,
             LuoyangFacilitySpatialCapability capability,

@@ -213,7 +213,8 @@ namespace Mandate.Tests
             v68.SchemaVersion = 68;
             var migrated = WorldSnapshotSerializer.Deserialize(
                 JsonUtility.ToJson(v68));
-            Assert.That(migrated.SchemaVersion, Is.EqualTo(69));
+            Assert.That(migrated.SchemaVersion,
+                Is.EqualTo(WorldState.CurrentSchemaVersion));
             Assert.That(migrated.HistoricalIdentities, Is.Empty);
             TestContext.WriteLine("integration_ms=" +
                 result.InitializationElapsedMilliseconds);

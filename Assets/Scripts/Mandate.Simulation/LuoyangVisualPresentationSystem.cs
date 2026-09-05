@@ -229,7 +229,7 @@ namespace Mandate.Simulation
                         "No materialized supplier can fulfil " +
                         requirement.ProductId + ".");
                 var destination = GetOrCreateOwnerMaterialInventory(runtime,
-                    ownerId, requirement.ProductId);
+                    ownerId, requirement.ProductId, missing);
                 var shipped = CalculateRequiredShipment(missing, supplier);
                 if (shipped > supplier.InventoryQuantityMilliunits)
                     throw new InvalidOperationException(
@@ -334,24 +334,59 @@ namespace Mandate.Simulation
         private static LuoyangInventoryBalanceState
             GetOrCreateOwnerMaterialInventory(
                 Luoyang184LivingWorldRuntimeState runtime, string ownerId,
-                string productId)
+                string productId, long requiredCapacityMilliunits)
         {
+            if (requiredCapacityMilliunits <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(requiredCapacityMilliunits));
             var existing = runtime.Inventories.Where(item =>
                     item.OwnerId == ownerId && item.ProductId == productId)
                 .OrderBy(item => item.Id, StringComparer.Ordinal).FirstOrDefault();
-            if (existing != null) return existing;
-            var inventory = new LuoyangInventoryBalanceState
+            if (existing != null &&
+                !string.IsNullOrEmpty(existing.FacilityId))
+                return existing;
+
+            var storage = runtime.Inventories
+                .Where(item => !string.IsNullOrEmpty(item.FacilityId))
+                .GroupBy(item => item.FacilityId)
+                .Select(group => new
+                {
+                    Facility = runtime.Facilities.Find(item =>
+                        item.FacilityId == group.Key),
+                    OwnerHasStock = group.Any(item =>
+                        item.OwnerId == ownerId),
+                    AvailableCapacityMilliunits = Math.Max(0,
+                        group.Max(item => item.CapacityMilliunits) -
+                        group.Sum(item => item.QuantityMilliunits))
+                })
+                .Where(item => item.Facility != null &&
+                    (item.Facility.OwnerId == ownerId || item.OwnerHasStock) &&
+                    item.AvailableCapacityMilliunits >=
+                        requiredCapacityMilliunits)
+                .OrderBy(item => item.Facility.OwnerId == ownerId ? 0 : 1)
+                .ThenByDescending(item =>
+                    item.AvailableCapacityMilliunits)
+                .ThenBy(item => item.Facility.FacilityId,
+                    StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (storage == null)
+                throw new InvalidOperationException(
+                    "Construction material owner has no physical storage " +
+                    "with sufficient capacity: " + ownerId + ".");
+
+            var inventory = existing ?? new LuoyangInventoryBalanceState
             {
                 Id = "inventory.construction." + ownerId + "." + productId,
                 OwnerKind = runtime.GovernmentEconomy.OrganizationId == ownerId
                     ? LuoyangInventoryOwnerKind.Government
                     : LuoyangInventoryOwnerKind.Household,
                 OwnerId = ownerId,
-                FacilityId = string.Empty,
-                ProductId = productId,
-                CapacityMilliunits = 1_000_000
+                ProductId = productId
             };
-            runtime.Inventories.Add(inventory);
+            inventory.FacilityId = storage.Facility.FacilityId;
+            inventory.CapacityMilliunits =
+                storage.AvailableCapacityMilliunits;
+            if (existing == null) runtime.Inventories.Add(inventory);
             return inventory;
         }
 

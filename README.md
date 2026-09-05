@@ -124,8 +124,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 - 推进世界时间并使用内存保存和读取；
 - 保存、返回主菜单、读取并继续同一人物。
 
-M26-P1 当前是独立试玩候选版：自动编译、核心流程和 Unity 启动测试已有证据；最终“成熟玩法完成”仍需由未阅读任务书与代码的试玩者完成一次 20—30 分钟盲玩。详细状态见
-`Docs/REPORT_M26_P1_IMPLEMENTATION_AND_ACCEPTANCE.md`。
+M26 商旅/商号 Product Readiness 自动化候选已经完成：当前冻结证据包含完整 Core 880/880、
+完整 Unity EditMode 1087/1087、目标 PlayMode 1/1 和三次一致重放。最终状态仍是
+`NOT ACCEPTED / BLOCKED`，因为尚无未参与开发、未阅读任务书和代码的独立玩家完成20—30分钟
+无提示盲玩；中山—涿县也仍使用正式区域 Route/Journey，而非全国统一 CellRoute。详细结论见
+`Docs/M26_MERCHANT_CARAVAN_BUSINESS_PRODUCT_READINESS_AND_BLIND_PLAY_V1_ACCEPTANCE_REPORT.md`，盲玩执行包见
+`Docs/Evidence/M26MerchantProductReadinessV1/blind-play/`。自动测试和开发者自测均不能替代该人工门禁。
 
 开发诊断请另行打开 `Assets/Scenes/SimulationDashboard.unity`。普通 `PlayableDemo` 默认隐藏
 开发观察台和内部医疗责任流水。

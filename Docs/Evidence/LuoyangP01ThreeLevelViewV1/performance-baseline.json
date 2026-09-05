@@ -1,0 +1,31 @@
+{
+    "UnityVersion": "2022.3.62f3c1",
+    "OperatingSystem": "Windows 11  (10.0.26200) 64bit",
+    "Processor": "AMD Ryzen 9 8940HX with Radeon Graphics ",
+    "ProcessorCount": 32,
+    "ScreenWidth": 640,
+    "ScreenHeight": 480,
+    "Views": [
+        {
+            "ViewMode": "WORLD",
+            "FramesPerSecond": 5.661167127298642,
+            "EnterMilliseconds": 10583.4022,
+            "ActiveGameObjectCount": 14,
+            "ManagedGcDeltaBytes": 0
+        },
+        {
+            "ViewMode": "CITY",
+            "FramesPerSecond": 112.76868758282194,
+            "EnterMilliseconds": 416.95390000000006,
+            "ActiveGameObjectCount": 572,
+            "ManagedGcDeltaBytes": 2899968
+        },
+        {
+            "ViewMode": "PERSON",
+            "FramesPerSecond": 95.74065612824757,
+            "EnterMilliseconds": 344.6261,
+            "ActiveGameObjectCount": 766,
+            "ManagedGcDeltaBytes": 7196672
+        }
+    ]
+}

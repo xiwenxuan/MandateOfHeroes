@@ -60,6 +60,10 @@ namespace Mandate.Domain
     {
         public string FacilityId;
         public string FacilityDefinitionId;
+        public string DisplayName;
+        public string CategoryId;
+        public string HistoricalConfidenceId;
+        public string SpatialPrecisionId;
         public string ModelId;
         public ulong CellId64;
         public int GridColumn;

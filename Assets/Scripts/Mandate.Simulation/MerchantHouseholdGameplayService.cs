@@ -6,11 +6,17 @@ namespace Mandate.Simulation
 {
     public sealed class KnownMarketOpportunityView
     {
+        public string ProductName;
         public string SourceName;
         public long LearnedDay;
+        public int AgeDays;
+        public string FreshnessLabel;
         public int ReliabilityBasisPoints;
+        public string ReliabilityLabel;
         public string OriginLocationId;
+        public string OriginLocationName;
         public string TargetLocationId;
+        public string TargetLocationName;
         public string CommodityId;
         public int ExpectedOriginUnitPrice;
         public int ExpectedTargetUnitPrice;
@@ -32,6 +38,7 @@ namespace Mandate.Simulation
         public TaskStatus Status;
         public long DeadlineDay;
         public KnownMarketOpportunityView MarketOpportunity;
+        public MerchantProductReadinessView ProductReadiness;
     }
 
     public sealed class MerchantHouseholdGameplayService
@@ -148,7 +155,10 @@ namespace Mandate.Simulation
                 Phase = task.Progress,
                 Status = task.Status,
                 DeadlineDay = task.DeadlineDay,
-                MarketOpportunity = BuildOpportunity(task, goal)
+                MarketOpportunity = BuildOpportunity(world, task, goal),
+                ProductReadiness =
+                    MerchantProductReadinessProjectionSystem.Build(
+                        world, personId, _content)
             };
             return view;
         }
@@ -407,12 +417,33 @@ namespace Mandate.Simulation
             TaskInstanceState task)
         {
             var goal = Goal();
-            var journey = _travel.StartJourney(
+            var commodity = FindCommodity(world, goal.CommodityId);
+            var container = world.InventoryContainers.Find(item =>
+                item.CarrierPersonId == person.Id &&
+                item.OwnerFamilyId == person.FamilyId &&
+                item.KindId == "inventory_container.merchant_caravan") ??
+                throw new InvalidOperationException(
+                    "Merchant caravan inventory container is missing.");
+            _simulator.DispatchMerchantOwnedFreight(
                 world,
-                new StableId(person.Id),
-                new StableId(goal.RouteId),
-                new StableId(goal.TargetLocationId),
-                TravelMode.Caravan);
+                new MerchantOwnedFreightDispatchRequest
+                {
+                    GoalId = goal.Id,
+                    CarrierPersonId = person.Id,
+                    TransportInventoryContainerId = container.Id,
+                    RouteId = goal.RouteId,
+                    CellRouteAssetRouteId = goal.CellRouteAssetRouteId,
+                    OriginCellId64 = goal.CellRouteOriginCellId64,
+                    TargetCellId64 = goal.CellRouteTargetCellId64,
+                    MovementCapabilityId =
+                        goal.CellRouteMovementCapabilityId,
+                    ProductDefinitionId = commodity.ProductDefinitionId,
+                    CommodityId = commodity.Id,
+                    Quantity = goal.CargoQuantity
+                });
+            var journey = FindJourney(world, person.Id) ?? throw new
+                InvalidOperationException(
+                    "Formal merchant freight did not create a Journey.");
             var companion = FindPerson(world, goal.CompanionPersonId, false);
             if (companion != null && companion.IsAlive &&
                 companion.LocationId == person.LocationId &&
@@ -428,7 +459,8 @@ namespace Mandate.Simulation
             var memory = RecordMemory(
                 world, person, "departed", LifeEventType.Migration,
                 "你沿已知的中山—涿县道路启程，路程" +
-                journey.RemainingKilometers + "公里。 ");
+                journey.RemainingKilometers +
+                "公里；随行货物已经登记为正式货运。 ");
             return Success(
                 PlayerActionIds.MerchantStartJourney,
                 memory,
@@ -461,7 +493,7 @@ namespace Mandate.Simulation
                     10_000) < travelEvent.HelpCargoLossChanceBasisPoints;
                 if (lost)
                 {
-                    _trading.LoseCargo(
+                    _simulator.RecordMerchantOwnedFreightCargoLoss(
                         world, person.Id, goal.CommodityId, 1);
                 }
                 key = "event_help";
@@ -515,10 +547,10 @@ namespace Mandate.Simulation
             var available = _trading.GetQuantity(
                 world, person.Id, goal.CommodityId);
             var quantity = Math.Min(goal.CargoQuantity, available);
-            var trade = _trading.Sell(
+            var trade = _simulator.SettleMerchantOwnedFreightCargoSale(
                 world,
-                new StableId(person.Id),
-                new StableId(goal.CommodityId),
+                person.Id,
+                goal.CommodityId,
                 quantity);
             if (!trade.Success)
             {
@@ -798,6 +830,20 @@ namespace Mandate.Simulation
             {
                 return "尚未备齐计划中的布帛。";
             }
+            if (!world.Routes.Exists(item => item.Id == goal.RouteId))
+            {
+                return "尚未掌握连接中山与涿县的可用道路。";
+            }
+            if (!_simulator.CanBuildStrategicCellRoute(
+                    world,
+                    goal.CellRouteAssetRouteId,
+                    goal.RouteId,
+                    goal.CellRouteOriginCellId64,
+                    goal.CellRouteTargetCellId64,
+                    goal.CellRouteMovementCapabilityId))
+            {
+                return "全国道路格数据尚未能生成这条正式商路。";
+            }
             var provisions = EstimatedTravelDays(goal) + 1;
             if (person.Provisions < provisions)
             {
@@ -815,13 +861,24 @@ namespace Mandate.Simulation
             {
                 return "需要先抵达涿县。";
             }
+            var freight = FindMerchantFreight(world, person.Id);
+            if (freight == null || freight.Status !=
+                    CivilianFreightStatus.AwaitingReceipt)
+            {
+                return "正式商旅货运单尚未进入到站交付状态。";
+            }
             if (_trading.GetQuantity(world, person.Id, goal.CommodityId) <= 0)
             {
                 return "已经没有可以交付的布帛；可继续经营筹措替代货物。";
             }
+            var quantity = _trading.GetQuantity(
+                world, person.Id, goal.CommodityId);
             var commission = world.AbsoluteDay <= FindTask(world, person.Id).DeadlineDay
                 ? goal.DeliveryCommission
                 : goal.LateCommission;
+            commission = checked((int)(
+                (long)commission * Math.Min(goal.CargoQuantity, quantity) /
+                goal.CargoQuantity));
             if (FindOrganization(world, goal.IssuerOrganizationId).Treasury <
                 commission)
             {
@@ -831,17 +888,30 @@ namespace Mandate.Simulation
         }
 
         private KnownMarketOpportunityView BuildOpportunity(
+            WorldState world,
             TaskInstanceState task,
             MerchantHouseholdGoalDefinition goal)
         {
+            var age = checked((int)Math.Max(
+                0L, world.AbsoluteDay - task.AcceptedDay));
             return new KnownMarketOpportunityView
             {
+                ProductName = FindCommodity(
+                    world, goal.CommodityId).DisplayName,
                 SourceName = goal.IntelligenceSourceName,
                 LearnedDay = task.AcceptedDay,
+                AgeDays = age,
+                FreshnessLabel = QuoteFreshness(age),
                 ReliabilityBasisPoints =
                     goal.IntelligenceReliabilityBasisPoints,
+                ReliabilityLabel = QuoteReliability(
+                    goal.IntelligenceReliabilityBasisPoints),
                 OriginLocationId = goal.OriginLocationId,
+                OriginLocationName = LocationName(
+                    world, goal.OriginLocationId),
                 TargetLocationId = goal.TargetLocationId,
+                TargetLocationName = LocationName(
+                    world, goal.TargetLocationId),
                 CommodityId = goal.CommodityId,
                 ExpectedOriginUnitPrice = goal.ExpectedOriginUnitPrice,
                 ExpectedTargetUnitPrice = goal.ExpectedTargetUnitPrice,
@@ -851,6 +921,28 @@ namespace Mandate.Simulation
                 EstimatedTravelDays = EstimatedTravelDays(goal),
                 EstimatedProvisionCost = EstimatedTravelDays(goal) + 1
             };
+        }
+
+        private static string QuoteFreshness(int ageDays)
+        {
+            if (ageDays <= 0) return "今日获得";
+            if (ageDays <= 2) return ageDays + "日前，仍较新";
+            if (ageDays <= 5) return ageDays + "日前，价格可能已变化";
+            return ageDays + "日前，消息较旧";
+        }
+
+        private static string QuoteReliability(int basisPoints)
+        {
+            if (basisPoints >= 8_000) return "较高";
+            if (basisPoints >= 6_000) return "中等";
+            return "较低";
+        }
+
+        private static string LocationName(WorldState world, string locationId)
+        {
+            var location = world.Locations.Find(item =>
+                item.Id == locationId);
+            return location == null ? "未知地点" : location.DisplayName;
         }
 
         private static int EstimatedTravelDays(
@@ -907,7 +999,7 @@ namespace Mandate.Simulation
             var definition = world.TaskDefinitions.Find(item =>
                 item.Id == followup.DefinitionId);
             return definition == null
-                ? "后续目标内容缺失：" + followup.DefinitionId
+                ? "新的家庭经营目标正在整理中。"
                 : definition.DisplayName;
         }
 
@@ -1025,7 +1117,7 @@ namespace Mandate.Simulation
                 WorldEventId = resultId,
                 Summary = summary,
                 PresentationCue = cue,
-                Detail = "权威结果已写入人物人生事件、任务阶段及相关世界账。"
+                Detail = "人物、货物、钱财、关系与目标进度已经结算。"
             };
         }
 
@@ -1035,7 +1127,7 @@ namespace Mandate.Simulation
                 Success = false,
                 ActionId = actionId,
                 Summary = summary ?? string.Empty,
-                Detail = "行动未提交，世界时间与资源均未变化。"
+                Detail = "行动没有提交；钱财、货物和时间均未变化，可以调整后继续。"
             };
 
         private static PlayerActionOption FindOption(
@@ -1063,6 +1155,15 @@ namespace Mandate.Simulation
             WorldState world,
             string personId) =>
             world.Journeys.Find(item => item.PersonId == personId);
+
+        private static CivilianFreightState FindMerchantFreight(
+            WorldState world,
+            string personId) =>
+            world.CivilianFreights.Find(item =>
+                item.CarrierPersonId == personId &&
+                item.PurposeId ==
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage &&
+                item.Status != CivilianFreightStatus.Completed);
 
         private static bool HasTraderPosition(
             WorldState world,

@@ -4,6 +4,15 @@
 > “当前最优先”不再有效。当前系统状态与后续建设顺序见
 > [`GAME_SYSTEMS_MASTER_AND_STATUS.md`](GAME_SYSTEMS_MASTER_AND_STATUS.md)。
 
+## 当前正式路由补充（2026-09-04）
+
+- 战争空间、野战、建筑攻坚与战斗结算设计已经归档至
+  [`WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md`](WARFARE_SPATIAL_ASSAULT_AND_COMBAT_ARCHITECTURE_DRAFT.md)。
+- 状态：`DESIGN_RECORDED_IMPLEMENTATION_DEFERRED`。
+- Deferred until county map/building/construction presentation foundation is accepted.
+- 当前实现主线继续为县域地图、Golden Block、建筑建模、50m PlanningCell 建设模式和县域
+  Facility Presentation；不得从本记录直接启动战争 Runtime 开发。
+
 ## P0：必须先完成
 
 - [x] 核心愿景与身份玩法

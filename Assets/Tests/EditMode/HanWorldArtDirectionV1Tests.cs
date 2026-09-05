@@ -8,12 +8,12 @@ namespace Mandate.Tests
     public sealed class HanWorldArtDirectionV1Tests
     {
         [Test]
-        public void ArtProfiles_DefineFourStablePresentationOnlyCandidates()
+        public void ArtProfiles_DefineSixStablePresentationOnlyCandidates()
         {
             var profiles = HanWorldArtProfileCatalog.All.ToArray();
-            Assert.That(profiles, Has.Length.EqualTo(4));
-            Assert.That(profiles.Select(value => value.ProfileId).Distinct().Count(), Is.EqualTo(4));
-            Assert.That(profiles.Select(value => value.Style).Distinct().Count(), Is.EqualTo(4));
+            Assert.That(profiles, Has.Length.EqualTo(6));
+            Assert.That(profiles.Select(value => value.ProfileId).Distinct().Count(), Is.EqualTo(6));
+            Assert.That(profiles.Select(value => value.Style).Distinct().Count(), Is.EqualTo(6));
             Assert.That(profiles.All(value => value.WorldVerticalExaggeration > 0f), Is.True);
             Assert.That(profiles.All(value => value.RegionVerticalExaggeration > 0f), Is.True);
             Assert.That(profiles.All(value => value.WorldFogEnd > value.WorldFogStart), Is.True);

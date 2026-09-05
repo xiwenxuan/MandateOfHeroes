@@ -4394,7 +4394,8 @@ namespace Mandate.Simulation
             ProductionContentRegistry productionContent = null,
             IPersonRepository personRepository = null,
             WorldCommandRuntime commandRuntime = null,
-            CellTraversalPlan cellTraversalPlan = null)
+            CellTraversalPlan cellTraversalPlan = null,
+            IStrategicCellRouteProvider strategicCellRouteProvider = null)
         {
             _random = new NamedRandom(masterSeed);
             _personRepository = personRepository;
@@ -4410,7 +4411,8 @@ namespace Mandate.Simulation
             _civilianFreightSystem = new CivilianFreightSystem(
                 masterSeed,
                 productionContent ?? ProductionContentRegistry.CreateCore(),
-                cellTraversalPlan);
+                cellTraversalPlan,
+                strategicCellRouteProvider);
             _villageLifeSystem = new VillageLifeSystem(
                 masterSeed, productionContent, personRepository);
             _formalHouseholdFoodMonthlyCommandScheduler =
@@ -4647,6 +4649,33 @@ namespace Mandate.Simulation
         public WorldSystemScheduler Scheduler => _scheduler;
 
         public WorldCommandRuntime CommandRuntime => _commandRuntime;
+
+        public bool CanBuildStrategicCellRoute(WorldState world,
+            string assetRouteId, string formalWorldRouteId,
+            ulong originCellId64, ulong targetCellId64,
+            string movementCapabilityId) =>
+            _civilianFreightSystem.CanBuildStrategicRoute(
+                world,
+                assetRouteId,
+                formalWorldRouteId,
+                originCellId64,
+                targetCellId64,
+                movementCapabilityId);
+
+        public CivilianFreightState DispatchMerchantOwnedFreight(
+            WorldState world, MerchantOwnedFreightDispatchRequest request) =>
+            _civilianFreightSystem.DispatchMerchantOwnedCargo(world, request);
+
+        public bool RecordMerchantOwnedFreightCargoLoss(WorldState world,
+            string carrierPersonId, string commodityId, long quantity) =>
+            _civilianFreightSystem.RecordMerchantOwnedCargoLoss(
+                world, carrierPersonId, commodityId, quantity);
+
+        public TradeResult SettleMerchantOwnedFreightCargoSale(
+            WorldState world, string carrierPersonId, string commodityId,
+            long quantity) =>
+            _civilianFreightSystem.SettleMerchantOwnedCargoSale(
+                world, carrierPersonId, commodityId, quantity);
 
         public void AdvanceDays(WorldState world, int days)
         {

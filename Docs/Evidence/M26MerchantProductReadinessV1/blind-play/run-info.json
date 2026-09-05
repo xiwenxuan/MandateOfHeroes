@@ -1,0 +1,16 @@
+{
+  "runId": "PENDING",
+  "date": "PENDING",
+  "buildOrCommit": "PENDING",
+  "unityVersion": "2022.3.62f3c1",
+  "scene": "Assets/Scenes/PlayableDemo.unity",
+  "screenResolution": "PENDING",
+  "input": "mouse-keyboard",
+  "startTime": "PENDING",
+  "endTime": "PENDING",
+  "durationMinutes": null,
+  "testerQualified": false,
+  "qualificationNotes": "PENDING",
+  "observer": "PENDING",
+  "result": "NOT_RUN"
+}

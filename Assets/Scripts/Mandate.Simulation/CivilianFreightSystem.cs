@@ -42,6 +42,21 @@ namespace Mandate.Simulation
         public long FreightFee;
     }
 
+    public sealed class MerchantOwnedFreightDispatchRequest
+    {
+        public string GoalId;
+        public string CarrierPersonId;
+        public string TransportInventoryContainerId;
+        public string RouteId;
+        public string CellRouteAssetRouteId;
+        public ulong OriginCellId64;
+        public ulong TargetCellId64;
+        public string MovementCapabilityId = MovementCapabilityIds.PackAnimal;
+        public string ProductDefinitionId;
+        public string CommodityId;
+        public long Quantity;
+    }
+
     public sealed class CivilianCarrierRegistrationRequest
     {
         public string CarrierPersonId;
@@ -66,11 +81,15 @@ namespace Mandate.Simulation
         private readonly NamedRandom _random;
         private readonly CellTraversalPlan _cellTraversalPlan;
         private readonly CellTraversalPlanner _cellTraversalPlanner;
+        private readonly IStrategicCellRouteProvider
+            _strategicCellRouteProvider;
+        private readonly TradingSystem _trading = new TradingSystem();
 
         public CivilianFreightSystem(
             ulong masterSeed,
             ProductionContentRegistry content,
-            CellTraversalPlan cellTraversalPlan = null)
+            CellTraversalPlan cellTraversalPlan = null,
+            IStrategicCellRouteProvider strategicCellRouteProvider = null)
         {
             _content = content ?? throw new ArgumentNullException(nameof(content));
             _foodInventory = new FoodInventorySystem(content);
@@ -80,6 +99,7 @@ namespace Mandate.Simulation
             _cellTraversalPlanner = cellTraversalPlan == null
                 ? null
                 : new CellTraversalPlanner(cellTraversalPlan);
+            _strategicCellRouteProvider = strategicCellRouteProvider;
         }
 
         public CivilianCarrierRegistrationState RegisterCarrier(
@@ -535,14 +555,16 @@ namespace Mandate.Simulation
                 seller.LocationId,
                 buyer.LocationId);
             var route = FindRoute(world, requestedRouteIds[0]);
-            var cellRoute = BuildRequestedCellRoute(
+            var cellRoutePlan = BuildRequestedCellRoute(
                 world,
                 seller.LocationId,
                 buyer.LocationId,
+                string.Empty,
+                route.Id,
                 request.OriginCellId64,
                 request.TargetCellId64,
                 request.MovementCapabilityId);
-            if (cellRoute != null && requestedRouteIds.Count != 1)
+            if (cellRoutePlan != null && requestedRouteIds.Count != 1)
                 throw new InvalidOperationException(
                     "Cell-routed civilian freight currently requires one continuous formal market route leg.");
             var demand = string.IsNullOrEmpty(request.DemandId)
@@ -634,6 +656,8 @@ namespace Mandate.Simulation
             var freight = new CivilianFreightState
             {
                 Id = freightId,
+                PurposeId =
+                    CivilianFreightPurposeIds.FormalMarketDelivery,
                 Status = CivilianFreightStatus.InTransit,
                 BuyOrderId = buy.Id,
                 SellOrderId = sell.Id,
@@ -680,9 +704,10 @@ namespace Mandate.Simulation
             };
             world.CivilianFreights.Add(freight);
             world.Journeys.Add(journey);
-            if (cellRoute != null)
-                BindCellRoute(world, freight, journey, carrier, cellRoute,
-                    false);
+            if (cellRoutePlan != null)
+                BindCellRoute(world, freight, journey, carrier,
+                    cellRoutePlan.Route, false, cellRoutePlan.VersionId,
+                    cellRoutePlan.AssetHash);
             if (demand != null)
             {
                 demand.Status = CivilianFreightDemandStatus.Dispatched;
@@ -706,6 +731,238 @@ namespace Mandate.Simulation
             world.Validate();
             _content.ValidateWorldReferences(world);
             return freight;
+        }
+
+        public bool CanBuildStrategicRoute(WorldState world,
+            string assetRouteId, string formalWorldRouteId,
+            ulong originCellId64, ulong targetCellId64,
+            string movementCapabilityId)
+        {
+            if (world == null || _strategicCellRouteProvider == null ||
+                !world.Routes.Any(item => item.Id == formalWorldRouteId))
+                return false;
+            return _strategicCellRouteProvider.TryBuildRoute(
+                assetRouteId,
+                formalWorldRouteId,
+                originCellId64,
+                targetCellId64,
+                movementCapabilityId,
+                out _,
+                out _);
+        }
+
+        public CivilianFreightState DispatchMerchantOwnedCargo(
+            WorldState world, MerchantOwnedFreightDispatchRequest request)
+        {
+            if (world == null || request == null)
+                throw new ArgumentNullException(
+                    world == null ? nameof(world) : nameof(request));
+            world.Validate();
+            _content.ValidateWorldReferences(world);
+            var carrier = ProductInventorySystem.FindPerson(
+                world, request.CarrierPersonId);
+            var family = ProductInventorySystem.FindFamily(
+                world, carrier.FamilyId);
+            var container = ProductInventorySystem.FindContainer(
+                world, request.TransportInventoryContainerId);
+            var route = FindRoute(world, request.RouteId);
+            var product = _content.GetProduct(request.ProductDefinitionId);
+            _content.TryGetFood(request.ProductDefinitionId, out var food);
+            var destinationLocationId = route.FromLocationId ==
+                carrier.LocationId
+                ? route.ToLocationId
+                : route.Bidirectional && route.ToLocationId ==
+                    carrier.LocationId
+                    ? route.FromLocationId
+                    : string.Empty;
+            var cellRoutePlan = BuildRequestedCellRoute(
+                world,
+                carrier.LocationId,
+                destinationLocationId,
+                request.CellRouteAssetRouteId,
+                route.Id,
+                request.OriginCellId64,
+                request.TargetCellId64,
+                request.MovementCapabilityId);
+            var sourceBatches = FindMerchantCargoBatches(
+                world, family.Id, container.Id, product.Id,
+                string.Empty);
+            var available = sourceBatches.Sum(item => item.Quantity);
+            if (string.IsNullOrWhiteSpace(request.GoalId) ||
+                string.IsNullOrEmpty(destinationLocationId) ||
+                request.Quantity <= 0 || request.Quantity > available ||
+                !carrier.IsAlive || HasJourney(world, carrier.Id) ||
+                HasActiveFreight(world, carrier.Id) ||
+                container.OwnerFamilyId != family.Id ||
+                !string.IsNullOrEmpty(container.OwnerOrganizationId) ||
+                container.CarrierPersonId != carrier.Id ||
+                container.LocationId != carrier.LocationId ||
+                cellRoutePlan == null)
+                throw new InvalidOperationException(
+                    "The merchant-owned civilian freight request is invalid.");
+
+            var unitCost = FindLastMerchantPurchaseUnitPrice(
+                world, carrier.Id, request.CommodityId);
+            var freightId = $"civilian_freight.{world.AbsoluteDay}." +
+                $"{world.CivilianFreights.Count:D6}";
+            var dispatch = ProductInventorySystem.NewTransaction(
+                world,
+                InventoryTransactionType.CivilianFreightDispatched,
+                carrier.Id,
+                string.Empty,
+                0,
+                0,
+                0,
+                "Merchant-owned cargo entered formal civilian freight.");
+            dispatch.SourceCivilianFreightId = freightId;
+            var createdBatches = ReSourceMerchantCargo(
+                world, sourceBatches, dispatch, request.Quantity,
+                carrier.LocationId);
+            var journey = new JourneyState
+            {
+                Id = $"journey.{freightId}.leg.0000",
+                PersonId = carrier.Id,
+                RouteId = route.Id,
+                OriginLocationId = carrier.LocationId,
+                DestinationLocationId = destinationLocationId,
+                Mode = TravelMode.Caravan,
+                RemainingKilometers = route.DistanceKilometers,
+                StartedDay = world.AbsoluteDay,
+                StartedSegment = world.Segment
+            };
+            var freight = new CivilianFreightState
+            {
+                Id = freightId,
+                PurposeId = CivilianFreightPurposeIds.MerchantOwnerCarriage,
+                Status = CivilianFreightStatus.InTransit,
+                BuyOrderId = string.Empty,
+                SellOrderId = string.Empty,
+                FormalMarketTradeId = string.Empty,
+                DemandId = string.Empty,
+                CarrierOfferId = string.Empty,
+                OriginCountyGovernanceId = string.Empty,
+                DestinationCountyGovernanceId = string.Empty,
+                OriginLocationId = carrier.LocationId,
+                DestinationLocationId = destinationLocationId,
+                BuyerFamilyId = family.Id,
+                BuyerOrganizationId = string.Empty,
+                SellerFamilyId = string.Empty,
+                BuyerStorageFacilityId = string.Empty,
+                DestinationInventoryContainerId = string.Empty,
+                SellerStorageFacilityId = string.Empty,
+                PublicReliefProcurementTradeId = string.Empty,
+                SourcePublicReliefEventId = string.Empty,
+                SourcePublicReliefCommandId = string.Empty,
+                PublicReliefRecoveryId = string.Empty,
+                CarrierPersonId = carrier.Id,
+                CarrierFamilyId = family.Id,
+                TransportInventoryContainerId = container.Id,
+                RouteId = route.Id,
+                JourneyId = journey.Id,
+                PlannedRouteIds = new List<string> { route.Id },
+                CurrentRouteIndex = 0,
+                DispatchInventoryTransactionId = dispatch.Id,
+                ProductDefinitionId = product.Id,
+                DispatchedQuantity = request.Quantity,
+                RemainingCargoQuantity = request.Quantity,
+                GoodsUnitPrice = unitCost,
+                GoodsMoneyTransferred = checked(request.Quantity * unitCost),
+                FreightFee = 0,
+                FreightFeeEscrow = 0,
+                FreightFeePaid = 0,
+                ProductPerishabilityBasisPoints =
+                    product.PerishabilityBasisPoints,
+                FoodSpoilageSensitivityBasisPoints =
+                    food == null ? 0 : food.SpoilageSensitivityBasisPoints,
+                CargoUnitWeight = product.BaseWeight,
+                CreatedDay = world.AbsoluteDay,
+                DispatchedDay = world.AbsoluteDay,
+                LastLossDay = world.AbsoluteDay
+            };
+            world.InventoryTransactions.Add(dispatch);
+            world.ProductBatches.AddRange(createdBatches);
+            world.CivilianFreights.Add(freight);
+            world.Journeys.Add(journey);
+            BindCellRoute(world, freight, journey, carrier,
+                cellRoutePlan.Route, false, cellRoutePlan.VersionId,
+                cellRoutePlan.AssetHash);
+            AddLedger(
+                world,
+                freight,
+                CivilianFreightLedgerType.Dispatched,
+                carrier.Id,
+                dispatch.Id,
+                request.Quantity,
+                freight.GoodsMoneyTransferred,
+                "Merchant-owned cargo dispatched with purchase cost basis.");
+            world.Validate();
+            _content.ValidateWorldReferences(world);
+            return freight;
+        }
+
+        public bool RecordMerchantOwnedCargoLoss(WorldState world,
+            string carrierPersonId, string commodityId, long quantity)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            var freight = FindActiveMerchantOwnedFreight(
+                world, carrierPersonId);
+            if (freight == null || quantity <= 0 ||
+                quantity > freight.RemainingCargoQuantity)
+                return false;
+            if (!_trading.LoseMerchantFreightCargo(
+                    world, freight, commodityId, checked((int)quantity),
+                    out var transaction))
+                return false;
+            freight.RemainingCargoQuantity -= quantity;
+            freight.NaturalLossQuantity += quantity;
+            freight.LastLossDay = world.AbsoluteDay;
+            AddLedger(
+                world,
+                freight,
+                CivilianFreightLedgerType.NaturalLoss,
+                carrierPersonId,
+                transaction.Id,
+                quantity,
+                0,
+                "Player travel event caused formal freight cargo loss.");
+            world.Validate();
+            return true;
+        }
+
+        public TradeResult SettleMerchantOwnedCargoSale(WorldState world,
+            string carrierPersonId, string commodityId, long quantity)
+        {
+            if (world == null) throw new ArgumentNullException(nameof(world));
+            var freight = FindActiveMerchantOwnedFreight(
+                world, carrierPersonId);
+            if (freight == null ||
+                freight.Status != CivilianFreightStatus.AwaitingReceipt ||
+                quantity <= 0 || quantity > freight.RemainingCargoQuantity)
+                return new TradeResult(
+                    false, 0, 0,
+                    "正式商旅尚未到达，或交付数量不合法。");
+            var result = _trading.SellMerchantFreightCargo(
+                world,
+                freight,
+                commodityId,
+                checked((int)quantity),
+                out var transaction);
+            if (!result.Success) return result;
+            freight.RemainingCargoQuantity -= quantity;
+            freight.DeliveredQuantity += quantity;
+            AddLedger(
+                world,
+                freight,
+                CivilianFreightLedgerType.Delivered,
+                carrierPersonId,
+                transaction.Id,
+                quantity,
+                0,
+                "Merchant-owned freight sold into the destination market.");
+            if (freight.RemainingCargoQuantity == 0)
+                Complete(world, freight);
+            world.Validate();
+            return result;
         }
 
         public bool TryPlanKnownRoute(
@@ -795,14 +1052,16 @@ namespace Mandate.Simulation
             var routePlan = BuildRoutePlan(
                 world, request.RouteIds, seller.LocationId,
                 destination.CountyLocationId);
-            var cellRoute = BuildRequestedCellRoute(
+            var cellRoutePlan = BuildRequestedCellRoute(
                 world,
                 seller.LocationId,
                 destination.CountyLocationId,
+                string.Empty,
+                request.RouteIds[0],
                 request.OriginCellId64,
                 request.TargetCellId64,
                 request.MovementCapabilityId);
-            if (cellRoute != null && request.RouteIds.Count != 1)
+            if (cellRoutePlan != null && request.RouteIds.Count != 1)
                 throw new InvalidOperationException(
                     "Cell-routed public relief freight currently requires one continuous formal market route leg.");
             var firstRoute = FindRoute(world, request.RouteIds[0]);
@@ -910,6 +1169,8 @@ namespace Mandate.Simulation
             var freight = new CivilianFreightState
             {
                 Id = freightId,
+                PurposeId =
+                    CivilianFreightPurposeIds.PublicReliefProcurement,
                 Status = CivilianFreightStatus.InTransit,
                 BuyOrderId = string.Empty,
                 SellOrderId = sell.Id,
@@ -958,9 +1219,10 @@ namespace Mandate.Simulation
             };
             world.CivilianFreights.Add(freight);
             world.Journeys.Add(journey);
-            if (cellRoute != null)
-                BindCellRoute(world, freight, journey, carrier, cellRoute,
-                    false);
+            if (cellRoutePlan != null)
+                BindCellRoute(world, freight, journey, carrier,
+                    cellRoutePlan.Route, false, cellRoutePlan.VersionId,
+                    cellRoutePlan.AssetHash);
             AddLedger(
                 world, freight, CivilianFreightLedgerType.Dispatched,
                 carrier.Id, dispatch.InventoryTransactionId,
@@ -1024,6 +1286,11 @@ namespace Mandate.Simulation
                     freight.ArrivedDay = world.AbsoluteDay;
                 }
                 if (freight.Status != CivilianFreightStatus.AwaitingReceipt)
+                {
+                    continue;
+                }
+                if (freight.PurposeId ==
+                    CivilianFreightPurposeIds.MerchantOwnerCarriage)
                 {
                     continue;
                 }
@@ -1374,6 +1641,127 @@ namespace Mandate.Simulation
             return false;
         }
 
+        private static bool HasActiveFreight(
+            WorldState world, string carrierPersonId) =>
+            FindActiveMerchantOwnedFreight(world, carrierPersonId) != null ||
+            world.CivilianFreights.Any(item =>
+                item.CarrierPersonId == carrierPersonId &&
+                item.Status != CivilianFreightStatus.Completed);
+
+        private static CivilianFreightState FindActiveMerchantOwnedFreight(
+            WorldState world, string carrierPersonId)
+        {
+            for (var i = 0; i < world.CivilianFreights.Count; i++)
+            {
+                var freight = world.CivilianFreights[i];
+                if (freight.PurposeId ==
+                        CivilianFreightPurposeIds.MerchantOwnerCarriage &&
+                    freight.CarrierPersonId == carrierPersonId &&
+                    freight.Status != CivilianFreightStatus.Completed)
+                    return freight;
+            }
+            return null;
+        }
+
+        private static List<ProductBatchState> FindMerchantCargoBatches(
+            WorldState world, string familyId, string containerId,
+            string productDefinitionId, string sourceTransactionId)
+        {
+            var result = new List<ProductBatchState>();
+            for (var i = 0; i < world.ProductBatches.Count; i++)
+            {
+                var batch = world.ProductBatches[i];
+                if (batch.OwnerFamilyId == familyId &&
+                    string.IsNullOrEmpty(batch.OwnerOrganizationId) &&
+                    batch.InventoryContainerId == containerId &&
+                    batch.ProductDefinitionId == productDefinitionId &&
+                    batch.Quantity > 0 &&
+                    (string.IsNullOrEmpty(sourceTransactionId) ||
+                     batch.SourceTransactionId == sourceTransactionId))
+                    result.Add(batch);
+            }
+            result.Sort((left, right) =>
+            {
+                var day = left.ProducedDay.CompareTo(right.ProducedDay);
+                return day != 0
+                    ? day
+                    : string.CompareOrdinal(left.Id, right.Id);
+            });
+            return result;
+        }
+
+        private static int FindLastMerchantPurchaseUnitPrice(
+            WorldState world, string personId, string commodityId)
+        {
+            for (var i = world.TradeRecords.Count - 1; i >= 0; i--)
+            {
+                var trade = world.TradeRecords[i];
+                if (trade.PersonId == personId &&
+                    trade.CommodityId == commodityId &&
+                    trade.IsPurchase && trade.UnitPrice > 0)
+                    return trade.UnitPrice;
+            }
+            throw new InvalidOperationException(
+                "Merchant freight lacks a formal purchase cost basis.");
+        }
+
+        private static List<ProductBatchState> ReSourceMerchantCargo(
+            WorldState world, IList<ProductBatchState> sources,
+            InventoryTransactionState transaction, long requestedQuantity,
+            string originLocationId)
+        {
+            var created = new List<ProductBatchState>();
+            var remaining = requestedQuantity;
+            for (var i = 0; i < sources.Count && remaining > 0; i++)
+            {
+                var source = sources[i];
+                var moved = Math.Min(source.Quantity, remaining);
+                source.Quantity -= moved;
+                transaction.Lines.Add(ProductInventorySystem.Line(
+                    source, -moved, 0));
+                var target = new ProductBatchState
+                {
+                    Id = $"product_batch.{world.AbsoluteDay}." +
+                        $"{world.ProductBatches.Count + created.Count:D6}",
+                    ProductDefinitionId = source.ProductDefinitionId,
+                    OwnerFamilyId = source.OwnerFamilyId,
+                    OwnerOrganizationId = string.Empty,
+                    StorageFacilityId = string.Empty,
+                    InventoryContainerId = source.InventoryContainerId,
+                    OriginLocationId = originLocationId,
+                    SourceWorkOrderId = string.Empty,
+                    SourceTransactionId = transaction.Id,
+                    CropVarietyDefinitionId =
+                        source.CropVarietyDefinitionId,
+                    UnitId = source.UnitId,
+                    UnitWeight = source.UnitWeight,
+                    ProducedDay = world.AbsoluteDay,
+                    Quantity = moved,
+                    ReservedQuantity = 0,
+                    QualityBasisPoints = source.QualityBasisPoints,
+                    FreshnessBasisPoints = source.FreshnessBasisPoints,
+                    SeedVigorBasisPoints = source.SeedVigorBasisPoints,
+                    SeedPurityBasisPoints = source.SeedPurityBasisPoints,
+                    NextFoodStorageAssessmentDay =
+                        source.NextFoodStorageAssessmentDay,
+                    QualityDimensions = source.QualityDimensions.Select(
+                        item => new ProductQualityDimensionState
+                        {
+                            QualityDimensionId = item.QualityDimensionId,
+                            ValueBasisPoints = item.ValueBasisPoints
+                        }).ToList()
+                };
+                transaction.Lines.Add(ProductInventorySystem.Line(
+                    target, moved, 0));
+                created.Add(target);
+                remaining -= moved;
+            }
+            if (remaining != 0)
+                throw new InvalidOperationException(
+                    "Merchant cargo changed during formal dispatch.");
+            return created;
+        }
+
         private static JourneyState FindJourney(
             WorldState world, string journeyId)
         {
@@ -1699,10 +2087,12 @@ namespace Mandate.Simulation
             return true;
         }
 
-        private CellRoute BuildRequestedCellRoute(
+        private StrategicCellRoutePlan BuildRequestedCellRoute(
             WorldState world,
             string originLocationId,
             string targetLocationId,
+            string assetRouteId,
+            string formalWorldRouteId,
             ulong requestedOriginCellId64,
             ulong requestedTargetCellId64,
             string movementCapabilityId)
@@ -1714,16 +2104,36 @@ namespace Mandate.Simulation
             if (targetCellId64 == 0)
                 TryParseCellLocation(targetLocationId, out targetCellId64);
             if (originCellId64 == 0 && targetCellId64 == 0) return null;
-            if (_cellTraversalPlanner == null || originCellId64 == 0 ||
-                targetCellId64 == 0)
+            if (originCellId64 == 0 || targetCellId64 == 0)
                 throw new InvalidOperationException(
-                    "Cell-routed freight requires one formal Cell traversal plan and two formal Cell IDs.");
+                    "Cell-routed freight requires two formal Cell IDs.");
             var capabilityId = string.IsNullOrWhiteSpace(movementCapabilityId)
                 ? MovementCapabilityIds.PackAnimal
                 : movementCapabilityId;
             if (!MovementCapabilityIds.All.Contains(capabilityId))
                 throw new InvalidOperationException(
                     "Civilian freight uses an unsupported movement capability.");
+            if (!string.IsNullOrWhiteSpace(assetRouteId))
+            {
+                if (_strategicCellRouteProvider == null)
+                    throw new InvalidOperationException(
+                        "Strategic CellRoute assets are unavailable.");
+                if (!_strategicCellRouteProvider.TryBuildRoute(
+                        assetRouteId,
+                        formalWorldRouteId,
+                        originCellId64,
+                        targetCellId64,
+                        capabilityId,
+                        out var strategicPlan,
+                        out var strategicFailureReasonId))
+                    throw new InvalidOperationException(
+                        "Strategic CellRoute planning failed: " +
+                        strategicFailureReasonId + ".");
+                return strategicPlan;
+            }
+            if (_cellTraversalPlanner == null)
+                throw new InvalidOperationException(
+                    "Cell-routed freight requires one formal Cell traversal plan.");
             if (!_cellTraversalPlanner.TryFindRoute(
                     originCellId64,
                     targetCellId64,
@@ -1735,7 +2145,12 @@ namespace Mandate.Simulation
                 throw new InvalidOperationException(
                     "Civilian freight CellRoute planning failed: " +
                     failureReasonId + ".");
-            return route;
+            return new StrategicCellRoutePlan(
+                _cellTraversalPlan.VersionId,
+                _cellTraversalPlan.AssetHash,
+                _cellTraversalPlan.VersionId,
+                formalWorldRouteId,
+                route);
         }
 
         private void BindCellRoute(WorldState world,
@@ -1743,7 +2158,9 @@ namespace Mandate.Simulation
             JourneyState journey,
             PersonState carrier,
             CellRoute route,
-            bool reroute)
+            bool reroute,
+            string planVersionId = null,
+            string assetHash = null)
         {
             if (route == null || route.Segments.Count == 0)
                 throw new InvalidOperationException(
@@ -1771,8 +2188,14 @@ namespace Mandate.Simulation
                     remaining + segment.WeightedDistanceCentimetres);
             }
             freight.UsesCellRoute = true;
-            freight.CellRoutePlanVersionId = _cellTraversalPlan.VersionId;
-            freight.CellRouteAssetHash = _cellTraversalPlan.AssetHash;
+            freight.CellRoutePlanVersionId = planVersionId ??
+                _cellTraversalPlan?.VersionId ?? throw new
+                    InvalidOperationException(
+                        "CellRoute plan version metadata is unavailable.");
+            freight.CellRouteAssetHash = assetHash ??
+                _cellTraversalPlan?.AssetHash ?? throw new
+                    InvalidOperationException(
+                        "CellRoute asset hash metadata is unavailable.");
             freight.CellRouteMovementCapabilityId =
                 route.MovementCapabilityId;
             if (!reroute)

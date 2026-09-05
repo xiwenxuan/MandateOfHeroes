@@ -38,7 +38,8 @@ namespace Mandate.Presentation
             HanBuildableFacilityModelFactory factory,
             Func<LuoyangBuildingPerformanceFacility, Vector3> positionResolver,
             Func<LuoyangBuildingPerformanceFacility, float> rotationResolver,
-            Func<LuoyangBuildingPerformanceFacility, Vector3> scaleResolver = null)
+            Func<LuoyangBuildingPerformanceFacility, Vector3> scaleResolver = null,
+            bool enforceFrozenResidentBudget = true)
         {
             if (_disposed) throw new ObjectDisposedException(GetType().Name);
             if (_ownedMeshes.Count != 0)
@@ -144,11 +145,37 @@ namespace Mandate.Presentation
                     .GetComponentsInChildren<MeshRenderer>()
                     .All(item => item.allowOcclusionWhenDynamic)
             };
-            metrics.WithinBudget = MeetsBudget(metrics, plan.Budget);
+            metrics.WithinBudget = enforceFrozenResidentBudget
+                ? MeetsBudget(metrics, plan.Budget)
+                : MeetsWholeCityBaseline(metrics, plan.Budget);
             if (!metrics.WithinBudget)
                 throw new InvalidOperationException(
-                    "Luoyang building batching exceeds the frozen performance budget.");
+                    enforceFrozenResidentBudget
+                        ? "Luoyang building batching exceeds the frozen performance budget."
+                        : "Luoyang whole-city batching is incomplete.");
             return metrics;
+        }
+
+        public LuoyangBuildingBatchMetrics BuildWholeCity(Transform parent,
+            LuoyangBuildingPerformancePlan plan,
+            HanBuildableFacilityModelFactory factory,
+            Func<LuoyangBuildingPerformanceFacility, Vector3> positionResolver,
+            Func<LuoyangBuildingPerformanceFacility, float> rotationResolver,
+            Func<LuoyangBuildingPerformanceFacility, Vector3> scaleResolver =
+                null)
+        {
+            if (plan == null) throw new ArgumentNullException(nameof(plan));
+            var window = new LuoyangBuildingResidentWindow(
+                LuoyangBuildingPerformanceBudgetIds.MinGridRow,
+                LuoyangBuildingPerformanceBudgetIds.MinGridColumn,
+                Math.Max(
+                    LuoyangBuildingPerformanceBudgetIds.MaxGridRow -
+                    LuoyangBuildingPerformanceBudgetIds.MinGridRow + 1,
+                    LuoyangBuildingPerformanceBudgetIds.MaxGridColumn -
+                    LuoyangBuildingPerformanceBudgetIds.MinGridColumn + 1),
+                plan.Facilities, plan.SpatialBatches);
+            return Build(parent, plan, window, factory, positionResolver,
+                rotationResolver, scaleResolver, false);
         }
 
         public void Dispose()
@@ -182,6 +209,25 @@ namespace Mandate.Presentation
                    budget.MaxBatchBuildMilliseconds &&
                    metrics.RendererReductionRatio + 0.000001d >=
                    budget.MinRendererReductionRatio &&
+                   metrics.AllowsSpatialOcclusion;
+        }
+
+        public static bool MeetsWholeCityBaseline(
+            LuoyangBuildingBatchMetrics metrics,
+            LuoyangBuildingPerformanceBudgetCatalog budget)
+        {
+            if (metrics == null || budget == null) return false;
+            return metrics.FullCityFacilityCount == budget.FacilityCount &&
+                   metrics.ResidentFacilityCount == budget.FacilityCount &&
+                   metrics.FullCitySpatialBatchCount ==
+                   budget.FullCitySpatialBatchCount &&
+                   metrics.ResidentSpatialBatchCount ==
+                   budget.FullCitySpatialBatchCount &&
+                   metrics.SourceModuleRendererCount >
+                   metrics.BuildingRendererBatchCount &&
+                   metrics.CombinedMeshCount ==
+                   metrics.BuildingRendererBatchCount &&
+                   metrics.RendererReductionRatio > 0d &&
                    metrics.AllowsSpatialOcclusion;
         }
 
